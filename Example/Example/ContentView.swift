@@ -10,6 +10,7 @@ import WalletConnectSwift
 import XMTPProto
 
 struct WalletActionsView: View {
+	var connection: WalletConnection
 	var wallet: WalletConnectSwift.Client
 	@State private var client: Client?
 
@@ -30,6 +31,10 @@ struct WalletActionsView: View {
 				} catch {
 					print("Error creating client: \(error.localizedDescription)")
 				}
+			}
+
+			if let url = connection.deepLinkURL {
+				UIApplication.shared.open(url, options: [:], completionHandler: nil)
 			}
 		}
 		.buttonStyle(.borderedProminent)
@@ -52,7 +57,7 @@ struct ContentView: View {
 	var body: some View {
 		VStack {
 			if let client = walletConnection.client {
-				WalletActionsView(wallet: client)
+				WalletActionsView(connection: walletConnection, wallet: client)
 			} else {
 				Button("Connect") {
 					DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
