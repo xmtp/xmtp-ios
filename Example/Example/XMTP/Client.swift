@@ -5,9 +5,11 @@
 //  Created by Pat Nakajima on 11/11/22.
 //
 
+import CryptoSwift
 import Foundation
 import WalletConnectSwift
-import CryptoSwift
+import web3
+import XMTPProto
 
 struct ContentTypeID {
 	var authorityID: String
@@ -24,9 +26,7 @@ struct EncodedContent {
 	var content: [UInt8]
 }
 
-struct CodecRegistry {
-
-}
+struct CodecRegistry {}
 
 protocol ContentCodec<T> {
 	associatedtype T
@@ -41,22 +41,7 @@ enum CodecError: Error {
 	case decodingError(String)
 }
 
-struct Conversations {
-
-}
-
-protocol UnsignedPublicKey {
-	var createdNs: Int { get }
-	var secp256k1UncompressedBytes: [UInt8] { get }
-}
-
-struct SignedPublicKey: UnsignedPublicKey {
-	var createdNs: Int
-	var secp256k1UncompressedBytes: [UInt8]
-
-	var keyBytes: [UInt8]
-	var signature: Signature
-}
+struct Conversations {}
 
 struct NetworkOptions {
 	var env: Environment = .dev
@@ -109,11 +94,18 @@ class MemoryKeyStore: KeyStore {
 	}
 
 	func storePrivateKeyBundle(bundle: PrivateKeyBundleV1) async {
-		self.privateKeyBundle = bundle
+		privateKeyBundle = bundle
 	}
 }
 
+enum KeyBundle {
+	case publicKeyBundle(Xmtp_MessageContents_PublicKeyBundle)
+	case signedPublicKeyBundle(Xmtp_MessageContents_SignedPublicKeyBundle)
+}
+
 struct Client {
+	var account: web3.EthereumAccount
+
 	var address: String
 	var keys: PrivateKeyBundleV2
 	var legacyKeys: PrivateKeyBundleV1
@@ -125,13 +117,17 @@ struct Client {
 	public private(set) var maxContentSize: Int
 
 	init(keys: PrivateKeyBundleV1, apiClient: ApiClient) {
-		self.legacyKeys = keys
+		legacyKeys = keys
 		self.keys = PrivateKeyBundleV2.fromLegacyBundle(keys)
 
-		self.address = keys.identityKey.publicKey.walletSignatureAddress()
-		self.conversations = Conversations()
-		self.maxContentSize = Constants.maxContentSize
+		let account = try! web3.EthereumAccount.importAccount(keyStorage: EthereumKeyLocalStorage(), privateKey: String(bytes: keys.identityKey.secp256k1Bytes), keystorePassword: "password")
+
+		address = account.address.value
+		conversations = Conversations()
+		maxContentSize = Constants.maxContentSize
 		self.apiClient = apiClient
+
+		self.account = account
 	}
 
 	static func create(wallet: WalletConnectSwift.Client?, options: ClientOptions? = nil) async throws -> Client {
@@ -147,9 +143,8 @@ struct Client {
 		return Client(keys: legacyKeys!, apiClient: apiClient)
 	}
 
-	private static func loadOrCreateKeysFromOptions(options: ClientOptions, wallet: WalletConnectSwift.Client?, apiClient: ApiClient) async throws -> PrivateKeyBundleV1? {
-
-		if wallet == nil && options.keystore.privateKeyOverride == nil {
+	private static func loadOrCreateKeysFromOptions(options: ClientOptions, wallet: WalletConnectSwift.Client?, apiClient _: ApiClient) async throws -> PrivateKeyBundleV1? {
+		if wallet == nil, options.keystore.privateKeyOverride == nil {
 			throw ClientError.noKeyOrWalletFound
 		}
 
@@ -171,5 +166,59 @@ struct Client {
 		let keys = try await PrivateKeyBundleV1.generate(wallet: wallet)
 		await store.storePrivateKeyBundle(bundle: keys)
 		return keys
+	}
+
+	func canMessage(peerAddress: String) async -> Bool {
+		guard let res = await getUserContactFromNetwork(apiClient: apiClient, peerAddress: peerAddress) else {
+			return false
+		}
+
+		print("GOT A RES \(res)")
+
+		var contactBundle: Xmtp_MessageContents_ContactBundle?
+
+		for envelope in res.envelopes {
+			guard let data = Data(base64Encoded: envelope.message) else {
+				continue
+			}
+
+			do {
+				contactBundle = try Xmtp_MessageContents_ContactBundle(serializedData: data)
+			} catch {
+				if let publicKeyBundle = try? Xmtp_MessageContents_PublicKeyBundle(serializedData: data) {
+					contactBundle = Xmtp_MessageContents_ContactBundle()
+					contactBundle?.v1.keyBundle = publicKeyBundle
+				}
+			}
+
+			guard let contactBundle else {
+				continue
+			}
+
+			if contactBundle.v1.hasKeyBundle {
+				return true
+			}
+
+			if contactBundle.v2.hasKeyBundle {
+				return true
+			}
+		}
+
+		print("NO GOOD ENVELOPES")
+
+		return false
+	}
+
+	func getUserContactFromNetwork(apiClient: ApiClient, peerAddress: String) async -> Xmtp_MessageApi_V1_QueryResponse? {
+		let name = "contact-\(peerAddress)"
+		let topic = "/xmtp/0/\(name)/proto"
+
+		var params = QueryParams(contentTopics: [topic])
+
+		do {
+			return try await apiClient.queryIteratePages(params: params)
+		} catch {
+			return nil
+		}
 	}
 }

@@ -8,6 +8,6 @@
 import Foundation
 
 enum Environment: String {
-	case dev = "https://dev.xmtp.network",
-			 production = "https://production.xmtp.network"
+	case dev = "dev.xmtp.network",
+	     production = "production.xmtp.network"
 }

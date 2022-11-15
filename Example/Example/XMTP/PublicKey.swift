@@ -7,11 +7,14 @@
 
 import Foundation
 import secp256k1
-import XMTPProto
 import WalletConnectSwift
+import web3
+import XMTPProto
 
 enum PublicKeyError: Error {
 	case unsigned
+	case notSignedByWallet
+	case invalidKeySignature
 }
 
 // LEGACY: PublicKey optionally signed with another trusted key pair or a wallet.
@@ -20,16 +23,6 @@ struct PublicKey: UnsignedPublicKey {
 	var createdNs: Int
 	var secp256k1UncompressedBytes: [UInt8]
 	var signature: Signature?
-
-	func bytesToSign() throws -> [UInt8] {
-		var protoPublicKey = Xmtp_MessageContents_PublicKey()
-		var uncompressed = Xmtp_MessageContents_PublicKey.Secp256k1Uncompressed()
-		uncompressed.bytes = Data(secp256k1UncompressedBytes)
-
-		protoPublicKey.timestamp = UInt64(createdNs)
-		protoPublicKey.secp256K1Uncompressed = uncompressed
-		return try protoPublicKey.serializedData().bytes
-	}
 
 	mutating func signWithWallet(wallet: WalletConnectSwift.Client) async throws {
 		let sigString = try await WalletSigner.sign(wallet: wallet, message: WalletSigner.identitySigRequestText(keyBytes: secp256k1UncompressedBytes))
@@ -43,11 +36,42 @@ struct PublicKey: UnsignedPublicKey {
 
 		let sig = try secp256k1.Recovery.ECDSASignature(compactRepresentation: sigBytes, recoveryId: Int32(sigParts.recoveryParam))
 
-		self.signature = Signature(walletEcdsaCompact: sig)
+		signature = Signature(walletEcdsaCompact: sig)
 	}
 
-	func walletSignatureAddress() -> String {
-		// FIXME: todo
-		""
+	func walletSignatureAddress() throws -> String {
+		if signature?.walletEcdsaCompact == nil {
+			throw PublicKeyError.notSignedByWallet
+		}
+
+		guard let pk = signerKey() else {
+			throw PublicKeyError.invalidKeySignature
+		}
+
+		return pk.getEthereumAddress()
+	}
+
+	func signerKey() -> UnsignedPublicKey? {
+		guard let signature, let sigBytes = signature.walletEcdsaCompact?.bytes else {
+			return nil
+		}
+
+		let message = WalletSigner.identitySigRequestText(keyBytes: sigBytes)
+
+		let prefix = "\u{19}Ethereum Signed Message:\n\(message.count)"
+		guard var data = prefix.data(using: .ascii) else {
+			print("ERROR GETTING PREFIX DATAA")
+			return nil
+		}
+
+		data.append(message.data(using: .utf8)!)
+
+		let digest = data.web3.keccak256
+
+		if let walletEcdsaCompact = signature.walletEcdsaCompact {
+			return Signature.ecdsaSignerKey(digest: digest.bytes, signature: walletEcdsaCompact)
+		}
+
+		return nil
 	}
 }

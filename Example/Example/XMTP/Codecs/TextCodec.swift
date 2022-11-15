@@ -14,15 +14,15 @@ struct TextCodec: ContentCodec {
 
 	let contentType = ContentTypeText
 
-	func encode(content: String, registry: CodecRegistry) throws -> EncodedContent {
+	func encode(content: String, registry _: CodecRegistry) throws -> EncodedContent {
 		EncodedContent(
 			type: ContentTypeText,
-			parameters: [ "encoding": String.Encoding.utf8.description ], // Don't love this
+			parameters: ["encoding": String.Encoding.utf8.description], // Don't love this
 			content: content.utf8.map { $0 }
 		)
 	}
 
-	func decode(content: EncodedContent, registry: CodecRegistry) throws -> String {
+	func decode(content: EncodedContent, registry _: CodecRegistry) throws -> String {
 		let encoding = content.parameters["encoding"]
 
 		guard let encoding, encoding == String.Encoding.utf8.description else {

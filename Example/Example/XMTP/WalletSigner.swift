@@ -5,17 +5,17 @@
 //  Created by Pat Nakajima on 11/11/22.
 //
 
+import CryptoSwift
 import Foundation
 import WalletConnectSwift
-import CryptoSwift
 
 struct WalletSigner {
 	static func identitySigRequestText(keyBytes: [UInt8]) -> String {
 		return (
 			"XMTP : Create Identity\n" +
-			keyBytes.toHexString() +
-			"\n" +
-			"For more info: https://xmtp.org/signatures/"
+				keyBytes.toHexString() +
+				"\n" +
+				"For more info: https://xmtp.org/signatures/"
 		)
 	}
 
@@ -63,7 +63,7 @@ struct WalletSigner {
 	}
 
 	static func signatureParts(from: String) throws -> SignatureParts {
-		let bytes = Array<UInt8>(hex: from)
+		let bytes = [UInt8](hex: from)
 
 		if bytes.count != 65 {
 			print("invalid signature string; must be 65 bytes, was \(bytes.count)")
@@ -71,14 +71,14 @@ struct WalletSigner {
 		}
 
 		var result = SignatureParts()
-		result.r = [UInt8](bytes[0...32]).toHexString()
-		result.s = [UInt8](bytes[33...64]).toHexString()
+		result.r = [UInt8](bytes[0 ... 32]).toHexString()
+		result.s = [UInt8](bytes[33 ... 64]).toHexString()
 		result.v = bytes[64]
 
 		if result.v < 27 {
 			if result.v == 0 || result.v == 1 {
 				result.v += 27
-			}	else {
+			} else {
 				print("invalid signature v byte: \(result)")
 				throw WalletSignerError.invalidSignature("invalid signature v byte: \(result.v.description)")
 			}

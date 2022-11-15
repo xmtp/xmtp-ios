@@ -26,6 +26,10 @@
 		A63280AB291F003900FC4337 /* WalletSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A63280AA291F003900FC4337 /* WalletSigner.swift */; };
 		A63280AD291F006000FC4337 /* Signature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A63280AC291F006000FC4337 /* Signature.swift */; };
 		A63280AF291F00BD00FC4337 /* PublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A63280AE291F00BD00FC4337 /* PublicKey.swift */; };
+		A6C4EC2D2922C2EC0044996F /* SignedPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C4EC2C2922C2EC0044996F /* SignedPublicKey.swift */; };
+		A6C4EC2F2922C7180044996F /* UnsignedPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C4EC2E2922C7180044996F /* UnsignedPublicKey.swift */; };
+		A6C4EC322922C92E0044996F /* web3.swift in Frameworks */ = {isa = PBXBuildFile; productRef = A6C4EC312922C92E0044996F /* web3.swift */; };
+		A6C4EC35292303190044996F /* GRPC in Frameworks */ = {isa = PBXBuildFile; productRef = A6C4EC34292303190044996F /* GRPC */; };
 		A6C62859291F0753005BD0B7 /* exampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C62858291F0752005BD0B7 /* exampleApp.swift */; };
 /* End PBXBuildFile section */
 
@@ -48,6 +52,8 @@
 		A63280AA291F003900FC4337 /* WalletSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletSigner.swift; sourceTree = "<group>"; };
 		A63280AC291F006000FC4337 /* Signature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signature.swift; sourceTree = "<group>"; };
 		A63280AE291F00BD00FC4337 /* PublicKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKey.swift; sourceTree = "<group>"; };
+		A6C4EC2C2922C2EC0044996F /* SignedPublicKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignedPublicKey.swift; sourceTree = "<group>"; };
+		A6C4EC2E2922C7180044996F /* UnsignedPublicKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsignedPublicKey.swift; sourceTree = "<group>"; };
 		A6C62858291F0752005BD0B7 /* exampleApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = exampleApp.swift; path = Example/exampleApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -57,7 +63,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A6328092291DCED100FC4337 /* XMTPProto in Frameworks */,
+				A6C4EC35292303190044996F /* GRPC in Frameworks */,
 				A63280A3291ECD5C00FC4337 /* secp256k1 in Frameworks */,
+				A6C4EC322922C92E0044996F /* web3.swift in Frameworks */,
 				A632808C291DBF3C00FC4337 /* WalletConnectSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -118,6 +126,8 @@
 				A63280AA291F003900FC4337 /* WalletSigner.swift */,
 				A63280AC291F006000FC4337 /* Signature.swift */,
 				A63280AE291F00BD00FC4337 /* PublicKey.swift */,
+				A6C4EC2C2922C2EC0044996F /* SignedPublicKey.swift */,
+				A6C4EC2E2922C7180044996F /* UnsignedPublicKey.swift */,
 			);
 			path = XMTP;
 			sourceTree = "<group>";
@@ -150,6 +160,8 @@
 				A632808B291DBF3C00FC4337 /* WalletConnectSwift */,
 				A6328091291DCED100FC4337 /* XMTPProto */,
 				A63280A2291ECD5C00FC4337 /* secp256k1 */,
+				A6C4EC312922C92E0044996F /* web3.swift */,
+				A6C4EC34292303190044996F /* GRPC */,
 			);
 			productName = web3pat;
 			productReference = A6328079291DBF1D00FC4337 /* Example.app */;
@@ -183,6 +195,8 @@
 				A632808A291DBF3C00FC4337 /* XCRemoteSwiftPackageReference "WalletConnectSwift" */,
 				A6328090291DCED100FC4337 /* XCRemoteSwiftPackageReference "proto" */,
 				A63280A1291ECD5C00FC4337 /* XCRemoteSwiftPackageReference "secp256k1" */,
+				A6C4EC302922C92E0044996F /* XCRemoteSwiftPackageReference "web3" */,
+				A6C4EC33292303190044996F /* XCRemoteSwiftPackageReference "grpc-swift" */,
 			);
 			productRefGroup = A632807A291DBF1D00FC4337 /* Products */;
 			projectDirPath = "";
@@ -212,10 +226,12 @@
 			files = (
 				A632807F291DBF1D00FC4337 /* ContentView.swift in Sources */,
 				A63280AD291F006000FC4337 /* Signature.swift in Sources */,
+				A6C4EC2D2922C2EC0044996F /* SignedPublicKey.swift in Sources */,
 				A6328094291DCF2400FC4337 /* WalletConnection.swift in Sources */,
 				A63280A9291F001400FC4337 /* PrivateKeyBundle.swift in Sources */,
 				A63280A0291EC25200FC4337 /* TextCodec.swift in Sources */,
 				A6328099291EB9AA00FC4337 /* Environment.swift in Sources */,
+				A6C4EC2F2922C7180044996F /* UnsignedPublicKey.swift in Sources */,
 				A63280A5291EF88400FC4337 /* Authenticator.swift in Sources */,
 				A63280AB291F003900FC4337 /* WalletSigner.swift in Sources */,
 				A632809B291EBB3100FC4337 /* Constants.swift in Sources */,
@@ -455,6 +471,22 @@
 				minimumVersion = 0.9.2;
 			};
 		};
+		A6C4EC302922C92E0044996F /* XCRemoteSwiftPackageReference "web3" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/argentlabs/web3.swift/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		A6C4EC33292303190044996F /* XCRemoteSwiftPackageReference "grpc-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/grpc/grpc-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -472,6 +504,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A63280A1291ECD5C00FC4337 /* XCRemoteSwiftPackageReference "secp256k1" */;
 			productName = secp256k1;
+		};
+		A6C4EC312922C92E0044996F /* web3.swift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A6C4EC302922C92E0044996F /* XCRemoteSwiftPackageReference "web3" */;
+			productName = web3.swift;
+		};
+		A6C4EC34292303190044996F /* GRPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A6C4EC33292303190044996F /* XCRemoteSwiftPackageReference "grpc-swift" */;
+			productName = GRPC;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

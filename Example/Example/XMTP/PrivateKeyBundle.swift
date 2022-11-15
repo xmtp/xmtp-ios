@@ -8,9 +8,7 @@
 import Foundation
 import WalletConnectSwift
 
-protocol PrivateKeyBundle {
-
-}
+protocol PrivateKeyBundle {}
 
 struct PrivateKeyBundleV1: PrivateKeyBundle {
 	var identityKey: PrivateKey
@@ -31,12 +29,12 @@ struct PrivateKeyBundleV1: PrivateKeyBundle {
 	mutating func addPreKey() async throws {
 		var preyKey = PrivateKey.generate()
 		try await identityKey.signKey(publicKey: &preyKey.publicKey)
-		self.preKeys.insert(preyKey, at: 0)
+		preKeys.insert(preyKey, at: 0)
 	}
 }
 
 struct PrivateKeyBundleV2: PrivateKeyBundle {
-	static func fromLegacyBundle(_ keys: PrivateKeyBundleV1) -> PrivateKeyBundleV2 {
+	static func fromLegacyBundle(_: PrivateKeyBundleV1) -> PrivateKeyBundleV2 {
 		return PrivateKeyBundleV2()
 	}
 }
