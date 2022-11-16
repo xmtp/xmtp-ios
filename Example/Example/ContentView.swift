@@ -5,69 +5,6 @@
 //  Created by Pat Nakajima on 11/10/22.
 //
 
-public extension Task {
-	/// Asynchronously runs the given `operation` in its own task after the specified number of `seconds`.
-	///
-	/// The operation will be executed after specified number of `seconds` passes. You can cancel the task earlier
-	/// for the operation to be skipped.
-	///
-	/// - Parameters:
-	///   - time: Delay time in seconds.
-	///   - operation: The operation to execute.
-	/// - Returns: Handle to the task which can be cancelled.
-	@discardableResult
-	static func delayed(
-		seconds: TimeInterval,
-		operation: @escaping @Sendable () async -> Void
-	) -> Self where Success == Void, Failure == Never {
-		Self {
-			do {
-				try await Task<Never, Never>.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-				await operation()
-			} catch {}
-		}
-	}
-}
-
-public extension View {
-	/// Adds a modifier for this view that fires an action only when a time interval in seconds represented by
-	/// `debounceTime` elapses between value changes.
-	///
-	/// Each time the value changes before `debounceTime` passes, the previous action will be cancelled and the next
-	/// action /// will be scheduled to run after that time passes again. This mean that the action will only execute
-	/// after changes to the value /// stay unmodified for the specified `debounceTime` in seconds.
-	///
-	/// - Parameters:
-	///   - value: The value to check against when determining whether to run the closure.
-	///   - debounceTime: The time in seconds to wait after each value change before running `action` closure.
-	///   - action: A closure to run when the value changes.
-	/// - Returns: A view that fires an action after debounced time when the specified value changes.
-	func onChange<Value>(
-		of value: Value,
-		debounceTime: TimeInterval,
-		perform action: @escaping (_ newValue: Value) -> Void
-	) -> some View where Value: Equatable {
-		modifier(DebouncedChangeViewModifier(trigger: value, debounceTime: debounceTime, action: action))
-	}
-}
-
-private struct DebouncedChangeViewModifier<Value>: ViewModifier where Value: Equatable {
-	let trigger: Value
-	let debounceTime: TimeInterval
-	let action: (Value) -> Void
-
-	@State private var debouncedTask: Task<Void, Never>?
-
-	func body(content: Content) -> some View {
-		content.onChange(of: trigger) { value in
-			debouncedTask?.cancel()
-			debouncedTask = Task.delayed(seconds: debounceTime) { @MainActor in
-				action(value)
-			}
-		}
-	}
-}
-
 import Combine
 import CoreImage.CIFilterBuiltins
 import SwiftUI
@@ -76,89 +13,122 @@ import WalletConnectSwift
 import web3
 import XMTPProto
 
+enum CanMessageStatus {
+	case unknown, loading, yes, no
+}
+
 struct CanMessageView: View {
 	var client: Client
-	@State private var address: String = "0x1F935A71f5539fa0eEaa71136Aef39Ab7c64520f"
-	@State private var canMessage: Bool?
+	@State private var address: String = "0x66942eC8b0A6d0cff51AEA9C7fd00494556E705F"
+	@State private var status: CanMessageStatus = .unknown
 	@State private var ensName = ""
 
 	var body: some View {
 		Form {
 			Section("ENS") {
-				TextField("ENS", text: $ensName)
-					.autocapitalization(.none)
-					.onChange(of: ensName, debounceTime: 0.4) { _ in
-						print("Checking ens name")
-						Task {
-							let ethClient = EthereumHttpClient(url: URL(string: "https://mainnet.infura.io/v3/ca05f64fb99645fc926bc1576ac126dc")!)
-							let ethNameService = EthereumNameService(client: ethClient)
-
-							do {
-								let results = try await ethNameService.resolve(names: [ensName])
-
-								guard let result = results.first else {
-									return
-								}
-
-								switch result.output {
-								case .resolved(let address):
-									self.address = address.value
-								case .couldNotBeResolved(let error):
-									print("Error looking up ENS: \(error)")
-								}
-							} catch {
-								print("error getting name: \(error)")
-							}
-						}
+				TextField("ENS", text: $ensName) { _ in
+					withAnimation {
+						self.status = .loading
 					}
-			}
+					Task(priority: .userInitiated) {
+						let ethClient = EthereumHttpClient(url: URL(string: "https://mainnet.infura.io/v3/ca05f64fb99645fc926bc1576ac126dc")!)
+						let ethNameService = EthereumNameService(client: ethClient)
 
-			Section(header: Text("Address"), footer: Text(ensName)) {
-				TextField("Address", text: $address)
-					.onChange(of: address, debounceTime: 0.4) { _ in
-						Task {
-							let ethClient = EthereumHttpClient(url: URL(string: "https://mainnet.infura.io/v3/ca05f64fb99645fc926bc1576ac126dc")!)
-							let ethNameService = EthereumNameService(client: ethClient)
+						do {
+							let results = try await ethNameService.resolve(names: [ensName])
 
-							do {
-								let results = try await ethNameService.resolve(addresses: [
-									EthereumAddress(address),
-								])
+							guard let result = results.first else {
+								return
+							}
 
-								guard let result = results.first else {
-									return
-								}
-
+							switch result.output {
+							case let .resolved(address):
 								await MainActor.run {
-									switch result.output {
-									case let .couldNotBeResolved(err):
-										print("Error resolving \(err)")
-									case let .resolved(name):
-										self.ensName = name
+									withAnimation {
+										self.address = address.toChecksumAddress()
+										self.status = .unknown
 									}
 								}
-							} catch {
-								print("error getting name: \(error)")
+							case let .couldNotBeResolved(error):
+								print("Error looking up ENS: \(error)")
+								withAnimation {
+									self.status = .unknown
+								}
+							}
+						} catch {
+							await MainActor.run {
+								withAnimation {
+									self.status = .unknown
+								}
+							}
+							print("error getting name: \(error)")
+						}
+					}
+				}
+				.autocapitalization(.none)
+				.autocorrectionDisabled(true)
+			}
+
+			Section(header: Text("Address")) {
+				TextField("Address", text: $address) { _ in
+					status = .loading
+					Task(priority: .userInitiated) {
+						let ethClient = EthereumHttpClient(url: URL(string: "https://mainnet.infura.io/v3/ca05f64fb99645fc926bc1576ac126dc")!)
+						let ethNameService = EthereumNameService(client: ethClient)
+
+						do {
+							let results = try await ethNameService.resolve(addresses: [
+								EthereumAddress(address),
+							])
+
+							guard let result = results.first else {
+								return
+							}
+
+							await MainActor.run {
+								status = .unknown
+								switch result.output {
+								case let .couldNotBeResolved(err):
+									print("Error resolving \(err)")
+								case let .resolved(name):
+									self.ensName = name
+								}
+							}
+						} catch {
+							await MainActor.run {
+								status = .unknown
 							}
 						}
 					}
+				}
+				.autocorrectionDisabled(true)
 				.autocapitalization(.none)
-					.lineLimit(2...)
-			}
+				.lineLimit(2...)
 
-			if let canMessage {
-				Text(canMessage ? "Yes" : "No")
-					.foregroundColor(canMessage ? .green : .red)
-					.bold()
+				switch status {
+				case .loading:
+					Text("Loading…")
+						.foregroundColor(.secondary)
+				case .yes:
+					Text("Can message this address")
+						.foregroundColor(.green)
+						.bold()
+				case .no:
+					Text("Cannot message this address")
+						.bold()
+				default:
+					EmptyView()
+				}
 			}
 
 			Button("See if can message") {
+				status = .loading
 				Task {
 					let canMessage = await client.canMessage(peerAddress: address)
 					// TODO: This doesn't work yet.
 					await MainActor.run {
 						withAnimation {
-							self.canMessage = canMessage
+							self.status = canMessage ? .yes : .no
 						}
 					}
 					print("CAN MESSAGE \(canMessage)")
@@ -170,6 +140,10 @@ struct CanMessageView: View {
 			.tint(.indigo)
 		}
 	}
+
+	func lookupAddress() {}
+
+	func lookupName() {}
 }
 
 struct WalletActionsView: View {
@@ -271,8 +245,12 @@ struct ContentView: View {
 							UIApplication.shared.open(url, options: [:], completionHandler: nil)
 						} else {
 							self.isShowingQR = true
-							print("Nope, \(walletConnection.deepLinkURL)")
 						}
+					}
+				}
+				.onChange(of: walletConnection.isConnected) { _ in
+					if walletConnection.isConnected {
+						self.isShowingQR = false
 					}
 				}
 				.sheet(isPresented: $isShowingQR) {

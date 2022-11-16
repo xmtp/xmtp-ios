@@ -21,7 +21,7 @@ enum PublicKeyError: Error {
 // PublicKeys can be generated through PrivateKey.generate()
 struct PublicKey: UnsignedPublicKey {
 	var createdNs: Int = 0
-	var secp256k1UncompressedBytes: [UInt8]
+	var secp256k1UncompressedBytes: Data
 	var signature: Signature?
 
 	mutating func signWithWallet(wallet: WalletConnectSwift.Client) async throws {

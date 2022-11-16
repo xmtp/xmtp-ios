@@ -168,57 +168,75 @@ struct Client {
 			return false
 		}
 
-		var contactBundle: Xmtp_MessageContents_ContactBundle?
+		var contactBundle = Xmtp_MessageContents_ContactBundle()
 
 		for envelope in res.envelopes {
 			let data = envelope.message
 
 			do {
-				contactBundle = try Xmtp_MessageContents_ContactBundle(serializedData: data)
+				let publicKeyBundle = try Xmtp_MessageContents_PublicKeyBundle(serializedData: data)
+				contactBundle.v1.keyBundle = publicKeyBundle
+				print("GOT PUBLIC KEY BUNDLE FROM MESSAGE \(try! publicKeyBundle.jsonString())")
 			} catch {
-				print("ERROR DESERIALIZING CONTACT BUNDLE \(error)")
-				do {
-					let publicKeyBundle = try Xmtp_MessageContents_PublicKeyBundle(serializedData: data)
-					contactBundle = Xmtp_MessageContents_ContactBundle()
-					contactBundle?.v1.keyBundle = publicKeyBundle
-				} catch {
-					print("Error decoding PublicKeyBundle \(error)")
-					continue
-				}
+				print("ERROR GETTING PUBLIC KEY BUNDLE \(error)")
 			}
 
-			guard let contactBundle else {
-				continue
+			if !contactBundle.v1.keyBundle.identityKey.hasSignature {
+				do {
+					try contactBundle.merge(serializedData: data)
+				} catch {
+					print("Error trying to merge!")
+				}
 			}
 
 			let v1Bundle = contactBundle.v1
 			let v2Bundle = contactBundle.v2
 
+			if !v1Bundle.keyBundle.hasIdentityKey, !v2Bundle.keyBundle.hasIdentityKey {
+				print("NO KEYBUNDLES FOUND")
+				continue
+			}
+
 			do {
-				let bundleKey = v2Bundle.keyBundle.identityKey
-				let identityKeyData = bundleKey.keyBytes
+				var signerKey = Xmtp_MessageContents_PublicKey()
+				var signature = Data()
 
-				let sig = try secp256k1.Recovery.ECDSASignature(
-					compactRepresentation: bundleKey.signature.walletEcdsaCompact.bytes,
-					recoveryId: Int32(bundleKey.signature.walletEcdsaCompact.recovery)
-				)
+				if contactBundle.v2.keyBundle.identityKey.hasSignature {
+					print("V2 BUNDLE: \(try! v2Bundle.jsonString())")
+					let bundleKey = v2Bundle.keyBundle.identityKey
+					signerKey = try Xmtp_MessageContents_PublicKey(serializedData: bundleKey.keyBytes)
+					if bundleKey.signature.walletEcdsaCompact.bytes.count > 0 {
+						signature = bundleKey.signature.walletEcdsaCompact.bytes + [UInt8(bundleKey.signature.walletEcdsaCompact.recovery)]
+					} else {
+						signature = bundleKey.signature.ecdsaCompact.bytes + [UInt8(bundleKey.signature.ecdsaCompact.recovery)]
+					}
+				} else {
+					print("V1 BUNDLE: \(try! v1Bundle.jsonString())")
+					let bundleKey = v1Bundle.keyBundle.identityKey
+					signerKey = Xmtp_MessageContents_PublicKey()
+					signerKey.timestamp = bundleKey.timestamp
+					signerKey.secp256K1Uncompressed = bundleKey.secp256K1Uncompressed
 
-				let msg = WalletSigner.identitySigRequestText(keyBytes: identityKeyData.bytes)
+					if bundleKey.signature.walletEcdsaCompact.bytes.count > 0 {
+						signature = bundleKey.signature.walletEcdsaCompact.bytes + [UInt8(bundleKey.signature.walletEcdsaCompact.recovery)]
+					} else {
+						signature = bundleKey.signature.ecdsaCompact.bytes + [UInt8(bundleKey.signature.ecdsaCompact.recovery)]
+					}
+				}
 
-				let prefix = "\u{19}Ethereum Signed Message:\n\(String(msg.count))"
-				let data = Data(prefix.data(using: .ascii)! + msg.web3.bytes)
-				let hash = data.web3.keccak256
+				let msg = WalletSigner.identitySigRequestText(keyBytes: try! signerKey.serializedData())
+				let decoratedBytes = "\u{19}Ethereum Signed Message:\n\(msg.count)\(msg)".data(using: .utf8)!
+				let digest = decoratedBytes.web3.keccak256
 
-				print("sig count \(sig.rawRepresentation.count)")
-				let sure = try KeyUtil.recoverPublicKey(message: hash, signature: sig.rawRepresentation)
-				print("SURE IS \(sure.debugDescription)")
+				let recovered = try KeyUtil.recoverPublicKey(message: digest, signature: signature)
+				print("recovered IS \(recovered.debugDescription)")
 
-				let walletAddress = sure.description
+				let walletAddress = recovered.description
 
 //				let walletSigAddress = KeyUtil.generateAddress(from: key).value
 
 				print("WALLET SIG ADDRESS: \(walletAddress)")
-				return walletAddress == peerAddress
+				return walletAddress.lowercased() == peerAddress.lowercased()
 			} catch {
 				print("error finding wallet sig addr \(error)")
 				return false

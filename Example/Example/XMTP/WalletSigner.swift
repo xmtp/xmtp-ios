@@ -11,7 +11,7 @@ import WalletConnectSwift
 import web3
 
 struct WalletSigner {
-	static func identitySigRequestText(keyBytes: [UInt8]) -> String {
+	static func identitySigRequestText(keyBytes: Data) -> String {
 		return (
 			"XMTP : Create Identity\n" +
 				"\(keyBytes.toHexString())\n" +
@@ -21,7 +21,7 @@ struct WalletSigner {
 	}
 
 	static func signerKey(signature: Signature) -> UnsignedPublicKey? {
-		guard let sigBytes = signature.walletEcdsaCompact?.bytes else {
+		guard let sigBytes = signature.walletEcdsaCompact?.rawRepresentation else {
 			return nil
 		}
 

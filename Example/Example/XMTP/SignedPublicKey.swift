@@ -11,7 +11,7 @@ import XMTPProto
 
 struct SignedPublicKey: UnsignedPublicKey {
 	var createdNs: Int
-	var secp256k1UncompressedBytes: [UInt8]
+	var secp256k1UncompressedBytes: Data
 
 	var keyBytes: [UInt8]
 	var signature: Signature
@@ -20,7 +20,7 @@ struct SignedPublicKey: UnsignedPublicKey {
 		signature = try Signature(key.signature)
 		createdNs = 0
 		keyBytes = key.keyBytes.bytes
-		secp256k1UncompressedBytes = key.keyBytes.bytes
+		secp256k1UncompressedBytes = key.keyBytes
 	}
 
 	func walletSignatureAddress() async -> String? {

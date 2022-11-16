@@ -38,7 +38,7 @@ struct Signature {
 		let key = try! secp256k1.Recovery.PublicKey(digest, signature: signature)
 		let signature = Signature(ecdsaCompact: signature)
 
-		return PublicKey(createdNs: 0, secp256k1UncompressedBytes: key.rawRepresentation.bytes, signature: signature)
+		return PublicKey(createdNs: 0, secp256k1UncompressedBytes: key.rawRepresentation, signature: signature)
 	}
 
 	func signerKey(_ key: SignedPublicKey) -> UnsignedPublicKey? {

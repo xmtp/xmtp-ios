@@ -12,7 +12,7 @@ import XMTPProto
 
 protocol UnsignedPublicKey {
 	var createdNs: Int { get }
-	var secp256k1UncompressedBytes: [UInt8] { get }
+	var secp256k1UncompressedBytes: Data { get }
 }
 
 extension UnsignedPublicKey {

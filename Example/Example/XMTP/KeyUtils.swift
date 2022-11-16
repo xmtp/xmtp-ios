@@ -110,6 +110,9 @@ enum KeyUtil {
 
 	static func recoverPublicKey(message: Data, signature: Data) throws -> String {
 		if signature.count != 65 || message.count != 32 {
+			print("SIGNATURE COUNT WAS \(signature.count) (expected 65")
+			print("MESSAGE COUNT WAS \(message.count) (expected 32")
+
 			throw KeyUtilError.badArguments
 		}
 

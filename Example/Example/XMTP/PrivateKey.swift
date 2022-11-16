@@ -17,7 +17,7 @@ struct PrivateKey {
 	static func generate() -> PrivateKey {
 		let secp256k1Key = try! secp256k1.KeyAgreement.PrivateKey()
 		let timestamp = Int((Date().timeIntervalSince1970 * 1000.0).rounded())
-		let publicKey = PublicKey(createdNs: timestamp, secp256k1UncompressedBytes: secp256k1Key.publicKey.rawRepresentation.bytes)
+		let publicKey = PublicKey(createdNs: timestamp, secp256k1UncompressedBytes: secp256k1Key.publicKey.rawRepresentation)
 
 		return PrivateKey(timestamp: timestamp, secp256k1Bytes: secp256k1Key.rawRepresentation.bytes, publicKey: publicKey)
 	}
