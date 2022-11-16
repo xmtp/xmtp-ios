@@ -479,8 +479,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/argentlabs/web3.swift/";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				branch = develop;
+				kind = branch;
 			};
 		};
 		A6C4EC33292303190044996F /* XCRemoteSwiftPackageReference "grpc-swift" */ = {

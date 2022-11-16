@@ -105,8 +105,6 @@ enum KeyBundle {
 }
 
 struct Client {
-	var account: web3.EthereumAccount
-
 	var address: String
 	var keys: PrivateKeyBundleV2
 	var legacyKeys: PrivateKeyBundleV1
@@ -121,14 +119,10 @@ struct Client {
 		legacyKeys = keys
 		self.keys = PrivateKeyBundleV2.fromLegacyBundle(keys)
 
-		let account = try! web3.EthereumAccount.importAccount(keyStorage: EthereumKeyLocalStorage(), privateKey: String(bytes: keys.identityKey.secp256k1Bytes), keystorePassword: "password")
-
-		address = account.address.value
+		address = KeyUtil.generateAddress(from: Data(keys.identityKey.publicKey.secp256k1UncompressedBytes)).value
 		conversations = Conversations()
 		maxContentSize = Constants.maxContentSize
 		self.apiClient = apiClient
-
-		self.account = account
 	}
 
 	static func create(wallet: WalletConnectSwift.Client?, options: ClientOptions? = nil) async throws -> Client {
