@@ -8,15 +8,40 @@
 import CryptoSwift
 import Foundation
 import WalletConnectSwift
+import web3
 
 struct WalletSigner {
 	static func identitySigRequestText(keyBytes: [UInt8]) -> String {
 		return (
 			"XMTP : Create Identity\n" +
-				keyBytes.toHexString() +
+				"\(keyBytes.toHexString())\n" +
 				"\n" +
 				"For more info: https://xmtp.org/signatures/"
 		)
+	}
+
+	static func signerKey(signature: Signature) -> UnsignedPublicKey? {
+		guard let sigBytes = signature.walletEcdsaCompact?.bytes else {
+			return nil
+		}
+
+		let message = WalletSigner.identitySigRequestText(keyBytes: sigBytes)
+
+		let prefix = "\u{19}Ethereum Signed Message:\n\(message.count)"
+		guard var data = prefix.data(using: .utf8) else {
+			print("ERROR GETTING PREFIX DATAA")
+			return nil
+		}
+
+		data.append(message.data(using: .utf8)!)
+
+		let digest = data.web3.keccak256
+
+		if let walletEcdsaCompact = signature.walletEcdsaCompact {
+			return Signature.ecdsaSignerKey(digest: digest.bytes, signature: walletEcdsaCompact)
+		}
+
+		return nil
 	}
 
 	static func sign(wallet: WalletConnectSwift.Client, message: String) async throws -> String {

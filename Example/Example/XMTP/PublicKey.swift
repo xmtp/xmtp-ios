@@ -20,7 +20,7 @@ enum PublicKeyError: Error {
 // LEGACY: PublicKey optionally signed with another trusted key pair or a wallet.
 // PublicKeys can be generated through PrivateKey.generate()
 struct PublicKey: UnsignedPublicKey {
-	var createdNs: Int
+	var createdNs: Int = 0
 	var secp256k1UncompressedBytes: [UInt8]
 	var signature: Signature?
 
@@ -56,22 +56,6 @@ struct PublicKey: UnsignedPublicKey {
 			return nil
 		}
 
-		let message = WalletSigner.identitySigRequestText(keyBytes: sigBytes)
-
-		let prefix = "\u{19}Ethereum Signed Message:\n\(message.count)"
-		guard var data = prefix.data(using: .ascii) else {
-			print("ERROR GETTING PREFIX DATAA")
-			return nil
-		}
-
-		data.append(message.data(using: .utf8)!)
-
-		let digest = data.web3.keccak256
-
-		if let walletEcdsaCompact = signature.walletEcdsaCompact {
-			return Signature.ecdsaSignerKey(digest: digest.bytes, signature: walletEcdsaCompact)
-		}
-
-		return nil
+		return WalletSigner.signerKey(signature: signature)
 	}
 }

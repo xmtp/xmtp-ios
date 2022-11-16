@@ -30,6 +30,7 @@
 		A6C4EC2F2922C7180044996F /* UnsignedPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C4EC2E2922C7180044996F /* UnsignedPublicKey.swift */; };
 		A6C4EC322922C92E0044996F /* web3.swift in Frameworks */ = {isa = PBXBuildFile; productRef = A6C4EC312922C92E0044996F /* web3.swift */; };
 		A6C4EC35292303190044996F /* GRPC in Frameworks */ = {isa = PBXBuildFile; productRef = A6C4EC34292303190044996F /* GRPC */; };
+		A6C4EC3929244E640044996F /* KeyUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C4EC3829244E640044996F /* KeyUtils.swift */; };
 		A6C62859291F0753005BD0B7 /* exampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C62858291F0752005BD0B7 /* exampleApp.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +55,7 @@
 		A63280AE291F00BD00FC4337 /* PublicKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicKey.swift; sourceTree = "<group>"; };
 		A6C4EC2C2922C2EC0044996F /* SignedPublicKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignedPublicKey.swift; sourceTree = "<group>"; };
 		A6C4EC2E2922C7180044996F /* UnsignedPublicKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsignedPublicKey.swift; sourceTree = "<group>"; };
+		A6C4EC3829244E640044996F /* KeyUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyUtils.swift; sourceTree = "<group>"; };
 		A6C62858291F0752005BD0B7 /* exampleApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = exampleApp.swift; path = Example/exampleApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -128,6 +130,7 @@
 				A63280AE291F00BD00FC4337 /* PublicKey.swift */,
 				A6C4EC2C2922C2EC0044996F /* SignedPublicKey.swift */,
 				A6C4EC2E2922C7180044996F /* UnsignedPublicKey.swift */,
+				A6C4EC3829244E640044996F /* KeyUtils.swift */,
 			);
 			path = XMTP;
 			sourceTree = "<group>";
@@ -235,6 +238,7 @@
 				A63280A5291EF88400FC4337 /* Authenticator.swift in Sources */,
 				A63280AB291F003900FC4337 /* WalletSigner.swift in Sources */,
 				A632809B291EBB3100FC4337 /* Constants.swift in Sources */,
+				A6C4EC3929244E640044996F /* KeyUtils.swift in Sources */,
 				A63280AF291F00BD00FC4337 /* PublicKey.swift in Sources */,
 				A6C62859291F0753005BD0B7 /* exampleApp.swift in Sources */,
 				A63280A7291EFFFC00FC4337 /* PrivateKey.swift in Sources */,

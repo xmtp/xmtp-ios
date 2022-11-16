@@ -5,8 +5,9 @@
 //  Created by Pat Nakajima on 11/11/22.
 //
 
-import CryptoSwift
 import Foundation
+import secp256k1
+import SwiftProtobuf
 import WalletConnectSwift
 import web3
 import XMTPProto
@@ -173,21 +174,22 @@ struct Client {
 			return false
 		}
 
-		print("GOT A RES \(res)")
-
 		var contactBundle: Xmtp_MessageContents_ContactBundle?
 
 		for envelope in res.envelopes {
-			guard let data = Data(base64Encoded: envelope.message) else {
-				continue
-			}
+			let data = envelope.message
 
 			do {
 				contactBundle = try Xmtp_MessageContents_ContactBundle(serializedData: data)
 			} catch {
-				if let publicKeyBundle = try? Xmtp_MessageContents_PublicKeyBundle(serializedData: data) {
+				print("ERROR DESERIALIZING CONTACT BUNDLE \(error)")
+				do {
+					let publicKeyBundle = try Xmtp_MessageContents_PublicKeyBundle(serializedData: data)
 					contactBundle = Xmtp_MessageContents_ContactBundle()
 					contactBundle?.v1.keyBundle = publicKeyBundle
+				} catch {
+					print("Error decoding PublicKeyBundle \(error)")
+					continue
 				}
 			}
 
@@ -195,12 +197,37 @@ struct Client {
 				continue
 			}
 
-			if contactBundle.v1.hasKeyBundle {
-				return true
-			}
+			let v1Bundle = contactBundle.v1
+			let v2Bundle = contactBundle.v2
 
-			if contactBundle.v2.hasKeyBundle {
-				return true
+			do {
+				let bundleKey = v2Bundle.keyBundle.identityKey
+				let identityKeyData = bundleKey.keyBytes
+
+				let sig = try secp256k1.Recovery.ECDSASignature(
+					compactRepresentation: bundleKey.signature.walletEcdsaCompact.bytes,
+					recoveryId: Int32(bundleKey.signature.walletEcdsaCompact.recovery)
+				)
+
+				let msg = WalletSigner.identitySigRequestText(keyBytes: identityKeyData.bytes)
+
+				let prefix = "\u{19}Ethereum Signed Message:\n\(String(msg.count))"
+				let data = Data(prefix.data(using: .ascii)! + msg.web3.bytes)
+				let hash = data.web3.keccak256
+
+				print("sig count \(sig.rawRepresentation.count)")
+				let sure = try KeyUtil.recoverPublicKey(message: hash, signature: sig.rawRepresentation)
+				print("SURE IS \(sure.debugDescription)")
+
+				let walletAddress = sure.description
+
+//				let walletSigAddress = KeyUtil.generateAddress(from: key).value
+
+				print("WALLET SIG ADDRESS: \(walletAddress)")
+				return walletAddress == peerAddress
+			} catch {
+				print("error finding wallet sig addr \(error)")
+				return false
 			}
 		}
 

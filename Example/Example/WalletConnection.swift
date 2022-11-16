@@ -8,9 +8,11 @@
 import Foundation
 import WalletConnectSwift
 
+typealias Wallet = WalletConnectSwift.Client
+
 class WalletConnection: ObservableObject, WalletConnectDelegate {
 	@Published var isConnected = false
-	@Published var client: WalletConnectSwift.Client?
+	@Published var wallet: Wallet?
 
 	var walletConnect: WalletConnect!
 	var connectionURL: String!
@@ -24,21 +26,22 @@ class WalletConnection: ObservableObject, WalletConnectDelegate {
 
 	func failedToConnect() {
 		DispatchQueue.main.async {
-			self.client = self.walletConnect.client
+			self.wallet = self.walletConnect.client
 		}
 		print("Failed to connect")
 	}
 
 	func didConnect() {
 		DispatchQueue.main.async {
-			self.client = self.walletConnect.client
+			self.wallet = self.walletConnect.client
+			self.isConnected = true
 		}
 		print("Did connect")
 	}
 
 	func didDisconnect() {
 		DispatchQueue.main.async {
-			self.client = self.walletConnect.client
+			self.wallet = self.walletConnect.client
 		}
 		print("Did disconnect")
 	}

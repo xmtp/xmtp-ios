@@ -21,7 +21,7 @@ extension UnsignedPublicKey {
 		var uncompressed = Xmtp_MessageContents_PublicKey.Secp256k1Uncompressed()
 		uncompressed.bytes = Data(secp256k1UncompressedBytes)
 
-		protoPublicKey.timestamp = UInt64(createdNs)
+		protoPublicKey.timestamp = UInt64(createdNs / 1_000_000)
 		protoPublicKey.secp256K1Uncompressed = uncompressed
 		return try protoPublicKey.serializedData().bytes
 	}
