@@ -18,13 +18,10 @@ enum PrivateKeyError: Error {
 
 extension PrivateKey: SigningKey {
 	func sign(_ data: Data) async throws -> Signature {
-		let signingKey = try secp256k1.Signing.PrivateKey(rawRepresentation: secp256K1.bytes, format: .uncompressed)
-		let signatureData = try signingKey.ecdsa.recoverableSignature(for: data)
-		let compact = try signatureData.compactRepresentation
-
+		let signatureData = try KeyUtil.sign(message: data, with: secp256K1.bytes, hashing: false)
 		var signature = Signature()
-		signature.ecdsaCompact.bytes = compact.signature
-		signature.ecdsaCompact.recovery = UInt32(compact.recoveryId)
+		signature.ecdsaCompact.bytes = signatureData[0..<64]
+		signature.ecdsaCompact.recovery = UInt32(signatureData[64])
 
 		return signature
 	}
