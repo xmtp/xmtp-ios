@@ -31,10 +31,6 @@ enum Crypto {
 
 		var ciphertext = CipherText()
 
-		guard let combined = payload.combined else {
-			throw CryptoError.combinedPayload
-		}
-
 		ciphertext.aes256GcmHkdfSha256.payload = payload.ciphertext + payload.tag
 		ciphertext.aes256GcmHkdfSha256.hkdfSalt = salt
 		ciphertext.aes256GcmHkdfSha256.gcmNonce = nonceData

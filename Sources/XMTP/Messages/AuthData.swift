@@ -16,6 +16,6 @@ extension AuthData {
 		walletAddr = walletAddress
 
 		let timestamp = timestamp ?? Date()
-		createdNs = UInt64(timestamp.timeIntervalSince1970 * 1_000_000)
+		createdNs = UInt64(timestamp.millisecondsSinceEpoch * 1_000_000)
 	}
 }

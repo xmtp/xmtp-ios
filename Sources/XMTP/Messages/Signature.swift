@@ -28,4 +28,8 @@ extension Signature {
 				"For more info: https://xmtp.org/signatures/"
 		)
 	}
+
+	var rawData: Data {
+		ecdsaCompact.bytes + [UInt8(Int(ecdsaCompact.recovery))]
+	}
 }

@@ -11,6 +11,6 @@ import XCTest
 
 final class ApiClientTests: XCTestCase {
 	func testHelloWorld() throws {
-		let apiClient = try ApiClient(environment: .local)
+		_ = try ApiClient(environment: .local)
 	}
 }

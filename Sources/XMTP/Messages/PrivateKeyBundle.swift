@@ -19,10 +19,10 @@ extension PrivateKeyBundle {
 		}
 
 		let signature = try await key.sign(input)
-		let cipherText = try Crypto.encrypt(signature, bundleBytes)
+		let cipherText = try Crypto.encrypt(signature.ecdsaCompact.bytes, bundleBytes)
 
 		var encryptedBundle = EncryptedPrivateKeyBundle()
-		encryptedBundle.v1.walletPreKey = signature
+		encryptedBundle.v1.walletPreKey = signature.ecdsaCompact.bytes
 		encryptedBundle.v1.ciphertext = cipherText
 
 		return encryptedBundle

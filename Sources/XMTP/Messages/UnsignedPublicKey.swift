@@ -14,7 +14,7 @@ extension UnsignedPublicKey {
 	static func generate() throws -> UnsignedPublicKey {
 		var unsigned = UnsignedPublicKey()
 		let key = try PrivateKey.generate()
-		let createdNs = Date().timeIntervalSince1970 * 1_000_000
+		let createdNs = Date().millisecondsSinceEpoch
 		unsigned.secp256K1Uncompressed.bytes = key.publicKey.secp256K1Uncompressed.bytes
 		unsigned.createdNs = UInt64(createdNs)
 		return unsigned

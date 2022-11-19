@@ -8,29 +8,35 @@
 import Foundation
 import secp256k1
 
+// Anything that can sign should be a SigningKey (like a private key or a wallet).
 protocol SigningKey {
-	func sign(_ data: Data) async throws -> Data
+	func sign(_ data: Data) async throws -> Signature
 }
 
-protocol PrivateKeySigner: SigningKey {
-	var signingBytes: Data { get }
-}
+extension SigningKey {
+	func sign(message: String) async throws -> Signature {
+		let prefix = "\u{19}Ethereum Signed Message:\n\(message.count)"
 
-extension PrivateKeySigner {
-	func sign(_ data: Data) async throws -> Data {
-		try KeyUtil.sign(message: data, with: signingBytes, hashing: false)
+		guard var data = prefix.data(using: .ascii) else {
+			throw PrivateKeyError.invalidPrefix
+		}
+
+		data.append(message.data(using: .utf8)!)
+
+		let digest = data.web3.keccak256
+
+		return try await sign(digest)
 	}
 
-	func sign(digest: any DataProtocol) async throws -> Signature {
-		let signingKey = try secp256k1.Signing.PrivateKey(rawRepresentation: signingBytes)
-		let secpSignature = try signingKey.ecdsa.recoverableSignature(for: digest)
+	func createIdentity(_ identity: PrivateKey) async throws -> AuthorizedIdentity {
+		let signatureText = Signature.createIdentityText(key: try identity.publicKey.serializedData())
+		let signature = try await sign(message: signatureText.web3.keccak256.toHex)
 
-		let compactSignature: secp256k1.Recovery.ECDSACompactSignature = try secpSignature.compactRepresentation
+		var publicKey = identity.publicKey
+		publicKey.signature = signature
 
-		var signature = Signature()
-		signature.ecdsaCompact.bytes = compactSignature.signature
-		signature.ecdsaCompact.recovery = UInt32(compactSignature.recoveryId)
+		let address = identity.walletAddress
 
-		return signature
+		return AuthorizedIdentity(address: address, authorized: publicKey, identity: identity)
 	}
 }

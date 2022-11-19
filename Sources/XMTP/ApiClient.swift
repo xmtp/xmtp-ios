@@ -54,6 +54,8 @@ struct ApiClient {
 
 		var options = CallOptions()
 		options.customMetadata.add(name: "authorization", value: "Bearer \(authToken)")
+		options.customMetadata.add(name: ClientVersionHeaderKey, value: Constants.version)
+		options.customMetadata.add(name: AppVersionHeaderKey, value: Constants.version)
 		options.timeLimit = .timeout(.seconds(5))
 
 		return try await client.publish(request, callOptions: options)

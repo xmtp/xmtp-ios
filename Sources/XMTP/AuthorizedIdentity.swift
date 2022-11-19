@@ -9,15 +9,16 @@ import Foundation
 
 struct AuthorizedIdentity {
 	var address: String
-	var publicKey: SignedPublicKey
-	var privateKey: PrivateKey
+	var authorized: PublicKey
+	var identity: PrivateKey
 
 	func createAuthToken() async throws -> String {
-		var publicKey = try PublicKey(publicKey)
-		let authData = AuthData(walletAddress: KeyUtil.generateAddress(from: publicKey.secp256K1Uncompressed.bytes).toChecksumAddress())
+		var publicKey = authorized
+
+		let authData = AuthData(walletAddress: address)
 		let authDataBytes = try authData.serializedData()
 
-		let signature = try await privateKey.sign(digest: authDataBytes.web3.keccak256)
+		let signature = try await identity.sign(authDataBytes.web3.keccak256)
 
 		var token = Token()
 		publicKey.signature = signature
@@ -32,8 +33,8 @@ struct AuthorizedIdentity {
 	var toBundle: PrivateKeyBundle {
 		get throws {
 			var bundle = PrivateKeyBundle()
-			bundle.v1.identityKey = privateKey
-			bundle.v1.identityKey.publicKey = try PublicKey(publicKey)
+			bundle.v1.identityKey = identity
+			bundle.v1.identityKey.publicKey = authorized
 			return bundle
 		}
 	}
