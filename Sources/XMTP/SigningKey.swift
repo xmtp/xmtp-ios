@@ -30,7 +30,8 @@ extension SigningKey {
 
 	func createIdentity(_ identity: PrivateKey) async throws -> AuthorizedIdentity {
 		let signatureText = Signature.createIdentityText(key: try identity.publicKey.serializedData())
-		let signature = try await sign(message: signatureText.web3.keccak256.toHex)
+
+		let signature = try await sign(message: signatureText)
 
 		var publicKey = identity.publicKey
 		publicKey.signature = signature

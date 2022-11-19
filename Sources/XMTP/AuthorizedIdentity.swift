@@ -18,7 +18,7 @@ struct AuthorizedIdentity {
 		let authData = AuthData(walletAddress: address)
 		let authDataBytes = try authData.serializedData()
 
-		let signature = try await identity.sign(authDataBytes.web3.keccak256)
+		let signature = try await identity.sign(authDataBytes)
 
 		var token = Token()
 		publicKey.signature = signature
