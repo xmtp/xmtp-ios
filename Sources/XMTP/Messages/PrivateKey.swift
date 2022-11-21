@@ -34,7 +34,7 @@ extension PrivateKey {
 		secp256K1.bytes = privateKeyData
 
 		let publicData = try KeyUtil.generatePublicKey(from: privateKeyData)
-		publicKey.secp256K1Uncompressed.bytes = [0x04] + publicData
+		publicKey.secp256K1Uncompressed.bytes = publicData
 		publicKey.timestamp = timestamp
 	}
 
