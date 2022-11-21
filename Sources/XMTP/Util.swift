@@ -1,12 +1,12 @@
 //
 //  Util.swift
-//  
+//
 //
 //  Created by Pat Nakajima on 11/20/22.
 //
 
-import Foundation
 import CryptoSwift
+import Foundation
 
 enum Util {
 	static func keccak256Digest(_ data: Data) -> Keccak256Digest {

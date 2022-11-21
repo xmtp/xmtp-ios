@@ -101,9 +101,11 @@ enum KeyUtil {
 	}
 
 	static func generateAddress(from publicKey: Data) -> EthereumAddress {
-		let hash = Util.keccak256(publicKey)
+		let publicKeyData = publicKey.count == 64 ? publicKey : publicKey[1 ..< publicKey.count]
+
+		let hash = Util.keccak256(publicKeyData)
 		let address = hash.subdata(in: 12 ..< hash.count)
-		return EthereumAddress(address.web3.hexString)
+		return EthereumAddress("0x" + address.toHex)
 	}
 
 	static func recoverPublicKey(message: Data, signature: Data) throws -> Data {
@@ -147,7 +149,7 @@ enum KeyUtil {
 		}
 		var size: Int = 65
 		var rv = Data(count: size)
-		rv.withUnsafeMutableBytes {
+		_ = rv.withUnsafeMutableBytes {
 			secp256k1_ec_pubkey_serialize(ctx, $0.bindMemory(to: UInt8.self).baseAddress!, &size, pubkey, UInt32(SECP256K1_EC_UNCOMPRESSED))
 		}
 		return rv

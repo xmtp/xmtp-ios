@@ -11,6 +11,18 @@ import XMTPProto
 typealias Signature = Xmtp_MessageContents_Signature
 
 extension Signature {
+	static func ethHash(_ message: String) throws -> Data {
+		let prefix = "\u{19}Ethereum Signed Message:\n\(message.count)"
+
+		guard var data = prefix.data(using: .ascii) else {
+			throw PrivateKeyError.invalidPrefix
+		}
+
+		data.append(message.data(using: .utf8)!)
+
+		return Util.keccak256(data)
+	}
+
 	static func createIdentityText(key: Data) -> String {
 		return (
 			"XMTP : Create Identity\n" +

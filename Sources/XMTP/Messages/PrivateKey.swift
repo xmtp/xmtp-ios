@@ -19,7 +19,7 @@ extension PrivateKey: SigningKey {
 	func sign(_ data: Data) async throws -> Signature {
 		let signatureData = try KeyUtil.sign(message: data, with: secp256K1.bytes, hashing: false)
 		var signature = Signature()
-		signature.ecdsaCompact.bytes = signatureData[0..<64]
+		signature.ecdsaCompact.bytes = signatureData[0 ..< 64]
 		signature.ecdsaCompact.recovery = UInt32(signatureData[64])
 
 		return signature
@@ -28,30 +28,23 @@ extension PrivateKey: SigningKey {
 
 extension PrivateKey {
 	// Easier conversion from the secp256k1 library's Private keys to our proto type.
-	init(_ secpkey: secp256k1.Signing.PrivateKey) {
+	init(_ privateKeyData: Data) throws {
 		self.init()
 		timestamp = UInt64(Date().millisecondsSinceEpoch)
+		secp256K1.bytes = privateKeyData
 
-		var keyData = Secp256k1()
-		keyData.bytes = secpkey.rawRepresentation
-		secp256K1 = keyData
-
-		var publicKey = PublicKey()
-		var publicSecp = Xmtp_MessageContents_PublicKey.Secp256k1Uncompressed()
-		publicSecp.bytes = secpkey.publicKey.rawRepresentation
-		publicKey.secp256K1Uncompressed = publicSecp
+		let publicData = try KeyUtil.generatePublicKey(from: privateKeyData)
+		publicKey.secp256K1Uncompressed.bytes = [0x04] + publicData
 		publicKey.timestamp = timestamp
-
-		self.publicKey = publicKey
 	}
 
 	static func generate() throws -> PrivateKey {
-		let secpkey = try secp256k1.Signing.PrivateKey(format: .uncompressed)
-		return PrivateKey(secpkey)
+		let data = Data(try Crypto.secureRandomBytes(count: 32))
+		return try PrivateKey(data)
 	}
 
 	var walletAddress: String {
-		KeyUtil.generateAddress(from: publicKey.secp256K1Uncompressed.bytes).value
+		KeyUtil.generateAddress(from: publicKey.secp256K1Uncompressed.bytes).toChecksumAddress()
 	}
 
 	func sign(key: UnsignedPublicKey) async throws -> SignedPublicKey {

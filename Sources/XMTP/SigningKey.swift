@@ -15,29 +15,28 @@ protocol SigningKey {
 
 extension SigningKey {
 	func sign(message: String) async throws -> Signature {
-		let prefix = "\u{19}Ethereum Signed Message:\n\(message.count)"
-
-		guard var data = prefix.data(using: .ascii) else {
-			throw PrivateKeyError.invalidPrefix
-		}
-
-		data.append(message.data(using: .utf8)!)
-
-		let digest = Util.keccak256(data)
+		let digest = try Signature.ethHash(message)
 
 		return try await sign(digest)
 	}
 
 	func createIdentity(_ identity: PrivateKey) async throws -> AuthorizedIdentity {
-		let signatureText = Signature.createIdentityText(key: try identity.publicKey.serializedData())
+		var slimKey = PublicKey()
+		slimKey.timestamp = UInt64(Date().millisecondsSinceEpoch)
+		slimKey.secp256K1Uncompressed = identity.publicKey.secp256K1Uncompressed
 
+		let signatureText = Signature.createIdentityText(key: try slimKey.serializedData())
 		let signature = try await sign(message: signatureText)
 
-		var publicKey = identity.publicKey
-		publicKey.signature = signature
+		let digest = try Signature.ethHash(signatureText)
+		let recoveredKey = try KeyUtil.recoverPublicKey(message: digest, signature: signature.rawData)
+		let address = KeyUtil.generateAddress(from: recoveredKey).toChecksumAddress()
 
-		let address = identity.walletAddress
+		var authorized = PublicKey()
+		authorized.secp256K1Uncompressed = slimKey.secp256K1Uncompressed
+		authorized.timestamp = slimKey.timestamp
+		authorized.signature = signature
 
-		return AuthorizedIdentity(address: address, authorized: publicKey, identity: identity)
+		return AuthorizedIdentity(address: address, authorized: authorized, identity: identity)
 	}
 }
