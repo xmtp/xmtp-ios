@@ -69,7 +69,7 @@ enum KeyUtil {
 			secp256k1_context_destroy(ctx)
 		}
 
-		let msgData = hashing ? message.web3.keccak256 : message
+		let msgData = hashing ? Util.keccak256(message) : message
 		let msg = (msgData as NSData).bytes.assumingMemoryBound(to: UInt8.self)
 		let privateKeyPtr = (privateKey as NSData).bytes.assumingMemoryBound(to: UInt8.self)
 		let signaturePtr = UnsafeMutablePointer<secp256k1_ecdsa_recoverable_signature>.allocate(capacity: 1)
@@ -101,12 +101,12 @@ enum KeyUtil {
 	}
 
 	static func generateAddress(from publicKey: Data) -> EthereumAddress {
-		let hash = publicKey.web3.keccak256
+		let hash = Util.keccak256(publicKey)
 		let address = hash.subdata(in: 12 ..< hash.count)
 		return EthereumAddress(address.web3.hexString)
 	}
 
-	static func recoverPublicKey(message: Data, signature: Data) throws -> String {
+	static func recoverPublicKey(message: Data, signature: Data) throws -> Data {
 		if signature.count != 65 || message.count != 32 {
 			throw KeyUtilError.badArguments
 		}
@@ -150,6 +150,6 @@ enum KeyUtil {
 		rv.withUnsafeMutableBytes {
 			secp256k1_ec_pubkey_serialize(ctx, $0.bindMemory(to: UInt8.self).baseAddress!, &size, pubkey, UInt32(SECP256K1_EC_UNCOMPRESSED))
 		}
-		return "0x\(rv[1...].web3.keccak256.web3.hexString.suffix(40))"
+		return rv
 	}
 }

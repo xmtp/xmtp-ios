@@ -7,7 +7,6 @@
 
 import Foundation
 import secp256k1
-import web3
 import XMTPProto
 
 typealias PrivateKey = Xmtp_MessageContents_PrivateKey

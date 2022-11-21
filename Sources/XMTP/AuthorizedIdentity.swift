@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import web3
 
 struct AuthorizedIdentity {
 	var address: String
@@ -19,7 +18,14 @@ struct AuthorizedIdentity {
 		let authData = AuthData(walletAddress: address)
 		let authDataBytes = try authData.serializedData()
 
-		let signature = try await identity.sign(authDataBytes.web3.keccak256)
+		let signature = try await identity.sign(Util.keccak256(authDataBytes))
+
+		print("PUBLIC KEY \(publicKey.secp256K1Uncompressed.bytes.toHex)")
+		print("HASHED \(Util.keccak256(authDataBytes).toHex)")
+		print("SIGNATURE \(signature.rawData.toHex)")
+
+		let recoveredPublic = try KeyUtil.recoverPublicKey(message: Util.keccak256(authDataBytes), signature: signature.rawData)
+		print("RECOVERED IS \(recoveredPublic.toHex)")
 
 		var token = Token()
 		publicKey.signature = signature

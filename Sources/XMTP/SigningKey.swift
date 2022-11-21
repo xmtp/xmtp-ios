@@ -23,7 +23,7 @@ extension SigningKey {
 
 		data.append(message.data(using: .utf8)!)
 
-		let digest = data.web3.keccak256
+		let digest = Util.keccak256(data)
 
 		return try await sign(digest)
 	}

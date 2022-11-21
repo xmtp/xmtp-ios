@@ -32,7 +32,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testSaveKey() async throws {
-		throw XCTSkip("integration only")
+//		throw XCTSkip("integration only")
 
 		let alice = try PrivateKey.generate()
 		let identity = try PrivateKey.generate()
