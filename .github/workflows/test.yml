@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build and Test default scheme using any available iPhone simulator
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: swift-actions/setup-swift@v1
       - uses: actions/checkout@v3
