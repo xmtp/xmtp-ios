@@ -10,9 +10,8 @@ jobs:
     name: Build and Test default scheme using any available iPhone simulator
     runs-on: macos-latest
     steps:
-      - uses: swift-actions/setup-swift@v1
+      - uses: maxim-lobanov/setup-xcode@v1
         with:
-          swift-version: "5.7.1"
+          xcode-version: "14.1"
       - uses: actions/checkout@v3
-      - run: swift build
-      - run: swift test
+      - run: xcodebuild -scheme XMTP -destination "platform=iOS Simulator,name=iPhone 14" test
