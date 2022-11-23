@@ -67,7 +67,7 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 	}
 
 	func sign(_ data: Data) async throws -> Data {
-		guard let session else {
+		guard session != nil else {
 			throw WalletConnectionError.noSession
 		}
 
