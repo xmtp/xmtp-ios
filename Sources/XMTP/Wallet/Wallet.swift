@@ -21,8 +21,8 @@ public struct Wallet {
 		self.connection = connection
 	}
 
-	public var address: String? {
-		connection.walletAddress
+	public var address: String {
+		connection.walletAddress ?? ""
 	}
 
 	public func preferredConnectionMethod() throws -> WalletConnectionMethodType {

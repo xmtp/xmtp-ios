@@ -10,6 +10,7 @@ import secp256k1
 
 // Anything that can sign should be a SigningKey (like a private key or a wallet).
 protocol SigningKey {
+	var address: String { get }
 	func sign(_ data: Data) async throws -> Signature
 }
 

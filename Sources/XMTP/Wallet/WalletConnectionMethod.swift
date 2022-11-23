@@ -5,7 +5,6 @@
 //  Created by Pat Nakajima on 11/22/22.
 //
 
-import CoreImage
 import CoreImage.CIFilterBuiltins
 import UIKit
 import WalletConnectSwift
