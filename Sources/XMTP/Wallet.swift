@@ -31,18 +31,3 @@ extension Wallet: SigningKey {
 		return signature
 	}
 }
-
-extension Wallet: WalletConnectionDelegate {
-	mutating func didConnect(connection _: WalletConnection) {
-		isConnected = true
-	}
-
-	mutating func didDisconnect(connection _: WalletConnection) {
-		isConnected = false
-	}
-
-	mutating func failedToConnect(connection: WalletConnection) {
-		print("Failed to connect: \(connection)")
-		isConnected = false
-	}
-}

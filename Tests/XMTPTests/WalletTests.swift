@@ -10,6 +10,7 @@ import XCTest
 
 class StubWalletConnection: WalletConnection {
 	var key: PrivateKey
+	var isConnected = false
 	var wasConnectCalled = false
 	var wasSignCalled = false
 
@@ -18,6 +19,7 @@ class StubWalletConnection: WalletConnection {
 	}
 
 	func connect() async throws {
+		isConnected = true
 		wasConnectCalled = true
 	}
 

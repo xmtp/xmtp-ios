@@ -20,17 +20,13 @@ enum WalletConnectionError: Error {
 }
 
 protocol WalletConnection {
+	var isConnected: Bool { get }
 	func connect() async throws
 	func sign(_ data: Data) async throws -> Data
 }
 
-protocol WalletConnectionDelegate {
-	mutating func didConnect(connection: WalletConnection)
-	mutating func didDisconnect(connection: WalletConnection)
-	mutating func failedToConnect(connection: WalletConnection)
-}
-
 class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
+	var isConnected: Bool { session != nil }
 	var walletConnectClient: WalletConnectSwift.Client!
 	var session: WalletConnectSwift.Session?
 
