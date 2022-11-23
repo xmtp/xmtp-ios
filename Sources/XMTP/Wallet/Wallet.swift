@@ -46,6 +46,6 @@ extension Wallet: SigningKey {
 	}
 
 	func sign(message: String) async throws -> Signature {
-		return try await sign(message.data(using: .utf8)!)
+		return try await sign(Data(message.utf8))
 	}
 }
