@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct Wallet {
 	var connection: WalletConnection
@@ -13,6 +14,14 @@ struct Wallet {
 
 	init(connection: WalletConnection) throws {
 		self.connection = connection
+	}
+
+	var address: String? {
+		connection.walletAddress
+	}
+
+	func preferredConnectionMethod() throws -> WalletConnectionMethodType {
+		try connection.preferredConnectionMethod()
 	}
 
 	func connect() async throws {

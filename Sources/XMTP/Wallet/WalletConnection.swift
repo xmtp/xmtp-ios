@@ -6,10 +6,19 @@
 //
 
 import Foundation
+import UIKit
 import WalletConnectSwift
 import web3
 
-enum WalletConnectionError: Error {
+extension WCURL {
+	var asURL: URL {
+		// swiftlint:disable force_unwrapping
+		URL(string: "wc://wc?uri=\(absoluteString)")!
+		// swiftlint:enable force_unwrapping
+	}
+}
+
+enum WalletConnectionError: String, Error {
 	case walletConnectURL
 	case noSession
 	case noAddress
@@ -19,14 +28,23 @@ enum WalletConnectionError: Error {
 
 protocol WalletConnection {
 	var isConnected: Bool { get }
+	var walletAddress: String? { get }
+	func preferredConnectionMethod() throws -> WalletConnectionMethodType
 	func connect() async throws
 	func sign(_ data: Data) async throws -> Data
 }
 
 class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
-	var isConnected: Bool { session != nil }
+	@Published var isConnected = false
+
 	var walletConnectClient: WalletConnectSwift.Client!
-	var session: WalletConnectSwift.Session?
+	var session: WalletConnectSwift.Session? {
+		didSet {
+			DispatchQueue.main.async {
+				self.isConnected = self.session != nil
+			}
+		}
+	}
 
 	init() {
 		let peerMeta = Session.ClientMeta(
@@ -40,6 +58,18 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 		let dAppInfo = WalletConnectSwift.Session.DAppInfo(peerId: UUID().uuidString, peerMeta: peerMeta)
 
 		walletConnectClient = WalletConnectSwift.Client(delegate: self, dAppInfo: dAppInfo)
+	}
+
+	func preferredConnectionMethod() throws -> WalletConnectionMethodType {
+		guard let url = walletConnectURL else {
+			throw WalletConnectionError.walletConnectURL
+		}
+
+		if let url = URL(string: url.absoluteString), UIApplication.shared.canOpenURL(url) {
+			return WalletRedirectConnectionMethod(redirectURI: url.absoluteString).type
+		}
+
+		return WalletQRCodeConnectionMethod(redirectURI: url.absoluteString).type
 	}
 
 	lazy var walletConnectURL: WCURL? = {
@@ -112,7 +142,11 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 	}
 
 	var walletAddress: String? {
-		return session?.walletInfo?.accounts.first
+		if let address = session?.walletInfo?.accounts.first {
+			return EthereumAddress(address).toChecksumAddress()
+		}
+
+		return nil
 	}
 
 	func client(_: WalletConnectSwift.Client, didConnect _: WalletConnectSwift.WCURL) {}

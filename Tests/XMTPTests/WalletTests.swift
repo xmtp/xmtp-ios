@@ -23,6 +23,14 @@ class StubWalletConnection: WalletConnection {
 		wasConnectCalled = true
 	}
 
+	var walletAddress: String? {
+		KeyUtil.generateAddress(from: key.publicKey.secp256K1Uncompressed.bytes).value
+	}
+
+	func preferredConnectionMethod() throws -> WalletConnectionMethodType {
+		WalletManualConnectionMethod(redirectURI: "https://example.com").type
+	}
+
 	func sign(_ data: Data) async throws -> Data {
 		wasSignCalled = true
 		let sig = try await key.sign(data)

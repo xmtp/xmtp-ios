@@ -19,6 +19,10 @@ class CallbackyConnection: WCWalletConnection {
 		super.client(client, didConnect: session)
 		onConnect?()
 	}
+
+	override func preferredConnectionMethod() throws -> WalletConnectionMethodType {
+		return WalletManualConnectionMethod(redirectURI: walletConnectURL?.asURL.absoluteString ?? "").type
+	}
 }
 
 @available(iOS 16, *)
@@ -56,23 +60,23 @@ final class IntegrationTests: XCTestCase {
 		let connection = CallbackyConnection()
 		let wallet = try Wallet(connection: connection)
 
-		let expectation = expectation(description: #function)
+		let expectation = expectation(description: "connected")
 
 		connection.onConnect = {
 			expectation.fulfill()
 		}
 
-		guard let url = connection.walletConnectURL?.absoluteString else {
+		guard case let .manual(url) = try connection.preferredConnectionMethod() else {
 			XCTFail("No WC URL")
 			return
 		}
 
-		let safariURL = "wc://wc?uri=\(url)"
-
-		print("Open in mobile safari: \(safariURL)")
+		print("Open in mobile safari: \(url)")
 		try await connection.connect()
 
 		wait(for: [expectation], timeout: 60)
+
+		XCTAssert(wallet.connection.isConnected, "wallet connection is not connected")
 
 		let digest = "Hello world".data(using: .utf8)!
 
@@ -83,6 +87,7 @@ final class IntegrationTests: XCTestCase {
 		let address = KeyUtil.generateAddress(from: publicKey)
 
 		XCTAssertEqual(address, "0x1F935A71f5539fa0eEaa71136Aef39Ab7c64520f") // fancypat.eth
+		XCTAssertEqual(wallet.address, "0x1F935A71f5539fa0eEaa71136Aef39Ab7c64520f")
 		XCTAssert(signature.walletEcdsaCompact.bytes.count > 1)
 	}
 }
