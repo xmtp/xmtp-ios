@@ -44,7 +44,6 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 
 	lazy var walletConnectURL: WCURL? = {
 		do {
-			print("GENERATING WALLET CONNECT URL")
 			let keybytes = try Crypto.secureRandomBytes(count: 32)
 
 			return WCURL(
@@ -53,7 +52,6 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 				key: keybytes.toHex
 			)
 		} catch {
-			print("Error getting wallet connect URL: \(error)")
 			return nil
 		}
 	}()
