@@ -98,4 +98,25 @@ final class IntegrationTests: XCTestCase {
 		let result = try await api.query(topics: [.userPrivateStoreKeyBundle("0xE2c094aB885170B56A811f0c8b5FeDC4a2565575")])
 		XCTAssert(result.envelopes.count >= 1)
 	}
+
+	func testPublishingContactBundles() async throws {
+		throw XCTSkip("integration only")
+
+		let alice = try PrivateKey.generate()
+
+		let clientOptions = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
+		let client = try await Client.create(wallet: alice, options: clientOptions)
+		XCTAssertEqual(.local, client.apiClient.environment)
+
+		let noContactYet = try await client.getUserContact(peerAddress: alice.walletAddress)
+		XCTAssertNil(noContactYet)
+
+		try await client.publishUserContact()
+
+		let contact = try await client.getUserContact(peerAddress: alice.walletAddress)
+
+		XCTAssertEqual(contact?.v1.keyBundle.identityKey.secp256K1Uncompressed, client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed)
+		XCTAssert(contact?.v1.keyBundle.identityKey.hasSignature == true, "no signature")
+		XCTAssert(contact?.v1.keyBundle.preKey.hasSignature == true, "pre key not signed")
+	}
 }

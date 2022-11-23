@@ -31,5 +31,9 @@ class ClientTests: XCTestCase {
 		let client = try await Client.create(wallet: fakeWallet)
 
 		XCTAssertEqual(1, client.privateKeyBundleV1.preKeys.count)
+
+		let preKey = client.privateKeyBundleV1.preKeys[0]
+
+		XCTAssert(preKey.publicKey.hasSignature, "prekey not signed")
 	}
 }
