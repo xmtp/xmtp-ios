@@ -8,23 +8,28 @@
 import Foundation
 import UIKit
 
-struct Wallet {
-	var connection: WalletConnection
+public struct Wallet {
+	public var connection: WalletConnection
 	var isConnected: Bool = false
+
+	public static func create() throws -> Wallet {
+		let connection = WCWalletConnection()
+		return try Wallet(connection: connection)
+	}
 
 	init(connection: WalletConnection) throws {
 		self.connection = connection
 	}
 
-	var address: String? {
+	public var address: String? {
 		connection.walletAddress
 	}
 
-	func preferredConnectionMethod() throws -> WalletConnectionMethodType {
+	public func preferredConnectionMethod() throws -> WalletConnectionMethodType {
 		try connection.preferredConnectionMethod()
 	}
 
-	func connect() async throws {
+	public func connect() async throws {
 		try await connection.connect()
 	}
 }

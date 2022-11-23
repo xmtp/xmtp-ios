@@ -5,21 +5,25 @@
 //  Created by Pat Nakajima on 11/22/22.
 //
 
+import CoreImage
 import CoreImage.CIFilterBuiltins
 import UIKit
+import WalletConnectSwift
 
 protocol WalletConnectionMethod {
 	var type: WalletConnectionMethodType { get }
 }
 
-enum WalletConnectionMethodType {
-	case redirect, qrCode(UIImage), manual(String)
+public enum WalletConnectionMethodType {
+	case redirect(URL), qrCode(UIImage), manual(String)
 }
 
 struct WalletRedirectConnectionMethod: WalletConnectionMethod {
 	var redirectURI: String
 	var type: WalletConnectionMethodType {
-		.redirect
+		// swiftlint:disable force_unwrapping
+		.redirect(URL(string: redirectURI)!)
+		// swiftlint:enable force_unwrapping
 	}
 }
 

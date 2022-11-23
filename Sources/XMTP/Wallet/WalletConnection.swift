@@ -26,7 +26,7 @@ enum WalletConnectionError: String, Error {
 	case noSignature
 }
 
-protocol WalletConnection {
+public protocol WalletConnection {
 	var isConnected: Bool { get }
 	var walletAddress: String? { get }
 	func preferredConnectionMethod() throws -> WalletConnectionMethodType
@@ -35,7 +35,7 @@ protocol WalletConnection {
 }
 
 class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
-	@Published var isConnected = false
+	@Published public var isConnected = false
 
 	var walletConnectClient: WalletConnectSwift.Client!
 	var session: WalletConnectSwift.Session? {
@@ -61,11 +61,11 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 	}
 
 	func preferredConnectionMethod() throws -> WalletConnectionMethodType {
-		guard let url = walletConnectURL else {
+		guard let url = walletConnectURL?.asURL else {
 			throw WalletConnectionError.walletConnectURL
 		}
 
-		if let url = URL(string: url.absoluteString), UIApplication.shared.canOpenURL(url) {
+		if UIApplication.shared.canOpenURL(url) {
 			return WalletRedirectConnectionMethod(redirectURI: url.absoluteString).type
 		}
 
