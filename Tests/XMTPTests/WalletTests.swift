@@ -1,0 +1,51 @@
+//
+//  WalletTests.swift
+//
+//
+//  Created by Pat Nakajima on 11/22/22.
+//
+
+import XCTest
+@testable import XMTP
+
+class StubWalletConnection: WalletConnection {
+	var key: PrivateKey
+	var wasConnectCalled = false
+	var wasSignCalled = false
+
+	init(key: PrivateKey) {
+		self.key = key
+	}
+
+	func connect() async throws {
+		wasConnectCalled = true
+	}
+
+	func sign(_ data: Data) async throws -> Data {
+		wasSignCalled = true
+		let sig = try await key.sign(data)
+
+		return sig.rawData
+	}
+}
+
+final class WalletTests: XCTestCase {
+	func testTakesAConnectionAndConnects() async throws {
+		let key = try PrivateKey.generate()
+		let stubConnection = StubWalletConnection(key: key)
+
+		let wallet = try Wallet(connection: stubConnection)
+
+		try await wallet.connect()
+		XCTAssert(stubConnection.wasConnectCalled, "did not call connect() on connection")
+
+		let digest = "Hello world".web3.keccak256
+
+		let expectedSignature = try await key.sign(digest)
+
+		let signature = try await wallet.sign(digest)
+
+		XCTAssertEqual(signature.walletEcdsaCompact.bytes, expectedSignature.ecdsaCompact.bytes)
+		XCTAssertEqual(signature.walletEcdsaCompact.recovery, expectedSignature.ecdsaCompact.recovery)
+	}
+}

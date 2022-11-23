@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",
       "state" : {
-        "revision" : "79ac632c85df81f2618dd838fc3869633e163370",
-        "version" : "1.2.0"
+        "revision" : "039f56c5d7960f277087a0be51f5eb04ed0ec073",
+        "version" : "1.5.1"
       }
     },
     {
@@ -52,15 +52,6 @@
       "state" : {
         "branch" : "main",
         "revision" : "1542d3a9968ddac9c33d04f7b22a6ad54a415e29"
-      }
-    },
-    {
-      "identity" : "starscream",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/daltoniam/Starscream.git",
-      "state" : {
-        "revision" : "a063fda2b8145a231953c20e7a646be254365396",
-        "version" : "3.1.2"
       }
     },
     {
@@ -149,8 +140,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/WalletConnect/WalletConnectSwift.git",
       "state" : {
-        "revision" : "aae79d56b294be87a3ad0cf805c73d923508f514",
-        "version" : "1.2.0"
+        "revision" : "e0bbfd16d5c54a7aa7e316956d765399c6332fa2",
+        "version" : "1.7.0"
       }
     },
     {
