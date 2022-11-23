@@ -10,6 +10,10 @@ import XMTPProto
 
 typealias Signature = Xmtp_MessageContents_Signature
 
+enum SignatureError: Error {
+	case invalidMessage
+}
+
 extension Signature {
 	static func ethHash(_ message: String) throws -> Data {
 		let prefix = "\u{19}Ethereum Signed Message:\n\(message.count)"
@@ -18,7 +22,11 @@ extension Signature {
 			throw PrivateKeyError.invalidPrefix
 		}
 
-		data.append(message.data(using: .utf8)!)
+		guard let messageData = message.data(using: .utf8) else {
+			throw SignatureError.invalidMessage
+		}
+
+		data.append(messageData)
 
 		return Util.keccak256(data)
 	}

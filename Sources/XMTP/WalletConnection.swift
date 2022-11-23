@@ -6,8 +6,6 @@
 //
 
 import Foundation
-
-import Foundation
 import WalletConnectSwift
 import web3
 
@@ -35,7 +33,9 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 			name: "xmtp-ios",
 			description: "XMTP",
 			icons: [],
+			// swiftlint:disable force_unwrapping
 			url: URL(string: "https://safe.gnosis.io")!
+			// swiftlint:enable force_unwrapping
 		)
 		let dAppInfo = WalletConnectSwift.Session.DAppInfo(peerId: UUID().uuidString, peerMeta: peerMeta)
 
@@ -48,7 +48,9 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 
 			return WCURL(
 				topic: UUID().uuidString,
+				// swiftlint:disable force_unwrapping
 				bridgeURL: URL(string: "https://bridge.walletconnect.org")!,
+				// swiftlint:enable force_unwrapping
 				key: keybytes.toHex
 			)
 		} catch {
