@@ -8,34 +8,6 @@
 import SwiftUI
 import XMTP
 
-class WalletManager: ObservableObject {
-	var wallet: XMTP.Wallet
-
-	init() {
-		do {
-			wallet = try XMTP.Wallet.create()
-		} catch {
-			fatalError("Wallet could not be created: \(error)")
-		}
-	}
-}
-
-struct LoggedInView: View {
-	var wallet: XMTP.Wallet
-
-	var body: some View {
-		Text("We're in")
-	}
-}
-
-struct QRCodeSheetView: View {
-	var image: UIImage
-
-	var body: some View {
-		Image(uiImage: image)
-	}
-}
-
 struct ContentView: View {
 	enum Status {
 		case unknown, connecting, connected, error(String)
@@ -44,6 +16,7 @@ struct ContentView: View {
 	@StateObject var walletManager = WalletManager()
 
 	@State private var status: Status = .unknown
+
 	@State private var isShowingQRCode = false
 	@State private var qrCodeImage: UIImage?
 
@@ -60,9 +33,6 @@ struct ContentView: View {
 				Text("Error: \(error)").foregroundColor(.red)
 			}
 		}
-		.onChange(of: walletManager.wallet.connection.isConnected) { isConnected in
-			self.status = isConnected ? .connected : .error("Could not connect")
-		}
 		.sheet(isPresented: $isShowingQRCode) {
 			if let qrCodeImage = qrCodeImage {
 				QRCodeSheetView(image: qrCodeImage)
@@ -72,6 +42,7 @@ struct ContentView: View {
 
 	func connectWallet() {
 		status = .connecting
+
 		do {
 			switch try walletManager.wallet.preferredConnectionMethod() {
 			case let .qrCode(image):
@@ -94,10 +65,13 @@ struct ContentView: View {
 						if walletManager.wallet.connection.isConnected {
 							self.status = .connected
 							self.isShowingQRCode = false
+							break
 						}
 
 						try await Task.sleep(for: .seconds(1))
 					}
+
+					self.status = .error("Timed out waiting to connect (30 seconds)")
 				} catch {
 					await MainActor.run {
 						self.status = .error("Error connecting: \(error)")
