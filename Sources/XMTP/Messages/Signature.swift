@@ -15,7 +15,7 @@ enum SignatureError: Error {
 }
 
 extension Signature {
-	static func ethHash(_ message: String) throws -> Data {
+	static func ethPersonalMessage(_ message: String) throws -> Data {
 		let prefix = "\u{19}Ethereum Signed Message:\n\(message.count)"
 
 		guard var data = prefix.data(using: .ascii) else {
@@ -27,6 +27,12 @@ extension Signature {
 		}
 
 		data.append(messageData)
+
+		return data
+	}
+
+	static func ethHash(_ message: String) throws -> Data {
+		let data = try ethPersonalMessage(message)
 
 		return Util.keccak256(data)
 	}
@@ -51,10 +57,11 @@ extension Signature {
 
 	var rawData: Data {
 		switch union {
-		case .ecdsaCompact(ecdsaCompact):
-			return ecdsaCompact.bytes + [UInt8(Int(ecdsaCompact.recovery))]
 		case .walletEcdsaCompact(walletEcdsaCompact):
 			return walletEcdsaCompact.bytes + [UInt8(Int(walletEcdsaCompact.recovery))]
+		case .ecdsaCompact(ecdsaCompact):
+			return ecdsaCompact.bytes + [UInt8(Int(ecdsaCompact.recovery))]
+
 		case .none:
 			return Data()
 		case .some:

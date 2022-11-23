@@ -28,6 +28,12 @@ extension PrivateKey: SigningKey {
 
 		return signature
 	}
+
+	func sign(message: String) async throws -> Signature {
+		let digest = try Signature.ethHash(message)
+
+		return try await sign(digest)
+	}
 }
 
 extension PrivateKey {

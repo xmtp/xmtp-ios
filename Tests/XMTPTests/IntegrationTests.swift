@@ -29,6 +29,7 @@ class CallbackyConnection: WCWalletConnection {
 final class IntegrationTests: XCTestCase {
 	func testSaveKey() async throws {
 		throw XCTSkip("integration only")
+
 		let alice = try PrivateKey.generate()
 		let identity = try PrivateKey.generate()
 
@@ -76,18 +77,25 @@ final class IntegrationTests: XCTestCase {
 
 		wait(for: [expectation], timeout: 60)
 
-		XCTAssert(wallet.connection.isConnected, "wallet connection is not connected")
+		let privateKey = try PrivateKey.generate()
+		let authorized = try await wallet.createIdentity(privateKey)
+		let authToken = try await authorized.createAuthToken()
 
-		let digest = "Hello world".data(using: .utf8)!
+		var api = try ApiClient(environment: .local, secure: false)
+		api.setAuthToken(authToken)
 
-		let signature = try await wallet.sign(digest)
+		let encryptedBundle = try await authorized.toBundle.encrypted(with: wallet)
 
-		let recoverDigest = try Signature.ethHash("Hello world")
-		let publicKey = try KeyUtil.recoverPublicKey(message: recoverDigest, signature: signature.rawData)
-		let address = KeyUtil.generateAddress(from: publicKey)
+		var envelope = Envelope()
+		envelope.contentTopic = Topic.userPrivateStoreKeyBundle(authorized.address).description
+		envelope.timestampNs = UInt64(Date().millisecondsSinceEpoch) * 1_000_000
+		envelope.message = try encryptedBundle.serializedData()
 
-		XCTAssertEqual(address, "0x1F935A71f5539fa0eEaa71136Aef39Ab7c64520f") // fancypat.eth
-		XCTAssertEqual(wallet.address, "0x1F935A71f5539fa0eEaa71136Aef39Ab7c64520f")
-		XCTAssert(signature.walletEcdsaCompact.bytes.count > 1)
+		try await api.publish(envelopes: [envelope])
+
+		try await Task.sleep(nanoseconds: 2_000_000_000)
+
+		let result = try await api.query(topics: [.userPrivateStoreKeyBundle("0xE2c094aB885170B56A811f0c8b5FeDC4a2565575")])
+		XCTAssert(result.envelopes.count >= 1)
 	}
 }

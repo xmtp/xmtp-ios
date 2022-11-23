@@ -39,9 +39,13 @@ extension Wallet: SigningKey {
 		let signatureData = try await connection.sign(data)
 
 		var signature = Signature()
-		signature.walletEcdsaCompact.bytes = signatureData[0 ..< 64]
-		signature.walletEcdsaCompact.recovery = UInt32(signatureData[64])
+		signature.ecdsaCompact.bytes = signatureData[0 ..< 64]
+		signature.ecdsaCompact.recovery = UInt32(signatureData[64])
 
 		return signature
+	}
+
+	func sign(message: String) async throws -> Signature {
+		return try await sign(message.data(using: .utf8)!)
 	}
 }

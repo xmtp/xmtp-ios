@@ -122,14 +122,23 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 					}
 
 					do {
-						let resultString = try response.result(as: String.self)
+						var resultString = try response.result(as: String.self)
+
+						// Strip leading 0x that we get back from `personal_sign`
+						if resultString.hasPrefix("0x"), resultString.count == 132 {
+							resultString = String(resultString.dropFirst(2))
+						}
 
 						guard let resultDataBytes = resultString.web3.bytesFromHex else {
 							continuation.resume(throwing: WalletConnectionError.noSignature)
 							return
 						}
 
-						let resultData = Data(resultDataBytes)
+						var resultData = Data(resultDataBytes)
+
+						// Ensure we have a valid recovery byte
+						resultData[resultData.count - 1] = 1 - resultData[resultData.count - 1] % 2
+
 						continuation.resume(returning: resultData)
 					} catch {
 						continuation.resume(throwing: error)
