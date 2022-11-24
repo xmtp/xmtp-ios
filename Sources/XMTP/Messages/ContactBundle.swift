@@ -17,11 +17,12 @@ extension ContactBundle {
 
 		var contactBundle = ContactBundle()
 
+		// Try to deserialize legacy v1 bundle
 		let publicKeyBundle = try PublicKeyBundle(serializedData: data)
 
 		contactBundle.v1.keyBundle = publicKeyBundle
 
-		// It's not a v1 bundle, so serialize the whole thing
+		// It's not a legacy bundle so just deserialize as a ContactBundle
 		if !contactBundle.v1.keyBundle.identityKey.hasSignature {
 			try contactBundle.merge(serializedData: data)
 		}
