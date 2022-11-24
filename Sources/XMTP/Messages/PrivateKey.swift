@@ -54,7 +54,7 @@ extension PrivateKey {
 	}
 
 	var walletAddress: String {
-		KeyUtil.generateAddress(from: publicKey.secp256K1Uncompressed.bytes).toChecksumAddress()
+		publicKey.walletAddress
 	}
 
 	func sign(key: UnsignedPublicKey) async throws -> SignedPublicKey {

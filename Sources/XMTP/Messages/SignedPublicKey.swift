@@ -26,7 +26,6 @@ extension SignedPublicKey {
 		let sigHash = try Signature.ethHash(sigText)
 
 		let pubKeyData = try KeyUtil.recoverPublicKey(message: sigHash, signature: signature.rawData)
-		print("pub key data is \(pubKeyData[0])")
 
 		return try PublicKey(pubKeyData)
 	}

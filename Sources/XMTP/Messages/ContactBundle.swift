@@ -18,6 +18,7 @@ extension ContactBundle {
 		var contactBundle = ContactBundle()
 
 		let publicKeyBundle = try PublicKeyBundle(serializedData: data)
+
 		contactBundle.v1.keyBundle = publicKeyBundle
 
 		// It's not a v1 bundle, so serialize the whole thing
@@ -42,6 +43,18 @@ extension ContactBundle {
 			}
 
 			return nil
+		case .none:
+			return nil
+		}
+	}
+
+	var identityAddress: String? {
+		switch version {
+		case .v1:
+			return v1.keyBundle.identityKey.walletAddress
+		case .v2:
+			let publicKey = try? PublicKey(v2.keyBundle.identityKey)
+			return publicKey?.walletAddress
 		case .none:
 			return nil
 		}

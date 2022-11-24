@@ -48,4 +48,8 @@ extension PublicKey {
 		let pubKeyData = try KeyUtil.recoverPublicKey(message: sigHash, signature: signature.rawData)
 		return try PublicKey(pubKeyData)
 	}
+
+	var walletAddress: String {
+		KeyUtil.generateAddress(from: secp256K1Uncompressed.bytes).toChecksumAddress()
+	}
 }

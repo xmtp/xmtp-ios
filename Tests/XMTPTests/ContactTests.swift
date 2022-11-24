@@ -70,5 +70,7 @@ class ContactTests: XCTestCase {
 
 		let contactBundle = try ContactBundle.from(envelope: envelope)
 		XCTAssertEqual(contactBundle.walletAddress, "0x66942eC8b0A6d0cff51AEA9C7fd00494556E705F")
+		XCTAssertEqual(contactBundle.identityAddress, "0xD320f1454e33ab9393c0cc596E6321d80e4b481e")
+		XCTAssert(contactBundle.v1.keyBundle.hasPreKey == false, "should not have pre key")
 	}
 }
