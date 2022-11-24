@@ -65,17 +65,11 @@ class Client {
 		let response = try await apiClient.query(topics: [.contact(peerAddress)])
 
 		for envelope in response.envelopes {
-			if let contactBundle = try extractContactBundle(message: envelope.message) {
+			if let contactBundle = try? ContactBundle.from(envelope: envelope) {
 				return contactBundle
 			}
 		}
 
 		return nil
-	}
-
-	private func extractContactBundle(message: Data) throws -> ContactBundle? {
-		let contactBundle = try? ContactBundle(serializedData: message)
-
-		return contactBundle
 	}
 }
