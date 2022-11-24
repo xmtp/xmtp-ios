@@ -42,8 +42,8 @@ extension Wallet: SigningKey {
 		signature.ecdsaCompact.bytes = signatureData[0 ..< 64]
 		signature.ecdsaCompact.recovery = UInt32(signatureData[64])
 
-		signature.walletEcdsaCompact.bytes = signature.ecdsaCompact.bytes
-		signature.walletEcdsaCompact.recovery = signature.ecdsaCompact.recovery
+		signature.walletEcdsaCompact.bytes = signatureData[0 ..< 64]
+		signature.walletEcdsaCompact.recovery = UInt32(signatureData[64])
 
 		return signature
 	}
