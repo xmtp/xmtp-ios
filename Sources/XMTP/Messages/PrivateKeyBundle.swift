@@ -6,8 +6,13 @@
 //
 
 import XMTPProto
+import Foundation
 
 typealias PrivateKeyBundle = Xmtp_MessageContents_PrivateKeyBundle
+
+enum PrivateKeyBundleError: Error {
+	case noPreKeyFound
+}
 
 extension PrivateKeyBundle {
 	func encrypted(with key: SigningKey) async throws -> EncryptedPrivateKeyBundle {

@@ -39,8 +39,16 @@ class Client {
 		self.apiClient = apiClient
 	}
 
+	var keys: PrivateKeyBundleV2 {
+		do {
+			return try privateKeyBundleV1.toV2()
+		} catch {
+			fatalError("Error getting keys \(error)")
+		}
+	}
+
 	func publishUserContact() async throws {
-		var keyBundle = privateKeyBundleV1.toPublicKeyBundle()
+		var keyBundle = try privateKeyBundleV1.toPublicKeyBundle()
 		var contactBundle = ContactBundle()
 		contactBundle.v1.keyBundle = keyBundle
 
@@ -71,5 +79,9 @@ class Client {
 		}
 
 		return nil
+	}
+
+	func listInvitations() async throws -> [SealedInvitation] {
+		return []
 	}
 }

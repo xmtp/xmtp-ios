@@ -10,6 +10,21 @@ import XMTPProto
 typealias SignedPublicKey = Xmtp_MessageContents_SignedPublicKey
 
 extension SignedPublicKey {
+	static func fromLegacy(_ legacyKey: PublicKey, signedByWallet: Bool? = false) throws -> SignedPublicKey {
+		var signedPublicKey = SignedPublicKey()
+		signedPublicKey.keyBytes = try legacyKey.serializedData()
+
+		var signature = legacyKey.signature
+		if signedByWallet == true {
+			signature.walletEcdsaCompact.bytes = signature.ecdsaCompact.bytes
+			signature.walletEcdsaCompact.recovery = signature.ecdsaCompact.recovery
+		}
+
+		signedPublicKey.signature = signature
+
+		return signedPublicKey
+	}
+
 	init(_ publicKey: PublicKey, signature: Signature) throws {
 		self.init()
 		self.signature = signature

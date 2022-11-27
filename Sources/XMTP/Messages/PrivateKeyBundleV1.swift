@@ -27,6 +27,15 @@ extension PrivateKeyBundleV1 {
 		return bundle.v1
 	}
 
+	func toV2() throws -> PrivateKeyBundleV2 {
+		var v2bundle = PrivateKeyBundleV2()
+
+		v2bundle.identityKey = try SignedPrivateKey.fromLegacy(identityKey, signedByWallet: true)
+		v2bundle.preKeys = try preKeys.map { try SignedPrivateKey.fromLegacy($0) }
+
+		return v2bundle
+	}
+
 	func toPublicKeyBundle() -> PublicKeyBundle {
 		var publicKeyBundle = PublicKeyBundle()
 

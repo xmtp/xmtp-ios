@@ -8,7 +8,6 @@
 import GRPC
 import XMTPProto
 
-typealias Envelope = Xmtp_MessageApi_V1_Envelope
 typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse
 
 struct ApiClient {
