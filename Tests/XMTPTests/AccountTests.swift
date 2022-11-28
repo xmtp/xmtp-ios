@@ -35,7 +35,7 @@ class StubWalletConnection: WalletConnection {
 		wasSignCalled = true
 		let sig = try await key.sign(data)
 
-		return sig.rawData
+		return sig.ecdsaCompact.bytes + [UInt8(Int(sig.ecdsaCompact.recovery))]
 	}
 }
 
@@ -55,7 +55,7 @@ final class AccountTests: XCTestCase {
 
 		let signature = try await wallet.sign(digest)
 
-		XCTAssertEqual(signature.walletEcdsaCompact.bytes, expectedSignature.ecdsaCompact.bytes)
-		XCTAssertEqual(signature.walletEcdsaCompact.recovery, expectedSignature.ecdsaCompact.recovery)
+		XCTAssertEqual(signature.ecdsaCompact.bytes, expectedSignature.ecdsaCompact.bytes)
+		XCTAssertEqual(signature.ecdsaCompact.recovery, expectedSignature.ecdsaCompact.recovery)
 	}
 }

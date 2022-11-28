@@ -40,9 +40,6 @@ extension Account: SigningKey {
 
 		var signature = Signature()
 
-		signature.walletEcdsaCompact.bytes = signatureData[0 ..< 64]
-		signature.walletEcdsaCompact.recovery = UInt32(signatureData[64])
-
 		signature.ecdsaCompact.bytes = signatureData[0 ..< 64]
 		signature.ecdsaCompact.recovery = UInt32(signatureData[64])
 
