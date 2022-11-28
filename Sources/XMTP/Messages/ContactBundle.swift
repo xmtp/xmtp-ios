@@ -23,12 +23,14 @@ extension ContactBundle {
 		contactBundle.v1.keyBundle = publicKeyBundle
 
 		// It's not a legacy bundle so just deserialize as a ContactBundle
-		if !contactBundle.v1.keyBundle.identityKey.hasSignature {
+		if contactBundle.v1.keyBundle.identityKey.secp256K1Uncompressed.bytes.isEmpty {
 			try contactBundle.merge(serializedData: data)
 		}
 
 		return contactBundle
 	}
+
+	// swiftlint:disable no_optional_try
 
 	var walletAddress: String? {
 		switch version {
@@ -60,4 +62,6 @@ extension ContactBundle {
 			return nil
 		}
 	}
+
+	// swiftlint:enable no_optional_try
 }

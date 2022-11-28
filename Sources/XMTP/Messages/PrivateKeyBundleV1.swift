@@ -22,10 +22,10 @@ extension PrivateKeyBundleV1 {
 		let bytesToSign = try UnsignedPublicKey(preKey.publicKey).serializedData()
 		let signature = try await privateKey.sign(Data(SHA256.hash(data: bytesToSign)))
 
-		preKey.publicKey.signature = signature
-
 		bundle.v1.identityKey = authorizedIdentity.identity
 		bundle.v1.identityKey.publicKey = authorizedIdentity.authorized
+		preKey.publicKey.signature = signature
+
 		bundle.v1.preKeys = [preKey]
 
 		let valid = try signature.verify(signedBy: privateKey.publicKey, digest: bytesToSign)

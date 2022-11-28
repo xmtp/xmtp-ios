@@ -64,11 +64,10 @@ extension Signature {
 
 	var rawData: Data {
 		switch union {
-		case .walletEcdsaCompact(walletEcdsaCompact):
-			return walletEcdsaCompact.bytes + [UInt8(Int(walletEcdsaCompact.recovery))]
 		case .ecdsaCompact(ecdsaCompact):
 			return ecdsaCompact.bytes + [UInt8(Int(ecdsaCompact.recovery))]
-
+		case .walletEcdsaCompact(walletEcdsaCompact):
+			return walletEcdsaCompact.bytes + [UInt8(Int(walletEcdsaCompact.recovery))]
 		case .none:
 			return Data()
 		case .some:

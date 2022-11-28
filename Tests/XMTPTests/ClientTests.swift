@@ -13,7 +13,7 @@ import XCTest
 class ClientTests: XCTestCase {
 	func testTakesAWallet() async throws {
 		let fakeWallet = try PrivateKey.generate()
-		_ = try await Client.create(wallet: fakeWallet)
+		_ = try await Client.create(account: fakeWallet)
 	}
 
 	func testHasAPIClient() async throws {
@@ -21,14 +21,14 @@ class ClientTests: XCTestCase {
 
 		var options = ClientOptions()
 		options.api.env = .local
-		let client = try await Client.create(wallet: fakeWallet, options: options)
+		let client = try await Client.create(account: fakeWallet, options: options)
 
 		XCTAssert(client.apiClient.environment == .local)
 	}
 
 	func testHasPrivateKeyBundleV1() async throws {
 		let fakeWallet = try PrivateKey.generate()
-		let client = try await Client.create(wallet: fakeWallet)
+		let client = try await Client.create(account: fakeWallet)
 
 		XCTAssertEqual(1, client.privateKeyBundleV1.preKeys.count)
 
@@ -39,12 +39,16 @@ class ClientTests: XCTestCase {
 
 	@available(iOS 16.0, *)
 	func testConversationWithMe() async throws {
+		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
+
 		let fakeWallet = try PrivateKey.generate()
+		let fakeContactWallet = try PrivateKey.generate()
+		let fakeContactClient = try await Client.create(account: fakeContactWallet, options: options)
+		try await fakeContactClient.publishUserContact()
 
-		let options = ClientOptions(api: ClientOptions.Api(env: .production, isSecure: true))
-		let client = try await Client.create(wallet: fakeWallet, options: options)
+		let client = try await Client.create(account: fakeWallet, options: options)
 
-		let contact = try await client.getUserContact(peerAddress: "0x1F935A71f5539fa0eEaa71136Aef39Ab7c64520f")!
+		let contact = try await client.getUserContact(peerAddress: fakeWallet.walletAddress)!
 		let privkeybundlev2 = try client.privateKeyBundleV1.toV2()
 
 		let conversations = Conversations(client: client)

@@ -1,5 +1,5 @@
 //
-//  WalletTests.swift
+//  AccountTests.swift
 //
 //
 //  Created by Pat Nakajima on 11/22/22.
@@ -35,16 +35,16 @@ class StubWalletConnection: WalletConnection {
 		wasSignCalled = true
 		let sig = try await key.sign(data)
 
-		return sig.rawData
+		return sig.ecdsaCompact.bytes + [UInt8(Int(sig.ecdsaCompact.recovery))]
 	}
 }
 
-final class WalletTests: XCTestCase {
+final class AccountTests: XCTestCase {
 	func testTakesAConnectionAndConnects() async throws {
 		let key = try PrivateKey.generate()
 		let stubConnection = StubWalletConnection(key: key)
 
-		let wallet = try Wallet(connection: stubConnection)
+		let wallet = try Account(connection: stubConnection)
 
 		try await wallet.connect()
 		XCTAssert(stubConnection.wasConnectCalled, "did not call connect() on connection")
@@ -55,7 +55,7 @@ final class WalletTests: XCTestCase {
 
 		let signature = try await wallet.sign(digest)
 
-		XCTAssertEqual(signature.walletEcdsaCompact.bytes, expectedSignature.ecdsaCompact.bytes)
-		XCTAssertEqual(signature.walletEcdsaCompact.recovery, expectedSignature.ecdsaCompact.recovery)
+		XCTAssertEqual(signature.ecdsaCompact.bytes, expectedSignature.ecdsaCompact.bytes)
+		XCTAssertEqual(signature.ecdsaCompact.recovery, expectedSignature.ecdsaCompact.recovery)
 	}
 }
