@@ -28,7 +28,6 @@ extension PrivateKeyBundleV1 {
 
 	func toPublicKeyBundle() -> PublicKeyBundle {
 		var publicKeyBundle = PublicKeyBundle()
-		print("to public key bundle \(try! jsonString())")
 
 		publicKeyBundle.identityKey = identityKey.publicKey
 		publicKeyBundle.preKey = preKeys[0].publicKey

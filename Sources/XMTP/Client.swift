@@ -33,7 +33,9 @@ class Client {
 	}
 
 	static func loadOrCreateKeys(for account: SigningKey, apiClient: ApiClient) async throws -> PrivateKeyBundleV1 {
-		if let keys = try await loadPrivateKeys(for: account, apiClient: apiClient) {
+		// swiftlint:disable no_optional_try
+		if let keys = try? await loadPrivateKeys(for: account, apiClient: apiClient) {
+			// swiftlint:enable no_optional_try
 			return keys
 		} else {
 			return try await PrivateKeyBundleV1.generate(wallet: account)
