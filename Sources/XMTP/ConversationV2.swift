@@ -20,8 +20,9 @@ struct ConversationV2 {
 
 	static func create(client: Client, invitation: InvitationV1, header: SealedInvitationHeaderV1) throws -> ConversationV2 {
 		let myKeys = client.keys.getPublicKeyBundle()
-		let peer = myKeys.identityKey.keyBytes == header.sender.identityKey.keyBytes ? header.recipient : header.sender
-		let peerAddress = try peer.identityKey.recoverWalletSignerPublicKey().walletAddress
+
+		let peer = myKeys.walletAddress == header.sender.walletAddress ? header.recipient : header.sender
+		let peerAddress = peer.walletAddress ?? "0x0"
 
 		let keyMaterial = Data(invitation.aes256GcmHkdfSha256.keyMaterial.bytes)
 
@@ -44,17 +45,34 @@ struct ConversationV2 {
 		self.header = header
 	}
 
+	func messages() async throws -> [DecodedMessage] {
+		let envelopes = try await client.apiClient.query(topics: [topic]).envelopes
+
+		return envelopes.compactMap { envelope in
+			do {
+				let message = try Message(serializedData: envelope.message)
+				let decrypted = try message.v1.decrypt(with: client.privateKeyBundleV1)
+				let encodedMessage = try EncodedContent(serializedData: decrypted)
+				let decoder = TextCodec()
+				let decoded = try decoder.decode(content: encodedMessage)
+
+				return DecodedMessage(body: decoded)
+			} catch {
+				print("Error decoding envelope \(error)")
+				return nil
+			}
+		}
+	}
+
 	// TODO: more types of content
 	func send(content: String, options _: SendOptions? = nil) async throws {
 		let contact = try await client.getUserContact(peerAddress: peerAddress)!
 
-		var encodedContent = Xmtp_MessageContents_EncodedContent()
-		encodedContent.content = Data(content.utf8)
-		encodedContent.fallback = content
+		var encoder = TextCodec()
+		let encodedContent = try encoder.encode(content: content)
 
-		var recipient = PublicKeyBundle()
-		recipient.identityKey = try PublicKey(contact.v2.keyBundle.identityKey)
-		recipient.preKey = try PublicKey(contact.v2.keyBundle.preKey)
+		let signedPublicKeyBundle = try contact.toSignedPublicKeyBundle()
+		let recipient = try PublicKeyBundle(signedPublicKeyBundle)
 
 		var message = try await MessageV1.encode(
 			sender: client.privateKeyBundleV1,
@@ -62,8 +80,6 @@ struct ConversationV2 {
 			message: try encodedContent.serializedData(),
 			timestamp: Date()
 		)
-
-		print("SENDING TO \(try recipient.identityKey.recoverWalletSignerPublicKey().walletAddress)")
 
 		try await client.publish(envelopes: [
 			Envelope(topic: .userIntro(try recipient.identityKey.recoverWalletSignerPublicKey().walletAddress), timestamp: Date(), message: try message.serializedData()),

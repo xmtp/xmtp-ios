@@ -28,7 +28,7 @@ class CallbackyConnection: WCWalletConnection {
 @available(iOS 16, *)
 final class IntegrationTests: XCTestCase {
 	func testSaveKey() async throws {
-		throw XCTSkip("integration only")
+		throw XCTSkip("integration only (requires local node)")
 
 		let alice = try PrivateKey.generate()
 		let identity = try PrivateKey.generate()
@@ -56,7 +56,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testWalletSaveKey() async throws {
-		throw XCTSkip("integration only")
+		throw XCTSkip("integration only (requires local node)")
 
 		let connection = CallbackyConnection()
 		let wallet = try Account(connection: connection)
@@ -100,7 +100,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testPublishingAndFetchingContactBundlesWithWhileGeneratingKeys() async throws {
-		throw XCTSkip("integration only")
+		throw XCTSkip("integration only (requires local node)")
 
 		let aliceWallet = try PrivateKey.generate()
 		let alice = try await PrivateKeyBundleV1.generate(wallet: aliceWallet)
@@ -122,7 +122,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testPublishingAndFetchingContactBundlesWithSavedKeys() async throws {
-		throw XCTSkip("integration only")
+		throw XCTSkip("integration only (requires local node)")
 
 		let aliceWallet = try PrivateKey.generate()
 		let alice = try await PrivateKeyBundleV1.generate(wallet: aliceWallet)
@@ -155,5 +155,67 @@ final class IntegrationTests: XCTestCase {
 		XCTAssertEqual(contact?.v1.keyBundle.identityKey.secp256K1Uncompressed, client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed)
 		XCTAssert(contact?.v1.keyBundle.identityKey.hasSignature == true, "no signature")
 		XCTAssert(contact?.v1.keyBundle.preKey.hasSignature == true, "pre key not signed")
+	}
+
+	func testConversationWithMe() async throws {
+		throw XCTSkip("integration only (requires local node)")
+
+		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
+
+		let fakeContactWallet = try PrivateKey.generate()
+		let fakeContactClient = try await Client.create(account: fakeContactWallet, options: options)
+		try await fakeContactClient.publishUserContact()
+
+		let fakeWallet = try PrivateKey.generate()
+		let client = try await Client.create(account: fakeWallet, options: options)
+
+		let contact = try await client.getUserContact(peerAddress: fakeContactWallet.walletAddress)!
+
+		XCTAssertEqual(contact.walletAddress, fakeContactWallet.walletAddress)
+		let privkeybundlev2 = try client.privateKeyBundleV1.toV2()
+		let conversations = Conversations(client: client)
+
+		let created = Date()
+		let invitationv1 = try InvitationV1.createRandom()
+		let senderBundle = try client.privateKeyBundleV1.toV2()
+
+		XCTAssertEqual(try senderBundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress, fakeWallet.address)
+		let invitation = try InvitationV1.createV1(
+			sender: try client.privateKeyBundleV1.toV2(),
+			recipient: try contact.toSignedPublicKeyBundle(),
+			created: created,
+			invitation: invitationv1
+		)
+
+		let inviteHeader = invitation.v1.header
+		XCTAssertEqual(inviteHeader.sender.walletAddress, fakeWallet.walletAddress)
+		XCTAssertEqual(inviteHeader.recipient.walletAddress, fakeContactWallet.walletAddress)
+
+		let recipBundle = privkeybundlev2.getPublicKeyBundle()
+		let sealedInvitation = try await conversations.sendInvitation(
+			recipient: recipBundle,
+			invitation: invitationv1,
+			created: created
+		)
+
+		let header = try SealedInvitationHeaderV1(serializedData: invitation.v1.headerBytes)
+		let conversation = try ConversationV2.create(client: client, invitation: invitationv1, header: header)
+
+		XCTAssertEqual(fakeContactWallet.walletAddress, conversation.peerAddress)
+//
+		do {
+			try await conversation.send(content: "hello world")
+		} catch {
+			print("ERROR SENDING \(error)")
+		}
+
+		let recipientConversation = try ConversationV2.create(client: fakeContactClient, invitation: invitationv1, header: header)
+		let messages = try await recipientConversation.messages()
+
+		if let message = messages.first {
+			XCTAssertEqual("hello world", message.body)
+		} else {
+			XCTFail("no messages")
+		}
 	}
 }

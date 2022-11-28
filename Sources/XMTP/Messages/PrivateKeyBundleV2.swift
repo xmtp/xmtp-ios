@@ -12,8 +12,6 @@ typealias PrivateKeyBundleV2 = Xmtp_MessageContents_PrivateKeyBundleV2
 
 extension PrivateKeyBundleV2 {
 	func sharedSecret(peer: SignedPublicKeyBundle, myPreKey: SignedPublicKey, isRecipient: Bool) throws -> Data {
-		print("peer pre key signature \(peer.preKey.signature)")
-
 //		if !(try peer.preKey.signature.verify(signedBy: try PublicKey(peer.identityKey), digest: peer.preKey.keyBytes)) {
 //			throw PublicKeyError.invalidPreKey
 //		}

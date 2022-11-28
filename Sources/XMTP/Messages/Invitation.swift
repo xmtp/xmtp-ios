@@ -48,12 +48,7 @@ extension InvitationV1 {
 		let invitationBytes = try invitation.serializedData()
 		let ciphertext = try Crypto.encrypt(secret, invitationBytes, additionalData: headerBytes)
 
-		var sealedInvitationv1 = SealedInvitationV1()
-		sealedInvitationv1.headerBytes = headerBytes
-		sealedInvitationv1.ciphertext = ciphertext
-
-		var sealedInvitation = SealedInvitation()
-		sealedInvitation.v1 = sealedInvitationv1
+		let sealedInvitation = SealedInvitation(headerBytes: headerBytes, ciphertext: ciphertext)
 
 		return sealedInvitation
 	}

@@ -24,9 +24,6 @@ extension SigningKey {
 		let signatureText = Signature.createIdentityText(key: try slimKey.serializedData())
 		var signature = try await sign(message: signatureText)
 
-		signature.walletEcdsaCompact.bytes = signature.ecdsaCompact.bytes
-		signature.walletEcdsaCompact.recovery = signature.ecdsaCompact.recovery
-
 		let digest = try Signature.ethHash(signatureText)
 		let recoveredKey = try KeyUtil.recoverPublicKey(message: digest, signature: signature.rawData)
 		let address = KeyUtil.generateAddress(from: recoveredKey).toChecksumAddress()

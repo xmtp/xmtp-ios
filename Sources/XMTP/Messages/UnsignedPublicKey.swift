@@ -23,7 +23,7 @@ extension UnsignedPublicKey {
 	init(_ publicKey: PublicKey) {
 		self.init()
 
-		createdNs = publicKey.timestamp * 1_000_000
+		createdNs = publicKey.timestamp
 		secp256K1Uncompressed.bytes = publicKey.secp256K1Uncompressed.bytes
 	}
 }

@@ -28,16 +28,13 @@ extension PrivateKeyBundleV1 {
 
 		bundle.v1.preKeys = [preKey]
 
-		let valid = try signature.verify(signedBy: privateKey.publicKey, digest: bytesToSign)
-		print("IS VALID \(valid)")
-
 		return bundle.v1
 	}
 
 	func toV2() throws -> PrivateKeyBundleV2 {
 		var v2bundle = PrivateKeyBundleV2()
 
-		v2bundle.identityKey = try SignedPrivateKey.fromLegacy(identityKey, signedByWallet: true)
+		v2bundle.identityKey = try SignedPrivateKey.fromLegacy(identityKey, signedByWallet: false)
 		v2bundle.preKeys = try preKeys.map { try SignedPrivateKey.fromLegacy($0) }
 
 		return v2bundle

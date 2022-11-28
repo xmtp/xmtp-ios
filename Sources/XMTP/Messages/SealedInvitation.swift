@@ -28,7 +28,7 @@ extension SealedInvitation {
 		return try SealedInvitation(headerBytes: headerBytes, ciphertext: ciphertext)
 	}
 
-	init(headerBytes: Data, ciphertext: CipherText) throws {
+	init(headerBytes: Data, ciphertext: CipherText) {
 		self.init()
 		v1.headerBytes = headerBytes
 		v1.ciphertext = ciphertext

@@ -14,7 +14,7 @@ typealias SignedPublicKey = Xmtp_MessageContents_SignedPublicKey
 extension SignedPublicKey {
 	static func fromLegacy(_ legacyKey: PublicKey, signedByWallet: Bool? = false) throws -> SignedPublicKey {
 		var signedPublicKey = SignedPublicKey()
-		signedPublicKey.keyBytes = try legacyKey.serializedData()
+		signedPublicKey.keyBytes = try UnsignedPublicKey(legacyKey).serializedData()
 		signedPublicKey.signature = legacyKey.signature
 
 		if signedByWallet == true, signedPublicKey.signature.walletEcdsaCompact.bytes.isEmpty {
@@ -48,7 +48,6 @@ extension SignedPublicKey {
 		let sigText = Signature.createIdentityText(key: keyBytes)
 		let sigHash = try Signature.ethHash(sigText)
 
-		print("RECOVERING \(signature)")
 		let pubKeyData = try KeyUtil.recoverPublicKey(message: sigHash, signature: signature.rawData)
 
 		return try PublicKey(pubKeyData)
