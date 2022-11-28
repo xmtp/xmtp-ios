@@ -15,15 +15,12 @@ extension SignedPublicKey {
 	static func fromLegacy(_ legacyKey: PublicKey, signedByWallet: Bool? = false) throws -> SignedPublicKey {
 		var signedPublicKey = SignedPublicKey()
 		signedPublicKey.keyBytes = try legacyKey.serializedData()
+		signedPublicKey.signature = legacyKey.signature
 
-		var signature = legacyKey.signature
-
-		if signedByWallet == true {
-			signature.walletEcdsaCompact.bytes = signature.ecdsaCompact.bytes
-			signature.walletEcdsaCompact.recovery = signature.ecdsaCompact.recovery
+		if signedByWallet == true, signedPublicKey.signature.walletEcdsaCompact.bytes.isEmpty {
+			signedPublicKey.signature.walletEcdsaCompact.bytes = signedPublicKey.signature.ecdsaCompact.bytes
+			signedPublicKey.signature.walletEcdsaCompact.recovery = signedPublicKey.signature.ecdsaCompact.recovery
 		}
-
-		signedPublicKey.signature = signature
 
 		return signedPublicKey
 	}
@@ -51,6 +48,7 @@ extension SignedPublicKey {
 		let sigText = Signature.createIdentityText(key: keyBytes)
 		let sigHash = try Signature.ethHash(sigText)
 
+		print("RECOVERING \(signature)")
 		let pubKeyData = try KeyUtil.recoverPublicKey(message: sigHash, signature: signature.rawData)
 
 		return try PublicKey(pubKeyData)

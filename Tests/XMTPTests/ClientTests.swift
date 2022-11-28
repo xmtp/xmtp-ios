@@ -39,17 +39,12 @@ class ClientTests: XCTestCase {
 
 	@available(iOS 16.0, *)
 	func testConversationWithMe() async throws {
-		let recip = try PrivateKey.generate()
 		let fakeWallet = try PrivateKey.generate()
 
-		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
-
-		try await Client.create(wallet: recip, options: options).publishUserContact()
-
+		let options = ClientOptions(api: ClientOptions.Api(env: .production, isSecure: true))
 		let client = try await Client.create(wallet: fakeWallet, options: options)
 
-		let contact = try await client.getUserContact(peerAddress: recip.walletAddress)!
-
+		let contact = try await client.getUserContact(peerAddress: "0x1F935A71f5539fa0eEaa71136Aef39Ab7c64520f")!
 		let privkeybundlev2 = try client.privateKeyBundleV1.toV2()
 
 		let conversations = Conversations(client: client)
@@ -64,8 +59,9 @@ class ClientTests: XCTestCase {
 			invitation: invitationv1
 		)
 
+		let recipBundle = privkeybundlev2.getPublicKeyBundle()
 		let sealedInvitation = try await conversations.sendInvitation(
-			recipient: privkeybundlev2.getPublicKeyBundle(),
+			recipient: recipBundle,
 			invitation: invitationv1,
 			created: created
 		)

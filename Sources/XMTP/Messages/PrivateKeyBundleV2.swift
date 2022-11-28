@@ -53,6 +53,7 @@ extension PrivateKeyBundleV2 {
 		var publicKeyBundle = SignedPublicKeyBundle()
 
 		publicKeyBundle.identityKey = identityKey.publicKey
+		publicKeyBundle.identityKey.signature = identityKey.publicKey.signature
 		publicKeyBundle.preKey = preKeys[0].publicKey
 
 		return publicKeyBundle
