@@ -23,7 +23,7 @@ extension ContactBundle {
 		contactBundle.v1.keyBundle = publicKeyBundle
 
 		// It's not a legacy bundle so just deserialize as a ContactBundle
-		if !contactBundle.v1.keyBundle.identityKey.hasSignature {
+		if contactBundle.v1.keyBundle.identityKey.secp256K1Uncompressed.bytes.isEmpty {
 			try contactBundle.merge(serializedData: data)
 		}
 
