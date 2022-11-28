@@ -52,7 +52,6 @@ extension InvitationV1 {
 		sealedInvitationv1.headerBytes = headerBytes
 		sealedInvitationv1.ciphertext = ciphertext
 
-
 		var sealedInvitation = SealedInvitation()
 		sealedInvitation.v1 = sealedInvitationv1
 

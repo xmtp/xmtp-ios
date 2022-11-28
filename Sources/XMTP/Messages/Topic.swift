@@ -10,9 +10,9 @@ import XMTPProto
 enum Topic: CustomStringConvertible {
 	case userPrivateStoreKeyBundle(String),
 	     contact(String),
-			 userIntro(String),
-			 userInvite(String),
-			 directMessageV2(String)
+	     userIntro(String),
+	     userInvite(String),
+	     directMessageV2(String)
 
 	var description: String {
 		switch self {

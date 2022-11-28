@@ -1,6 +1,6 @@
 //
 //  SealedInvitationHeaderV1.swift
-//  
+//
 //
 //  Created by Pat Nakajima on 11/26/22.
 //

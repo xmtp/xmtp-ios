@@ -1,6 +1,6 @@
 //
 //  SealedInvitationV1.swift
-//  
+//
 //
 //  Created by Pat Nakajima on 11/26/22.
 //
@@ -11,11 +11,11 @@ import XMTPProto
 typealias SealedInvitationV1 = Xmtp_MessageContents_SealedInvitationV1
 
 extension SealedInvitationV1 {
-	init(headerBytes: Data, ciphtertext: CipherText, header: SealedInvitationHeaderV1? = nil) {
+	init(headerBytes: Data, ciphtertext: CipherText, header _: SealedInvitationHeaderV1? = nil) {
 		self.init()
 
 		self.headerBytes = headerBytes
-		self.ciphertext = ciphtertext
+		ciphertext = ciphtertext
 	}
 
 	var header: SealedInvitationHeaderV1 {
@@ -37,8 +37,7 @@ extension SealedInvitationV1 {
 			secret = try viewer.sharedSecret(peer: header.sender, myPreKey: header.recipient.preKey, isRecipient: true)
 		}
 
-		let decryptedBytes = try Crypto.decrypt(secret, self.ciphertext, additionalData: headerBytes)
-
+		let decryptedBytes = try Crypto.decrypt(secret, ciphertext, additionalData: headerBytes)
 		let invitation = try InvitationV1(serializedData: decryptedBytes)
 
 		return invitation

@@ -23,6 +23,7 @@ extension PrivateKey: SigningKey {
 	func sign(_ data: Data) async throws -> Signature {
 		let signatureData = try KeyUtil.sign(message: data, with: secp256K1.bytes, hashing: false)
 		var signature = Signature()
+
 		signature.ecdsaCompact.bytes = signatureData[0 ..< 64]
 		signature.ecdsaCompact.recovery = UInt32(signatureData[64])
 
@@ -59,8 +60,13 @@ extension PrivateKey {
 
 	func sign(key: UnsignedPublicKey) async throws -> SignedPublicKey {
 		let bytes = try key.serializedData()
-		let digest = SHA256Digest([UInt8](bytes))
-		let signature = try await sign(Data(digest.bytes))
+		let digest = SHA256.hash(data: bytes)
+
+		let signatureData = try KeyUtil.sign(message: Data(digest), with: secp256K1.bytes, hashing: false)
+		var signature = Signature(
+			bytes: signatureData[0 ..< 64],
+			recovery: Int(signatureData[64])
+		)
 
 		var signedPublicKey = SignedPublicKey()
 		signedPublicKey.signature = signature

@@ -30,7 +30,7 @@ enum Crypto {
 		var payload: AES.GCM.SealedBox
 
 		if let additionalData {
-			payload = try AES.GCM.seal(message, using: resultKey, authenticating: additionalData)
+			payload = try AES.GCM.seal(message, using: resultKey, nonce: nonce, authenticating: additionalData)
 		} else {
 			payload = try AES.GCM.seal(message, using: resultKey, nonce: nonce)
 		}

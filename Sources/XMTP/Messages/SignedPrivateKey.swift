@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import XMTPProto
 import secp256k1
+import XMTPProto
 
 typealias SignedPrivateKey = Xmtp_MessageContents_SignedPrivateKey
 
@@ -23,7 +23,15 @@ extension SignedPrivateKey {
 	}
 
 	func matches(_ signedPublicKey: SignedPublicKey) -> Bool {
-		return publicKey.keyBytes == signedPublicKey.keyBytes
+		do {
+			let deserializedPublic = try UnsignedPublicKey(serializedData: publicKey.keyBytes)
+			let deserializedSigned = try UnsignedPublicKey(serializedData: signedPublicKey.keyBytes)
+
+			return deserializedPublic.secp256K1Uncompressed.bytes == deserializedSigned.secp256K1Uncompressed.bytes
+		} catch {
+			print("Error in matchces \(error)")
+			return false
+		}
 	}
 
 	func sharedSecret(_ peer: SignedPublicKey) throws -> Data {
@@ -42,7 +50,7 @@ extension SignedPrivateKey {
 		var sharedSecret: SharedSecret?
 
 		do {
-			privateKey = try secp256k1.KeyAgreement.PrivateKey(rawRepresentation: self.secp256K1.bytes, format: .uncompressed)
+			privateKey = try secp256k1.KeyAgreement.PrivateKey(rawRepresentation: secp256K1.bytes, format: .uncompressed)
 		} catch {
 			fatalError("error with private key: \(error)")
 		}
@@ -65,5 +73,4 @@ extension SignedPrivateKey {
 
 		return Data()
 	}
-
 }

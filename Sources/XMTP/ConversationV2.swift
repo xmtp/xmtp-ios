@@ -1,6 +1,6 @@
 //
 //  ConversationV2.swift
-//  
+//
 //
 //  Created by Pat Nakajima on 11/26/22.
 //
@@ -8,9 +8,7 @@
 import Foundation
 import XMTPProto
 
-struct SendOptions {
-
-}
+struct SendOptions {}
 
 struct ConversationV2 {
 	var topic: String
@@ -47,7 +45,7 @@ struct ConversationV2 {
 	}
 
 	// TODO: more types of content
-	func send(content: String, options: SendOptions? = nil) async throws {
+	func send(content: String, options _: SendOptions? = nil) async throws {
 		let contact = try await client.getUserContact(peerAddress: peerAddress)!
 
 		var encodedContent = Xmtp_MessageContents_EncodedContent()
@@ -70,7 +68,7 @@ struct ConversationV2 {
 		try await client.publish(envelopes: [
 			Envelope(topic: .userIntro(try recipient.identityKey.recoverWalletSignerPublicKey().walletAddress), timestamp: Date(), message: try message.serializedData()),
 			Envelope(topic: .userIntro(client.address), timestamp: Date(), message: try message.serializedData()),
-			Envelope(topic: topic, timestamp: Date(), message: try message.serializedData())
+			Envelope(topic: topic, timestamp: Date(), message: try message.serializedData()),
 		])
 	}
 }

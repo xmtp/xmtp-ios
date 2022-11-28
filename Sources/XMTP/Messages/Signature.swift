@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import secp256k1
 import XMTPProto
 
 typealias Signature = Xmtp_MessageContents_Signature
@@ -55,6 +56,12 @@ extension Signature {
 		)
 	}
 
+	init(bytes: Data, recovery: Int) {
+		self.init()
+		ecdsaCompact.bytes = bytes
+		ecdsaCompact.recovery = UInt32(recovery)
+	}
+
 	var rawData: Data {
 		switch union {
 		case .walletEcdsaCompact(walletEcdsaCompact):
@@ -67,5 +74,21 @@ extension Signature {
 		case .some:
 			return Data()
 		}
+	}
+
+	func verify(signedBy: PublicKey, digest: Data) throws -> Bool {
+		let recoverySignature = try secp256k1.Recovery.ECDSASignature(compactRepresentation: ecdsaCompact.bytes, recoveryId: Int32(ecdsaCompact.recovery))
+		let ecdsaSignature = try recoverySignature.normalize
+		let signingKey = try secp256k1.Signing.PublicKey(rawRepresentation: signedBy.secp256K1Uncompressed.bytes, format: .uncompressed)
+
+		return signingKey.ecdsa.isValidSignature(ecdsaSignature, for: digest)
+	}
+
+	func verify(signedBy: PublicKey, digest: any Digest) throws -> Bool {
+		let recoverySignature = try secp256k1.Recovery.ECDSASignature(compactRepresentation: ecdsaCompact.bytes, recoveryId: Int32(ecdsaCompact.recovery))
+		let ecdsaSignature = try recoverySignature.normalize
+		let signingKey = try secp256k1.Signing.PublicKey(rawRepresentation: signedBy.secp256K1Uncompressed.bytes, format: .uncompressed)
+
+		return signingKey.ecdsa.isValidSignature(ecdsaSignature, for: digest)
 	}
 }

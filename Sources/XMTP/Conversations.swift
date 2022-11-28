@@ -1,6 +1,6 @@
 //
 //  Conversations.swift
-//  
+//
 //
 //  Created by Pat Nakajima on 11/26/22.
 //
@@ -25,7 +25,7 @@ struct Conversations {
 
 	func sendInvitation(recipient: SignedPublicKeyBundle, invitation: InvitationV1, created: Date) async throws -> SealedInvitation {
 		let sealed = try await InvitationV1.createV1(
-			sender: try self.client.privateKeyBundleV1.toV2(),
+			sender: try client.privateKeyBundleV1.toV2(),
 			recipient: recipient,
 			created: Date(),
 			invitation: invitation
@@ -35,11 +35,9 @@ struct Conversations {
 
 		try await client.publish(envelopes: [
 			Envelope(topic: .userInvite(peerAddress), timestamp: created, message: try sealed.serializedData()),
-			Envelope(topic: .userInvite(client.address), timestamp: created, message: try sealed.serializedData())
+			Envelope(topic: .userInvite(client.address), timestamp: created, message: try sealed.serializedData()),
 		])
 
 		return sealed
 	}
 }
-
-

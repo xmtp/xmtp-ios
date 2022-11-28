@@ -37,7 +37,6 @@ class ClientTests: XCTestCase {
 		XCTAssert(preKey.publicKey.hasSignature, "prekey not signed")
 	}
 
-
 	@available(iOS 16.0, *)
 	func testConversationWithMe() async throws {
 		let recip = try PrivateKey.generate()

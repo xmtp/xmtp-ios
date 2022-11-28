@@ -5,6 +5,8 @@
 //  Created by Pat Nakajima on 11/22/22.
 //
 
+import CryptoKit
+import Foundation
 import XMTPProto
 
 typealias PrivateKeyBundleV1 = Xmtp_MessageContents_PrivateKeyBundleV1
@@ -17,12 +19,17 @@ extension PrivateKeyBundleV1 {
 		var bundle = try authorizedIdentity.toBundle
 		var preKey = try PrivateKey.generate()
 
-		let signedPublicKey = try await privateKey.sign(key: UnsignedPublicKey(preKey.publicKey))
+		let bytesToSign = try UnsignedPublicKey(preKey.publicKey).serializedData()
+		let signature = try await privateKey.sign(Data(SHA256.hash(data: bytesToSign)))
 
-		preKey.publicKey = try PublicKey(serializedData: signedPublicKey.keyBytes)
-		preKey.publicKey.signature = signedPublicKey.signature
+		preKey.publicKey.signature = signature
 
+		bundle.v1.identityKey = authorizedIdentity.identity
+		bundle.v1.identityKey.publicKey = authorizedIdentity.authorized
 		bundle.v1.preKeys = [preKey]
+
+		let valid = try signature.verify(signedBy: privateKey.publicKey, digest: bytesToSign)
+		print("IS VALID \(valid)")
 
 		return bundle.v1
 	}
@@ -43,5 +50,12 @@ extension PrivateKeyBundleV1 {
 		publicKeyBundle.preKey = preKeys[0].publicKey
 
 		return publicKeyBundle
+	}
+
+	func sharedSecret(peer: PublicKeyBundle, myPreKey: PublicKey, isRecipient: Bool) throws -> Data {
+		let peerBundle = try SignedPublicKeyBundle(peer)
+		let preKey = try SignedPublicKey.fromLegacy(myPreKey)
+
+		return try toV2().sharedSecret(peer: peerBundle, myPreKey: preKey, isRecipient: isRecipient)
 	}
 }

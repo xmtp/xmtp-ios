@@ -1,17 +1,23 @@
 //
 //  PrivateKeyBundleV2.swift
-//  
+//
 //
 //  Created by Pat Nakajima on 11/26/22.
 //
 
-import XMTPProto
 import Foundation
+import XMTPProto
 
 typealias PrivateKeyBundleV2 = Xmtp_MessageContents_PrivateKeyBundleV2
 
 extension PrivateKeyBundleV2 {
 	func sharedSecret(peer: SignedPublicKeyBundle, myPreKey: SignedPublicKey, isRecipient: Bool) throws -> Data {
+		print("peer pre key signature \(peer.preKey.signature)")
+
+//		if !(try peer.preKey.signature.verify(signedBy: try PublicKey(peer.identityKey), digest: peer.preKey.keyBytes)) {
+//			throw PublicKeyError.invalidPreKey
+//		}
+
 		var dh1: Data
 		var dh2: Data
 		var preKey: SignedPrivateKey
@@ -34,7 +40,7 @@ extension PrivateKeyBundleV2 {
 	}
 
 	func findPreKey(_ myPreKey: SignedPublicKey) throws -> SignedPrivateKey {
-		for preKey in self.preKeys {
+		for preKey in preKeys {
 			if preKey.matches(myPreKey) {
 				return preKey
 			}

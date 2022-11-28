@@ -5,8 +5,8 @@
 //  Created by Pat Nakajima on 11/17/22.
 //
 
-import XMTPProto
 import Foundation
+import XMTPProto
 
 typealias PrivateKeyBundle = Xmtp_MessageContents_PrivateKeyBundle
 
