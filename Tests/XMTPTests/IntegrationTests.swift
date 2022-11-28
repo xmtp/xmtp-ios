@@ -59,7 +59,7 @@ final class IntegrationTests: XCTestCase {
 		throw XCTSkip("integration only")
 
 		let connection = CallbackyConnection()
-		let wallet = try Wallet(connection: connection)
+		let wallet = try Account(connection: connection)
 
 		let expectation = expectation(description: "connected")
 

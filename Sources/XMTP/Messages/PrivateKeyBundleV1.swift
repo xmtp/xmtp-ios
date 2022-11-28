@@ -21,7 +21,6 @@ extension PrivateKeyBundleV1 {
 
 		preKey.publicKey = try PublicKey(serializedData: signedPublicKey.keyBytes)
 		preKey.publicKey.signature = signedPublicKey.signature
-
 		bundle.v1.preKeys = [preKey]
 
 		return bundle.v1
