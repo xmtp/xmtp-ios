@@ -13,7 +13,7 @@ import XCTest
 class ClientTests: XCTestCase {
 	func testTakesAWallet() async throws {
 		let fakeWallet = try PrivateKey.generate()
-		_ = try await Client.create(wallet: fakeWallet)
+		_ = try await Client.create(account: fakeWallet)
 	}
 
 	func testHasAPIClient() async throws {
@@ -21,14 +21,14 @@ class ClientTests: XCTestCase {
 
 		var options = ClientOptions()
 		options.api.env = .local
-		let client = try await Client.create(wallet: fakeWallet, options: options)
+		let client = try await Client.create(account: fakeWallet, options: options)
 
 		XCTAssert(client.apiClient.environment == .local)
 	}
 
 	func testHasPrivateKeyBundleV1() async throws {
 		let fakeWallet = try PrivateKey.generate()
-		let client = try await Client.create(wallet: fakeWallet)
+		let client = try await Client.create(account: fakeWallet)
 
 		XCTAssertEqual(1, client.privateKeyBundleV1.preKeys.count)
 

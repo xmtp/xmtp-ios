@@ -10,6 +10,11 @@ import XMTPProto
 typealias PrivateKeyBundle = Xmtp_MessageContents_PrivateKeyBundle
 
 extension PrivateKeyBundle {
+	init(v1: PrivateKeyBundleV1) {
+		self.init()
+		self.v1 = v1
+	}
+
 	func encrypted(with key: SigningKey) async throws -> EncryptedPrivateKeyBundle {
 		let bundleBytes = try serializedData()
 		let walletPreKey = try Crypto.secureRandomBytes(count: 32)

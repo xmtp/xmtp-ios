@@ -21,16 +21,42 @@ class Client {
 	var privateKeyBundleV1: PrivateKeyBundleV1
 	var apiClient: ApiClient
 
-	public static func create(wallet: SigningKey, options: ClientOptions = ClientOptions()) async throws -> Client {
+	public static func create(account: SigningKey, options: ClientOptions = ClientOptions()) async throws -> Client {
 		let apiClient = try ApiClient(
 			environment: options.api.env,
 			secure: options.api.isSecure
 		)
 
-		// TODO: Load existing bundle
-		let privateKeyBundleV1 = try await PrivateKeyBundleV1.generate(wallet: wallet)
+		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient)
 
-		return try Client(address: wallet.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient)
+		return try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient)
+	}
+
+	static func loadOrCreateKeys(for account: SigningKey, apiClient: ApiClient) async throws -> PrivateKeyBundleV1 {
+		if let keys = try await loadPrivateKeys(for: account, apiClient: apiClient) {
+			return keys
+		} else {
+			return try await PrivateKeyBundleV1.generate(wallet: account)
+		}
+	}
+
+	static func loadPrivateKeys(for account: SigningKey, apiClient: ApiClient) async throws -> PrivateKeyBundleV1? {
+		let topics: [Topic] = [.userPrivateStoreKeyBundle(account.address)]
+		let res = try await apiClient.query(topics: topics)
+
+		for envelope in res.envelopes {
+			do {
+				let encryptedBundle = try EncryptedPrivateKeyBundle(serializedData: envelope.message)
+				let bundle = try await encryptedBundle.decrypted(with: account)
+
+				return bundle.v1
+			} catch {
+				print("Error decoding encrypted private key bundle: \(error)")
+				continue
+			}
+		}
+
+		return nil
 	}
 
 	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient) throws {
