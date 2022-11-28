@@ -44,7 +44,7 @@ final class WalletTests: XCTestCase {
 		let key = try PrivateKey.generate()
 		let stubConnection = StubWalletConnection(key: key)
 
-		let wallet = try Wallet(connection: stubConnection)
+		let wallet = try Account(connection: stubConnection)
 
 		try await wallet.connect()
 		XCTAssert(stubConnection.wasConnectCalled, "did not call connect() on connection")
