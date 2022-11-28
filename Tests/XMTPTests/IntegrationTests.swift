@@ -99,7 +99,7 @@ final class IntegrationTests: XCTestCase {
 		XCTAssert(result.envelopes.count >= 1)
 	}
 
-	func testPublishingContactBundles() async throws {
+	func testPublishingAndFetchingContactBundles() async throws {
 		throw XCTSkip("integration only")
 
 		let alice = try PrivateKey.generate()
