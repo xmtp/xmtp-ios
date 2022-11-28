@@ -65,9 +65,11 @@ class Client {
 		let response = try await apiClient.query(topics: [.contact(peerAddress)])
 
 		for envelope in response.envelopes {
+			// swiftlint:disable no_optional_try
 			if let contactBundle = try? ContactBundle.from(envelope: envelope) {
 				return contactBundle
 			}
+			// swiftlint:enable no_optional_try
 		}
 
 		return nil

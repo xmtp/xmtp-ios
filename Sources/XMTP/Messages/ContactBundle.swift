@@ -30,6 +30,8 @@ extension ContactBundle {
 		return contactBundle
 	}
 
+	// swiftlint:disable no_optional_try
+
 	var walletAddress: String? {
 		switch version {
 		case .v1:
@@ -60,4 +62,6 @@ extension ContactBundle {
 			return nil
 		}
 	}
+
+	// swiftlint:enable no_optional_try
 }
