@@ -1,5 +1,5 @@
 //
-//  WalletTests.swift
+//  AccountTests.swift
 //
 //
 //  Created by Pat Nakajima on 11/22/22.
@@ -39,7 +39,7 @@ class StubWalletConnection: WalletConnection {
 	}
 }
 
-final class WalletTests: XCTestCase {
+final class AccountTests: XCTestCase {
 	func testTakesAConnectionAndConnects() async throws {
 		let key = try PrivateKey.generate()
 		let stubConnection = StubWalletConnection(key: key)
