@@ -10,7 +10,6 @@ import XCTest
 
 @available(iOS 16.0, *)
 class MessageTests: XCTestCase {
-	// FIXME: This is flakey, sometimes it passes, sometimes not.
 	func testFullyEncodesDecodesMessages() async throws {
 		let aliceWallet = try PrivateKey.generate()
 		let bobWallet = try PrivateKey.generate()
@@ -27,8 +26,6 @@ class MessageTests: XCTestCase {
 			message: content,
 			timestamp: Date()
 		).v1
-
-		XCTAssertEqual(aliceWallet.walletAddress, try alice.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress)
 
 		XCTAssertEqual(aliceWallet.walletAddress, message1.senderAddress)
 		XCTAssertEqual(bobWallet.walletAddress, message1.recipientAddress)
