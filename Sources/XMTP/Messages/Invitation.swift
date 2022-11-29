@@ -1,6 +1,6 @@
 //
 //  Invitation.swift
-//  
+//
 //
 //  Created by Pat Nakajima on 11/26/22.
 //
@@ -34,7 +34,7 @@ extension InvitationV1 {
 		)
 	}
 
-	static func createV1(sender: PrivateKeyBundleV2, recipient: SignedPublicKeyBundle, created: Date, invitation: InvitationV1) throws -> SealedInvitation {
+	static func createV1(sender: PrivateKeyBundleV2, recipient: SignedPublicKeyBundle, created _: Date, invitation: InvitationV1) throws -> SealedInvitation {
 		let header = SealedInvitationHeaderV1(
 			sender: sender.getPublicKeyBundle(),
 			recipient: recipient,
