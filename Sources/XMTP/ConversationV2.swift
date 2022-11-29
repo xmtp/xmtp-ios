@@ -21,8 +21,8 @@ struct ConversationV2 {
 	static func create(client: Client, invitation: InvitationV1, header: SealedInvitationHeaderV1) throws -> ConversationV2 {
 		let myKeys = client.keys.getPublicKeyBundle()
 
-		let peer = myKeys.walletAddress == header.sender.walletAddress ? header.recipient : header.sender
-		let peerAddress = peer.walletAddress ?? "0x0"
+		let peer = try myKeys.walletAddress == (try header.sender.walletAddress) ? header.recipient : header.sender
+		let peerAddress = try peer.walletAddress
 
 		let keyMaterial = Data(invitation.aes256GcmHkdfSha256.keyMaterial.bytes)
 
@@ -84,7 +84,7 @@ struct ConversationV2 {
 		)
 
 		try await client.publish(envelopes: [
-			Envelope(topic: .userIntro(try recipient.identityKey.recoverWalletSignerPublicKey().walletAddress), timestamp: Date(), message: try message.serializedData()),
+			Envelope(topic: .userIntro(recipient.walletAddress), timestamp: Date(), message: try message.serializedData()),
 			Envelope(topic: .userIntro(client.address), timestamp: Date(), message: try message.serializedData()),
 			Envelope(topic: topic, timestamp: Date(), message: try message.serializedData()),
 		])

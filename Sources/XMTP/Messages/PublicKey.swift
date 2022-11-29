@@ -12,7 +12,7 @@ import XMTPProto
 typealias PublicKey = Xmtp_MessageContents_PublicKey
 
 enum PublicKeyError: String, Error {
-	case noSignature, invalidPreKey
+	case noSignature, invalidPreKey, addressNotFound
 }
 
 extension PublicKey {

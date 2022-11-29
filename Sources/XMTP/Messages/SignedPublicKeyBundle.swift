@@ -19,9 +19,15 @@ extension SignedPublicKeyBundle {
 		preKey = try SignedPublicKey.fromLegacy(publicKeyBundle.preKey)
 	}
 
-	var walletAddress: String? {
-		// swiftlint:disable no_optional_try
-		return try? identityKey.recoverWalletSignerPublicKey().walletAddress
-		// swiftlint:enable no_optional_try
+	var walletAddress: String {
+		get throws {
+			// swiftlint:disable no_optional_try
+			if let address = try? identityKey.recoverWalletSignerPublicKey().walletAddress {
+				// swiftlint:enable no_optional_try
+				return address
+			}
+
+			throw PublicKeyError.addressNotFound
+		}
 	}
 }

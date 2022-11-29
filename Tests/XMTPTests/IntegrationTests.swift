@@ -157,7 +157,7 @@ final class IntegrationTests: XCTestCase {
 		XCTAssert(contact?.v1.keyBundle.preKey.hasSignature == true, "pre key not signed")
 	}
 
-	func testConversationWithMe() async throws {
+	func testEndToEndConversation() async throws {
 		throw XCTSkip("integration only (requires local node)")
 
 		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
@@ -188,8 +188,8 @@ final class IntegrationTests: XCTestCase {
 		)
 
 		let inviteHeader = invitation.v1.header
-		XCTAssertEqual(inviteHeader.sender.walletAddress, fakeWallet.walletAddress)
-		XCTAssertEqual(inviteHeader.recipient.walletAddress, fakeContactWallet.walletAddress)
+		XCTAssertEqual(try inviteHeader.sender.walletAddress, fakeWallet.walletAddress)
+		XCTAssertEqual(try inviteHeader.recipient.walletAddress, fakeContactWallet.walletAddress)
 
 		let recipBundle = privkeybundlev2.getPublicKeyBundle()
 		let sealedInvitation = try await conversations.sendInvitation(
