@@ -115,8 +115,4 @@ class Client {
 
 		return nil
 	}
-
-	func listInvitations() async throws -> [SealedInvitation] {
-		return []
-	}
 }
