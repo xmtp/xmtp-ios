@@ -17,8 +17,6 @@ class MessageTests: XCTestCase {
 		let alice = try await PrivateKeyBundleV1.generate(wallet: aliceWallet)
 		let bob = try await PrivateKeyBundleV1.generate(wallet: bobWallet)
 
-		let alicePub = alice.toPublicKeyBundle()
-
 		let content = Data("Yo!".utf8)
 		let message1 = try MessageV1.encode(
 			sender: alice,
@@ -37,5 +35,6 @@ class MessageTests: XCTestCase {
 		let message2Decrypted = try message2.decrypt(with: alice)
 		XCTAssertEqual(message2.senderAddress, aliceWallet.walletAddress)
 		XCTAssertEqual(message2.recipientAddress, bobWallet.walletAddress)
+		XCTAssertEqual(message2Decrypted, content)
 	}
 }
