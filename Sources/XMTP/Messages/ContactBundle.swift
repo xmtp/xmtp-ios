@@ -12,7 +12,7 @@ typealias ContactBundleV1 = Xmtp_MessageContents_ContactBundleV1
 typealias ContactBundleV2 = Xmtp_MessageContents_ContactBundleV2
 
 enum ContactBundleError: Error {
-	case invalidVersion
+	case invalidVersion, notFound
 }
 
 extension ContactBundle {

@@ -66,15 +66,17 @@ struct ConversationV2 {
 
 	// TODO: more types of content
 	func send(content: String, options _: SendOptions? = nil) async throws {
-		let contact = try await client.getUserContact(peerAddress: peerAddress)!
+		guard let contact = try await client.getUserContact(peerAddress: peerAddress) else {
+			throw ContactBundleError.notFound
+		}
 
-		var encoder = TextCodec()
+		let encoder = TextCodec()
 		let encodedContent = try encoder.encode(content: content)
 
 		let signedPublicKeyBundle = try contact.toSignedPublicKeyBundle()
 		let recipient = try PublicKeyBundle(signedPublicKeyBundle)
 
-		var message = try await MessageV1.encode(
+		let message = try MessageV1.encode(
 			sender: client.privateKeyBundleV1,
 			recipient: recipient,
 			message: try encodedContent.serializedData(),
