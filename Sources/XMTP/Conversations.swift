@@ -19,7 +19,7 @@ struct Conversations {
 			invitation: invitation
 		)
 
-		let peerAddress = try recipient.identityKey.recoverWalletSignerPublicKey().walletAddress
+		let peerAddress = try recipient.walletAddress
 
 		try await client.publish(envelopes: [
 			Envelope(topic: .userInvite(peerAddress), timestamp: created, message: try sealed.serializedData()),
