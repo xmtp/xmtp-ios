@@ -88,7 +88,7 @@ class Client {
 		_ = try await publish(envelopes: [envelope])
 	}
 
-	func publish(envelopes: [Envelope]) async throws -> PublishResponse {
+	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
 		let authorized = AuthorizedIdentity(
 			address: address,
 			authorized: privateKeyBundleV1.identityKey.publicKey,

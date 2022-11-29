@@ -11,20 +11,8 @@ import XMTPProto
 struct Conversations {
 	var client: Client
 
-//	func newConversation(peerAddress: String, context: InvitationV1.Context?) async throws -> Conversation {
-//		let contact = try await client.getUserContact(peerAddress: peerAddress)
-//
-//		if !contact.v2.hasKeyBundle {
-//
-//		}
-//	}
-
-	func getGetIntroductionPeers() async throws -> [String: Date] {
-		return [:]
-	}
-
 	func sendInvitation(recipient: SignedPublicKeyBundle, invitation: InvitationV1, created: Date) async throws -> SealedInvitation {
-		let sealed = try await InvitationV1.createV1(
+		let sealed = try InvitationV1.createV1(
 			sender: try client.privateKeyBundleV1.toV2(),
 			recipient: recipient,
 			created: Date(),

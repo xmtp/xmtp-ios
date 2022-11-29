@@ -13,7 +13,6 @@ typealias SealedInvitationV1 = Xmtp_MessageContents_SealedInvitationV1
 extension SealedInvitationV1 {
 	init(headerBytes: Data, ciphtertext: CipherText, header _: SealedInvitationHeaderV1? = nil) {
 		self.init()
-
 		self.headerBytes = headerBytes
 		ciphertext = ciphtertext
 	}
