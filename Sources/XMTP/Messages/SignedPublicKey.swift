@@ -12,15 +12,15 @@ import XMTPProto
 typealias SignedPublicKey = Xmtp_MessageContents_SignedPublicKey
 
 extension SignedPublicKey {
-	static func fromLegacy(_ legacyKey: PublicKey, signedByWallet: Bool? = false) throws -> SignedPublicKey {
+	static func fromLegacy(_ legacyKey: PublicKey, signedByWallet _: Bool? = false) throws -> SignedPublicKey {
 		var signedPublicKey = SignedPublicKey()
-		signedPublicKey.keyBytes = try UnsignedPublicKey(legacyKey).serializedData()
-		signedPublicKey.signature = legacyKey.signature
 
-		if signedByWallet == true, signedPublicKey.signature.walletEcdsaCompact.bytes.isEmpty {
-			signedPublicKey.signature.walletEcdsaCompact.bytes = signedPublicKey.signature.ecdsaCompact.bytes
-			signedPublicKey.signature.walletEcdsaCompact.recovery = signedPublicKey.signature.ecdsaCompact.recovery
-		}
+		var publicKey = PublicKey()
+		publicKey.secp256K1Uncompressed = legacyKey.secp256K1Uncompressed
+		publicKey.timestamp = legacyKey.timestamp
+
+		signedPublicKey.keyBytes = try publicKey.serializedData()
+		signedPublicKey.signature = legacyKey.signature
 
 		return signedPublicKey
 	}
@@ -29,11 +29,16 @@ extension SignedPublicKey {
 		self.init()
 		self.signature = signature
 
-		var unsignedKey = UnsignedPublicKey()
-		unsignedKey.createdNs = publicKey.timestamp * 1_000_000
+		var unsignedKey = PublicKey()
+		unsignedKey.timestamp = publicKey.timestamp
 		unsignedKey.secp256K1Uncompressed.bytes = publicKey.secp256K1Uncompressed.bytes
 
 		keyBytes = try unsignedKey.serializedData()
+	}
+
+	var secp256K1Uncompressed: PublicKey.Secp256k1Uncompressed {
+		let key = try! PublicKey(serializedData: keyBytes)
+		return key.secp256K1Uncompressed
 	}
 
 	func verify(key: SignedPublicKey) throws -> Bool {

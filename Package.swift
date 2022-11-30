@@ -16,10 +16,13 @@ let package = Package(
 	dependencies: [
 		// Dependencies declare other packages that this package depends on.
 		// .package(url: /* package url */, from: "1.0.0"),
+
+		.package(url: "https://github.com/krzyzanowskim/CryptoSwift", branch: "main"),
 		.package(url: "https://github.com/xmtp/proto", branch: "main"),
 		.package(url: "https://github.com/GigaBitcoin/secp256k1.swift.git", branch: "main"),
 		.package(url: "https://github.com/argentlabs/web3.swift", from: "1.1.0"),
 		.package(url: "https://github.com/WalletConnect/WalletConnectSwift.git", revision: "9e4dfba34fb35336fd5da551285d7986ff536cb8"),
+		.package(url: "https://github.com/TICESoftware/X3DH.git", .upToNextMajor(from: "2.0.0")),
 	],
 	targets: [
 		// Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -31,6 +34,7 @@ let package = Package(
 				.product(name: "secp256k1", package: "secp256k1.swift"),
 				"web3.swift",
 				"WalletConnectSwift",
+				"X3DH",
 			]
 		),
 		.testTarget(

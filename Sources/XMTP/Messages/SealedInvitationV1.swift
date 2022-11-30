@@ -25,7 +25,7 @@ extension SealedInvitationV1 {
 		}
 	}
 
-	func getInvitation(viewer: PrivateKeyBundleV2) async throws -> InvitationV1 {
+	func getInvitation(viewer: PrivateKeyBundleV2) throws -> InvitationV1 {
 		let header = header
 
 		var secret: Data

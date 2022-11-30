@@ -20,6 +20,10 @@ extension PrivateKey: SigningKey {
 		walletAddress
 	}
 
+	func matches(_ publicKey: PublicKey) -> Bool {
+		return self.publicKey.secp256K1Uncompressed.bytes == publicKey.secp256K1Uncompressed.bytes
+	}
+
 	func sign(_ data: Data) async throws -> Signature {
 		let signatureData = try KeyUtil.sign(message: data, with: secp256K1.bytes, hashing: false)
 		var signature = Signature()

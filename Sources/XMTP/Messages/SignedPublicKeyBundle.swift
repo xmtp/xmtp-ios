@@ -13,10 +13,10 @@ extension SignedPublicKeyBundle {
 	init(_ publicKeyBundle: PublicKeyBundle) throws {
 		self.init()
 
-		let signedByWallet = publicKeyBundle.identityKey.signature.walletEcdsaCompact.isInitialized
-		identityKey = try SignedPublicKey.fromLegacy(publicKeyBundle.identityKey, signedByWallet: signedByWallet)
+		identityKey = try SignedPublicKey.fromLegacy(publicKeyBundle.identityKey)
 		identityKey.signature = publicKeyBundle.identityKey.signature
 		preKey = try SignedPublicKey.fromLegacy(publicKeyBundle.preKey)
+		preKey.signature = publicKeyBundle.preKey.signature
 	}
 
 	var walletAddress: String {

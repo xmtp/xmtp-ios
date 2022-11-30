@@ -49,6 +49,16 @@ extension PrivateKeyBundleV1 {
 		return publicKeyBundle
 	}
 
+	func findPreKey(_ myPreKey: PublicKey) throws -> PrivateKey {
+		for preKey in preKeys {
+			if preKey.publicKey.secp256K1Uncompressed.bytes == myPreKey.secp256K1Uncompressed.bytes {
+				return preKey
+			}
+		}
+
+		throw PrivateKeyBundleError.noPreKeyFound
+	}
+
 	func sharedSecret(peer: PublicKeyBundle, myPreKey: PublicKey, isRecipient: Bool) throws -> Data {
 		let peerBundle = try SignedPublicKeyBundle(peer)
 		let preKey = try SignedPublicKey.fromLegacy(myPreKey)

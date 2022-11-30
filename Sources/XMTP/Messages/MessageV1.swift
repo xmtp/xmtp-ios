@@ -10,8 +10,12 @@ import XMTPProto
 
 typealias MessageV1 = Xmtp_MessageContents_MessageV1
 
+enum MessageV1Error: Error {
+	case cannotDecodeFromBytes
+}
+
 extension MessageV1 {
-	static func encode(sender: PrivateKeyBundleV1, recipient: PublicKeyBundle, message: Data, timestamp: Date) throws -> Message {
+	static func encode(sender: PrivateKeyBundleV1, recipient: PublicKeyBundle, message: Data, timestamp: Date) throws -> MessageV1 {
 		let secret = try sender.sharedSecret(
 			peer: recipient,
 			myPreKey: sender.preKeys[0].publicKey,
@@ -26,9 +30,27 @@ extension MessageV1 {
 
 		let headerBytes = try header.serializedData()
 		let ciphertext = try Crypto.encrypt(secret, message, additionalData: headerBytes)
-		let message = Message(v1: MessageV1(headerBytes: headerBytes, ciphertext: ciphertext))
 
-		return message
+		return MessageV1(headerBytes: headerBytes, ciphertext: ciphertext)
+	}
+
+	static func fromBytes(_ bytes: Data) throws -> MessageV1 {
+		let message = try Message(serializedData: bytes)
+		var headerBytes: Data
+		var ciphertext: CipherText
+
+		switch message.version {
+		case .v1:
+			headerBytes = message.v1.headerBytes
+			ciphertext = message.v1.ciphertext
+		case .v2:
+			headerBytes = message.v2.headerBytes
+			ciphertext = message.v2.ciphertext
+		default:
+			throw MessageV1Error.cannotDecodeFromBytes
+		}
+
+		return MessageV1(headerBytes: headerBytes, ciphertext: ciphertext)
 	}
 
 	init(headerBytes: Data, ciphertext: CipherText) {
@@ -37,9 +59,19 @@ extension MessageV1 {
 		self.ciphertext = ciphertext
 	}
 
+	var header: MessageHeaderV1 {
+		get throws {
+			do {
+				return try MessageHeaderV1(serializedData: headerBytes)
+			} catch {
+				print("ERROR GETTING MESSAGE HEADER V1 \(error)")
+				throw error
+			}
+		}
+	}
+
 	var senderAddress: String? {
 		do {
-			let header = try MessageHeaderV1(serializedData: headerBytes)
 			let senderKey = try header.sender.identityKey.recoverWalletSignerPublicKey()
 			return senderKey.walletAddress
 		} catch {
@@ -48,9 +80,16 @@ extension MessageV1 {
 		}
 	}
 
+	var sentAt: Date? {
+		do {
+			return try Date(timeIntervalSince1970: Double(header.timestamp) / 1_000_000)
+		} catch {
+			return nil
+		}
+	}
+
 	var recipientAddress: String? {
 		do {
-			let header = try MessageHeaderV1(serializedData: headerBytes)
 			let recipientKey = try header.recipient.identityKey.recoverWalletSignerPublicKey()
 			return recipientKey.walletAddress
 		} catch {
@@ -62,20 +101,19 @@ extension MessageV1 {
 	func decrypt(with viewer: PrivateKeyBundleV1) throws -> Data {
 		let header = try MessageHeaderV1(serializedData: headerBytes)
 
-		var recipient = PublicKeyBundle()
-		recipient.identityKey = header.recipient.identityKey
-		recipient.preKey = header.recipient.preKey
-
-		var sender = PublicKeyBundle()
-		sender.identityKey = header.sender.identityKey
-		sender.preKey = header.sender.preKey
+		let recipient = header.recipient
+		let sender = header.sender
 
 		var secret: Data
-		if viewer.identityKey.publicKey == sender.identityKey {
+		// THIS IS WRONG
+		if viewer.identityKey.matches(sender.identityKey) {
 			secret = try viewer.sharedSecret(peer: recipient, myPreKey: sender.preKey, isRecipient: false)
 		} else {
 			secret = try viewer.sharedSecret(peer: sender, myPreKey: recipient.preKey, isRecipient: true)
 		}
+
+		// FIXME: This is NOT the same as the js version
+		print("SECRET HEX: \(secret.toHex)")
 
 		return try Crypto.decrypt(secret, ciphertext, additionalData: headerBytes)
 	}

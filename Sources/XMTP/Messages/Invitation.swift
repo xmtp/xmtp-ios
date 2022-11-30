@@ -34,25 +34,6 @@ extension InvitationV1 {
 		)
 	}
 
-	static func createV1(sender: PrivateKeyBundleV2, recipient: SignedPublicKeyBundle, created _: Date, invitation: InvitationV1) throws -> SealedInvitation {
-		let header = SealedInvitationHeaderV1(
-			sender: sender.getPublicKeyBundle(),
-			recipient: recipient,
-			createdNs: UInt64(Date().millisecondsSinceEpoch * 1_000_000)
-		)
-
-		let headerBytes = try header.serializedData()
-
-		let secret = try sender.sharedSecret(peer: recipient, myPreKey: sender.preKeys[0].publicKey, isRecipient: false)
-
-		let invitationBytes = try invitation.serializedData()
-		let ciphertext = try Crypto.encrypt(secret, invitationBytes, additionalData: headerBytes)
-
-		let sealedInvitation = SealedInvitation(headerBytes: headerBytes, ciphertext: ciphertext)
-
-		return sealedInvitation
-	}
-
 	init(topic: Topic, context: InvitationV1.Context? = nil, aes256GcmHkdfSha256: InvitationV1.Aes256gcmHkdfsha256) throws {
 		self.init()
 

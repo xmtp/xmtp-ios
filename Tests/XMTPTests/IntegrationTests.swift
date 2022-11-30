@@ -157,6 +157,44 @@ final class IntegrationTests: XCTestCase {
 		XCTAssert(contact?.v1.keyBundle.preKey.hasSignature == true, "pre key not signed")
 	}
 
+	func testCanReceiveMessagesFromJS() async throws {
+		throw XCTSkip("integration only (requires local node)")
+
+		//  Uncomment these lines to generate a new wallet to test with the JS sdk
+//		var wallet = try PrivateKey.generate()
+//		print("wallet bytes \(wallet.secp256K1.bytes.bytes)")
+//		print("NEW address \(wallet.walletAddress)")
+
+		var wallet = PrivateKey()
+		wallet.secp256K1.bytes = Data([71, 20, 13, 178, 165, 51, 252, 200, 56, 174, 243, 189, 126, 51, 87, 216, 52, 7, 47, 10, 192, 2, 82, 43, 81, 43, 192, 30, 236, 174, 91, 167])
+		wallet.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: wallet.secp256K1.bytes)
+
+		let options = ClientOptions(api: ClientOptions.Api(env: .dev, isSecure: true))
+		let client = try await Client.create(account: wallet, options: options)
+
+		try await client.publishUserContact()
+
+		let convos = try await client.conversations.list()
+
+		guard let convo = convos.first else {
+			XCTFail("No conversations")
+			return
+		}
+
+		var messages: [DecodedMessage] = []
+
+		switch convo {
+		case let .v1(conversation):
+			messages = try await conversation.messages()
+			print("Got messages (v1) \(messages)")
+		case let .v2(conversation):
+			messages = try await conversation.messages()
+			print("Got messages (v2) \(messages)")
+		}
+
+		XCTAssert(messages.count > 0, "did not find messages")
+	}
+
 	func testEndToEndConversation() async throws {
 		throw XCTSkip("integration only (requires local node)")
 
@@ -180,7 +218,7 @@ final class IntegrationTests: XCTestCase {
 		let senderBundle = try client.privateKeyBundleV1.toV2()
 
 		XCTAssertEqual(try senderBundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress, fakeWallet.address)
-		let invitation = try InvitationV1.createV1(
+		let invitation = try SealedInvitation.createV1(
 			sender: try client.privateKeyBundleV1.toV2(),
 			recipient: try contact.toSignedPublicKeyBundle(),
 			created: created,
@@ -209,7 +247,15 @@ final class IntegrationTests: XCTestCase {
 			print("ERROR SENDING \(error)")
 		}
 
-		let recipientConversation = try ConversationV2.create(client: fakeContactClient, invitation: invitationv1, header: header)
+		let conversationList = try await client.conversations.list()
+
+		print("CONVO LIST \(conversationList)")
+
+		guard case let .v2(recipientConversation) = conversationList.last else {
+			XCTFail("No conversation found")
+			return
+		}
+
 		let messages = try await recipientConversation.messages()
 
 		if let message = messages.first {

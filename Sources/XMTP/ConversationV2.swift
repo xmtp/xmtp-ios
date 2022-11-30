@@ -86,7 +86,7 @@ struct ConversationV2 {
 		try await client.publish(envelopes: [
 			Envelope(topic: .userIntro(recipient.walletAddress), timestamp: Date(), message: try message.serializedData()),
 			Envelope(topic: .userIntro(client.address), timestamp: Date(), message: try message.serializedData()),
-			Envelope(topic: topic, timestamp: Date(), message: try message.serializedData()),
+			Envelope(topic: topic, timestamp: Date(), message: try Message(v1: message).serializedData()),
 		])
 	}
 }

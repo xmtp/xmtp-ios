@@ -12,6 +12,7 @@ enum Topic: CustomStringConvertible {
 	     contact(String),
 	     userIntro(String),
 	     userInvite(String),
+	     directMessageV1(String, String),
 	     directMessageV2(String)
 
 	var description: String {
@@ -24,6 +25,9 @@ enum Topic: CustomStringConvertible {
 			return wrap("intro-\(address)")
 		case let .userInvite(address):
 			return wrap("invite-\(address)")
+		case let .directMessageV1(address1, address2):
+			let addresses = [address1, address2].sorted().joined(separator: "-")
+			return wrap("dm-\(addresses)")
 		case let .directMessageV2(randomString):
 			return wrap("m-\(randomString)")
 		}

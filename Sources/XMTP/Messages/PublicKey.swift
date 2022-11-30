@@ -19,11 +19,17 @@ extension PublicKey {
 	init(_ signedPublicKey: SignedPublicKey) throws {
 		self.init()
 
-		let unsignedPublicKey = try UnsignedPublicKey(serializedData: signedPublicKey.keyBytes)
+		let unsignedPublicKey = try PublicKey(serializedData: signedPublicKey.keyBytes)
 
-		timestamp = unsignedPublicKey.createdNs
+		timestamp = unsignedPublicKey.timestamp
 		secp256K1Uncompressed.bytes = unsignedPublicKey.secp256K1Uncompressed.bytes
 		signature = signedPublicKey.signature
+	}
+
+	init(_ unsignedPublicKey: UnsignedPublicKey) {
+		self.init()
+		secp256K1Uncompressed.bytes = unsignedPublicKey.secp256K1Uncompressed.bytes
+		timestamp = unsignedPublicKey.createdNs / 1_000_000
 	}
 
 	init(_ data: Data) throws {
