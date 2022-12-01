@@ -50,13 +50,9 @@ class Client {
 			var apiClient = apiClient
 			apiClient.setAuthToken(authToken)
 
-			do {
-				try await apiClient.publish(envelopes: [
-					Envelope(topic: .userPrivateStoreKeyBundle(account.address), timestamp: Date(), message: try encryptedKeys.serializedData()),
-				])
-			} catch {
-				// Unable to save keys
-			}
+			try await apiClient.publish(envelopes: [
+				Envelope(topic: .userPrivateStoreKeyBundle(account.address), timestamp: Date(), message: try encryptedKeys.serializedData()),
+			])
 
 			return keys
 		}
