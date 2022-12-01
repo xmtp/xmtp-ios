@@ -24,6 +24,11 @@ extension PublicKey {
 		timestamp = unsignedPublicKey.timestamp
 		secp256K1Uncompressed.bytes = unsignedPublicKey.secp256K1Uncompressed.bytes
 		signature = signedPublicKey.signature
+
+		if !signature.walletEcdsaCompact.bytes.isEmpty {
+			signature.ecdsaCompact.bytes = signature.walletEcdsaCompact.bytes
+			signature.ecdsaCompact.recovery = signature.walletEcdsaCompact.recovery
+		}
 	}
 
 	init(_ unsignedPublicKey: UnsignedPublicKey) {

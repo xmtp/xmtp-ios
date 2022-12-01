@@ -23,6 +23,10 @@ struct ConversationV1 {
 		let signedPublicKeyBundle = try contact.toSignedPublicKeyBundle()
 		let recipient = try PublicKeyBundle(signedPublicKeyBundle)
 
+		if !recipient.identityKey.hasSignature {
+			fatalError("no signature for id key")
+		}
+
 		let message = try MessageV1.encode(
 			sender: client.privateKeyBundleV1,
 			recipient: recipient,

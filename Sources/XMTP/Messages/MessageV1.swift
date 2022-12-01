@@ -25,7 +25,7 @@ extension MessageV1 {
 		let header = MessageHeaderV1(
 			sender: sender.toPublicKeyBundle(),
 			recipient: recipient,
-			timestamp: UInt64(timestamp.millisecondsSinceEpoch * 1_000_000)
+			timestamp: UInt64(timestamp.millisecondsSinceEpoch)
 		)
 
 		let headerBytes = try header.serializedData()
@@ -64,7 +64,7 @@ extension MessageV1 {
 			do {
 				return try MessageHeaderV1(serializedData: headerBytes)
 			} catch {
-				print("ERROR GETTING MESSAGE HEADER V1 \(error)")
+				print("Error deserializing MessageHeaderV1 \(error)")
 				throw error
 			}
 		}

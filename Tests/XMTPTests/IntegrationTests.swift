@@ -158,7 +158,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReceiveMessagesFromJS() async throws {
-		throw XCTSkip("integration only (requires dev network)")
+//		throw XCTSkip("integration only (requires dev network)")
 
 		//  Uncomment these lines to generate a new wallet to test with the JS sdk
 //		var wallet = try PrivateKey.generate()
@@ -166,11 +166,11 @@ final class IntegrationTests: XCTestCase {
 //		print("NEW address \(wallet.walletAddress)")
 
 		var wallet = PrivateKey()
-		wallet.secp256K1.bytes = Data([71, 20, 13, 178, 165, 51, 252, 200, 56, 174, 243, 189, 126, 51, 87, 216, 52, 7, 47, 10, 192, 2, 82, 43, 81, 43, 192, 30, 236, 174, 91, 167])
+		wallet.secp256K1.bytes = Data([65, 48, 96, 54, 186, 123, 188, 219, 77, 158, 158, 62, 89, 35, 88, 88, 118, 11, 79, 23, 239, 48, 25, 113, 195, 230, 114, 240, 243, 180, 122, 135])
 		wallet.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: wallet.secp256K1.bytes)
 		print("OUR ADDRESS: \(wallet.walletAddress)")
 
-		let options = ClientOptions(api: ClientOptions.Api(env: .dev, isSecure: true))
+		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let client = try await Client.create(account: wallet, options: options)
 
 		try await client.publishUserContact()
@@ -187,16 +187,13 @@ final class IntegrationTests: XCTestCase {
 		switch convo {
 		case let .v1(conversation):
 			messages = try await conversation.messages()
-			print("Got messages (v1) \(messages)")
 		case let .v2(conversation):
-			print("GOT A V2 CONVO")
 			messages = try await conversation.messages()
-			print("Got messages (v2) \(messages)")
 		}
 
 		XCTAssert(messages.count > 0, "did not find messages")
 
-		let contact = try await client.getUserContact(peerAddress: "0xE2c094aB885170B56A811f0c8b5FeDC4a2565575")!
+		let contact = try await client.getUserContact(peerAddress: "0x8B26203eDc935Ab291ABC67Cd343c40970B3c1d3")!
 		let invitation = try InvitationV1.createRandom()
 		let created = Date()
 		let sealedInvitation = try await client.conversations.sendInvitation(
@@ -206,13 +203,13 @@ final class IntegrationTests: XCTestCase {
 		)
 
 		let header = try SealedInvitationHeaderV1(serializedData: sealedInvitation.v1.headerBytes)
-		let conversation = ConversationV1(client: client, peerAddress: "0xE2c094aB885170B56A811f0c8b5FeDC4a2565575", sentAt: Date())
-
-		do {
-			try await conversation.send(content: "you did it!")
-		} catch {
-			print("ERROR SENDING \(error)")
-		}
+		let conversation = ConversationV1(client: client, peerAddress: "0x8B26203eDc935Ab291ABC67Cd343c40970B3c1d3", sentAt: Date())
+//
+//		do {
+//			try await conversation.send(content: "and another one...")
+//		} catch {
+//			print("ERROR SENDING \(error)")
+//		}
 	}
 
 	func testEndToEndConversation() async throws {
