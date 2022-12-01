@@ -37,7 +37,9 @@ extension SignedPublicKey {
 	}
 
 	var secp256K1Uncompressed: PublicKey.Secp256k1Uncompressed {
+		// swiftlint:disable force_try
 		let key = try! PublicKey(serializedData: keyBytes)
+		// swiftlint:enable force_try
 		return key.secp256K1Uncompressed
 	}
 
