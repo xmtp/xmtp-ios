@@ -105,15 +105,11 @@ extension MessageV1 {
 		let sender = header.sender
 
 		var secret: Data
-		// THIS IS WRONG
 		if viewer.identityKey.matches(sender.identityKey) {
 			secret = try viewer.sharedSecret(peer: recipient, myPreKey: sender.preKey, isRecipient: false)
 		} else {
 			secret = try viewer.sharedSecret(peer: sender, myPreKey: recipient.preKey, isRecipient: true)
 		}
-
-		// FIXME: This is NOT the same as the js version
-		print("SECRET HEX: \(secret.toHex)")
 
 		return try Crypto.decrypt(secret, ciphertext, additionalData: headerBytes)
 	}

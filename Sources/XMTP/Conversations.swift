@@ -46,13 +46,17 @@ struct Conversations {
 			.userIntro(client.address),
 		]).envelopes
 
-		let messages = try envelopes.map { envelope in
-			let message = try MessageV1.fromBytes(envelope.message)
+		let messages = try envelopes.compactMap { envelope in
+			do {
+				let message = try MessageV1.fromBytes(envelope.message)
 
-			// Attempt to decrypt, just to make sure we can
-			_ = try message.decrypt(with: client.privateKeyBundleV1)
+				// Attempt to decrypt, just to make sure we can
+				_ = try message.decrypt(with: client.privateKeyBundleV1)
 
-			return message
+				return message
+			} catch {
+				return nil
+			}
 		}
 
 		var seenPeers: [String: Date] = [:]

@@ -14,6 +14,7 @@ enum KeyUtilError: Error {
 	case signatureFailure
 	case signatureParseFailure
 	case badArguments
+	case parseError
 }
 
 // Copied from web3.swift since its version is `internal`

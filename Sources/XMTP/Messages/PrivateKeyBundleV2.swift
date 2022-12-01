@@ -29,22 +29,17 @@ extension PrivateKeyBundleV2 {
 
 		let dh3 = try sharedSecret(private: preKey.secp256K1.bytes, public: peer.preKey.secp256K1Uncompressed.bytes)
 
-		print("DH1 \(dh1.count)")
-		print("DH2 \(dh2.count)")
-		print("DH3 \(dh3.count)")
-
 		let secret = dh1 + dh2 + dh3
 
 		return secret
 	}
 
 	func sharedSecret(private privateData: Data, public publicData: Data) throws -> Data {
-		let privateKey = try secp256k1.KeyAgreement.PrivateKey(rawRepresentation: privateData, format: .uncompressed)
-		let publicKey = try secp256k1.KeyAgreement.PublicKey(rawRepresentation: publicData, format: .uncompressed)
+		let publicKey = try secp256k1.Signing.PublicKey(rawRepresentation: publicData, format: .uncompressed)
 
-		let agreement = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
+		let sharedSecret = try publicKey.multiply(privateData.bytes, format: .uncompressed)
 
-		return Data(agreement.bytes)
+		return try sharedSecret.rawRepresentation
 	}
 
 	func findPreKey(_ myPreKey: SignedPublicKey) throws -> SignedPrivateKey {
