@@ -174,7 +174,7 @@ final class IntegrationTests: XCTestCase {
 		let client = try await Client.create(account: wallet, options: options)
 
 		try await client.publishUserContact()
-//
+
 		let convos = try await client.conversations.list()
 
 		guard let convo = convos.first else {
