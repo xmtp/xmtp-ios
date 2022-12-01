@@ -7,7 +7,6 @@
 
 import Foundation
 import secp256k1
-import X3DH
 import XMTPProto
 
 typealias SignedPrivateKey = Xmtp_MessageContents_SignedPrivateKey
