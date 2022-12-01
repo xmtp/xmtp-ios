@@ -7,7 +7,7 @@
 
 import XMTPProto
 
-enum Topic: CustomStringConvertible {
+enum Topic {
 	case userPrivateStoreKeyBundle(String),
 	     contact(String),
 	     userIntro(String),

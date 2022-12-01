@@ -26,6 +26,10 @@ extension PrivateKeyBundleV1 {
 		bundle.v1.identityKey.publicKey = authorizedIdentity.authorized
 		preKey.publicKey.signature = signature
 
+		let signedPublicKey = try await privateKey.sign(key: UnsignedPublicKey(preKey.publicKey))
+
+		preKey.publicKey = try PublicKey(serializedData: signedPublicKey.keyBytes)
+		preKey.publicKey.signature = signedPublicKey.signature
 		bundle.v1.preKeys = [preKey]
 
 		return bundle.v1

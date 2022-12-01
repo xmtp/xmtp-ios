@@ -65,12 +65,7 @@ extension PrivateKey {
 	func sign(key: UnsignedPublicKey) async throws -> SignedPublicKey {
 		let bytes = try key.serializedData()
 		let digest = SHA256.hash(data: bytes)
-
-		let signatureData = try KeyUtil.sign(message: Data(digest), with: secp256K1.bytes, hashing: false)
-		var signature = Signature(
-			bytes: signatureData[0 ..< 64],
-			recovery: Int(signatureData[64])
-		)
+		let signature = try await sign(Data(digest.bytes))
 
 		var signedPublicKey = SignedPublicKey()
 		signedPublicKey.signature = signature

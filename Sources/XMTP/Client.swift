@@ -99,6 +99,7 @@ class Client {
 
 	func publishUserContact() async throws {
 		let keyBundle = privateKeyBundleV1.toPublicKeyBundle()
+
 		var contactBundle = ContactBundle()
 		contactBundle.v1.keyBundle = keyBundle
 
@@ -111,12 +112,7 @@ class Client {
 	}
 
 	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
-		let authorized = AuthorizedIdentity(
-			address: address,
-			authorized: privateKeyBundleV1.identityKey.publicKey,
-			identity: privateKeyBundleV1.identityKey
-		)
-
+		let authorized = AuthorizedIdentity(address: address, authorized: privateKeyBundleV1.identityKey.publicKey, identity: privateKeyBundleV1.identityKey)
 		let authToken = try await authorized.createAuthToken()
 
 		apiClient.setAuthToken(authToken)
