@@ -21,7 +21,11 @@ extension PrivateKey: SigningKey {
 	}
 
 	func matches(_ publicKey: PublicKey) -> Bool {
-		return self.publicKey.secp256K1Uncompressed.bytes == publicKey.secp256K1Uncompressed.bytes
+		do {
+			return try self.publicKey.recoverKeySignedPublicKey() == (try publicKey.recoverKeySignedPublicKey())
+		} catch {
+			return false
+		}
 	}
 
 	public func sign(_ data: Data) async throws -> Signature {

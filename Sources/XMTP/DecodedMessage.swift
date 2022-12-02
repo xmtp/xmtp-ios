@@ -8,5 +8,5 @@
 import Foundation
 
 public struct DecodedMessage {
-	var body: String
+	public var body: String
 }

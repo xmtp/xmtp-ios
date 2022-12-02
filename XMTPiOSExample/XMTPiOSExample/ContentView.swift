@@ -65,8 +65,6 @@ struct ContentView: View {
 
 					for _ in 0 ... 30 {
 						if accountManager.account.connection.isConnected {
-							let apiOptions = XMTP.ClientOptions.Api(env: .production, isSecure: true)
-							let options = XMTP.ClientOptions(api: apiOptions)
 							let client = try await Client.create(account: accountManager.account)
 
 							self.status = .connected(client)
