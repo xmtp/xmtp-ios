@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ConversationV1 {
+public struct ConversationV1 {
 	var client: Client
 	var peerAddress: String
 	var sentAt: Date

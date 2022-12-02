@@ -8,6 +8,7 @@
 import CryptoKit
 import secp256k1
 import XMTPProto
+import Foundation
 
 typealias SignedPublicKey = Xmtp_MessageContents_SignedPublicKey
 
@@ -49,6 +50,19 @@ extension SignedPublicKey {
 		}
 
 		return try signature.verify(signedBy: try PublicKey(key), digest: key.keyBytes)
+	}
+
+	func recoverKeySignedPublicKey() throws -> PublicKey {
+		let publicKey = try PublicKey(self)
+
+		// We don't want to include the signature in the key bytes
+		var slimKey = PublicKey()
+		slimKey.secp256K1Uncompressed.bytes = secp256K1Uncompressed.bytes
+		slimKey.timestamp = publicKey.timestamp
+		let bytesToSign = try slimKey.serializedData()
+
+		let pubKeyData = try KeyUtil.recoverPublicKey(message: Data(SHA256.hash(data: bytesToSign)), signature: signature.rawData)
+		return try PublicKey(pubKeyData)
 	}
 
 	func recoverWalletSignerPublicKey() throws -> PublicKey {

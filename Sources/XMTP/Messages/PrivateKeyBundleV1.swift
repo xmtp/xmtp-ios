@@ -55,11 +55,12 @@ extension PrivateKeyBundleV1 {
 
 	func findPreKey(_ myPreKey: PublicKey) throws -> PrivateKey {
 		for preKey in preKeys {
-			if preKey.publicKey.secp256K1Uncompressed.bytes == myPreKey.secp256K1Uncompressed.bytes {
+			if (try preKey.publicKey.recoverWalletSignerPublicKey()) == (try myPreKey.recoverWalletSignerPublicKey()) {
 				return preKey
 			}
 		}
 
+		print("no pre key in PrivateKeyBundleV1: \(try myPreKey.recoverWalletSignerPublicKey().walletAddress)")
 		throw PrivateKeyBundleError.noPreKeyFound
 	}
 

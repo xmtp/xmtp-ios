@@ -9,9 +9,11 @@ import SwiftUI
 import XMTP
 
 struct LoggedInView: View {
-	var account: XMTP.Account
+	var client: XMTP.Client
 
 	var body: some View {
-		Text("We're in")
+		NavigationView {
+			ConversationListView(client: client)
+		}
 	}
 }

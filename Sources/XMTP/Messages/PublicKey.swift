@@ -60,6 +60,21 @@ extension PublicKey {
 		return try PublicKey(pubKeyData)
 	}
 
+	func recoverKeySignedPublicKey() throws -> PublicKey {
+		if !hasSignature {
+			throw PublicKeyError.noSignature
+		}
+
+		// We don't want to include the signature in the key bytes
+		var slimKey = PublicKey()
+		slimKey.secp256K1Uncompressed.bytes = secp256K1Uncompressed.bytes
+		slimKey.timestamp = timestamp
+		let bytesToSign = try slimKey.serializedData()
+
+		let pubKeyData = try KeyUtil.recoverPublicKey(message: Data(SHA256.hash(data: bytesToSign)), signature: signature.rawData)
+		return try PublicKey(pubKeyData)
+	}
+
 	var walletAddress: String {
 		KeyUtil.generateAddress(from: secp256K1Uncompressed.bytes).toChecksumAddress()
 	}

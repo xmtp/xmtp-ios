@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct DecodedMessage {
+public struct DecodedMessage {
 	var body: String
 }

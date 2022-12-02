@@ -15,6 +15,7 @@
 		A69F33C6292DC992005A5556 /* XMTP in Frameworks */ = {isa = PBXBuildFile; productRef = A69F33C5292DC992005A5556 /* XMTP */; };
 		A69F33CA292DD557005A5556 /* LoggedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F33C9292DD557005A5556 /* LoggedInView.swift */; };
 		A69F33CC292DD568005A5556 /* QRCodeSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F33CB292DD568005A5556 /* QRCodeSheetView.swift */; };
+		A6D192D0293A7B97006B49F2 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D192CF293A7B97006B49F2 /* ConversationListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,8 @@
 		A69F33C7292DD3A9005A5556 /* xmtp-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "xmtp-ios"; path = ..; sourceTree = "<group>"; };
 		A69F33C9292DD557005A5556 /* LoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedInView.swift; sourceTree = "<group>"; };
 		A69F33CB292DD568005A5556 /* QRCodeSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeSheetView.swift; sourceTree = "<group>"; };
+		A6D192CD293A792D006B49F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A6D192CF293A7B97006B49F2 /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +66,7 @@
 		A6281991292DC825004B9117 /* XMTPiOSExample */ = {
 			isa = PBXGroup;
 			children = (
+				A6D192CD293A792D006B49F2 /* Info.plist */,
 				A67CCEC029355B4B00131F5C /* AccountManager.swift */,
 				A69F33C8292DD54C005A5556 /* Views */,
 				A6281992292DC825004B9117 /* XMTPiOSExampleApp.swift */,
@@ -94,6 +98,7 @@
 			children = (
 				A69F33C9292DD557005A5556 /* LoggedInView.swift */,
 				A69F33CB292DD568005A5556 /* QRCodeSheetView.swift */,
+				A6D192CF293A7B97006B49F2 /* ConversationListView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -176,6 +181,7 @@
 				A69F33CC292DD568005A5556 /* QRCodeSheetView.swift in Sources */,
 				A6281993292DC825004B9117 /* XMTPiOSExampleApp.swift in Sources */,
 				A67CCEC129355B4B00131F5C /* AccountManager.swift in Sources */,
+				A6D192D0293A7B97006B49F2 /* ConversationListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,8 +306,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"XMTPiOSExample/Preview Content\"";
+				DEVELOPMENT_TEAM = Z773AM52SJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = XMTPiOSExample/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -336,8 +344,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"XMTPiOSExample/Preview Content\"";
+				DEVELOPMENT_TEAM = Z773AM52SJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = XMTPiOSExample/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

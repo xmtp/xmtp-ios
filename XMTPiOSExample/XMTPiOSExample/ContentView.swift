@@ -10,7 +10,7 @@ import XMTP
 
 struct ContentView: View {
 	enum Status {
-		case unknown, connecting, connected, error(String)
+		case unknown, connecting, connected(Client), error(String)
 	}
 
 	@StateObject var accountManager = AccountManager()
@@ -20,6 +20,8 @@ struct ContentView: View {
 	@State private var isShowingQRCode = false
 	@State private var qrCodeImage: UIImage?
 
+	@State private var client: Client?
+
 	var body: some View {
 		VStack {
 			switch status {
@@ -27,8 +29,8 @@ struct ContentView: View {
 				Button("Connect Wallet", action: connectWallet)
 			case .connecting:
 				ProgressView("Connecting…")
-			case .connected:
-				LoggedInView(account: accountManager.account)
+			case let .connected(client):
+				LoggedInView(client: client)
 			case let .error(error):
 				Text("Error: \(error)").foregroundColor(.red)
 			}
@@ -63,9 +65,13 @@ struct ContentView: View {
 
 					for _ in 0 ... 30 {
 						if accountManager.account.connection.isConnected {
-							self.status = .connected
+							let apiOptions = XMTP.ClientOptions.Api(env: .production, isSecure: true)
+							let options = XMTP.ClientOptions(api: apiOptions)
+							let client = try await Client.create(account: accountManager.account)
+
+							self.status = .connected(client)
 							self.isShowingQRCode = false
-							break
+							return
 						}
 
 						try await Task.sleep(for: .seconds(1))

@@ -8,34 +8,41 @@
 import Foundation
 import XMTPProto
 
-struct Conversations {
+public struct Conversations {
 	var client: Client
 
-	func list() async throws -> [Conversation] {
+	public func list() async throws -> [Conversation] {
 		var conversations: [Conversation] = []
 
-		let seenPeers = try await listIntroductionPeers()
-		let invitations = try await listInvitations()
-
-		for (peerAddress, sentAt) in seenPeers {
-			conversations.append(
-				Conversation.v1(
-					ConversationV1(
-						client: client,
-						peerAddress: peerAddress,
-						sentAt: sentAt
+		do {
+			let seenPeers = try await listIntroductionPeers()
+			for (peerAddress, sentAt) in seenPeers {
+				conversations.append(
+					Conversation.v1(
+						ConversationV1(
+							client: client,
+							peerAddress: peerAddress,
+							sentAt: sentAt
+						)
 					)
 				)
-			)
+			}
+		} catch {
+			print("Error loading introduction peers: \(error)")
 		}
 
-		for sealedInvitation in invitations {
-			let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)
-			let conversation = try ConversationV2.create(client: client, invitation: unsealed, header: sealedInvitation.v1.header)
+		do {
+			let invitations = try await listInvitations()
+			for sealedInvitation in invitations {
+				let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)
+				let conversation = try ConversationV2.create(client: client, invitation: unsealed, header: sealedInvitation.v1.header)
 
-			conversations.append(
-				Conversation.v2(conversation)
-			)
+				conversations.append(
+					Conversation.v2(conversation)
+				)
+			}
+		} catch {
+			print("Error loading invitations: \(error)")
 		}
 
 		return conversations

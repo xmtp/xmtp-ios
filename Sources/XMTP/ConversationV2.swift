@@ -10,7 +10,7 @@ import XMTPProto
 
 struct SendOptions {}
 
-struct ConversationV2 {
+public struct ConversationV2 {
 	var topic: String
 	var keyMaterial: Data // MUST be kept secret
 	var context: InvitationV1.Context

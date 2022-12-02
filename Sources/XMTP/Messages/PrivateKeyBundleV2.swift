@@ -44,11 +44,13 @@ extension PrivateKeyBundleV2 {
 
 	func findPreKey(_ myPreKey: SignedPublicKey) throws -> SignedPrivateKey {
 		for preKey in preKeys {
+			print("CHECKING PRE KEY \(try preKey.publicKey.recoverKeySignedPublicKey().walletAddress)")
 			if preKey.matches(myPreKey) {
 				return preKey
 			}
 		}
 
+		print("no pre key in PrivateKeyBundleV2: \(try myPreKey.recoverKeySignedPublicKey().walletAddress)")
 		throw PrivateKeyBundleError.noPreKeyFound
 	}
 
