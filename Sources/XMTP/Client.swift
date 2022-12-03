@@ -26,7 +26,7 @@ public struct ClientOptions {
 }
 
 public class Client {
-	var address: String
+	public var address: String
 	var privateKeyBundleV1: PrivateKeyBundleV1
 	var apiClient: ApiClient
 
@@ -142,5 +142,15 @@ public class Client {
 		}
 
 		return nil
+	}
+}
+
+public extension Client {
+	static var preview: Client {
+		get async {
+			let wallet = try! PrivateKey.generate()
+			let client = try! await Client.create(account: wallet)
+			return client
+		}
 	}
 }

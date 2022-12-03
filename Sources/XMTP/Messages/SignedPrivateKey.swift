@@ -25,7 +25,8 @@ extension SignedPrivateKey {
 
 	func matches(_ signedPublicKey: SignedPublicKey) -> Bool {
 		do {
-			return try publicKey.recoverKeySignedPublicKey() == (try signedPublicKey.recoverKeySignedPublicKey())
+			return try publicKey.recoverKeySignedPublicKey().walletAddress ==
+				(try signedPublicKey.recoverKeySignedPublicKey().walletAddress)
 		} catch {
 			return false
 		}

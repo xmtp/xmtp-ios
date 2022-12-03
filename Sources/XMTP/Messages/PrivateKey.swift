@@ -9,7 +9,7 @@ import Foundation
 import secp256k1
 import XMTPProto
 
-typealias PrivateKey = Xmtp_MessageContents_PrivateKey
+public typealias PrivateKey = Xmtp_MessageContents_PrivateKey
 
 enum PrivateKeyError: Error {
 	case invalidSignatureText, invalidPrefix, invalidSignature
@@ -57,7 +57,7 @@ extension PrivateKey {
 		publicKey.timestamp = timestamp
 	}
 
-	static func generate() throws -> PrivateKey {
+	public static func generate() throws -> PrivateKey {
 		let data = Data(try Crypto.secureRandomBytes(count: 32))
 		return try PrivateKey(data)
 	}

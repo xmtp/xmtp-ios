@@ -27,6 +27,7 @@ struct ContentView: View {
 			switch status {
 			case .unknown:
 				Button("Connect Wallet", action: connectWallet)
+				Button("Generate Wallet", action: generateWallet)
 			case .connecting:
 				ProgressView("Connecting…")
 			case let .connected(client):
@@ -85,6 +86,23 @@ struct ContentView: View {
 			}
 		} catch {
 			status = .error("No acceptable connection methods found \(error)")
+		}
+	}
+
+	func generateWallet() {
+		Task {
+			do {
+				let wallet = try PrivateKey.generate()
+				let client = try await Client.create(account: wallet)
+
+				await MainActor.run {
+					self.status = .connected(client)
+				}
+			} catch {
+				await MainActor.run {
+					self.status = .error("Error generating wallet: \(error)")
+				}
+			}
 		}
 	}
 }

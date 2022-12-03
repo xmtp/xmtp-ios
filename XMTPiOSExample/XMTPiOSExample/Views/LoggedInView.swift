@@ -13,7 +13,17 @@ struct LoggedInView: View {
 
 	var body: some View {
 		NavigationView {
-			ConversationListView(client: client)
+			VStack {
+				ConversationListView(client: client)
+				VStack(alignment: .leading) {
+					Text("Connected as")
+					Text("`\(client.address)`")
+						.bold()
+						.textSelection(.enabled)
+				}
+				.frame(maxWidth: .infinity)
+				.font(.caption)
+			}
 		}
 	}
 }

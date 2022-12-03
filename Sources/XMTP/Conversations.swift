@@ -17,6 +17,7 @@ public struct Conversations {
 		do {
 			let seenPeers = try await listIntroductionPeers()
 			for (peerAddress, sentAt) in seenPeers {
+				print("We've got a v2 convo")
 				conversations.append(
 					Conversation.v1(
 						ConversationV1(
@@ -37,6 +38,7 @@ public struct Conversations {
 				let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)
 				let conversation = try ConversationV2.create(client: client, invitation: unsealed, header: sealedInvitation.v1.header)
 
+				print("We've got a v2 convo")
 				conversations.append(
 					Conversation.v2(conversation)
 				)

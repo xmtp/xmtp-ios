@@ -5,6 +5,7 @@
 //  Created by Pat Nakajima on 11/28/22.
 //
 
+import Foundation
 import XMTPProto
 
 public enum Conversation {
@@ -20,12 +21,30 @@ public enum Conversation {
 		}
 	}
 
+	public func send(text: String) async throws {
+		switch self {
+		case let .v1(conversationV1):
+			try await conversationV1.send(content: text)
+		case let .v2(conversationV2):
+			try await conversationV2.send(content: text)
+		}
+	}
+
 	public func messages() async throws -> [DecodedMessage] {
 		switch self {
 		case let .v1(conversationV1):
 			return try await conversationV1.messages()
 		case let .v2(conversationV2):
 			return try await conversationV2.messages()
+		}
+	}
+
+	var client: Client {
+		switch self {
+		case let .v1(conversationV1):
+			return conversationV1.client
+		case let .v2(conversationV2):
+			return conversationV2.client
 		}
 	}
 }

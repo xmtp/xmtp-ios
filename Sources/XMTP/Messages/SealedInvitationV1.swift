@@ -21,6 +21,7 @@ extension SealedInvitationV1 {
 		do {
 			return try SealedInvitationHeaderV1(serializedData: headerBytes)
 		} catch {
+			print("ERROR DESERIALIZING SealedInvitationHeaderV1 \(error)")
 			return SealedInvitationHeaderV1()
 		}
 	}
@@ -29,6 +30,10 @@ extension SealedInvitationV1 {
 		let header = header
 
 		var secret: Data
+
+		if !header.sender.identityKey.hasSignature {
+			throw SealedInvitationError.noSignature
+		}
 
 		if viewer.identityKey.matches(header.sender.identityKey) {
 			secret = try viewer.sharedSecret(peer: header.recipient, myPreKey: header.sender.preKey, isRecipient: false)

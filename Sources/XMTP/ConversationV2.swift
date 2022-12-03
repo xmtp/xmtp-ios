@@ -15,7 +15,7 @@ public struct ConversationV2 {
 	var keyMaterial: Data // MUST be kept secret
 	var context: InvitationV1.Context
 	var peerAddress: String
-	private var client: Client
+	var client: Client
 	private var header: SealedInvitationHeaderV1
 
 	static func create(client: Client, invitation: InvitationV1, header: SealedInvitationHeaderV1) throws -> ConversationV2 {
@@ -84,8 +84,8 @@ public struct ConversationV2 {
 		)
 
 		try await client.publish(envelopes: [
-			Envelope(topic: .userIntro(recipient.walletAddress), timestamp: Date(), message: try message.serializedData()),
-			Envelope(topic: .userIntro(client.address), timestamp: Date(), message: try message.serializedData()),
+			Envelope(topic: .userInvite(recipient.walletAddress), timestamp: Date(), message: try message.serializedData()),
+			Envelope(topic: .userInvite(client.address), timestamp: Date(), message: try message.serializedData()),
 			Envelope(topic: topic, timestamp: Date(), message: try Message(v1: message).serializedData()),
 		])
 	}

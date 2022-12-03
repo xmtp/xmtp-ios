@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A60FC8BF293AD054001697E3 /* MessageComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60FC8BE293AD054001697E3 /* MessageComposerView.swift */; };
+		A60FC8C1293AD171001697E3 /* ConversationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60FC8C0293AD171001697E3 /* ConversationDetailView.swift */; };
+		A60FC8C3293AD18A001697E3 /* PreviewClientProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60FC8C2293AD18A001697E3 /* PreviewClientProvider.swift */; };
 		A6281993292DC825004B9117 /* XMTPiOSExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6281992292DC825004B9117 /* XMTPiOSExampleApp.swift */; };
 		A6281995292DC825004B9117 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6281994292DC825004B9117 /* ContentView.swift */; };
 		A6281997292DC826004B9117 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A6281996292DC826004B9117 /* Assets.xcassets */; };
@@ -19,6 +22,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A60FC8BE293AD054001697E3 /* MessageComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageComposerView.swift; sourceTree = "<group>"; };
+		A60FC8C0293AD171001697E3 /* ConversationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationDetailView.swift; sourceTree = "<group>"; };
+		A60FC8C2293AD18A001697E3 /* PreviewClientProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewClientProvider.swift; sourceTree = "<group>"; };
 		A628198F292DC825004B9117 /* XMTPiOSExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XMTPiOSExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6281992292DC825004B9117 /* XMTPiOSExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMTPiOSExampleApp.swift; sourceTree = "<group>"; };
 		A6281994292DC825004B9117 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -99,6 +105,9 @@
 				A69F33C9292DD557005A5556 /* LoggedInView.swift */,
 				A69F33CB292DD568005A5556 /* QRCodeSheetView.swift */,
 				A6D192CF293A7B97006B49F2 /* ConversationListView.swift */,
+				A60FC8BE293AD054001697E3 /* MessageComposerView.swift */,
+				A60FC8C0293AD171001697E3 /* ConversationDetailView.swift */,
+				A60FC8C2293AD18A001697E3 /* PreviewClientProvider.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -176,11 +185,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A60FC8C1293AD171001697E3 /* ConversationDetailView.swift in Sources */,
+				A60FC8C3293AD18A001697E3 /* PreviewClientProvider.swift in Sources */,
 				A6281995292DC825004B9117 /* ContentView.swift in Sources */,
 				A69F33CA292DD557005A5556 /* LoggedInView.swift in Sources */,
 				A69F33CC292DD568005A5556 /* QRCodeSheetView.swift in Sources */,
 				A6281993292DC825004B9117 /* XMTPiOSExampleApp.swift in Sources */,
 				A67CCEC129355B4B00131F5C /* AccountManager.swift in Sources */,
+				A60FC8BF293AD054001697E3 /* MessageComposerView.swift in Sources */,
 				A6D192D0293A7B97006B49F2 /* ConversationListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
