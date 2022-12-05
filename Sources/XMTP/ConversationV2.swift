@@ -62,9 +62,6 @@ public struct ConversationV2 {
 	}
 
 	private func decode(_ message: MessageV2) throws -> DecodedMessage {
-		print("client private key bundle: \(try client.privateKeyBundleV1.jsonString())")
-		print("message: \(try message.jsonString())")
-
 		do {
 			let decrypted = try Crypto.decrypt(keyMaterial, message.ciphertext, additionalData: message.headerBytes)
 			let signed = try SignedContent(serializedData: decrypted)

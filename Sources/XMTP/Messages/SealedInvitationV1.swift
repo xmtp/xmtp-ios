@@ -31,7 +31,6 @@ extension SealedInvitationV1 {
 
 		var secret: Data
 
-		print("header: \(try header.jsonString())")
 		if !header.sender.identityKey.hasSignature {
 			throw SealedInvitationError.noSignature
 		}

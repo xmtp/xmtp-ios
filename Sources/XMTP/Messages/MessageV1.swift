@@ -91,6 +91,7 @@ extension MessageV1 {
 	var recipientAddress: String? {
 		do {
 			let recipientKey = try header.recipient.identityKey.recoverWalletSignerPublicKey()
+
 			return recipientKey.walletAddress
 		} catch {
 			print("Error getting recipient address: \(error)")

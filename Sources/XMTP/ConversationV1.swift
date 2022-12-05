@@ -19,9 +19,7 @@ public struct ConversationV1 {
 
 		let encoder = TextCodec()
 		let encodedContent = try encoder.encode(content: content)
-
-		let signedPublicKeyBundle = try contact.toSignedPublicKeyBundle()
-		let recipient = try PublicKeyBundle(signedPublicKeyBundle)
+		let recipient = try contact.toPublicKeyBundle()
 
 		if !recipient.identityKey.hasSignature {
 			fatalError("no signature for id key")

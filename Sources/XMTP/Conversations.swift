@@ -17,7 +17,6 @@ public struct Conversations {
 		do {
 			let seenPeers = try await listIntroductionPeers()
 			for (peerAddress, sentAt) in seenPeers {
-				print("We've got a v1 convo")
 				conversations.append(
 					Conversation.v1(
 						ConversationV1(
