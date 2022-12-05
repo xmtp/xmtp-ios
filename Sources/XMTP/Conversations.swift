@@ -98,7 +98,9 @@ public struct Conversations {
 		]).envelopes
 
 		return envelopes.compactMap { envelope in
+			// swiftlint:disable no_optional_try
 			try? SealedInvitation(serializedData: envelope.message)
+			// swiftlint:enable no_optional_try
 		}
 	}
 

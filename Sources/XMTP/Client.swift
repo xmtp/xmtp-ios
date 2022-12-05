@@ -148,8 +148,10 @@ public class Client {
 public extension Client {
 	static var preview: Client {
 		get async {
+			// swiftlint:disable force_try
 			let wallet = try! PrivateKey.generate()
 			let client = try! await Client.create(account: wallet)
+			// swiftlint:enable force_try
 			return client
 		}
 	}
