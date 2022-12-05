@@ -70,12 +70,12 @@ public struct Conversations {
 		var seenPeers: [String: Date] = [:]
 		for message in messages {
 			guard let recipientAddress = message.recipientAddress,
-			      let senderAddress = message.senderAddress,
-			      let sentAt = message.sentAt
+			      let senderAddress = message.senderAddress
 			else {
 				continue
 			}
 
+			let sentAt = message.sentAt
 			let peerAddress = recipientAddress == client.address ? senderAddress : recipientAddress
 
 			guard let existing = seenPeers[peerAddress] else {

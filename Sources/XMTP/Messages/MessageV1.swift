@@ -80,12 +80,8 @@ extension MessageV1 {
 		}
 	}
 
-	var sentAt: Date? {
-		do {
-			return try Date(timeIntervalSince1970: Double(header.timestamp) / 1_000_000)
-		} catch {
-			return nil
-		}
+	var sentAt: Date {
+		try! Date(timeIntervalSince1970: Double(header.timestamp) / 1_000_000)
 	}
 
 	var recipientAddress: String? {

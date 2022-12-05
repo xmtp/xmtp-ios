@@ -69,7 +69,13 @@ public struct ConversationV2 {
 			let decoder = TextCodec()
 			let decoded = try decoder.decode(content: encodedMessage)
 
-			return DecodedMessage(body: decoded)
+			let header = try MessageHeaderV2(serializedData: message.headerBytes)
+
+			return DecodedMessage(
+				body: decoded,
+				senderAddress: try signed.sender.walletAddress,
+				sent: Date(timeIntervalSince1970: Double(header.createdNs) / 1_000_000)
+			)
 		} catch {
 			print("ERROR DECODING: \(error)")
 			throw error

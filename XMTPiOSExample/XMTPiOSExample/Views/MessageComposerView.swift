@@ -23,6 +23,7 @@ struct MessageComposerView: View {
 					.font(.title)
 					.labelStyle(.iconOnly)
 			}
+			.tint(.purple)
 		}
 		.disabled(isSending)
 		.padding(4)

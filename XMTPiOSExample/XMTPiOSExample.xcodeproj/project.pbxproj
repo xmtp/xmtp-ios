@@ -15,6 +15,7 @@
 		A6281997292DC826004B9117 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A6281996292DC826004B9117 /* Assets.xcassets */; };
 		A628199B292DC826004B9117 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A628199A292DC826004B9117 /* Preview Assets.xcassets */; };
 		A67CCEC129355B4B00131F5C /* AccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67CCEC029355B4B00131F5C /* AccountManager.swift */; };
+		A683860C293EA862006336FF /* MessageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A683860B293EA862006336FF /* MessageListView.swift */; };
 		A69F33C6292DC992005A5556 /* XMTP in Frameworks */ = {isa = PBXBuildFile; productRef = A69F33C5292DC992005A5556 /* XMTP */; };
 		A69F33CA292DD557005A5556 /* LoggedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F33C9292DD557005A5556 /* LoggedInView.swift */; };
 		A69F33CC292DD568005A5556 /* QRCodeSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F33CB292DD568005A5556 /* QRCodeSheetView.swift */; };
@@ -32,6 +33,7 @@
 		A6281998292DC826004B9117 /* XMTPiOSExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XMTPiOSExample.entitlements; sourceTree = "<group>"; };
 		A628199A292DC826004B9117 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A67CCEC029355B4B00131F5C /* AccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountManager.swift; sourceTree = "<group>"; };
+		A683860B293EA862006336FF /* MessageListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageListView.swift; sourceTree = "<group>"; };
 		A69F33C7292DD3A9005A5556 /* xmtp-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "xmtp-ios"; path = ..; sourceTree = "<group>"; };
 		A69F33C9292DD557005A5556 /* LoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedInView.swift; sourceTree = "<group>"; };
 		A69F33CB292DD568005A5556 /* QRCodeSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeSheetView.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 				A60FC8BE293AD054001697E3 /* MessageComposerView.swift */,
 				A60FC8C0293AD171001697E3 /* ConversationDetailView.swift */,
 				A60FC8C2293AD18A001697E3 /* PreviewClientProvider.swift */,
+				A683860B293EA862006336FF /* MessageListView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -193,6 +196,7 @@
 				A6281993292DC825004B9117 /* XMTPiOSExampleApp.swift in Sources */,
 				A67CCEC129355B4B00131F5C /* AccountManager.swift in Sources */,
 				A60FC8BF293AD054001697E3 /* MessageComposerView.swift in Sources */,
+				A683860C293EA862006336FF /* MessageListView.swift in Sources */,
 				A6D192D0293A7B97006B49F2 /* ConversationListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

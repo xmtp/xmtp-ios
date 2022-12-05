@@ -16,18 +16,13 @@ struct ConversationDetailView: View {
 
 	var body: some View {
 		VStack {
-			List {
-				// TODO: Expose more on message so it can be identifiable
-				ForEach(Array(messages.enumerated()), id: \.0) { _, message in
-					Text(message.body)
+			MessageListView(myAddress: client.address, messages: messages)
+				.refreshable {
+					await loadMessages()
 				}
-			}
-			.refreshable {
-				await loadMessages()
-			}
-			.task {
-				await loadMessages()
-			}
+				.task {
+					await loadMessages()
+				}
 
 			MessageComposerView { text in
 				do {
