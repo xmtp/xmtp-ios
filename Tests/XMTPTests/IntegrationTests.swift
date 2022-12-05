@@ -158,7 +158,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReceiveMessagesFromJS() async throws {
-//		throw XCTSkip("integration only (requires local node)")
+		throw XCTSkip("integration only (requires local node)")
 
 		//  Uncomment these lines to generate a new wallet to test with the JS sdk
 //		var wallet = try PrivateKey.generate()
@@ -170,7 +170,7 @@ final class IntegrationTests: XCTestCase {
 		wallet.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: wallet.secp256K1.bytes)
 		print("OUR ADDRESS: \(wallet.walletAddress)")
 
-		let options = ClientOptions(api: ClientOptions.Api(env: .dev, isSecure: true))
+		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let client = try await Client.create(account: wallet, options: options)
 
 		try await client.publishUserContact()
