@@ -166,7 +166,7 @@ final class IntegrationTests: XCTestCase {
 //		print("NEW address \(wallet.walletAddress)")
 
 		var wallet = PrivateKey()
-		wallet.secp256K1.bytes = Data([65, 48, 96, 54, 186, 123, 188, 219, 77, 158, 158, 62, 89, 35, 88, 88, 118, 11, 79, 23, 239, 48, 25, 113, 195, 230, 114, 240, 243, 180, 122, 135])
+		wallet.secp256K1.bytes = Data([115, 217, 208, 26, 56, 102, 190, 41, 207, 105, 172, 193, 200, 111, 24, 185, 121, 21, 8, 20, 172, 112, 11, 190, 198, 184, 142, 160, 58, 64, 67, 19])
 		wallet.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: wallet.secp256K1.bytes)
 		print("OUR ADDRESS: \(wallet.walletAddress)")
 
@@ -191,31 +191,9 @@ final class IntegrationTests: XCTestCase {
 			messages = try await conversation.messages()
 		}
 
-		XCTAssert(messages.count > 0, "did not find messages")
-
-		let contact = try await client.getUserContact(peerAddress: "0x8347c63700Aef2BD66d96846b9870758f0E2dbE9")!
-
-		var invitationContext = InvitationV1.Context()
-		invitationContext.conversationID = "https://example.com/1"
-		let invitation = try InvitationV1.createRandom(context: invitationContext)
-		let created = Date()
-
-		let sealedInvitation = try await client.conversations.sendInvitation(
-			recipient: contact.toSignedPublicKeyBundle(),
-			invitation: invitation,
-			created: created
-		)
-
-		let header = try SealedInvitationHeaderV1(serializedData: sealedInvitation.v1.headerBytes)
-//		let conversation = ConversationV1(client: client, peerAddress: "0x8B26203eDc935Ab291ABC67Cd343c40970B3c1d3", sentAt: Date())
-
-		let conversation = try ConversationV2.create(client: client, invitation: invitation, header: header)
-
-		do {
-			try await conversation.send(content: "hello from swift conversaion v2")
-		} catch {
-			print("ERROR SENDING \(error)")
-		}
+//		print("Got messages: \(messages.map(\.body))")
+		print("sending")
+		try await convo.send(text: "hello from swift")
 	}
 
 	func testEndToEndConversation() async throws {

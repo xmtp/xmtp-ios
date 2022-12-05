@@ -5,6 +5,7 @@
 //  Created by Pat Nakajima on 11/26/22.
 //
 
+import CryptoKit
 import Foundation
 import XMTPProto
 
@@ -51,16 +52,30 @@ public struct ConversationV2 {
 		return envelopes.compactMap { envelope in
 			do {
 				let message = try Message(serializedData: envelope.message)
-				let decrypted = try message.v1.decrypt(with: client.privateKeyBundleV1)
-				let encodedMessage = try EncodedContent(serializedData: decrypted)
-				let decoder = TextCodec()
-				let decoded = try decoder.decode(content: encodedMessage)
 
-				return DecodedMessage(body: decoded)
+				return try decode(message.v2)
 			} catch {
 				print("Error decoding envelope \(error)")
 				return nil
 			}
+		}
+	}
+
+	private func decode(_ message: MessageV2) throws -> DecodedMessage {
+		print("client private key bundle: \(try client.privateKeyBundleV1.jsonString())")
+		print("message: \(try message.jsonString())")
+
+		do {
+			let decrypted = try Crypto.decrypt(keyMaterial, message.ciphertext, additionalData: message.headerBytes)
+			let signed = try SignedContent(serializedData: decrypted)
+			let encodedMessage = try EncodedContent(serializedData: signed.payload)
+			let decoder = TextCodec()
+			let decoded = try decoder.decode(content: encodedMessage)
+
+			return DecodedMessage(body: decoded)
+		} catch {
+			print("ERROR DECODING: \(error)")
+			throw error
 		}
 	}
 
@@ -70,23 +85,37 @@ public struct ConversationV2 {
 			throw ContactBundleError.notFound
 		}
 
-		let encoder = TextCodec()
-		let encodedContent = try encoder.encode(content: content)
-
 		let signedPublicKeyBundle = try contact.toSignedPublicKeyBundle()
 		let recipient = try PublicKeyBundle(signedPublicKeyBundle)
 
-		let message = try MessageV1.encode(
-			sender: client.privateKeyBundleV1,
-			recipient: recipient,
-			message: try encodedContent.serializedData(),
-			timestamp: Date()
+		let encoder = TextCodec()
+		let encodedContent = try encoder.encode(content: content)
+		let payload = try encodedContent.serializedData()
+
+		let date = Date()
+		let header = MessageHeaderV2(topic: topic, created: date)
+		let headerBytes = try header.serializedData()
+
+		let digest = SHA256.hash(data: headerBytes + payload)
+		let preKey = client.keys.preKeys[0]
+		let signature = try await preKey.sign(Data(digest))
+
+		var bundle = try client.privateKeyBundleV1.toV2().getPublicKeyBundle()
+		bundle.identityKey.signature.walletEcdsaCompact.bytes = bundle.identityKey.signature.ecdsaCompact.bytes
+		bundle.identityKey.signature.walletEcdsaCompact.recovery = bundle.identityKey.signature.ecdsaCompact.recovery
+
+		let signedContent = SignedContent(payload: payload, sender: bundle, signature: signature)
+		let signedBytes = try signedContent.serializedData()
+
+		let ciphertext = try Crypto.encrypt(keyMaterial, signedBytes, additionalData: headerBytes)
+
+		let message = MessageV2(
+			headerBytes: headerBytes,
+			ciphertext: ciphertext
 		)
 
 		try await client.publish(envelopes: [
-			Envelope(topic: .userInvite(recipient.walletAddress), timestamp: Date(), message: try message.serializedData()),
-			Envelope(topic: .userInvite(client.address), timestamp: Date(), message: try message.serializedData()),
-			Envelope(topic: topic, timestamp: Date(), message: try Message(v1: message).serializedData()),
+			Envelope(topic: topic, timestamp: date, message: try Message(v2: message).serializedData()),
 		])
 	}
 }

@@ -61,7 +61,7 @@ extension SignedPublicKey {
 		slimKey.timestamp = publicKey.timestamp
 		let bytesToSign = try slimKey.serializedData()
 
-		let pubKeyData = try KeyUtil.recoverPublicKey(message: Data(SHA256.hash(data: bytesToSign)), signature: signature.rawData)
+		let pubKeyData = try KeyUtil.recoverPublicKey(message: Data(SHA256.hash(data: bytesToSign)), signature: publicKey.signature.rawData)
 		return try PublicKey(pubKeyData)
 	}
 

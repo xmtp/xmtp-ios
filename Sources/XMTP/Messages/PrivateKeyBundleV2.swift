@@ -49,13 +49,6 @@ extension PrivateKeyBundleV2 {
 			}
 		}
 
-		print("no pre key in PrivateKeyBundleV2: \(try myPreKey.recoverKeySignedPublicKey().walletAddress) \(try myPreKey.recoverWalletSignerPublicKey().walletAddress)")
-
-		for key in preKeys {
-			print("Attempted Public: \(try key.publicKey.recoverKeySignedPublicKey().walletAddress)")
-			print("Attempted Wallet: \(try key.publicKey.recoverWalletSignerPublicKey().walletAddress)")
-		}
-
 		throw PrivateKeyBundleError.noPreKeyFound
 	}
 
