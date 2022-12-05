@@ -232,12 +232,6 @@ final class IntegrationTests: XCTestCase {
 		XCTAssertEqual(try inviteHeader.recipient.walletAddress, fakeContactWallet.walletAddress)
 
 		let recipBundle = privkeybundlev2.getPublicKeyBundle()
-		let sealedInvitation = try await conversations.sendInvitation(
-			recipient: recipBundle,
-			invitation: invitationv1,
-			created: created
-		)
-
 		let header = try SealedInvitationHeaderV1(serializedData: invitation.v1.headerBytes)
 		let conversation = try ConversationV2.create(client: client, invitation: invitationv1, header: header)
 

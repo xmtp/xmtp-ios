@@ -89,7 +89,6 @@ public struct ConversationV2 {
 		}
 
 		let signedPublicKeyBundle = try contact.toSignedPublicKeyBundle()
-		let recipient = try PublicKeyBundle(signedPublicKeyBundle)
 
 		let encoder = TextCodec()
 		let encodedContent = try encoder.encode(content: content)

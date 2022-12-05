@@ -39,7 +39,7 @@ class PrivateKeyBundleTests: XCTestCase {
 	func testSharedSecret() async throws {
 		let alice = try PrivateKey.generate()
 		let alicePrivateBundle = try await PrivateKeyBundleV1.generate(wallet: alice).toV2()
-		let alicePublicBundle = await alicePrivateBundle.getPublicKeyBundle()
+		let alicePublicBundle = alicePrivateBundle.getPublicKeyBundle()
 
 		let bob = try PrivateKey.generate()
 		let bobPrivateBundle = try await PrivateKeyBundleV1.generate(wallet: bob).toV2()

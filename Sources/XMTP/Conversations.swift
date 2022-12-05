@@ -54,7 +54,7 @@ public struct Conversations {
 			.userIntro(client.address),
 		]).envelopes
 
-		let messages = try envelopes.compactMap { envelope in
+		let messages = envelopes.compactMap { envelope in
 			do {
 				let message = try MessageV1.fromBytes(envelope.message)
 
