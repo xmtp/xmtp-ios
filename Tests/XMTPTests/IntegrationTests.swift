@@ -158,7 +158,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReceiveMessagesFromJS() async throws {
-//		throw XCTSkip("integration only (requires dev network)")
+		throw XCTSkip("integration only (requires local node)")
 
 		//  Uncomment these lines to generate a new wallet to test with the JS sdk
 //		var wallet = try PrivateKey.generate()
