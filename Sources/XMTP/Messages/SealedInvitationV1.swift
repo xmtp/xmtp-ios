@@ -21,7 +21,6 @@ extension SealedInvitationV1 {
 		do {
 			return try SealedInvitationHeaderV1(serializedData: headerBytes)
 		} catch {
-			print("ERROR DESERIALIZING SealedInvitationHeaderV1 \(error)")
 			return SealedInvitationHeaderV1()
 		}
 	}
