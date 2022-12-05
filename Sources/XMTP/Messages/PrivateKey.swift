@@ -47,7 +47,7 @@ extension PrivateKey: SigningKey {
 
 extension PrivateKey {
 	// Easier conversion from the secp256k1 library's Private keys to our proto type.
-	init(_ privateKeyData: Data) throws {
+	public init(_ privateKeyData: Data) throws {
 		self.init()
 		timestamp = UInt64(Date().millisecondsSinceEpoch)
 		secp256K1.bytes = privateKeyData

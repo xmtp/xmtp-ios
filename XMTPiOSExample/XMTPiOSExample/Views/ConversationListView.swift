@@ -41,3 +41,15 @@ struct ConversationListView: View {
 		}
 	}
 }
+
+struct ConversationListView_Previews: PreviewProvider {
+	static var previews: some View {
+		VStack {
+			PreviewClientProvider { client in
+				NavigationView {
+					ConversationListView(client: client)
+				}
+			}
+		}
+	}
+}
