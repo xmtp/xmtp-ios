@@ -18,9 +18,10 @@ struct MessageCellView: View {
 				Spacer()
 			}
 			Text(message.body)
-				.padding(8)
+				.padding(.vertical, 8)
+				.padding(.horizontal, 12)
 				.background(background)
-				.cornerRadius(12)
+				.cornerRadius(16)
 				.foregroundColor(color)
 			if message.senderAddress != myAddress {
 				Spacer()
