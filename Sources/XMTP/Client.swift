@@ -33,11 +33,15 @@ public class Client {
 	public static func create(account: SigningKey, options: ClientOptions? = nil) async throws -> Client {
 		let options = options ?? ClientOptions()
 
-		let apiClient = try ApiClient(
+		let apiClient = try GRPCApiClient(
 			environment: options.api.env,
 			secure: options.api.isSecure
 		)
 
+		return try await create(account: account, apiClient: apiClient)
+	}
+
+	static func create(account: SigningKey, apiClient: ApiClient) async throws -> Client {
 		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient)
 
 		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient)
