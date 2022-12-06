@@ -18,6 +18,8 @@ extension PublicKeyBundle {
 	}
 
 	var walletAddress: String {
-		return try! identityKey.recoverWalletSignerPublicKey().walletAddress
+		// swiftlint:disable no_optional_try
+		return (try? identityKey.recoverWalletSignerPublicKey().walletAddress) ?? ""
+		// swiftlint:enable no_optional_try
 	}
 }
