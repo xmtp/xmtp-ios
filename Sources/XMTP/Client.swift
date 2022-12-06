@@ -111,11 +111,14 @@ public class Client {
 		}
 	}
 
-	func publishUserContact() async throws {
-		let keyBundle = privateKeyBundleV1.toPublicKeyBundle()
-
+	func publishUserContact(legacy: Bool = false) async throws {
 		var contactBundle = ContactBundle()
-		contactBundle.v1.keyBundle = keyBundle
+
+		if legacy {
+			contactBundle.v1.keyBundle = privateKeyBundleV1.toPublicKeyBundle()
+		} else {
+			contactBundle.v2.keyBundle = keys.getPublicKeyBundle()
+		}
 
 		var envelope = Envelope()
 		envelope.contentTopic = Topic.contact(address).description

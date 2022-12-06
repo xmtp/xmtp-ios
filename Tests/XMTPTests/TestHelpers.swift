@@ -5,6 +5,7 @@
 //  Created by Pat Nakajima on 12/6/22.
 //
 
+import XCTest
 @testable import XMTP
 
 enum FakeApiClientError: String, Error {
@@ -15,7 +16,13 @@ class FakeApiClient: ApiClient {
 	var environment: Environment
 	var authToken: String = ""
 	private var responses: [String: [Envelope]] = [:]
-	private var published: [Envelope] = []
+	var published: [Envelope] = []
+
+	func assertNoPublish(callback: () async throws -> Void) async throws {
+		let oldCount = published.count
+		try await callback()
+		XCTAssertEqual(oldCount, published.count, "Published messages: \(try? published[oldCount - 1 ..< published.count].map { try $0.jsonString() })")
+	}
 
 	func register(message: [Envelope], for topic: Topic) {
 		var responsesForTopic = responses[topic.description] ?? []
@@ -25,6 +32,20 @@ class FakeApiClient: ApiClient {
 
 	init() {
 		environment = .local
+	}
+
+	func findPublishedEnvelope(_ topic: Topic) -> Envelope? {
+		return findPublishedEnvelope(topic.description)
+	}
+
+	func findPublishedEnvelope(_ topic: String) -> Envelope? {
+		for envelope in published.reversed() {
+			if envelope.contentTopic == topic.description {
+				return envelope
+			}
+		}
+
+		return nil
 	}
 
 	// MARK: ApiClient conformance
@@ -43,6 +64,10 @@ class FakeApiClient: ApiClient {
 		for topic in topics {
 			if let response = responses.removeValue(forKey: topic) {
 				result.append(contentsOf: response)
+			}
+
+			if let envelope = findPublishedEnvelope(topic) {
+				result.append(envelope)
 			}
 		}
 

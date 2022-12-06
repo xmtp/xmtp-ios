@@ -9,11 +9,10 @@ import XCTest
 @testable import XMTP
 
 class ConversationTests: XCTestCase {
+	var fakeApiClient: FakeApiClient!
+
 	var alice: PrivateKey!
 	var aliceClient: Client!
-
-	var aliceApiClient: FakeApiClient!
-	var bobApiClient: FakeApiClient!
 
 	var bob: PrivateKey!
 	var bobClient: Client!
@@ -22,15 +21,89 @@ class ConversationTests: XCTestCase {
 		alice = try PrivateKey.generate()
 		bob = try PrivateKey.generate()
 
-		aliceApiClient = FakeApiClient()
-		aliceClient = try await Client.create(account: alice, apiClient: aliceApiClient)
+		fakeApiClient = FakeApiClient()
 
-		bobApiClient = FakeApiClient()
-		bobClient = try await Client.create(account: bob, apiClient: bobApiClient)
+		aliceClient = try await Client.create(account: alice, apiClient: fakeApiClient)
+		bobClient = try await Client.create(account: bob, apiClient: fakeApiClient)
 	}
 
-	func testCanInitiateConversation() async throws {
+	func testCanInitiateV2Conversation() async throws {
 		let existingConversations = try await aliceClient.conversations.list()
 		XCTAssert(existingConversations.isEmpty, "already had conversations somehow")
+
+		guard case let .v2(conversation) = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
+			XCTFail("Did not get a v2 convo")
+			return
+		}
+
+		let aliceInviteMessage = fakeApiClient.findPublishedEnvelope(.userInvite(alice.walletAddress))
+		let bobInviteMessage = fakeApiClient.findPublishedEnvelope(.userInvite(bob.walletAddress))
+
+		XCTAssert(aliceInviteMessage != nil, "no alice invite message")
+		XCTAssert(bobInviteMessage != nil, "no bob invite message")
+
+		XCTAssertEqual(conversation.peerAddress, alice.walletAddress)
+
+		let newConversations = try await aliceClient.conversations.list()
+		XCTAssertEqual(1, newConversations.count, "already had conversations somehow")
+	}
+
+	func testCanFindExistingV1Conversation() async throws {
+		let encoder = TextCodec()
+		let encodedContent = try encoder.encode(content: "hi alice")
+
+		let date = Date().advanced(by: -1_000_000)
+
+		let messageV1 = try MessageV1.encode(
+			sender: bobClient.privateKeyBundleV1,
+			recipient: aliceClient.privateKeyBundleV1.toPublicKeyBundle(),
+			message: try encodedContent.serializedData(),
+			timestamp: date
+		)
+
+		// Overwrite contact as legacy
+		try await bobClient.publishUserContact(legacy: true)
+		try await aliceClient.publishUserContact(legacy: true)
+
+		try await bobClient.publish(envelopes: [
+			Envelope(topic: .userIntro(bob.walletAddress), timestamp: date, message: try Message(v1: messageV1).serializedData()),
+			Envelope(topic: .userIntro(alice.walletAddress), timestamp: date, message: try Message(v1: messageV1).serializedData()),
+			Envelope(topic: .directMessageV1(bob.walletAddress, alice.walletAddress), timestamp: date, message: try Message(v1: messageV1).serializedData()),
+		])
+
+		guard case let .v1(conversation) = try await aliceClient.conversations.newConversation(with: bob.walletAddress) else {
+			XCTFail("Did not have a convo with bob")
+			return
+		}
+
+		XCTAssertEqual(conversation.peerAddress, bob.walletAddress)
+		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(date.timeIntervalSince1970))
+
+		let existingMessages = fakeApiClient.published.count
+
+		guard case let .v1(conversation) = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
+			XCTFail("Did not have a convo with alice")
+			return
+		}
+
+		XCTAssertEqual(existingMessages, fakeApiClient.published.count, "published more messages when we shouldn't have")
+		XCTAssertEqual(conversation.peerAddress, alice.walletAddress)
+		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(date.timeIntervalSince1970))
+	}
+
+	func testCanFindExistingV2Conversation() async throws {
+		guard case let .v2(existingConversation) = try await bobClient.conversations.newConversation(with: alice.walletAddress, context: .init(conversationID: "http://example.com/2")) else {
+			XCTFail("Did not create existing conversation with alice")
+			return
+		}
+
+		try await fakeApiClient.assertNoPublish {
+			guard case let .v2(conversation) = try await aliceClient.conversations.newConversation(with: bob.walletAddress, context: .init(conversationID: "http://example.com/2")) else {
+				XCTFail("Did not get conversation with bob")
+				return
+			}
+
+			XCTAssertEqual(conversation.topic, existingConversation.topic, "made new conversation instead of using existing one")
+		}
 	}
 }
