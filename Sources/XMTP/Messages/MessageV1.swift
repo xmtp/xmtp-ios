@@ -104,7 +104,7 @@ extension MessageV1 {
 		let sender = header.sender
 
 		var secret: Data
-		if viewer.identityKey.matches(sender.identityKey) {
+		if viewer.walletAddress == sender.walletAddress {
 			secret = try viewer.sharedSecret(peer: recipient, myPreKey: sender.preKey, isRecipient: false)
 		} else {
 			secret = try viewer.sharedSecret(peer: sender, myPreKey: recipient.preKey, isRecipient: true)

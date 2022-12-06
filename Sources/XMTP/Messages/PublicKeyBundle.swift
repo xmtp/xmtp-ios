@@ -18,8 +18,6 @@ extension PublicKeyBundle {
 	}
 
 	var walletAddress: String {
-		get throws {
-			return try identityKey.recoverWalletSignerPublicKey().walletAddress
-		}
+		return try! identityKey.recoverWalletSignerPublicKey().walletAddress
 	}
 }
