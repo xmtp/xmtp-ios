@@ -8,6 +8,7 @@
 import XCTest
 @testable import XMTP
 
+
 @available(iOS 16, *)
 class ConversationTests: XCTestCase {
 	var fakeApiClient: FakeApiClient!

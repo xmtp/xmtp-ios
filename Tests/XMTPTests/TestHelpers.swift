@@ -26,6 +26,7 @@ class FakeApiClient: ApiClient {
 	var environment: Environment
 	var authToken: String = ""
 	private var responses: [String: [Envelope]] = [:]
+
 	private var stream = FakeStreamHolder()
 	var published: [Envelope] = []
 	var cancellable: AnyCancellable?
@@ -33,6 +34,8 @@ class FakeApiClient: ApiClient {
 	deinit {
 		cancellable?.cancel()
 	}
+
+	var published: [Envelope] = []
 
 	func assertNoPublish(callback: () async throws -> Void) async throws {
 		let oldCount = published.count
@@ -54,7 +57,7 @@ class FakeApiClient: ApiClient {
 		stream.send(envelope: envelope)
 	}
 
-	func findPublishedEnvelope(_ topic: Topic) -> Envelope? {
+  func findPublishedEnvelope(_ topic: Topic) -> Envelope? {
 		return findPublishedEnvelope(topic.description)
 	}
 
