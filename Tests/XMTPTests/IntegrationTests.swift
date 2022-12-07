@@ -304,7 +304,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testStreamMessagesInV2Conversation() async throws {
-		throw XCTSkip("integration only (requires local node)")
+//		throw XCTSkip("integration only (requires local node)")
 
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
