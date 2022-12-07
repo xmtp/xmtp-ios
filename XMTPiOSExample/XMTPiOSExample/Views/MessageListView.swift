@@ -24,7 +24,7 @@ struct MessageListView: View {
 					Spacer()
 						.onChange(of: messages.count) { _ in
 							withAnimation {
-								proxy.scrollTo(messages.count - 1, anchor: .top)
+								proxy.scrollTo(messages.count - 1, anchor: .bottom)
 							}
 						}
 				}

@@ -11,20 +11,37 @@ import XMTP
 struct MessageCellView: View {
 	var myAddress: String
 	var message: DecodedMessage
+	@State private var isDebugging = false
 
 	var body: some View {
-		HStack {
-			if message.senderAddress == myAddress {
-				Spacer()
-			}
-			Text(message.body)
+		VStack {
+			HStack {
+				if message.senderAddress == myAddress {
+					Spacer()
+				}
+				VStack(alignment: .leading) {
+					Text(message.body)
+
+					if isDebugging {
+						Text("My Address \(myAddress)")
+							.font(.caption)
+						Text("Sender Address \(message.senderAddress)")
+							.font(.caption)
+					}
+				}
 				.padding(.vertical, 8)
 				.padding(.horizontal, 12)
 				.background(background)
 				.cornerRadius(16)
 				.foregroundColor(color)
-			if message.senderAddress != myAddress {
-				Spacer()
+				.onTapGesture {
+					withAnimation {
+						isDebugging.toggle()
+					}
+				}
+				if message.senderAddress != myAddress {
+					Spacer()
+				}
 			}
 		}
 	}

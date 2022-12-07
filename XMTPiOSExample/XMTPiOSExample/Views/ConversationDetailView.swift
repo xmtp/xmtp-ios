@@ -44,6 +44,10 @@ struct ConversationDetailView: View {
 			}
 		}
 		.navigationTitle(conversation.peerAddress)
+		.navigationBarTitleDisplayMode(.inline)
+		.onAppear {
+			print("convo: \(conversation.topic)")
+		}
 	}
 
 	func loadMessages() async {

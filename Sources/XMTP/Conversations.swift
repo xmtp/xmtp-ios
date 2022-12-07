@@ -70,15 +70,7 @@ public struct Conversations {
 		let invitation = try InvitationV1.createRandom(context: context)
 
 		let sealedInvitation = try await sendInvitation(recipient: recipient, invitation: invitation, created: Date())
-
-		let conversationV2 = ConversationV2(
-			topic: invitation.topic,
-			keyMaterial: invitation.aes256GcmHkdfSha256.keyMaterial,
-			context: invitation.context,
-			peerAddress: peerAddress,
-			client: client,
-			header: sealedInvitation.v1.header
-		)
+		let conversationV2 = try ConversationV2.create(client: client, invitation: invitation, header: sealedInvitation.v1.header)
 
 		let conversation: Conversation = .v2(conversationV2)
 		conversations.append(conversation)
@@ -179,7 +171,6 @@ public struct Conversations {
 
 	func sendInvitation(recipient: SignedPublicKeyBundle, invitation: InvitationV1, created: Date) async throws -> SealedInvitation {
 		var senderBundle = client.keys
-		senderBundle.identityKey.publicKey.signature.ensureWalletSigned()
 
 		let sealed = try SealedInvitation.createV1(
 			sender: senderBundle,

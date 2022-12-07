@@ -31,6 +31,7 @@ struct NewConversationView: View {
 				}
 			}
 		}
+		.presentationDetents([.height(100), .height(120)])
 		.navigationTitle("New conversation")
 	}
 
@@ -66,7 +67,10 @@ struct NewConversationView_Previews: PreviewProvider {
 		NavigationStack {
 			VStack {
 				PreviewClientProvider { client in
-					NewConversationView(client: client) { _ in }
+					Text("Hi")
+						.sheet(isPresented: .constant(true)) {
+							NewConversationView(client: client) { _ in }
+						}
 				}
 			}
 		}
