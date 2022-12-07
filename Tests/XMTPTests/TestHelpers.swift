@@ -35,8 +35,6 @@ class FakeApiClient: ApiClient {
 		cancellable?.cancel()
 	}
 
-	var published: [Envelope] = []
-
 	func assertNoPublish(callback: () async throws -> Void) async throws {
 		let oldCount = published.count
 		try await callback()
