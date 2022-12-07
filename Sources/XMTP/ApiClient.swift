@@ -66,7 +66,7 @@ public class GRPCApiClient: ApiClient {
 
 	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
 		return AsyncThrowingStream { continuation in
-			Task.detached {
+			Task {
 				var request = SubscribeRequest()
 				request.contentTopics = topics
 

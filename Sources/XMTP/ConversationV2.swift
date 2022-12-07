@@ -63,7 +63,7 @@ public struct ConversationV2 {
 
 	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
 		AsyncThrowingStream { continuation in
-			Task.detached(priority: .userInitiated) {
+			Task {
 				for try await envelope in client.subscribe(topics: [topic.description]) {
 					let message = try Message(serializedData: envelope.message)
 					let decoded = try decode(message.v2)
