@@ -69,7 +69,6 @@ public struct ConversationV2 {
 					let decoded = try decode(message.v2)
 
 					if decoded.senderAddress != client.address {
-						print("Got \(decoded.body) \(decoded.senderAddress) \(client.address)")
 						continuation.yield(decoded)
 					}
 				}
