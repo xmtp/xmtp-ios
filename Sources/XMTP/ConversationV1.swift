@@ -50,9 +50,7 @@ public struct ConversationV1 {
 			Task {
 				for try await envelope in client.subscribe(topics: [topic.description]) {
 					let decoded = try decode(envelope: envelope)
-					if decoded.senderAddress != client.address {
-						continuation.yield(decoded)
-					}
+					continuation.yield(decoded)
 				}
 			}
 		}

@@ -68,9 +68,7 @@ public struct ConversationV2 {
 					let message = try Message(serializedData: envelope.message)
 					let decoded = try decode(message.v2)
 
-					if decoded.senderAddress != client.address {
-						continuation.yield(decoded)
-					}
+					continuation.yield(decoded)
 				}
 			}
 		}
