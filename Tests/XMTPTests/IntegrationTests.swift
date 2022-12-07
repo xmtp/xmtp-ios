@@ -327,6 +327,6 @@ final class IntegrationTests: XCTestCase {
 
 		try await aliceConversation.send(text: "hi bob")
 
-		await waitForExpectations(timeout: 5)
+		await waitForExpectations(timeout: 3)
 	}
 }
