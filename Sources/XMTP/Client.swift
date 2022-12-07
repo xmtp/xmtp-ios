@@ -11,10 +11,10 @@ import XMTPProto
 
 public struct ClientOptions {
 	public struct Api {
-		public var env: Environment = .dev
+		public var env: XMTPEnvironment = .dev
 		public var isSecure: Bool = true
 
-		public init(env: Environment = .dev, isSecure: Bool = true) {
+		public init(env: XMTPEnvironment = .dev, isSecure: Bool = true) {
 			self.env = env
 			self.isSecure = isSecure
 		}
@@ -32,6 +32,10 @@ public class Client {
 	var privateKeyBundleV1: PrivateKeyBundleV1
 	var apiClient: ApiClient
 
+	public var environment: XMTPEnvironment {
+		apiClient.environment
+	}
+
 	public static func create(account: SigningKey, options: ClientOptions? = nil) async throws -> Client {
 		let options = options ?? ClientOptions()
 
@@ -47,6 +51,7 @@ public class Client {
 		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient)
 
 		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient)
+		try await client.publishUserContact(legacy: true)
 		try await client.publishUserContact()
 
 		return client
@@ -120,7 +125,7 @@ public class Client {
 			contactBundle.v1.keyBundle = privateKeyBundleV1.toPublicKeyBundle()
 		} else {
 			contactBundle.v2.keyBundle = keys.getPublicKeyBundle()
-			contactBundle.v2.keyBundle.identityKey.signature.convertToWallet()
+			contactBundle.v2.keyBundle.identityKey.signature.ensureWalletSigned()
 		}
 
 		var envelope = Envelope()

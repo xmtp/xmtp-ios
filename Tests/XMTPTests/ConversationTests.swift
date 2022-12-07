@@ -28,6 +28,20 @@ class ConversationTests: XCTestCase {
 		bobClient = try await Client.create(account: bob, apiClient: fakeApiClient)
 	}
 
+	func testCanUseCachedConversation() async throws {
+		guard case .v2 = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
+			XCTFail("Did not get a v2 convo")
+			return
+		}
+
+		try await fakeApiClient.assertNoQuery {
+			guard case .v2 = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
+				XCTFail("Did not get a v2 convo")
+				return
+			}
+		}
+	}
+
 	func testCanInitiateV2Conversation() async throws {
 		let existingConversations = try await aliceClient.conversations.list()
 		XCTAssert(existingConversations.isEmpty, "already had conversations somehow")

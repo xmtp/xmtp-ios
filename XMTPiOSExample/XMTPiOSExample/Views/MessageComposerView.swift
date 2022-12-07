@@ -30,6 +30,10 @@ struct MessageComposerView: View {
 	}
 
 	func send() {
+		if text.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
+			return
+		}
+
 		isSending = true
 		Task {
 			await onSend(text)

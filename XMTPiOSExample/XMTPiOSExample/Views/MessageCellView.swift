@@ -27,7 +27,6 @@ struct MessageCellView: View {
 				Spacer()
 			}
 		}
-		.listRowSeparator(.hidden)
 	}
 
 	var background: Color {
