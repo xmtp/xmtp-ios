@@ -8,45 +8,6 @@
 import SwiftUI
 import XMTP
 
-struct MessageCellView: View {
-	var myAddress: String
-	var message: DecodedMessage
-
-	var body: some View {
-		HStack {
-			if message.senderAddress == myAddress {
-				Spacer()
-			}
-			Text(message.body)
-				.padding(.vertical, 8)
-				.padding(.horizontal, 12)
-				.background(background)
-				.cornerRadius(16)
-				.foregroundColor(color)
-			if message.senderAddress != myAddress {
-				Spacer()
-			}
-		}
-		.listRowSeparator(.hidden)
-	}
-
-	var background: Color {
-		if message.senderAddress == myAddress {
-			return .purple
-		} else {
-			return .secondary.opacity(0.2)
-		}
-	}
-
-	var color: Color {
-		if message.senderAddress == myAddress {
-			return .white
-		} else {
-			return .primary
-		}
-	}
-}
-
 struct MessageListView: View {
 	var myAddress: String
 	var messages: [DecodedMessage]
