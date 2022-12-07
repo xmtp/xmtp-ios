@@ -171,7 +171,6 @@ class ConversationTests: XCTestCase {
 			)
 		)
 
-
 		await waitForExpectations(timeout: 3)
 	}
 
