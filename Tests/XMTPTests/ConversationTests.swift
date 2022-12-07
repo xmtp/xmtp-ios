@@ -52,7 +52,8 @@ class ConversationTests: XCTestCase {
 		let encoder = TextCodec()
 		let encodedContent = try encoder.encode(content: "hi alice")
 
-		let date = Date().advanced(by: -1_000_000)
+		// Get a date that's roughly two weeks ago to test with
+		let date = Date().advanced(by: -2_000_000)
 
 		let messageV1 = try MessageV1.encode(
 			sender: bobClient.privateKeyBundleV1,
@@ -77,7 +78,7 @@ class ConversationTests: XCTestCase {
 		}
 
 		XCTAssertEqual(conversation.peerAddress, bob.walletAddress)
-		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(date.timeIntervalSince1970))
+		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(date.millisecondsSinceEpoch))
 
 		let existingMessages = fakeApiClient.published.count
 
@@ -88,7 +89,7 @@ class ConversationTests: XCTestCase {
 
 		XCTAssertEqual(existingMessages, fakeApiClient.published.count, "published more messages when we shouldn't have")
 		XCTAssertEqual(conversation.peerAddress, alice.walletAddress)
-		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(date.timeIntervalSince1970))
+		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(date.millisecondsSinceEpoch))
 	}
 
 	func testCanFindExistingV2Conversation() async throws {
