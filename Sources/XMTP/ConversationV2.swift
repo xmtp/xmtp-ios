@@ -61,6 +61,22 @@ public struct ConversationV2 {
 		}
 	}
 
+	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
+		AsyncThrowingStream { continuation in
+			Task.detached(priority: .userInitiated) {
+				for try await envelope in client.subscribe(topics: [topic.description]) {
+					let message = try Message(serializedData: envelope.message)
+					let decoded = try decode(message.v2)
+
+					if decoded.senderAddress != client.address {
+						print("Got \(decoded.body) \(decoded.senderAddress) \(client.address)")
+						continuation.yield(decoded)
+					}
+				}
+			}
+		}
+	}
+
 	private func decode(_ message: MessageV2) throws -> DecodedMessage {
 		try MessageV2.decode(message, keyMaterial: keyMaterial)
 	}
