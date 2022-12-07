@@ -61,7 +61,7 @@ class FakeApiClient: ApiClient {
 		stream.send(envelope: envelope)
 	}
 
-	func findPublishedEnvelope(_ topic: Topic) -> Envelope? {
+  func findPublishedEnvelope(_ topic: Topic) -> Envelope? {
 		return findPublishedEnvelope(topic.description)
 	}
 
