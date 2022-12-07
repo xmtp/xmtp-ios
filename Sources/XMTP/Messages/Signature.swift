@@ -70,6 +70,13 @@ extension Signature {
 		return ecdsaCompact.bytes + [UInt8(Int(ecdsaCompact.recovery))]
 	}
 
+	mutating func convertToWallet() {
+		if walletEcdsaCompact.bytes.isEmpty {
+			self.walletEcdsaCompact.bytes = ecdsaCompact.bytes
+			self.walletEcdsaCompact.recovery = ecdsaCompact.recovery
+		}
+	}
+
 	func verify(signedBy: PublicKey, digest: Data) throws -> Bool {
 		let recoverySignature = try secp256k1.Recovery.ECDSASignature(compactRepresentation: ecdsaCompact.bytes, recoveryId: Int32(ecdsaCompact.recovery))
 		let ecdsaSignature = try recoverySignature.normalize

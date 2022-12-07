@@ -120,6 +120,7 @@ public class Client {
 			contactBundle.v1.keyBundle = privateKeyBundleV1.toPublicKeyBundle()
 		} else {
 			contactBundle.v2.keyBundle = keys.getPublicKeyBundle()
+			contactBundle.v2.keyBundle.identityKey.signature.convertToWallet()
 		}
 
 		var envelope = Envelope()
