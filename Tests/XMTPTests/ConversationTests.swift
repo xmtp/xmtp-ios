@@ -54,13 +54,13 @@ class ConversationTests: XCTestCase {
 		let encodedContent = try encoder.encode(content: "hi alice")
 
 		// Get a date that's roughly two weeks ago to test with
-		let date = Date().advanced(by: -2_000_000)
+		let someTimeAgo = Date().advanced(by: -2_000_000)
 
 		let messageV1 = try MessageV1.encode(
 			sender: bobClient.privateKeyBundleV1,
 			recipient: aliceClient.privateKeyBundleV1.toPublicKeyBundle(),
 			message: try encodedContent.serializedData(),
-			timestamp: date
+			timestamp: someTimeAgo
 		)
 
 		// Overwrite contact as legacy
@@ -68,9 +68,9 @@ class ConversationTests: XCTestCase {
 		try await aliceClient.publishUserContact(legacy: true)
 
 		try await bobClient.publish(envelopes: [
-			Envelope(topic: .userIntro(bob.walletAddress), timestamp: date, message: try Message(v1: messageV1).serializedData()),
-			Envelope(topic: .userIntro(alice.walletAddress), timestamp: date, message: try Message(v1: messageV1).serializedData()),
-			Envelope(topic: .directMessageV1(bob.walletAddress, alice.walletAddress), timestamp: date, message: try Message(v1: messageV1).serializedData()),
+			Envelope(topic: .userIntro(bob.walletAddress), timestamp: someTimeAgo, message: try Message(v1: messageV1).serializedData()),
+			Envelope(topic: .userIntro(alice.walletAddress), timestamp: someTimeAgo, message: try Message(v1: messageV1).serializedData()),
+			Envelope(topic: .directMessageV1(bob.walletAddress, alice.walletAddress), timestamp: someTimeAgo, message: try Message(v1: messageV1).serializedData()),
 		])
 
 		guard case let .v1(conversation) = try await aliceClient.conversations.newConversation(with: bob.walletAddress) else {
@@ -79,7 +79,7 @@ class ConversationTests: XCTestCase {
 		}
 
 		XCTAssertEqual(conversation.peerAddress, bob.walletAddress)
-		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(date.millisecondsSinceEpoch))
+		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(someTimeAgo.millisecondsSinceEpoch))
 
 		let existingMessages = fakeApiClient.published.count
 
@@ -90,7 +90,7 @@ class ConversationTests: XCTestCase {
 
 		XCTAssertEqual(existingMessages, fakeApiClient.published.count, "published more messages when we shouldn't have")
 		XCTAssertEqual(conversation.peerAddress, alice.walletAddress)
-		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(date.millisecondsSinceEpoch))
+		XCTAssertEqual(Int(conversation.sentAt.timeIntervalSince1970), Int(someTimeAgo.millisecondsSinceEpoch))
 	}
 
 	func testCanFindExistingV2Conversation() async throws {
