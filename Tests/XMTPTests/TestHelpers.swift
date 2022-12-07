@@ -6,8 +6,6 @@
 //
 
 import Combine
-import GRPC
-import NIO
 import XCTest
 @testable import XMTP
 
