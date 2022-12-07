@@ -72,8 +72,8 @@ extension Signature {
 
 	mutating func convertToWallet() {
 		if walletEcdsaCompact.bytes.isEmpty {
-			self.walletEcdsaCompact.bytes = ecdsaCompact.bytes
-			self.walletEcdsaCompact.recovery = ecdsaCompact.recovery
+			walletEcdsaCompact.bytes = ecdsaCompact.bytes
+			walletEcdsaCompact.recovery = ecdsaCompact.recovery
 		}
 	}
 
