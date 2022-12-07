@@ -123,9 +123,7 @@ class ConversationTests: XCTestCase {
 
 		Task(priority: .userInitiated) {
 			for try await message in conversation.streamMessages() {
-				if message.body == "hi alice" {
-					expectation.fulfill()
-				}
+				expectation.fulfill()
 			}
 		}
 
@@ -157,6 +155,23 @@ class ConversationTests: XCTestCase {
 			)
 		)
 
+		// Stream a message from alice to make sure we filter those out
+		fakeApiClient.send(
+			envelope: Envelope(
+				topic: conversation.topic,
+				timestamp: Date(),
+				message: try Message(
+					v1: MessageV1.encode(
+						sender: aliceClient.privateKeyBundleV1,
+						recipient: bobClient.privateKeyBundleV1.toPublicKeyBundle(),
+						message: try encodedContent.serializedData(),
+						timestamp: date
+					)
+				).serializedData()
+			)
+		)
+
+
 		await waitForExpectations(timeout: 3)
 	}
 
@@ -170,9 +185,7 @@ class ConversationTests: XCTestCase {
 
 		Task(priority: .userInitiated) {
 			for try await message in conversation.streamMessages() {
-				if message.body == "hi alice" {
-					expectation.fulfill()
-				}
+				expectation.fulfill()
 			}
 		}
 
@@ -185,6 +198,22 @@ class ConversationTests: XCTestCase {
 					v2: try await MessageV2.encode(
 						client: bobClient,
 						content: "hi alice",
+						topic: conversation.topic,
+						keyMaterial: conversation.keyMaterial
+					)
+				).serializedData()
+			)
+		)
+
+		// Stream a message from alice to make sure we filter those out
+		fakeApiClient.send(
+			envelope: Envelope(
+				topic: conversation.topic,
+				timestamp: Date(),
+				message: try Message(
+					v2: try await MessageV2.encode(
+						client: aliceClient,
+						content: "hi bob",
 						topic: conversation.topic,
 						keyMaterial: conversation.keyMaterial
 					)
