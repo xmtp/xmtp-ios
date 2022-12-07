@@ -262,7 +262,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testStreamMessagesInV1Conversation() async throws {
-		throw XCTSkip("integration only (requires local node)")
+//		throw XCTSkip("integration only (requires local node)")
 
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
@@ -291,9 +291,7 @@ final class IntegrationTests: XCTestCase {
 
 		Task(priority: .userInitiated) {
 			for try await _ in bobConversation.streamMessages() {
-				await MainActor.run {
-					expectation.fulfill()
-				}
+				expectation.fulfill()
 			}
 		}
 
@@ -308,8 +306,6 @@ final class IntegrationTests: XCTestCase {
 
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
-		print("ALICE IS \(alice.walletAddress)")
-		print("BOB IS \(bob.walletAddress)")
 
 		let clientOptions = ClientOptions(api: .init(env: .local, isSecure: false))
 		let aliceClient = try await Client.create(account: alice, options: clientOptions)
@@ -325,15 +321,12 @@ final class IntegrationTests: XCTestCase {
 
 		Task(priority: .userInitiated) {
 			for try await _ in bobConversation.streamMessages() {
-				await MainActor.run {
-					expectation.fulfill()
-				}
+				expectation.fulfill()
 			}
 		}
 
 		try await aliceConversation.send(text: "hi bob")
-		try await bobConversation.send(text: "hi alice")
 
-		await waitForExpectations(timeout: 3)
+		await waitForExpectations(timeout: 5)
 	}
 }
