@@ -63,11 +63,40 @@ extension Signature {
 	}
 
 	var rawData: Data {
-		if ecdsaCompact.bytes.isEmpty {
-			return walletEcdsaCompact.bytes + [UInt8(Int(walletEcdsaCompact.recovery))]
+		switch union {
+		case let .ecdsaCompact(ecdsa):
+			return ecdsa.bytes + [UInt8(Int(ecdsa.recovery))]
+		case let .walletEcdsaCompact(ecdsa):
+			return ecdsa.bytes + [UInt8(Int(ecdsa.recovery))]
+		case .none:
+			return Data()
 		}
+	}
 
-		return ecdsaCompact.bytes + [UInt8(Int(ecdsaCompact.recovery))]
+	mutating func ensureEcdsaSignature() {
+		switch union {
+		case let .walletEcdsaCompact(walletEcdsa):
+			var ecdsa = Signature.ECDSACompact()
+			ecdsa.bytes = walletEcdsa.bytes
+			ecdsa.recovery = walletEcdsa.recovery
+			ecdsaCompact = ecdsa
+			union = .ecdsaCompact(ecdsa)
+		case .ecdsaCompact(_), .none:
+			return
+		}
+	}
+
+	mutating func ensureWalletSignature() {
+		switch union {
+		case let .ecdsaCompact(ecdsa):
+			var walletEcdsa = Signature.WalletECDSACompact()
+			walletEcdsa.bytes = ecdsa.bytes
+			walletEcdsa.recovery = ecdsa.recovery
+			walletEcdsaCompact = walletEcdsa
+			union = .walletEcdsaCompact(walletEcdsa)
+		case .walletEcdsaCompact(_), .none:
+			return
+		}
 	}
 
 	func verify(signedBy: PublicKey, digest: Data) throws -> Bool {

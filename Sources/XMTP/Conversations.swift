@@ -21,7 +21,7 @@ public struct Conversations {
 			return existingConversation
 		}
 
-		guard let contact = try await client.getUserContact(peerAddress: peerAddress) else {
+		guard let contact = try await client.contacts.find(peerAddress) else {
 			throw ConversationError.recipientNotOnNetwork
 		}
 

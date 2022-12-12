@@ -12,8 +12,8 @@ import XCTest
 @available(iOS 16.0, *)
 class InvitationTests: XCTestCase {
 	func testGenerateSealedInvitation() async throws {
-		let aliceWallet = try PrivateKey.generate()
-		let bobWallet = try PrivateKey.generate()
+		let aliceWallet = try FakeWallet.generate()
+		let bobWallet = try FakeWallet.generate()
 
 		let alice = try await PrivateKeyBundleV1.generate(wallet: aliceWallet)
 		let bob = try await PrivateKeyBundleV1.generate(wallet: bobWallet)
@@ -41,12 +41,12 @@ class InvitationTests: XCTestCase {
 		XCTAssertEqual(header.recipient, try bob.toV2().getPublicKeyBundle())
 
 		// Ensure alice can decrypt the invitation
-		let aliceInvite = try await newInvitation.v1.getInvitation(viewer: try alice.toV2())
+		let aliceInvite = try newInvitation.v1.getInvitation(viewer: try alice.toV2())
 		XCTAssertEqual(aliceInvite.topic, invitation.topic)
 		XCTAssertEqual(aliceInvite.aes256GcmHkdfSha256.keyMaterial, invitation.aes256GcmHkdfSha256.keyMaterial)
 
 		// Ensure bob can decrypt the invitation
-		let bobInvite = try await newInvitation.v1.getInvitation(viewer: try bob.toV2())
+		let bobInvite = try newInvitation.v1.getInvitation(viewer: try bob.toV2())
 		XCTAssertEqual(bobInvite.topic, invitation.topic)
 		XCTAssertEqual(bobInvite.aes256GcmHkdfSha256.keyMaterial, invitation.aes256GcmHkdfSha256.keyMaterial)
 	}

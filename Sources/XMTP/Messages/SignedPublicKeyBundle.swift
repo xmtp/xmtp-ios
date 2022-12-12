@@ -15,6 +15,7 @@ extension SignedPublicKeyBundle {
 
 		identityKey = try SignedPublicKey.fromLegacy(publicKeyBundle.identityKey)
 		identityKey.signature = publicKeyBundle.identityKey.signature
+		identityKey.signature.ensureWalletSignature()
 		preKey = try SignedPublicKey.fromLegacy(publicKeyBundle.preKey)
 		preKey.signature = publicKeyBundle.preKey.signature
 	}

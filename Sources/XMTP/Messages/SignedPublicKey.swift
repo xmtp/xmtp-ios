@@ -25,8 +25,7 @@ extension SignedPublicKey {
 
 		if let signedByWallet, signedByWallet {
 			var signature = legacyKey.signature
-			signature.walletEcdsaCompact.bytes = legacyKey.signature.ecdsaCompact.bytes
-			signature.walletEcdsaCompact.recovery = legacyKey.signature.ecdsaCompact.recovery
+			signature.ensureWalletSignature()
 			signedPublicKey.signature = signature
 		}
 

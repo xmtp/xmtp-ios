@@ -66,7 +66,6 @@ public class Client {
 			return keys
 		} else {
 			let keys = try await PrivateKeyBundleV1.generate(wallet: account)
-
 			let keyBundle = PrivateKeyBundle(v1: keys)
 			let encryptedKeys = try await keyBundle.encrypted(with: account)
 
@@ -146,6 +145,8 @@ public class Client {
 
 		var contactBundle = ContactBundle()
 		contactBundle.v2.keyBundle = keys.getPublicKeyBundle()
+		contactBundle.v2.keyBundle.identityKey.signature.ensureWalletSignature()
+		contactBundle.v2.keyBundle.preKey.signature.ensureWalletSignature()
 
 		var envelope = Envelope()
 		envelope.contentTopic = Topic.contact(address).description
@@ -161,7 +162,7 @@ public class Client {
 	}
 
 	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
-		let authorized = AuthorizedIdentity(address: address, authorized: privateKeyBundleV1.identityKey.publicKey, identity: privateKeyBundleV1.identityKey)
+		var authorized = AuthorizedIdentity(address: address, authorized: privateKeyBundleV1.identityKey.publicKey, identity: privateKeyBundleV1.identityKey)
 		let authToken = try await authorized.createAuthToken()
 
 		apiClient.setAuthToken(authToken)

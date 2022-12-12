@@ -17,7 +17,7 @@ final class AuthenticationTests: XCTestCase {
 		let identity = try PrivateKey.generate()
 
 		// Prompt them to sign "XMTP : Create Identity ..."
-		let authorized = try await key.createIdentity(identity)
+		var authorized = try await key.createIdentity(identity)
 
 		// Create the `Authorization: Bearer $authToken` for API calls.
 		let authToken = try await authorized.createAuthToken()

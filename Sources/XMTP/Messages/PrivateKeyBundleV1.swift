@@ -54,7 +54,9 @@ extension PrivateKeyBundleV1 {
 		var publicKeyBundle = PublicKeyBundle()
 
 		publicKeyBundle.identityKey = identityKey.publicKey
+		publicKeyBundle.identityKey.signature.ensureEcdsaSignature()
 		publicKeyBundle.preKey = preKeys[0].publicKey
+		publicKeyBundle.preKey.signature.ensureEcdsaSignature()
 
 		return publicKeyBundle
 	}

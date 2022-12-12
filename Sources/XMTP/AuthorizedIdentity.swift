@@ -15,9 +15,14 @@ struct AuthorizedIdentity {
 	func createAuthToken() async throws -> String {
 		let authData = AuthData(walletAddress: address)
 		let authDataBytes = try authData.serializedData()
-		let signature = try await identity.sign(Util.keccak256(authDataBytes))
+		var signature = try await identity.sign(Util.keccak256(authDataBytes))
 
 		var token = Token()
+
+		var authorized = authorized
+		authorized.signature.ensureEcdsaSignature()
+
+		signature.ensureEcdsaSignature()
 
 		token.identityKey = authorized
 		token.authDataBytes = authDataBytes
@@ -29,6 +34,9 @@ struct AuthorizedIdentity {
 	var toBundle: PrivateKeyBundle {
 		get throws {
 			var bundle = PrivateKeyBundle()
+			var identity = identity
+			var authorized = authorized
+
 			bundle.v1.identityKey = identity
 			bundle.v1.identityKey.publicKey = authorized
 			return bundle

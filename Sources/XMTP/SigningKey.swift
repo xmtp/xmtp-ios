@@ -22,7 +22,10 @@ extension SigningKey {
 		slimKey.secp256K1Uncompressed = identity.publicKey.secp256K1Uncompressed
 
 		let signatureText = Signature.createIdentityText(key: try slimKey.serializedData())
-		let signature = try await sign(message: signatureText)
+		var signature = try await sign(message: signatureText)
+		signature.ensureEcdsaSignature()
+
+		print("Created identity and got signature \(try signature.jsonString())")
 
 		let digest = try Signature.ethHash(signatureText)
 		let recoveredKey = try KeyUtil.recoverPublicKey(message: digest, signature: signature.rawData)

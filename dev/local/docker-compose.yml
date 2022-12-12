@@ -22,3 +22,6 @@ services:
     image: postgres:13
     environment:
       POSTGRES_PASSWORD: xmtp
+  js:
+    build: dev/test
+    network_mode: host
