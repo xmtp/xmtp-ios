@@ -28,8 +28,6 @@ class CallbackyConnection: WCWalletConnection {
 @available(iOS 16, *)
 final class IntegrationTests: XCTestCase {
 	func testSaveKey() async throws {
-		throw XCTSkip("integration only (requires local node)")
-
 		let alice = try PrivateKey.generate()
 		let identity = try PrivateKey.generate()
 
