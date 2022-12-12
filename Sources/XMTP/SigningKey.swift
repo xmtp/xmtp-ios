@@ -25,8 +25,6 @@ extension SigningKey {
 		var signature = try await sign(message: signatureText)
 		signature.ensureEcdsaSignature()
 
-		print("Created identity and got signature \(try signature.jsonString())")
-
 		let digest = try Signature.ethHash(signatureText)
 		let recoveredKey = try KeyUtil.recoverPublicKey(message: digest, signature: signature.rawData)
 		let address = KeyUtil.generateAddress(from: recoveredKey).toChecksumAddress()
