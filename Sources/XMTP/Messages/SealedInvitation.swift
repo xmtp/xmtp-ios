@@ -16,9 +16,6 @@ enum SealedInvitationError: Error {
 
 extension SealedInvitation {
 	static func createV1(sender: PrivateKeyBundleV2, recipient: SignedPublicKeyBundle, created: Date, invitation: InvitationV1) throws -> SealedInvitation {
-//		var recipient = recipient
-//		recipient.identityKey.signature.ensureWalletSignature()
-//
 		var sender = sender
 		sender.identityKey.publicKey.signature.ensureWalletSignature()
 		sender.preKeys[0].publicKey.signature.ensureEcdsaSignature()
