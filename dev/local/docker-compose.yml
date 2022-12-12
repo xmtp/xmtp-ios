@@ -23,5 +23,5 @@ services:
     environment:
       POSTGRES_PASSWORD: xmtp
   js:
-    build: ./dev/test/Dockerfile
+    build: ./dev/test
     network_mode: host
