@@ -13,7 +13,7 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: mkdir -p .github
+      - uses: actions/checkout@v3
       - name: Update Homebrew and save docker version
         run: |
           brew update --preinstall
@@ -39,7 +39,6 @@ jobs:
           docker ps
       - name: Start local test server
         run: docker-compose -p xmtp -f dev/local/docker-compose.yml up
-      - uses: actions/checkout@v3
       - run: xcodebuild test -scheme XMTP -destination "platform=iOS Simulator,name=iPhone 14" 
       - name: Stop local test server
         run: docker-compose -p xmtp -f dev/local/docker-compose.yml down
