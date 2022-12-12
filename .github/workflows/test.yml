@@ -38,6 +38,8 @@ jobs:
           # Verify Docker
           docker ps
       - name: Start local test server
-        run: script/local
+        run: docker-compose -p xmtp -f dev/local/docker-compose.yml up
       - uses: actions/checkout@v3
       - run: xcodebuild test -scheme XMTP -destination "platform=iOS Simulator,name=iPhone 14" 
+      - name: Stop local test server
+        run: docker-compose -p xmtp -f dev/local/docker-compose.yml down
