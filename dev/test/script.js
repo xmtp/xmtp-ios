@@ -12,7 +12,7 @@ const keyBytes = [
 async function checkAll() {
   const wallet = new Wallet(keyBytes);
   const client = await Client.create(wallet, {
-    apiUrl: "http://waku-node:5555",
+    apiUrl: "http://wakunode:5555",
   });
   const stream = await client.conversations.stream();
 
