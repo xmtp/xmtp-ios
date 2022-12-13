@@ -20,7 +20,7 @@ async function checkAll() {
 
   try {
     for await (const conversation of stream) {
-      conversation.send("hi from js");
+      conversation.send("HI " + conversation.peerAddress);
       console.log(`Replied to ${conversation.peerAddress}`);
     }
   } catch (e) {

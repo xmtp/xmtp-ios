@@ -168,7 +168,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReceiveV1MessagesFromJS() async throws {
-		var wallet = try FakeWallet.generate()
+		let wallet = try FakeWallet.generate()
 		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let client = try await Client.create(account: wallet, options: options)
 
@@ -178,10 +178,12 @@ final class IntegrationTests: XCTestCase {
 
 		let messages = try await convo.messages()
 		XCTAssertEqual(2, messages.count)
+
+		XCTAssertEqual("HI \(wallet.address)", messages[0].body)
 	}
 
 	func testCanReceiveV2MessagesFromJS() async throws {
-		var wallet = try PrivateKey.generate()
+		let wallet = try PrivateKey.generate()
 		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let client = try await Client.create(account: wallet, options: options)
 
@@ -197,6 +199,7 @@ final class IntegrationTests: XCTestCase {
 
 		let messages = try await convo.messages()
 		XCTAssertEqual(2, messages.count)
+		XCTAssertEqual("HI \(wallet.address)", messages[0].body)
 	}
 
 	func testEndToEndConversation() async throws {
