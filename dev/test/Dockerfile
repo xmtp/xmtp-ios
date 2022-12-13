@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/devcontainers/typescript-node:16-bullseye
+FROM node:19-alpine
+
 WORKDIR /code
 ADD script.js script.js
 RUN npm install @xmtp/xmtp-js ethers

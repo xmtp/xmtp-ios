@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-docker-compose -p xmtp -f dev/local/docker-compose.yml up
+docker-compose -p xmtp-ios -f dev/local/docker-compose.yml up

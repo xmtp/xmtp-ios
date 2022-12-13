@@ -1,3 +1,4 @@
+version: "3.8"
 services:
   waku-node:
     image: xmtp/node-go
@@ -23,5 +24,6 @@ services:
     environment:
       POSTGRES_PASSWORD: xmtp
   js:
+    depends_on:
+      - waku-node
     build: ./dev/test
-    network_mode: host
