@@ -28,6 +28,8 @@ class CallbackyConnection: WCWalletConnection {
 @available(iOS 16, *)
 final class IntegrationTests: XCTestCase {
 	func testSaveKey() async throws {
+		throw XCTSkip("integration only (requires local node)")
+
 		let alice = try PrivateKey.generate()
 		let identity = try PrivateKey.generate()
 
@@ -168,6 +170,8 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReceiveV1MessagesFromJS() async throws {
+		throw XCTSkip("integration only (requires local node)")
+
 		let wallet = try FakeWallet.generate()
 		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let client = try await Client.create(account: wallet, options: options)
@@ -183,6 +187,8 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReceiveV2MessagesFromJS() async throws {
+		throw XCTSkip("integration only (requires local node)")
+
 		let wallet = try PrivateKey.generate()
 		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let client = try await Client.create(account: wallet, options: options)
