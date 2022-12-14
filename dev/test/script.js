@@ -14,14 +14,17 @@ async function checkAll() {
   const client = await Client.create(wallet, {
     apiUrl: "http://wakunode:5555",
   });
-  const stream = await client.conversations.stream();
 
   console.log("Listening…");
 
   try {
-    for await (const conversation of stream) {
-      conversation.send("HI " + conversation.peerAddress);
-      console.log(`Replied to ${conversation.peerAddress}`);
+    for await (const message of await client.conversations.streamAllMessages()) {
+      if (message.senderAddress === wallet.address) {
+        continue;
+      }
+
+      await message.conversation.send("HI " + message.senderAddress);
+      console.log(`Replied to ${message.senderAddress}`);
     }
   } catch (e) {
     console.info(`Error:`, e);

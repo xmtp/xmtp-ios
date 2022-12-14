@@ -20,14 +20,12 @@ struct FakeWallet: SigningKey {
 	}
 
 	func sign(_ data: Data) async throws -> XMTP.Signature {
-		var signature = try await key.sign(data)
-		signature.ensureWalletSignature()
+		let signature = try await key.sign(data)
 		return signature
 	}
 
 	func sign(message: String) async throws -> XMTP.Signature {
-		var signature = try await key.sign(message: message)
-		signature.ensureWalletSignature()
+		let signature = try await key.sign(message: message)
 		return signature
 	}
 

@@ -23,7 +23,6 @@ extension SigningKey {
 
 		let signatureText = Signature.createIdentityText(key: try slimKey.serializedData())
 		var signature = try await sign(message: signatureText)
-		signature.ensureEcdsaSignature()
 
 		let digest = try Signature.ethHash(signatureText)
 		let recoveredKey = try KeyUtil.recoverPublicKey(message: digest, signature: signature.rawData)

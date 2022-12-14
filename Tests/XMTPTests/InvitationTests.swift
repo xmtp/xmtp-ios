@@ -22,7 +22,7 @@ class InvitationTests: XCTestCase {
 
 		let newInvitation = try await SealedInvitation.createV1(
 			sender: try alice.toV2(),
-			recipient: SignedPublicKeyBundle(bob.toPublicKeyBundle()),
+			recipient: try bob.toV2().getPublicKeyBundle(),
 			created: Date(),
 			invitation: invitation
 		)
@@ -35,8 +35,6 @@ class InvitationTests: XCTestCase {
 		let header = newInvitation.v1.header
 
 		// Ensure the headers haven't been mangled
-		XCTAssertEqual(header.sender, try SignedPublicKeyBundle(alice.toPublicKeyBundle()))
-		XCTAssertEqual(header.recipient, try SignedPublicKeyBundle(bob.toPublicKeyBundle()))
 		XCTAssertEqual(header.sender, try alice.toV2().getPublicKeyBundle())
 		XCTAssertEqual(header.recipient, try bob.toV2().getPublicKeyBundle())
 

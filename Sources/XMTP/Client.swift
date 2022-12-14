@@ -146,7 +146,6 @@ public class Client {
 		var contactBundle = ContactBundle()
 		contactBundle.v2.keyBundle = keys.getPublicKeyBundle()
 		contactBundle.v2.keyBundle.identityKey.signature.ensureWalletSignature()
-		contactBundle.v2.keyBundle.preKey.signature.ensureWalletSignature()
 
 		var envelope = Envelope()
 		envelope.contentTopic = Topic.contact(address).description

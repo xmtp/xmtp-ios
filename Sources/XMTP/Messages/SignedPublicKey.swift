@@ -25,7 +25,6 @@ extension SignedPublicKey {
 
 		if let signedByWallet, signedByWallet {
 			var signature = legacyKey.signature
-			signature.ensureWalletSignature()
 			signedPublicKey.signature = signature
 		}
 
