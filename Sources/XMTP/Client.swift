@@ -162,7 +162,7 @@ public class Client {
 	}
 
 	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
-		var authorized = AuthorizedIdentity(address: address, authorized: privateKeyBundleV1.identityKey.publicKey, identity: privateKeyBundleV1.identityKey)
+		let authorized = AuthorizedIdentity(address: address, authorized: privateKeyBundleV1.identityKey.publicKey, identity: privateKeyBundleV1.identityKey)
 		let authToken = try await authorized.createAuthToken()
 
 		apiClient.setAuthToken(authToken)
