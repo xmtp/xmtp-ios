@@ -205,10 +205,8 @@ public struct Conversations {
 	}
 
 	func sendInvitation(recipient: SignedPublicKeyBundle, invitation: InvitationV1, created: Date) async throws -> SealedInvitation {
-		var senderBundle = client.keys
-
 		let sealed = try SealedInvitation.createV1(
-			sender: senderBundle,
+			sender: client.keys,
 			recipient: recipient,
 			created: created,
 			invitation: invitation

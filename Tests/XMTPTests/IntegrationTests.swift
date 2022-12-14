@@ -170,7 +170,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReceiveV1MessagesFromJS() async throws {
-		throw XCTSkip("integration only (requires local node)")
+//		throw XCTSkip("integration only (requires local node)")
 
 		let wallet = try FakeWallet.generate()
 		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
@@ -187,7 +187,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReceiveV2MessagesFromJS() async throws {
-		throw XCTSkip("integration only (requires local node)")
+//		throw XCTSkip("integration only (requires local node)")
 
 		let wallet = try PrivateKey.generate()
 		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
