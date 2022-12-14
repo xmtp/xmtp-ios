@@ -73,19 +73,6 @@ extension Signature {
 		}
 	}
 
-	mutating func ensureEcdsaSignature() {
-		switch union {
-		case let .walletEcdsaCompact(walletEcdsa):
-			var ecdsa = Signature.ECDSACompact()
-			ecdsa.bytes = walletEcdsa.bytes
-			ecdsa.recovery = walletEcdsa.recovery
-			ecdsaCompact = ecdsa
-			union = .ecdsaCompact(ecdsa)
-		case .ecdsaCompact(_), .none:
-			return
-		}
-	}
-
 	mutating func ensureWalletSignature() {
 		switch union {
 		case let .ecdsaCompact(ecdsa):
