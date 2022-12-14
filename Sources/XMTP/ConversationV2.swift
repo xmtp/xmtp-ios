@@ -80,7 +80,7 @@ public struct ConversationV2 {
 
 	// TODO: more types of content
 	func send(content: String, options _: SendOptions? = nil) async throws {
-		guard let contact = try await client.getUserContact(peerAddress: peerAddress) else {
+		guard try await client.getUserContact(peerAddress: peerAddress) != nil else {
 			throw ContactBundleError.notFound
 		}
 

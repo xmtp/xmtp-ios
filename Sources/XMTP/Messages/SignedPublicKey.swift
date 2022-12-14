@@ -23,11 +23,6 @@ extension SignedPublicKey {
 		signedPublicKey.keyBytes = try publicKey.serializedData()
 		signedPublicKey.signature = legacyKey.signature
 
-		if let signedByWallet, signedByWallet {
-			var signature = legacyKey.signature
-			signedPublicKey.signature = signature
-		}
-
 		return signedPublicKey
 	}
 
