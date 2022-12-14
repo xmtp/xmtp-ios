@@ -39,8 +39,6 @@ jobs:
           docker ps
       - name: Start local test server
         run: docker-compose -p xmtp -f dev/local/docker-compose.yml up -d
-        ports:
-          - 5556:5556
       - run: xcodebuild test -scheme XMTP -destination "platform=iOS Simulator,name=iPhone 14" 
       - name: Stop local test server
         run: docker-compose -p xmtp -f dev/local/docker-compose.yml down
