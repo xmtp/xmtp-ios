@@ -46,10 +46,6 @@ public struct ConversationV2 {
 		self.header = header
 	}
 
-//	func messages(pageSize: Int) async throws -> AsyncThrowingStream<[DecodedMessage], Error> {
-//
-//	}
-
 	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil) async throws -> [DecodedMessage] {
 		let pagination = Pagination(limit: limit, startTime: before, endTime: after)
 
