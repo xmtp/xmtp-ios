@@ -34,19 +34,6 @@ struct Pagination {
 }
 
 extension PagingInfo {
-//	/// Note: this is a uint32, while go-waku's pageSize is a uint64
-//	public var limit: UInt32 = 0
-//
-//	public var cursor: Xmtp_MessageApi_V1_Cursor {
-//		get {return _cursor ?? Xmtp_MessageApi_V1_Cursor()}
-//		set {_cursor = newValue}
-//	}
-//	/// Returns true if `cursor` has been explicitly set.
-//	public var hasCursor: Bool {return self._cursor != nil}
-//	/// Clears the value of `cursor`. Subsequent reads from it will return its default value.
-//	public mutating func clearCursor() {self._cursor = nil}
-//
-//	public var direction: Xmtp_MessageApi_V1_SortDirection = .unspecified
 	init(limit: Int? = nil, cursor: PagingInfoCursor? = nil, direction: PagingInfoSortDirection? = nil) {
 		self.init()
 

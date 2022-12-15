@@ -45,7 +45,6 @@ public struct Conversations {
 		// See if we have a v2 conversation
 		for sealedInvitation in try await listInvitations() {
 			if !sealedInvitation.involves(contact) {
-				print("does not involve me")
 				continue
 			}
 
