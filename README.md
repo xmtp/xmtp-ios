@@ -94,6 +94,12 @@ The client's network connection and key storage method can be configured with th
 | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | env       | `dev`   | Connect to the specified XMTP network environment. Valid values include `.dev`, `.production`, or `.local`. For important details about working with these environments, see [XMTP `production` and `dev` network environments](#xmtp-production-and-dev-network-environments). |
 
+```swift
+// Configure the client to use the production network
+let clientOptions = ClientOptions(api: .init(env: .production))
+let client = try await Client.create(account: account, options: clientOptions)
+```
+
 **Note: that the `apiUrl`, `keyStoreType`, `codecs`, `maxContentSize` and `appVersion` parameters from the JavaScript SDK are not yet supported.**
 
 ### Conversations
