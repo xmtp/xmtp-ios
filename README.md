@@ -33,46 +33,6 @@ For a demonstration of the core concepts and capabilities of the `xmtp-ios` clie
 
 To learn more about XMTP and get answers to frequently asked questions, see [FAQ about XMTP](https://xmtp.org/docs/dev-concepts/faq).
 
-## 🏗 **Breaking revisions**
-
-Because `xmtp-ios` is in active development, you should expect breaking revisions that might require you to adopt the latest SDK release to enable your app to continue working as expected.
-
-XMTP communicates about breaking revisions in the [XMTP Discord community](https://discord.gg/xmtp), providing as much advance notice as possible. Additionally, breaking revisions in an `xmtp-ios` release are described on the [Releases page](https://github.com/xmtp/xmtp-ios/releases).
-
-### Deprecation
-
-Older versions of the SDK will eventually become deprecated, which means:
-
-1. The network will not support and eventually actively reject connections from clients using deprecated versions.
-2. Bugs will not be fixed in deprecated versions.
-
-Following table shows the deprecation schedule.
-
-| Announced  | Effective  | Minimum Version | Rationale                                                                                                         |
-| ---------- | ---------- | --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| 2022-08-18 | 2022-11-08 | v6.0.0          | XMTP network will stop supporting the Waku/libp2p based client interface in favor of the new GRPC based interface |
-
-Issues and PRs are welcome in accordance with our [contribution guidelines](https://github.com/xmtp/xmtp-ios/blob/main/CONTRIBUTING.md).
-
-## XMTP `production` and `dev` network environments
-
-XMTP provides both `production` and `dev` network environments to support the development phases of your project.
-
-The `production` and `dev` networks are completely separate and not interchangeable.
-For example, for a given blockchain account address, its XMTP identity on `dev` network is completely distinct from its XMTP identity on the `production` network, as are the messages associated with these identities. In addition, XMTP identities and messages created on the `dev` network can't be accessed from or moved to the `production` network, and vice versa.
-
-**Important:** When you [create a client](#creating-a-client), it connects to the XMTP `dev` environment by default. To learn how to use the `env` parameter to set your client's network environment, see [Configuring the Client](#configuring-the-client).
-
-The `env` parameter accepts one of three valid values: `dev`, `production`, or `local`. Here are some best practices for when to use each environment:
-
-- `dev`: Use to have a client communicate with the `dev` network. As a best practice, set `env` to `dev` while developing and testing your app. Follow this best practice to isolate test messages to `dev` inboxes.
-
-- `production`: Use to have a client communicate with the `production` network. As a best practice, set `env` to `production` when your app is serving real users. Follow this best practice to isolate messages between real-world users to `production` inboxes.
-
-- `local`: Use to have a client communicate with an XMTP node you are running locally. For example, an XMTP node developer can set `env` to `local` to generate client traffic to test a node running locally.
-
-The `production` network is configured to store messages indefinitely. XMTP may occasionally delete messages and keys from the `dev` network, and will provide advance notice in the [XMTP Discord community](https://discord.gg/xmtp).
-
 ## Installation
 
 ### Install with Swift Package Manager
@@ -276,3 +236,43 @@ let myAppConversations = conversations.filter {
 #### Compression
 
 This package currently does not support message content compression.
+
+## 🏗 **Breaking revisions**
+
+Because `xmtp-ios` is in active development, you should expect breaking revisions that might require you to adopt the latest SDK release to enable your app to continue working as expected.
+
+XMTP communicates about breaking revisions in the [XMTP Discord community](https://discord.gg/xmtp), providing as much advance notice as possible. Additionally, breaking revisions in an `xmtp-ios` release are described on the [Releases page](https://github.com/xmtp/xmtp-ios/releases).
+
+### Deprecation
+
+Older versions of the SDK will eventually become deprecated, which means:
+
+1. The network will not support and eventually actively reject connections from clients using deprecated versions.
+2. Bugs will not be fixed in deprecated versions.
+
+Following table shows the deprecation schedule.
+
+| Announced  | Effective  | Minimum Version | Rationale                                                                                                         |
+| ---------- | ---------- | --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| 2022-08-18 | 2022-11-08 | v6.0.0          | XMTP network will stop supporting the Waku/libp2p based client interface in favor of the new GRPC based interface |
+
+Issues and PRs are welcome in accordance with our [contribution guidelines](https://github.com/xmtp/xmtp-ios/blob/main/CONTRIBUTING.md).
+
+## XMTP `production` and `dev` network environments
+
+XMTP provides both `production` and `dev` network environments to support the development phases of your project.
+
+The `production` and `dev` networks are completely separate and not interchangeable.
+For example, for a given blockchain account address, its XMTP identity on `dev` network is completely distinct from its XMTP identity on the `production` network, as are the messages associated with these identities. In addition, XMTP identities and messages created on the `dev` network can't be accessed from or moved to the `production` network, and vice versa.
+
+**Important:** When you [create a client](#creating-a-client), it connects to the XMTP `dev` environment by default. To learn how to use the `env` parameter to set your client's network environment, see [Configuring the Client](#configuring-the-client).
+
+The `env` parameter accepts one of three valid values: `dev`, `production`, or `local`. Here are some best practices for when to use each environment:
+
+- `dev`: Use to have a client communicate with the `dev` network. As a best practice, set `env` to `dev` while developing and testing your app. Follow this best practice to isolate test messages to `dev` inboxes.
+
+- `production`: Use to have a client communicate with the `production` network. As a best practice, set `env` to `production` when your app is serving real users. Follow this best practice to isolate messages between real-world users to `production` inboxes.
+
+- `local`: Use to have a client communicate with an XMTP node you are running locally. For example, an XMTP node developer can set `env` to `local` to generate client traffic to test a node running locally.
+
+The `production` network is configured to store messages indefinitely. XMTP may occasionally delete messages and keys from the `dev` network, and will provide advance notice in the [XMTP Discord community](https://discord.gg/xmtp).
