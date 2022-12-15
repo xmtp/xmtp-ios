@@ -367,7 +367,6 @@ final class IntegrationTests: XCTestCase {
 		XCTAssertEqual(1, messages.count)
 		let nowMessage = messages[0]
 		XCTAssertEqual("now", nowMessage.body)
-		print("now message sent \(nowMessage.sent)")
 
 		let messages2 = try await convo.messages(limit: 1, before: nowMessage.sent)
 		XCTAssertEqual(1, messages2.count)
@@ -402,15 +401,10 @@ final class IntegrationTests: XCTestCase {
 		try await convo.send(content: "10 seconds ago", sentAt: tenSecondsAgo)
 		try await convo.send(content: "now")
 
-		let all = try await convo.messages()
-		print("all: \(all)")
-
 		let messages = try await convo.messages(limit: 1)
 		XCTAssertEqual(1, messages.count)
 		let nowMessage = messages[0]
 		XCTAssertEqual("now", nowMessage.body)
-
-		print("now message sent: \(nowMessage.sent)")
 
 		let messages2 = try await convo.messages(limit: 1, before: nowMessage.sent)
 		XCTAssertEqual(1, messages2.count)
