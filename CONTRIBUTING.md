@@ -1,22 +1,22 @@
 # Contributing
 
-If you're seeing this document, you are an early contributor to the development and success of XMTP. We welcome your questions, feedback, suggestions, and code contributions.
+If you're seeing this document, you are an early contributor to the development and success of XMTP. Your questions, feedback, suggestions, and code contributions are welcome!
 
 ## ❔ Questions
 
-Have a question? We welcome you to ask it in [Q&A discussions](https://github.com/orgs/xmtp/discussions/categories/q-a).
+Have a question? You are welcome to ask it in [Q&A discussions](https://github.com/orgs/xmtp/discussions/categories/q-a).
 
 ## 🐞 Bugs
 
-Bugs should be reported as GitHub Issues. Please confirm there isn't already an open issue and include detailed steps to reproduce.
+Report bugs as GitHub Issues. Please confirm that there isn't an existing open issue about the bug and include detailed steps to reproduce the bug.
 
-## ✨ Feature Requests
+## ✨ Feature requests
 
-These should also be submitted as GitHub Issues. Again, please confirm there isn't already an open issue. Let us know what use cases this feature would unlock so that we can investigate and prioritize.
+Submit feature requests as GitHub Issues. Please confirm that there isn't an existing open issue requesting the feature. Describe the use cases this feature unlocks so the issue can be investigated and prioritized.
 
-## 🔀 Pull Requests
+## 🔀 Pull requests
 
-PRs are encouraged, but we suggest starting with a Feature Request to temperature-check first. If the PR would involve a major change to the protocol, it should be fleshed out as an [XMTP Improvement Proposal](https://github.com/xmtp/XIPs/blob/main/XIPs/xip-0-purpose-process.md) before work begins.
+PRs are encouraged, but consider starting with a feature request to temperature-check first. If the PR involves a major change to the protocol, the work should be fleshed out as an [XMTP Improvement Proposal](https://github.com/xmtp/XIPs/blob/main/XIPs/xip-0-purpose-process.md) before work begins.
 
 ## 🔧 Developing
 
