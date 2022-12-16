@@ -152,7 +152,7 @@ let newConversation = try await client.conversations.newConversation(with: "0x3F
 
 ### Send messages
 
-To be able to send a message, the recipient must have already started a client at least once and consequently advertised their key bundle on the network. Messages are addressed using account addresses. The message payload must be a plain string.
+To be able to send a message, the recipient must have already created a client at least once and consequently advertised their key bundle on the network. Messages are addressed using account addresses. The message payload must be a plain string.
 
 **Note: Other types of content are currently not supported.**
 
