@@ -128,7 +128,7 @@ for conversation in allConversations {
 
 You can also listen for new conversations being started in real-time. This will allow apps to display incoming messages from new contacts.
 
-**Warning: This stream will continue infinitely. To end the stream, break from the loop`**
+**Warning: This stream will continue infinitely. To end the stream, break from the loop.**
 
 ```swift
 for try await conversation in client.conversations.stream() {
