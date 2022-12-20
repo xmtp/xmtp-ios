@@ -17,9 +17,13 @@ struct ConversationListView: View {
 
 	var body: some View {
 		List {
-			ForEach(conversations, id: \.peerAddress) { conversation in
+			ForEach(conversations, id: \.topic) { conversation in
 				NavigationLink(value: conversation) {
-					Text(conversation.peerAddress)
+					VStack {
+						Text(conversation.peerAddress)
+						Text(conversation.topic)
+							.font(.caption)
+					}
 				}
 			}
 		}
@@ -36,7 +40,9 @@ struct ConversationListView: View {
 		.task {
 			do {
 				for try await conversation in client.conversations.stream() {
-					conversations.insert(conversation, at: 0)
+					if !conversations.contains(conversation) {
+						conversations.insert(conversation, at: 0)
+					}
 				}
 			} catch {
 				print("Error streaming conversations: \(error)")
