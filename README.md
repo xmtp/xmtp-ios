@@ -1,19 +1,14 @@
 # XMTP-iOS
 
-![Test](https://github.com/xmtp/xmtp-ios/actions/workflows/test.yml/badge.svg) ![Lint](https://github.com/xmtp/xmtp-ios/actions/workflows/lint.yml/badge.svg) ![Status](https://camo.githubusercontent.com/5bb5892781bbf711c7fe5eba3328e9e15a767de87c587d3fb65f2fd7e1f4ae72/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f50726f6a6563745f5374617475732d446576656c6f7065725f507265766965772d726564)
+![Test](https://github.com/xmtp/xmtp-ios/actions/workflows/test.yml/badge.svg) ![Lint](https://github.com/xmtp/xmtp-ios/actions/workflows/lint.yml/badge.svg) ![Status](https://img.shields.io/badge/Project_Status-Developer_Preview-yellow)
 
 `xmtp-ios` provides a Swift implementation of an XMTP message API client for use with iOS apps.
 
 Use `xmtp-ios` to build with XMTP to send messages between blockchain accounts, including DMs, notifications, announcements, and more.
 
-This SDK is in **Developer Preview** status. We do **not** recommend using Developer Preview software in production apps.
+This SDK is in **Developer Preview** status and ready for you to start building.
 
-Software in this status:
-
-- Is not formally supported
-- Will change without warning
-- May not be backward compatible
-- Has not undergone a formal security audit
+However, we do **not** recommend using Developer Preview software in production apps. Software in this status may change based on feedback.
 
 Specifically, this SDK is missing this functionality:
 
@@ -35,10 +30,10 @@ For a basic demonstration of the core concepts and capabilities of the `xmtp-ios
 
 ## Install with Swift Package Manager
 
-Use Xcode to add to the project (**File** > **Swift Packages**) or add this to your `Package.swift` file:
+Use Xcode to add to the project (**File** > **Add Packages…**) or add this to your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/xmtp/xmtp-ios.swift", branch: "main")
+.package(url: "https://github.com/xmtp/xmtp-ios", branch: "main")
 ```
 
 ## Usage overview
