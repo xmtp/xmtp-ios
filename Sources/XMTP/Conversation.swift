@@ -35,6 +35,15 @@ public enum Conversation {
 		}
 	}
 
+	public func send<T, CodecType: ContentCodec>(content: T, codec: CodecType, fallback _: String? = nil) async throws where CodecType.T == T {
+		switch self {
+		case let .v1(conversationV1):
+			try await conversationV1.send(codec: codec, content: content)
+		case let .v2(conversationV2):
+			try await conversationV2.send(codec: codec, content: content)
+		}
+	}
+
 	/// Send a message to the conversation
 	public func send(text: String) async throws {
 		switch self {
@@ -59,7 +68,7 @@ public enum Conversation {
 	///
 	/// > Note: All messages in the conversation are returned by this stream. If you want to filter out messages
 	/// by a sender, you can check the ``Client`` address against the message's ``peerAddress``.
-	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
+	public func streamMessages() -> AsyncThrowingStream<any DecodedMessage, Error> {
 		switch self {
 		case let .v1(conversation):
 			return conversation.streamMessages()
@@ -69,7 +78,7 @@ public enum Conversation {
 	}
 
 	/// List messages in the conversation
-	public func messages() async throws -> [DecodedMessage] {
+	public func messages() async throws -> [any DecodedMessage] {
 		switch self {
 		case let .v1(conversationV1):
 			return try await conversationV1.messages()

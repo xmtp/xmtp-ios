@@ -26,9 +26,11 @@ public struct ClientOptions {
 	}
 
 	public var api = Api()
+	public var codecs: [any ContentCodec] = []
 
-	public init(api: Api = Api()) {
+	public init(api: Api = Api(), codecs: [any ContentCodec] = []) {
 		self.api = api
+		self.codecs = codecs
 	}
 }
 

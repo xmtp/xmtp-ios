@@ -47,7 +47,7 @@ public struct ConversationV2 {
 		self.header = header
 	}
 
-	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil) async throws -> [DecodedMessage] {
+	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil) async throws -> [any DecodedMessage] {
 		let pagination = Pagination(limit: limit, startTime: before, endTime: after)
 
 		let envelopes = try await client.apiClient.query(topics: [topic], pagination: pagination).envelopes
@@ -64,7 +64,7 @@ public struct ConversationV2 {
 		}
 	}
 
-	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
+	public func streamMessages() -> AsyncThrowingStream<any DecodedMessage, Error> {
 		AsyncThrowingStream { continuation in
 			Task {
 				for try await envelope in client.subscribe(topics: [topic.description]) {
@@ -77,11 +77,22 @@ public struct ConversationV2 {
 		}
 	}
 
-	private func decode(_ message: MessageV2) throws -> DecodedMessage {
+	private func decode(_ message: MessageV2) throws -> any DecodedMessage {
 		try MessageV2.decode(message, keyMaterial: keyMaterial)
 	}
 
-	internal func send(content: String, sentAt: Date) async throws {
+	func send<Codec: ContentCodec>(codec: Codec, content: Codec.T) async throws {
+		let encoded = try codec.encode(content: content)
+		try await send(content: encoded, sentAt: Date())
+	}
+
+	func send(content: String, sentAt: Date) async throws {
+		let encoder = TextCodec()
+		let encodedContent = try encoder.encode(content: content)
+		try await send(content: encodedContent, sentAt: sentAt)
+	}
+
+	internal func send(content: EncodedContent, sentAt: Date) async throws {
 		guard try await client.getUserContact(peerAddress: peerAddress) != nil else {
 			throw ContactBundleError.notFound
 		}

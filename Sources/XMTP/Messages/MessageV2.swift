@@ -18,7 +18,7 @@ extension MessageV2 {
 		self.ciphertext = ciphertext
 	}
 
-	static func decode(_ message: MessageV2, keyMaterial: Data) throws -> DecodedMessage {
+	static func decode(_ message: MessageV2, keyMaterial: Data) throws -> some DecodedMessage {
 		do {
 			let decrypted = try Crypto.decrypt(keyMaterial, message.ciphertext, additionalData: message.headerBytes)
 			let signed = try SignedContent(serializedData: decrypted)
@@ -28,8 +28,9 @@ extension MessageV2 {
 
 			let header = try MessageHeaderV2(serializedData: message.headerBytes)
 
-			return DecodedMessage(
-				body: decoded,
+			return TypedDecodedMessage(
+				codec: decoder,
+				content: decoded,
 				senderAddress: try signed.sender.walletAddress,
 				sent: Date(timeIntervalSince1970: Double(header.createdNs / 1_000_000) / 1000)
 			)
@@ -39,9 +40,7 @@ extension MessageV2 {
 		}
 	}
 
-	static func encode(client: Client, content: String, topic: String, keyMaterial: Data) async throws -> MessageV2 {
-		let encoder = TextCodec()
-		let encodedContent = try encoder.encode(content: content)
+	static func encode(client: Client, content encodedContent: EncodedContent, topic: String, keyMaterial: Data) async throws -> MessageV2 {
 		let payload = try encodedContent.serializedData()
 
 		let date = Date()

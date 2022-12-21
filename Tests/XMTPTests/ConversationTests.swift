@@ -261,6 +261,9 @@ class ConversationTests: XCTestCase {
 			}
 		}
 
+		let encoder = TextCodec()
+		let encodedContent = try encoder.encode(content: "hi alice")
+
 		// Stream a message
 		fakeApiClient.send(
 			envelope: Envelope(
@@ -269,7 +272,7 @@ class ConversationTests: XCTestCase {
 				message: try Message(
 					v2: try await MessageV2.encode(
 						client: bobClient,
-						content: "hi alice",
+						content: encodedContent,
 						topic: conversation.topic,
 						keyMaterial: conversation.keyMaterial
 					)

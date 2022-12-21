@@ -56,10 +56,12 @@ class MessageTests: XCTestCase {
 
 		let sealedInvitation = try SealedInvitation.createV1(sender: alice.toV2(), recipient: bob.toV2().getPublicKeyBundle(), created: Date(), invitation: invitationv1)
 		let conversation = try ConversationV2.create(client: client, invitation: invitationv1, header: sealedInvitation.v1.header)
-		let message1 = try await MessageV2.encode(client: client, content: "Yo!", topic: invitationv1.topic, keyMaterial: invitationv1.aes256GcmHkdfSha256.keyMaterial)
+		let encoder = TextCodec()
+		let encodedContent = try encoder.encode(content: "Yo!")
+		let message1 = try await MessageV2.encode(client: client, content: encodedContent, topic: invitationv1.topic, keyMaterial: invitationv1.aes256GcmHkdfSha256.keyMaterial)
 
 		let decoded = try MessageV2.decode(message1, keyMaterial: invitationv1.aes256GcmHkdfSha256.keyMaterial)
-		XCTAssertEqual(decoded.body, "Yo!")
+		XCTAssertEqual(decoded.content as! String, "Yo!")
 	}
 
 	func testCanDecrypt() throws {

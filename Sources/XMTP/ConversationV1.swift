@@ -22,12 +22,22 @@ public struct ConversationV1 {
 	}
 
 	internal func send(content: String, options _: SendOptions? = nil, sentAt: Date? = nil) async throws {
+		let encoder = TextCodec()
+		let encodedContent = try encoder.encode(content: content)
+
+		try await send(content: encodedContent, sentAt: sentAt)
+	}
+
+	func send<Codec: ContentCodec>(codec: Codec, content: Codec.T) async throws {
+		let encoded = try codec.encode(content: content)
+		try await send(content: encoded)
+	}
+
+	internal func send(content encodedContent: EncodedContent, options _: SendOptions? = nil, sentAt: Date? = nil) async throws {
 		guard let contact = try await client.contacts.find(peerAddress) else {
 			throw ContactBundleError.notFound
 		}
 
-		let encoder = TextCodec()
-		let encodedContent = try encoder.encode(content: content)
 		let recipient = try contact.toPublicKeyBundle()
 
 		if !recipient.identityKey.hasSignature {
@@ -71,7 +81,7 @@ public struct ConversationV1 {
 		try await client.publish(envelopes: envelopes)
 	}
 
-	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
+	public func streamMessages() -> AsyncThrowingStream<any DecodedMessage, Error> {
 		AsyncThrowingStream { continuation in
 			Task {
 				for try await envelope in client.subscribe(topics: [topic.description]) {
@@ -82,7 +92,7 @@ public struct ConversationV1 {
 		}
 	}
 
-	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil) async throws -> [DecodedMessage] {
+	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil) async throws -> [any DecodedMessage] {
 		let pagination = Pagination(limit: limit, startTime: before, endTime: after)
 
 		let envelopes = try await client.apiClient.query(topics: [
@@ -99,7 +109,7 @@ public struct ConversationV1 {
 		}
 	}
 
-	private func decode(envelope: Envelope) throws -> DecodedMessage {
+	private func decode(envelope: Envelope) throws -> any DecodedMessage {
 		let message = try Message(serializedData: envelope.message)
 		let decrypted = try message.v1.decrypt(with: client.privateKeyBundleV1)
 
@@ -109,8 +119,8 @@ public struct ConversationV1 {
 
 		let header = try message.v1.header
 
-		return DecodedMessage(
-			body: decoded,
+		return TypedDecodedMessage(
+			content: decoded,
 			senderAddress: header.sender.walletAddress,
 			sent: message.v1.sentAt
 		)

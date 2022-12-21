@@ -7,9 +7,13 @@
 
 import XMTPProto
 
-typealias EncodedContent = Xmtp_MessageContents_EncodedContent
+enum CodecError: Error {
+	case invalidContent
+}
 
-protocol ContentCodec {
+public typealias EncodedContent = Xmtp_MessageContents_EncodedContent
+
+public protocol ContentCodec {
 	associatedtype T
 
 	var contentType: ContentTypeID { get }
