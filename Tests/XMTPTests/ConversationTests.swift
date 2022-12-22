@@ -221,13 +221,6 @@ class ConversationTests: XCTestCase {
 
 		let date = Date().advanced(by: -1_000_000)
 
-		let messageV1 = try MessageV1.encode(
-			sender: bobClient.privateKeyBundleV1,
-			recipient: aliceClient.privateKeyBundleV1.toPublicKeyBundle(),
-			message: try encodedContent.serializedData(),
-			timestamp: date
-		)
-
 		// Stream a message
 		fakeApiClient.send(
 			envelope: Envelope(
@@ -256,7 +249,7 @@ class ConversationTests: XCTestCase {
 		let expectation = expectation(description: "got a message")
 
 		Task(priority: .userInitiated) {
-			for try await message in conversation.streamMessages() {
+			for try await _ in conversation.streamMessages() {
 				expectation.fulfill()
 			}
 		}

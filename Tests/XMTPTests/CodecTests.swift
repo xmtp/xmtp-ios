@@ -39,7 +39,6 @@ class CodecTests: XCTestCase {
 		let fixtures = await fixtures()
 
 		let aliceClient = fixtures.aliceClient!
-		let bobClient = fixtures.bobClient!
 
 		let aliceConversation = try await aliceClient.conversations.newConversation(with: fixtures.bob.address)
 

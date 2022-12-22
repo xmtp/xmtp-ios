@@ -47,9 +47,4 @@ class ClientTests: XCTestCase {
 
 		XCTAssert(preKey.publicKey.hasSignature, "prekey not signed")
 	}
-
-	func testCanHaveCustomCodecs() async throws {
-		let fakeWallet = try PrivateKey.generate()
-		let client = try await Client.create(account: fakeWallet, options: .init(codecs: [TestCodec()]))
-	}
 }
