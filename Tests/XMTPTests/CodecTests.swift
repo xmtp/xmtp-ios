@@ -45,7 +45,7 @@ class CodecTests: XCTestCase {
 		XCTAssertEqual(messages.count, 1)
 
 		if messages.count == 1 {
-			let content: Double = try messages[0].content(as: Double.self)
+			let content: Double = try messages[0].content()
 			XCTAssertEqual(3.14, content)
 		}
 	}
@@ -64,7 +64,7 @@ class CodecTests: XCTestCase {
 		let messages = try await aliceConversation.messages()
 		XCTAssertEqual(messages.count, 1)
 
-		let content: Double? = try? messages[0].content(as: Double.self)
+		let content: Double? = try? messages[0].content()
 		XCTAssertEqual(nil, content)
 		XCTAssertEqual("pi", messages[0].fallbackContent)
 	}

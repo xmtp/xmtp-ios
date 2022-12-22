@@ -23,10 +23,12 @@ public struct DecodedMessage {
 		self.sent = sent
 	}
 
-	public func content<T>(as _: T.Type) throws -> T {
-		if let codec = Client.codecRegistry.find(for: encodedContent.type),
-		   let content = try codec.decode(content: encodedContent) as? T
-		{
+	public func content<T>() throws -> T {
+		guard let codec = Client.codecRegistry.find(for: encodedContent.type) else {
+			throw CodecError.codecNotFound
+		}
+
+		if let content = try codec.decode(content: encodedContent) as? T {
 			return content
 		}
 
@@ -39,7 +41,7 @@ public struct DecodedMessage {
 
 	var body: String {
 		do {
-			return try content(as: String.self)
+			return try content()
 		} catch {
 			return fallbackContent
 		}
