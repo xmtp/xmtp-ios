@@ -24,15 +24,7 @@ public struct DecodedMessage {
 	}
 
 	public func content<T>() throws -> T {
-		guard let codec = Client.codecRegistry.find(for: encodedContent.type) else {
-			throw CodecError.codecNotFound
-		}
-
-		if let content = try codec.decode(content: encodedContent) as? T {
-			return content
-		}
-
-		throw CodecError.invalidContent
+		return try encodedContent.decoded()
 	}
 
 	var fallbackContent: String {

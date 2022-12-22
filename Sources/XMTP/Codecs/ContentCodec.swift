@@ -13,6 +13,20 @@ enum CodecError: String, Error {
 
 public typealias EncodedContent = Xmtp_MessageContents_EncodedContent
 
+extension EncodedContent {
+	func decoded<T>() throws -> T {
+		guard let codec = Client.codecRegistry.find(for: type) else {
+			throw CodecError.codecNotFound
+		}
+
+		if let content = try codec.decode(content: self) as? T {
+			return content
+		}
+
+		throw CodecError.invalidContent
+	}
+}
+
 public protocol ContentCodec: Hashable, Equatable {
 	associatedtype T
 

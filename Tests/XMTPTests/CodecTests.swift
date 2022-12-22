@@ -68,4 +68,50 @@ class CodecTests: XCTestCase {
 		XCTAssertEqual(nil, content)
 		XCTAssertEqual("pi", messages[0].fallbackContent)
 	}
+
+	func testCompositeCodecOnePart() async throws {
+		Client.register(codec: CompositeCodec())
+
+		let fixtures = await fixtures()
+
+		let aliceClient = fixtures.aliceClient!
+		let aliceConversation = try await aliceClient.conversations.newConversation(with: fixtures.bob.address)
+
+		let textContent = try TextCodec().encode(content: "hiya")
+		let source = DecodedComposite(encodedContent: textContent)
+		try await aliceConversation.send(content: source, codec: CompositeCodec())
+		let messages = try await aliceConversation.messages()
+
+		let decoded: DecodedComposite = try messages[0].content()
+		XCTAssertEqual("hiya", try decoded.content())
+	}
+
+	func testCompositeCodecCanHaveParts() async throws {
+		Client.register(codec: CompositeCodec())
+		Client.register(codec: NumberCodec())
+
+		let fixtures = await fixtures()
+
+		let aliceClient = fixtures.aliceClient!
+		let aliceConversation = try await aliceClient.conversations.newConversation(with: fixtures.bob.address)
+
+		let textContent = try TextCodec().encode(content: "sup")
+		let numberContent = try NumberCodec().encode(content: 3.14)
+
+		var source = DecodedComposite(parts: [
+			DecodedComposite(encodedContent: textContent),
+			DecodedComposite(parts: [
+				DecodedComposite(encodedContent: numberContent),
+			]),
+		])
+
+		try await aliceConversation.send(content: source, codec: CompositeCodec())
+		let messages = try await aliceConversation.messages()
+
+		let decoded: DecodedComposite = try messages[0].content()
+		let part1 = decoded.parts[0]
+		let part2 = decoded.parts[1].parts[0]
+		XCTAssertEqual("sup", try part1.content())
+		XCTAssertEqual(3.14, try part2.content())
+	}
 }

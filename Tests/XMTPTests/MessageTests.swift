@@ -81,6 +81,5 @@ class MessageTests: XCTestCase {
 		XCTAssertEqual(Data(content), decrypted)
 
 		let message = try EncodedContent(serializedData: decrypted)
-		print(message.textFormatString())
 	}
 }
