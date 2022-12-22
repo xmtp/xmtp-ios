@@ -110,7 +110,6 @@ public struct ConversationV2 {
 		])
 	}
 
-	// TODO: more types of content
 	func send(content: String) async throws {
 		try await send(content: content, sentAt: Date())
 	}
