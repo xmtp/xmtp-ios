@@ -79,7 +79,5 @@ class MessageTests: XCTestCase {
 		let decrypted = try Crypto.decrypt(Data(secret), ciphertext, additionalData: Data(additionalData))
 
 		XCTAssertEqual(Data(content), decrypted)
-
-		let message = try EncodedContent(serializedData: decrypted)
 	}
 }
