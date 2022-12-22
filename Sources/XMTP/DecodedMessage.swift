@@ -33,6 +33,10 @@ public struct DecodedMessage {
 		throw CodecError.invalidContent
 	}
 
+	var fallbackContent: String {
+		encodedContent.fallback
+	}
+
 	var body: String {
 		(try? content(as: String.self)) ?? ""
 	}

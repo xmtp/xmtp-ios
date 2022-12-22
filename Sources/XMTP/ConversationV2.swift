@@ -81,8 +81,9 @@ public struct ConversationV2 {
 		try MessageV2.decode(message, keyMaterial: keyMaterial)
 	}
 
-	func send<Codec: ContentCodec>(codec: Codec, content: Codec.T) async throws {
-		let encoded = try codec.encode(content: content)
+	func send<Codec: ContentCodec>(codec: Codec, content: Codec.T, fallback: String? = nil) async throws {
+		var encoded = try codec.encode(content: content)
+		encoded.fallback = fallback ?? ""
 		try await send(content: encoded, sentAt: Date())
 	}
 
