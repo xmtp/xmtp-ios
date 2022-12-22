@@ -81,7 +81,7 @@ public struct ConversationV1 {
 		try await client.publish(envelopes: envelopes)
 	}
 
-	public func streamMessages() -> AsyncThrowingStream<any DecodedMessage, Error> {
+	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
 		AsyncThrowingStream { continuation in
 			Task {
 				for try await envelope in client.subscribe(topics: [topic.description]) {
@@ -92,7 +92,7 @@ public struct ConversationV1 {
 		}
 	}
 
-	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil) async throws -> [any DecodedMessage] {
+	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil) async throws -> [DecodedMessage] {
 		let pagination = Pagination(limit: limit, startTime: before, endTime: after)
 
 		let envelopes = try await client.apiClient.query(topics: [
@@ -109,18 +109,15 @@ public struct ConversationV1 {
 		}
 	}
 
-	private func decode(envelope: Envelope) throws -> any DecodedMessage {
+	private func decode(envelope: Envelope) throws -> DecodedMessage {
 		let message = try Message(serializedData: envelope.message)
 		let decrypted = try message.v1.decrypt(with: client.privateKeyBundleV1)
 
 		let encodedMessage = try EncodedContent(serializedData: decrypted)
-		let decoder = TextCodec()
-		let decoded = try decoder.decode(content: encodedMessage)
-
 		let header = try message.v1.header
 
-		return TypedDecodedMessage(
-			content: decoded,
+		return DecodedMessage(
+			encodedContent: encodedMessage,
 			senderAddress: header.sender.walletAddress,
 			sent: message.v1.sentAt
 		)

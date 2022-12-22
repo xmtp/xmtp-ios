@@ -18,19 +18,15 @@ extension MessageV2 {
 		self.ciphertext = ciphertext
 	}
 
-	static func decode(_ message: MessageV2, keyMaterial: Data) throws -> some DecodedMessage {
+	static func decode(_ message: MessageV2, keyMaterial: Data) throws -> DecodedMessage {
 		do {
 			let decrypted = try Crypto.decrypt(keyMaterial, message.ciphertext, additionalData: message.headerBytes)
 			let signed = try SignedContent(serializedData: decrypted)
 			let encodedMessage = try EncodedContent(serializedData: signed.payload)
-			let decoder = TextCodec()
-			let decoded = try decoder.decode(content: encodedMessage)
-
 			let header = try MessageHeaderV2(serializedData: message.headerBytes)
 
-			return TypedDecodedMessage(
-				codec: decoder,
-				content: decoded,
+			return DecodedMessage(
+				encodedContent: encodedMessage,
 				senderAddress: try signed.sender.walletAddress,
 				sent: Date(timeIntervalSince1970: Double(header.createdNs / 1_000_000) / 1000)
 			)

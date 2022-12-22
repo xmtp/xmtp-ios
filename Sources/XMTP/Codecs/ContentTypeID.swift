@@ -18,3 +18,9 @@ public extension ContentTypeID {
 		self.versionMinor = UInt32(versionMinor)
 	}
 }
+
+extension ContentTypeID {
+	var id: String {
+		"\(authorityID):\(typeID)"
+	}
+}

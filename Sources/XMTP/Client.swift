@@ -59,6 +59,16 @@ public class Client {
 		apiClient.environment
 	}
 
+	static var codecRegistry = {
+		var registry = CodecRegsistry()
+		registry.register(codec: TextCodec())
+		return registry
+	}()
+
+	public static func register(codec: any ContentCodec) {
+		codecRegistry.register(codec: codec)
+	}
+
 	/// Creates a client.
 	public static func create(account: SigningKey, options: ClientOptions? = nil) async throws -> Client {
 		let options = options ?? ClientOptions()

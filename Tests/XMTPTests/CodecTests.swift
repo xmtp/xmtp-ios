@@ -15,18 +15,26 @@ struct NumberCodec: ContentCodec {
 		ContentTypeID(authorityID: "example.com", typeID: "number", versionMajor: 1, versionMinor: 1)
 	}
 
-	func encode(content _: Double) throws -> XMTP.EncodedContent {
-		var content = EncodedContent()
-		return content
+	func encode(content: Double) throws -> XMTP.EncodedContent {
+		var encodedContent = EncodedContent()
+
+		encodedContent.type = ContentTypeID(authorityID: "example.com", typeID: "number", versionMajor: 1, versionMinor: 1)
+		encodedContent.content = try JSONEncoder().encode(content)
+
+		return encodedContent
 	}
 
-	func decode(content _: XMTP.EncodedContent) throws -> Double {
-		return 0
+	func decode(content: XMTP.EncodedContent) throws -> Double {
+		return try JSONDecoder().decode(Double.self, from: content.content)
 	}
 }
 
 @available(iOS 15, *)
 class CodecTests: XCTestCase {
+	override func setUp() async throws {
+		Client.register(codec: NumberCodec())
+	}
+
 	func testCanRoundTripWithCustomContentType() async throws {
 		let fixtures = await fixtures()
 
@@ -34,18 +42,17 @@ class CodecTests: XCTestCase {
 		let bobClient = fixtures.bobClient!
 
 		let aliceConversation = try await aliceClient.conversations.newConversation(with: fixtures.bob.address)
-		let bobConversation = try await bobClient.conversations.newConversation(with: fixtures.alice.address)
 
 		try await aliceConversation.send(content: 3.14, codec: NumberCodec())
 
-		let messages = try await bobConversation.messages()
+		let messages = try await aliceConversation.messages()
 		XCTAssertEqual(messages.count, 1)
 
 		print("MESSAGES: \(messages)")
 
 		if messages.count == 1 {
-			let content: Double = messages[0].content as! Double
-			XCTAssertEqual(3.14, messages[0].content as! Double)
+			let content: Double = try messages[0].content(as: Double.self)
+			XCTAssertEqual(3.14, content)
 		}
 	}
 }
