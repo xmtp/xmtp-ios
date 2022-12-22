@@ -38,6 +38,10 @@ public struct DecodedMessage {
 	}
 
 	var body: String {
-		(try? content(as: String.self)) ?? ""
+		do {
+			return try content(as: String.self)
+		} catch {
+			return fallbackContent
+		}
 	}
 }
