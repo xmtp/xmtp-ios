@@ -13,14 +13,14 @@ import XMTPProto
 typealias SignedPublicKey = Xmtp_MessageContents_SignedPublicKey
 
 extension SignedPublicKey {
-	static func fromLegacy(_ legacyKey: PublicKey, signedByWallet _: Bool? = false) throws -> SignedPublicKey {
+	static func fromLegacy(_ legacyKey: PublicKey, signedByWallet _: Bool? = false) -> SignedPublicKey {
 		var signedPublicKey = SignedPublicKey()
 
 		var publicKey = PublicKey()
 		publicKey.secp256K1Uncompressed = legacyKey.secp256K1Uncompressed
 		publicKey.timestamp = legacyKey.timestamp
 
-		signedPublicKey.keyBytes = try publicKey.serializedData()
+		signedPublicKey.keyBytes = try! publicKey.serializedData()
 		signedPublicKey.signature = legacyKey.signature
 
 		return signedPublicKey

@@ -128,12 +128,8 @@ public class Client {
 		self.apiClient = apiClient
 	}
 
-	var keys: PrivateKeyBundleV2 {
-		do {
-			return try privateKeyBundleV1.toV2()
-		} catch {
-			fatalError("Error getting keys \(error)")
-		}
+	public var keys: PrivateKeyBundleV2 {
+		privateKeyBundleV1.toV2()
 	}
 
 	func ensureUserContactPublished() async throws {

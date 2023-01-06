@@ -9,7 +9,7 @@ import Foundation
 import secp256k1
 import XMTPProto
 
-typealias PrivateKeyBundleV2 = Xmtp_MessageContents_PrivateKeyBundleV2
+public typealias PrivateKeyBundleV2 = Xmtp_MessageContents_PrivateKeyBundleV2
 
 extension PrivateKeyBundleV2 {
 	func sharedSecret(peer: SignedPublicKeyBundle, myPreKey: SignedPublicKey, isRecipient: Bool) throws -> Data {
