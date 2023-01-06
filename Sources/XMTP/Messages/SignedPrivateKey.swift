@@ -9,7 +9,7 @@ import Foundation
 import secp256k1
 import XMTPProto
 
-typealias SignedPrivateKey = Xmtp_MessageContents_SignedPrivateKey
+public typealias SignedPrivateKey = Xmtp_MessageContents_SignedPrivateKey
 
 extension SignedPrivateKey {
 	static func fromLegacy(_ key: PrivateKey, signedByWallet: Bool? = false) -> SignedPrivateKey {

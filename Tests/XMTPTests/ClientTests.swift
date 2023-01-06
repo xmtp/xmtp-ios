@@ -26,4 +26,16 @@ class ClientTests: XCTestCase {
 
 		XCTAssert(preKey.publicKey.hasSignature, "prekey not signed")
 	}
+
+	func testCanBeCreatedWithV2Bundle() async throws {
+		let fakeWallet = try PrivateKey.generate()
+		let client = try await Client.create(account: fakeWallet)
+
+		let bundleV2 = client.keys
+		let clientFromV2Bundle = try Client.from(bundle: bundleV2)
+
+		XCTAssertEqual(client.address, clientFromV2Bundle.address)
+		XCTAssertEqual(client.privateKeyBundleV1.identityKey, clientFromV2Bundle.privateKeyBundleV1.identityKey)
+		XCTAssertEqual(client.privateKeyBundleV1.preKeys, clientFromV2Bundle.privateKeyBundleV1.preKeys)
+	}
 }

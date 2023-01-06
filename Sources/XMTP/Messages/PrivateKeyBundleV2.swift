@@ -52,6 +52,13 @@ extension PrivateKeyBundleV2 {
 		throw PrivateKeyBundleError.noPreKeyFound
 	}
 
+	func toV1() throws -> PrivateKeyBundleV1 {
+		var bundle = PrivateKeyBundleV1()
+		bundle.identityKey = try PrivateKey(identityKey)
+		bundle.preKeys = try preKeys.map { try PrivateKey($0) }
+		return bundle
+	}
+
 	func getPublicKeyBundle() -> SignedPublicKeyBundle {
 		var publicKeyBundle = SignedPublicKeyBundle()
 

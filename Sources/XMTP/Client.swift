@@ -122,6 +122,20 @@ public class Client {
 		return nil
 	}
 
+	public static func from(bundle: PrivateKeyBundleV2, options: ClientOptions? = nil) throws -> Client {
+		let v1Bundle = try bundle.toV1()
+		let address = try v1Bundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress
+
+		let options = options ?? ClientOptions()
+
+		let apiClient = try GRPCApiClient(
+			environment: options.api.env,
+			secure: options.api.isSecure
+		)
+
+		return try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient)
+	}
+
 	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient) throws {
 		self.address = address
 		self.privateKeyBundleV1 = privateKeyBundleV1
