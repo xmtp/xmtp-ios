@@ -20,7 +20,9 @@ extension SignedPublicKey {
 		publicKey.secp256K1Uncompressed = legacyKey.secp256K1Uncompressed
 		publicKey.timestamp = legacyKey.timestamp
 
+		// swiftlint:disable force_try
 		signedPublicKey.keyBytes = try! publicKey.serializedData()
+		// swiftlint:enable force_try
 		signedPublicKey.signature = legacyKey.signature
 
 		return signedPublicKey
