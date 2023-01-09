@@ -47,7 +47,9 @@ struct MessageCellView: View {
 	}
 
 	var bodyText: String {
+		// swiftlint:disable force_try
 		return try! message.content()
+		// swiftlint:enable force_try
 	}
 
 	var background: Color {
