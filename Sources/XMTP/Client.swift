@@ -122,6 +122,7 @@ public class Client {
 		return nil
 	}
 
+	/// Create a Client from saved v1 key bundle.
 	public static func from(bundle v1Bundle: PrivateKeyBundleV1, options: ClientOptions? = nil) throws -> Client {
 		let address = try v1Bundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress
 

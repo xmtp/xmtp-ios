@@ -79,6 +79,24 @@ import XMTP
 let client = try await Client.create(account: account)
 ```
 
+### Creating a client from saved keys
+
+You can save your keys from the client via the `v1keys` property:
+
+```swift
+// Create the client with a `SigningKey` from your app
+let client = try await Client.create(account: account)
+
+// Save the keys somewhere safe
+let keys = client.v1keys
+```
+
+Once you have those keys, you can create a new client with `Client.from`:
+
+```swift
+let client = try Client.from(bundle: keys)
+```
+
 ### Configure the client
 
 You can configure the client's network connection and key storage method with these optional parameters of `Client.create`:
