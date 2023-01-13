@@ -9,7 +9,7 @@ import CryptoKit
 import Foundation
 import XMTPProto
 
-typealias PrivateKeyBundleV1 = Xmtp_MessageContents_PrivateKeyBundleV1
+public typealias PrivateKeyBundleV1 = Xmtp_MessageContents_PrivateKeyBundleV1
 
 extension PrivateKeyBundleV1 {
 	static func generate(wallet: SigningKey) async throws -> PrivateKeyBundleV1 {

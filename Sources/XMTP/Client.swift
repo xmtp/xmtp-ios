@@ -122,8 +122,7 @@ public class Client {
 		return nil
 	}
 
-	public static func from(bundle: PrivateKeyBundleV2, options: ClientOptions? = nil) throws -> Client {
-		let v1Bundle = try bundle.toV1()
+	public static func from(bundle v1Bundle: PrivateKeyBundleV1, options: ClientOptions? = nil) throws -> Client {
 		let address = try v1Bundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress
 
 		let options = options ?? ClientOptions()
@@ -140,6 +139,10 @@ public class Client {
 		self.address = address
 		self.privateKeyBundleV1 = privateKeyBundleV1
 		self.apiClient = apiClient
+	}
+
+	public var v1keys: PrivateKeyBundleV1 {
+		privateKeyBundleV1
 	}
 
 	public var keys: PrivateKeyBundleV2 {
