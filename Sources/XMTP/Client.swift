@@ -127,9 +127,6 @@ public class Client {
 		let topics: [Topic] = [.userPrivateStoreKeyBundle(account.address)]
 		let res = try await apiClient.query(topics: topics, pagination: nil)
 
-		print("Loading private keys for \(account.address)")
-		print("Got envelopes \(res.envelopes)")
-
 		for envelope in res.envelopes {
 			let encryptedBundle = try EncryptedPrivateKeyBundle(serializedData: envelope.message)
 			let bundle = try await encryptedBundle.decrypted(with: account)
