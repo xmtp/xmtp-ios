@@ -254,6 +254,19 @@ let myAppConversations = conversations.filter {
 }
 ```
 
+### Decoding a single message
+
+You can decode a single `Envelope` from XMTP using the `decode` method:
+
+```swift
+let conversation = try await client.conversations.newConversation(with: "0x3F11b27F323b62B159D2642964fa27C46C841897")
+
+// Assume this method returns an Envelope that contains a message for the above conversation
+let envelope = getEnvelopeFromXMTP()
+
+let decodedMessage = try conversation.decode(envelope)
+```
+
 ### Serialize/Deserialize conversations
 
 You can save a conversation object locally using its `encodedContainer` property. This returns a `ConversationContainer` object which conforms to `Codable`.
