@@ -261,7 +261,7 @@ You can decode a single `Envelope` from XMTP using the `decode` method:
 ```swift
 let conversation = try await client.conversations.newConversation(with: "0x3F11b27F323b62B159D2642964fa27C46C841897")
 
-// Assume this method returns an Envelope that contains a message for the above conversation
+// Assume this function returns an Envelope that contains a message for the above conversation
 let envelope = getEnvelopeFromXMTP()
 
 let decodedMessage = try conversation.decode(envelope)
