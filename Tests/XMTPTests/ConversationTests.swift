@@ -428,9 +428,12 @@ class ConversationTests: XCTestCase {
 		let envelope = fakeApiClient.published.first(where: { $0.contentTopic.hasPrefix("/xmtp/0/dm-") })!
 
 		let container = Conversation.v1(conversation).encodedContainer
-		let decodedConversation = container.decode(with: aliceClient)
-		let decodedMessage = try decodedConversation.decode(envelope)
-		XCTAssertEqual(decodedMessage.body, "hi")
+
+		try await fakeApiClient.assertNoQuery {
+			let decodedConversation = container.decode(with: aliceClient)
+			let decodedMessage = try decodedConversation.decode(envelope)
+			XCTAssertEqual(decodedMessage.body, "hi")
+		}
 	}
 
 	func testV2ConversationCodable() async throws {
@@ -442,9 +445,12 @@ class ConversationTests: XCTestCase {
 		let envelope = fakeApiClient.published.first(where: { $0.contentTopic.hasPrefix("/xmtp/0/m-") })!
 
 		let container = Conversation.v2(conversation).encodedContainer
-		let decodedConversation = container.decode(with: aliceClient)
-		let decodedMessage = try decodedConversation.decode(envelope)
-		XCTAssertEqual(decodedMessage.body, "hi")
+
+		try await fakeApiClient.assertNoQuery {
+			let decodedConversation = container.decode(with: aliceClient)
+			let decodedMessage = try decodedConversation.decode(envelope)
+			XCTAssertEqual(decodedMessage.body, "hi")
+		}
 	}
 
 	func testDecodeSingleV1Message() async throws {
