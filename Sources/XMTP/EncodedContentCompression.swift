@@ -15,7 +15,7 @@ public enum EncodedContentCompression {
 	func compress(content: Data) throws -> Data {
 		switch self {
 		case .deflate:
-			// 78 9C - Default Compression according to https://www.rfc-editor.org/rfc/rfc1950
+			// 78 9C - Default Compression according to https://www.ietf.org/rfc/rfc1950.txt
 			let header = Data([0x78, 0x9C])
 
 			// Perform rfc1951 compression
