@@ -23,7 +23,7 @@ final class IntegrationTests: XCTestCase {
 
 		let authToken = try await authorized.createAuthToken()
 
-		var api = try GRPCApiClient(environment: .local, secure: false)
+		let api = try GRPCApiClient(environment: .local, secure: false)
 		api.setAuthToken(authToken)
 
 		let encryptedBundle = try await authorized.toBundle.encrypted(with: alice)
@@ -45,8 +45,6 @@ final class IntegrationTests: XCTestCase {
 		throw XCTSkip("integration only (requires local node)")
 
 		let aliceWallet = try PrivateKey.generate()
-		let alice = try await PrivateKeyBundleV1.generate(wallet: aliceWallet)
-
 		let clientOptions = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let client = try await Client.create(account: aliceWallet, options: clientOptions)
 		XCTAssertEqual(.local, client.apiClient.environment)
@@ -166,8 +164,6 @@ final class IntegrationTests: XCTestCase {
 
 		XCTAssertEqual(contact.walletAddress, fakeContactWallet.walletAddress)
 		let privkeybundlev2 = try client.privateKeyBundleV1.toV2()
-		let conversations = Conversations(client: client)
-
 		let created = Date()
 
 		var invitationContext = InvitationV1.Context()
@@ -187,7 +183,6 @@ final class IntegrationTests: XCTestCase {
 		XCTAssertEqual(try inviteHeader.sender.walletAddress, fakeWallet.walletAddress)
 		XCTAssertEqual(try inviteHeader.recipient.walletAddress, fakeContactWallet.walletAddress)
 
-		let recipBundle = privkeybundlev2.getPublicKeyBundle()
 		let header = try SealedInvitationHeaderV1(serializedData: invitation.v1.headerBytes)
 		let conversation = try ConversationV2.create(client: client, invitation: invitationv1, header: header)
 
@@ -357,5 +352,77 @@ final class IntegrationTests: XCTestCase {
 		XCTAssertEqual(1, messages3.count)
 		let nowMessage2 = messages3[0]
 		XCTAssertEqual("now", nowMessage2.body)
+	}
+
+	// Test used to verify https://github.com/xmtp/xmtp-ios/issues/39 fix.
+	func testExistingWallet() async throws {
+		throw XCTSkip("integration only (requires dev network)")
+
+		// Generated from JS script
+		let keyBytes: [UInt8] = [
+			31, 116, 198, 193, 189, 122, 19, 254,
+			191, 189, 211, 215, 255, 131, 171, 239,
+			243, 33, 4, 62, 143, 86, 18, 195,
+			251, 61, 128, 90, 34, 126, 219, 236,
+		]
+
+		var key = PrivateKey()
+		key.secp256K1.bytes = Data(keyBytes)
+		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+
+		let client = try await XMTP.Client.create(account: key)
+		XCTAssertEqual(client.apiClient.environment, .dev)
+
+		let conversations = try await client.conversations.list()
+		XCTAssertEqual(1, conversations.count)
+
+		let message = try await conversations[0].messages().first
+		XCTAssertEqual(message?.body, "hello")
+	}
+
+	func testCanStreamV2Conversations() async throws {
+		throw XCTSkip("integration only (requires local node)")
+
+		let alice = try PrivateKey.generate()
+		let bob = try PrivateKey.generate()
+
+		let clientOptions = ClientOptions(api: .init(env: .local, isSecure: false))
+		let aliceClient = try await Client.create(account: alice, options: clientOptions)
+		let bobClient = try await Client.create(account: bob, options: clientOptions)
+
+		let expectation1 = expectation(description: "got a conversation")
+		expectation1.expectedFulfillmentCount = 2
+
+		Task(priority: .userInitiated) {
+			for try await convo in bobClient.conversations.stream() {
+				expectation1.fulfill()
+			}
+		}
+
+		guard case let .v2(conversation) = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
+			XCTFail("Did not create a v2 convo")
+			return
+		}
+
+		try await conversation.send(content: "hi")
+
+		guard case let .v2(conversation) = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
+			XCTFail("Did not create a v2 convo")
+			return
+		}
+
+		try await conversation.send(content: "hi again")
+
+		let newWallet = try PrivateKey.generate()
+		let newClient = try await Client.create(account: newWallet, options: clientOptions)
+
+		guard case let .v2(conversation2) = try await bobClient.conversations.newConversation(with: newWallet.walletAddress) else {
+			XCTFail("Did not create a v2 convo")
+			return
+		}
+
+		try await conversation2.send(content: "hi from new wallet")
+
+		await waitForExpectations(timeout: 3)
 	}
 }

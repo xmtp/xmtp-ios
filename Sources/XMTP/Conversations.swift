@@ -9,7 +9,7 @@ import Foundation
 import XMTPProto
 
 public enum ConversationError: Error {
-	case recipientNotOnNetwork
+	case recipientNotOnNetwork, recipientIsSender
 }
 
 /// Handles listing and creating Conversations.
@@ -18,6 +18,10 @@ public struct Conversations {
 	var conversations: [Conversation] = []
 
 	public mutating func newConversation(with peerAddress: String, context: InvitationV1.Context? = nil) async throws -> Conversation {
+		if peerAddress.lowercased() == client.address.lowercased() {
+			throw ConversationError.recipientIsSender
+		}
+
 		if let existingConversation = conversations.first(where: { $0.peerAddress == peerAddress }) {
 			return existingConversation
 		}
@@ -84,10 +88,6 @@ public struct Conversations {
 				var streamedConversationTopics: Set<String> = []
 
 				for try await envelope in client.subscribe(topics: [.userIntro(client.address), .userInvite(client.address)]) {
-					if streamedConversationTopics.contains(envelope.contentTopic) {
-						continue
-					}
-
 					if envelope.contentTopic == Topic.userIntro(client.address).description {
 						let messageV1 = try MessageV1.fromBytes(envelope.message)
 						let senderAddress = try messageV1.header.sender.walletAddress
@@ -96,7 +96,11 @@ public struct Conversations {
 						let peerAddress = client.address == senderAddress ? recipientAddress : senderAddress
 						let conversationV1 = ConversationV1(client: client, peerAddress: peerAddress, sentAt: messageV1.sentAt)
 
-						streamedConversationTopics.insert(envelope.contentTopic)
+						if streamedConversationTopics.contains(conversationV1.topic.description) {
+							continue
+						}
+
+						streamedConversationTopics.insert(conversationV1.topic.description)
 						continuation.yield(Conversation.v1(conversationV1))
 					}
 
@@ -105,7 +109,11 @@ public struct Conversations {
 						let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)
 						let conversationV2 = try ConversationV2.create(client: client, invitation: unsealed, header: sealedInvitation.v1.header)
 
-						streamedConversationTopics.insert(envelope.contentTopic)
+						if streamedConversationTopics.contains(conversationV2.topic) {
+							continue
+						}
+
+						streamedConversationTopics.insert(conversationV2.topic)
 						continuation.yield(Conversation.v2(conversationV2))
 					}
 				}
@@ -148,7 +156,7 @@ public struct Conversations {
 			}
 		}
 
-		return conversations
+		return conversations.filter { $0.peerAddress != client.address }
 	}
 
 	func listIntroductionPeers() async throws -> [String: Date] {

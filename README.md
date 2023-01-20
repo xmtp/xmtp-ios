@@ -76,7 +76,28 @@ A client is created with `Client.create(account: SigningKey) async throws -> Cli
 import XMTP
 
 // Create the client with a `SigningKey` from your app
-let client = try await Client.create(account: account)
+let client = try await Client.create(account: account, options: .init(api: .init(env: .production)))
+```
+
+### Creating a client from saved keys
+
+You can save your keys from the client via the `v1keys` property:
+
+```swift
+// Create the client with a `SigningKey` from your app
+let client = try await Client.create(account: account, options: .init(api: .init(env: .production)))
+
+// Get the key bundle
+let keys = client.v1keys
+
+// Serialize the key bundle and store it somewhere safe
+let keysData = try keys.serializedData()
+```
+
+Once you have those keys, you can create a new client with `Client.from`:
+
+```swift
+let client = try Client.from(bundle: keys, options: .init(api: .init(env: .production)))
 ```
 
 ### Configure the client
@@ -171,10 +192,10 @@ for conversation in client.conversations.list() {
 It may be helpful to retrieve and process the messages in a conversation page by page. You can do this by calling `conversation.messages(limit: Int, before: Date)` which will return the specified number of messages sent before that time.
 
 ```swift
-let conversation = try await clienet.conversations.newConversation(with: "0x3F11b27F323b62B159D2642964fa27C46C841897")
+let conversation = try await client.conversations.newConversation(with: "0x3F11b27F323b62B159D2642964fa27C46C841897")
 
-let messages = conversation.messages(limit: 25)
-let nextPage = conversation.messages(limit: 25, before: messages[0].sent)
+let messages = try await conversation.messages(limit: 25)
+let nextPage = try await conversation.messages(limit: 25, before: messages[0].sent)
 ```
 
 ### Listen for new messages in a conversation

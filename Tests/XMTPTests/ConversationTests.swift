@@ -28,6 +28,45 @@ class ConversationTests: XCTestCase {
 		bobClient = try await Client.create(account: bob, apiClient: fakeApiClient)
 	}
 
+	func testDoesNotAllowConversationWithSelf() async throws {
+		let expectation = expectation(description: "convo with self throws")
+		let client = try await Client.create(account: alice)
+
+		do {
+			try await client.conversations.newConversation(with: alice.walletAddress)
+		} catch {
+			expectation.fulfill()
+		}
+
+		wait(for: [expectation], timeout: 0.1)
+	}
+
+	func testDoesNotIncludeSelfConversationsInList() async throws {
+		let convos = try await aliceClient.conversations.list()
+		XCTAssert(convos.isEmpty, "setup is wrong")
+
+		let recipient = aliceClient.privateKeyBundleV1.toPublicKeyBundle()
+		let invitation = try InvitationV1.createRandom()
+		let created = Date()
+
+		let sealedInvitation = try SealedInvitation.createV1(
+			sender: aliceClient.keys,
+			recipient: SignedPublicKeyBundle(recipient),
+			created: created,
+			invitation: invitation
+		)
+
+		let peerAddress = recipient.walletAddress
+
+		try await aliceClient.publish(envelopes: [
+			Envelope(topic: .userInvite(aliceClient.address), timestamp: created, message: try sealedInvitation.serializedData()),
+			Envelope(topic: .userInvite(peerAddress), timestamp: created, message: try sealedInvitation.serializedData()),
+		])
+
+		let newConvos = try await aliceClient.conversations.list()
+		XCTAssert(newConvos.isEmpty, "did not filter out self conversations")
+	}
+
 	func testCanStreamConversationsV1() async throws {
 		// Overwrite contact as legacy
 		try await publishLegacyContact(client: bobClient)
@@ -59,34 +98,38 @@ class ConversationTests: XCTestCase {
 	}
 
 	func testCanStreamConversationsV2() async throws {
-		let expectation = expectation(description: "got a conversation")
+		let expectation1 = expectation(description: "got a conversation")
+		expectation1.expectedFulfillmentCount = 2
 
 		Task(priority: .userInitiated) {
-			for try await conversation in aliceClient.conversations.stream() {
-				if conversation.peerAddress == bob.walletAddress {
-					expectation.fulfill()
-				}
+			for try await conversation in bobClient.conversations.stream() {
+				expectation1.fulfill()
 			}
 		}
 
 		guard case let .v2(conversation) = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
-			XCTFail("Did not create a v1 convo")
+			XCTFail("Did not create a v2 convo")
 			return
 		}
 
 		try await conversation.send(content: "hi")
 
-		// Remove known introduction from contacts to test de-duping
-		bobClient.contacts.hasIntroduced.removeAll()
-		bobClient.contacts.knownBundles.removeAll()
-		bobClient.conversations.conversations.removeAll()
-
 		guard case let .v2(conversation) = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
-			XCTFail("Did not create a v1 convo")
+			XCTFail("Did not create a v2 convo")
 			return
 		}
 
 		try await conversation.send(content: "hi again")
+
+		let newWallet = try PrivateKey.generate()
+		let newClient = try await Client.create(account: newWallet, apiClient: fakeApiClient)
+
+		guard case let .v2(conversation2) = try await bobClient.conversations.newConversation(with: newWallet.walletAddress) else {
+			XCTFail("Did not create a v2 convo")
+			return
+		}
+
+		try await conversation2.send(content: "hi from new wallet")
 
 		await waitForExpectations(timeout: 3)
 	}
@@ -221,13 +264,6 @@ class ConversationTests: XCTestCase {
 
 		let date = Date().advanced(by: -1_000_000)
 
-		let messageV1 = try MessageV1.encode(
-			sender: bobClient.privateKeyBundleV1,
-			recipient: aliceClient.privateKeyBundleV1.toPublicKeyBundle(),
-			message: try encodedContent.serializedData(),
-			timestamp: date
-		)
-
 		// Stream a message
 		fakeApiClient.send(
 			envelope: Envelope(
@@ -256,10 +292,13 @@ class ConversationTests: XCTestCase {
 		let expectation = expectation(description: "got a message")
 
 		Task(priority: .userInitiated) {
-			for try await message in conversation.streamMessages() {
+			for try await _ in conversation.streamMessages() {
 				expectation.fulfill()
 			}
 		}
+
+		let encoder = TextCodec()
+		let encodedContent = try encoder.encode(content: "hi alice")
 
 		// Stream a message
 		fakeApiClient.send(
@@ -269,7 +308,7 @@ class ConversationTests: XCTestCase {
 				message: try Message(
 					v2: try await MessageV2.encode(
 						client: bobClient,
-						content: "hi alice",
+						content: encodedContent,
 						topic: conversation.topic,
 						keyMaterial: conversation.keyMaterial
 					)

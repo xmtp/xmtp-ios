@@ -23,13 +23,10 @@ extension MessageV2 {
 			let decrypted = try Crypto.decrypt(keyMaterial, message.ciphertext, additionalData: message.headerBytes)
 			let signed = try SignedContent(serializedData: decrypted)
 			let encodedMessage = try EncodedContent(serializedData: signed.payload)
-			let decoder = TextCodec()
-			let decoded = try decoder.decode(content: encodedMessage)
-
 			let header = try MessageHeaderV2(serializedData: message.headerBytes)
 
 			return DecodedMessage(
-				body: decoded,
+				encodedContent: encodedMessage,
 				senderAddress: try signed.sender.walletAddress,
 				sent: Date(timeIntervalSince1970: Double(header.createdNs / 1_000_000) / 1000)
 			)
@@ -39,9 +36,7 @@ extension MessageV2 {
 		}
 	}
 
-	static func encode(client: Client, content: String, topic: String, keyMaterial: Data) async throws -> MessageV2 {
-		let encoder = TextCodec()
-		let encodedContent = try encoder.encode(content: content)
+	static func encode(client: Client, content encodedContent: EncodedContent, topic: String, keyMaterial: Data) async throws -> MessageV2 {
 		let payload = try encodedContent.serializedData()
 
 		let date = Date()
@@ -52,7 +47,7 @@ extension MessageV2 {
 		let preKey = client.keys.preKeys[0]
 		let signature = try await preKey.sign(Data(digest))
 
-		let bundle = try client.privateKeyBundleV1.toV2().getPublicKeyBundle()
+		let bundle = client.privateKeyBundleV1.toV2().getPublicKeyBundle()
 
 		let signedContent = SignedContent(payload: payload, sender: bundle, signature: signature)
 		let signedBytes = try signedContent.serializedData()

@@ -26,9 +26,11 @@ public struct ClientOptions {
 	}
 
 	public var api = Api()
+	public var codecs: [any ContentCodec] = []
 
-	public init(api: Api = Api()) {
+	public init(api: Api = Api(), codecs: [any ContentCodec] = []) {
 		self.api = api
+		self.codecs = codecs
 	}
 }
 
@@ -57,6 +59,16 @@ public class Client {
 		apiClient.environment
 	}
 
+	static var codecRegistry = {
+		var registry = CodecRegsistry()
+		registry.register(codec: TextCodec())
+		return registry
+	}()
+
+	public static func register(codec: any ContentCodec) {
+		codecRegistry.register(codec: codec)
+	}
+
 	/// Creates a client.
 	public static func create(account: SigningKey, options: ClientOptions? = nil) async throws -> Client {
 		let options = options ?? ClientOptions()
@@ -80,10 +92,18 @@ public class Client {
 
 	static func loadOrCreateKeys(for account: SigningKey, apiClient: ApiClient) async throws -> PrivateKeyBundleV1 {
 		// swiftlint:disable no_optional_try
-		if let keys = try? await loadPrivateKeys(for: account, apiClient: apiClient) {
+		if let keys = try await loadPrivateKeys(for: account, apiClient: apiClient) {
 			// swiftlint:enable no_optional_try
+
+			#if DEBUG
+				print("Loaded existing private keys.")
+			#endif
 			return keys
 		} else {
+			#if DEBUG
+				print("No existing keys found, creating new bundle.")
+			#endif
+
 			let keys = try await PrivateKeyBundleV1.generate(wallet: account)
 			let keyBundle = PrivateKeyBundle(v1: keys)
 			let encryptedKeys = try await keyBundle.encrypted(with: account)
@@ -108,18 +128,26 @@ public class Client {
 		let res = try await apiClient.query(topics: topics, pagination: nil)
 
 		for envelope in res.envelopes {
-			do {
-				let encryptedBundle = try EncryptedPrivateKeyBundle(serializedData: envelope.message)
-				let bundle = try await encryptedBundle.decrypted(with: account)
-
-				return bundle.v1
-			} catch {
-				print("Error decoding encrypted private key bundle: \(error)")
-				continue
-			}
+			let encryptedBundle = try EncryptedPrivateKeyBundle(serializedData: envelope.message)
+			let bundle = try await encryptedBundle.decrypted(with: account)
+			return bundle.v1
 		}
 
 		return nil
+	}
+
+	/// Create a Client from saved v1 key bundle.
+	public static func from(bundle v1Bundle: PrivateKeyBundleV1, options: ClientOptions? = nil) throws -> Client {
+		let address = try v1Bundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress
+
+		let options = options ?? ClientOptions()
+
+		let apiClient = try GRPCApiClient(
+			environment: options.api.env,
+			secure: options.api.isSecure
+		)
+
+		return try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient)
 	}
 
 	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient) throws {
@@ -128,12 +156,12 @@ public class Client {
 		self.apiClient = apiClient
 	}
 
-	var keys: PrivateKeyBundleV2 {
-		do {
-			return try privateKeyBundleV1.toV2()
-		} catch {
-			fatalError("Error getting keys \(error)")
-		}
+	public var v1keys: PrivateKeyBundleV1 {
+		privateKeyBundleV1
+	}
+
+	public var keys: PrivateKeyBundleV2 {
+		privateKeyBundleV1.toV2()
 	}
 
 	func ensureUserContactPublished() async throws {
