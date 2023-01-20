@@ -36,6 +36,15 @@ struct ContentView: View {
 				Text("Error: \(error)").foregroundColor(.red)
 			}
 		}
+		.task {
+			UIApplication.shared.registerForRemoteNotifications()
+
+			do {
+				_ = try await XMTPPush.shared.request()
+			} catch {
+				print("Error requesting push access: \(error)")
+			}
+		}
 		.sheet(isPresented: $isShowingQRCode) {
 			if let qrCodeImage = qrCodeImage {
 				QRCodeSheetView(image: qrCodeImage)

@@ -37,7 +37,9 @@ struct ConversationListView: View {
 			do {
 				for try await conversation in client.conversations.stream() {
 					conversations.insert(conversation, at: 0)
+					await XMTPPush.shared.subscribe(topics: [conversation.topic])
 				}
+
 			} catch {
 				print("Error streaming conversations: \(error)")
 			}
@@ -66,6 +68,9 @@ struct ConversationListView: View {
 			await MainActor.run {
 				self.conversations = conversations
 			}
+
+			// Ensure we're subscribed to push notifications on these conversations
+			await XMTPPush.shared.subscribe(topics: conversations.map(\.topic))
 		} catch {
 			print("Error loading conversations: \(error)")
 		}
