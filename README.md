@@ -12,10 +12,8 @@ However, we do **not** recommend using Developer Preview software in production 
 
 Specifically, this SDK is missing this functionality:
 
-- Specifying `apiUrl`, `keyStoreType`, `codecs`, `maxContentSize`, and `appVersion` when creating a `Client`
-- Content types other than text
+- Specifying `apiUrl`, `keyStoreType`, `maxContentSize`, and `appVersion` when creating a `Client`
 - Streaming all messages from all conversations
-- Message content compression
 
 Follow along in the [tracking issue](https://github.com/xmtp/xmtp-ios/issues/7) for updates.
 
