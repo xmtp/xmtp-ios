@@ -45,9 +45,7 @@ class NotificationService: UNNotificationServiceExtension {
 			if let bestAttemptContent = bestAttemptContent {
 				let decodedMessage = try conversation.decode(envelope)
 
-				// Modify the notification content here...
 				bestAttemptContent.body = (try? decodedMessage.content()) ?? "no content"
-				//			"\(bestAttemptContent.title) [modified]"
 
 				contentHandler(bestAttemptContent)
 			}
