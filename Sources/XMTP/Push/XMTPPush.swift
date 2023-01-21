@@ -24,15 +24,12 @@ public struct XMTPPush {
 	}
 
 	public func request() async throws -> Bool {
-		print("Requesting push access.")
-
 		if try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge]) {
 			await UIApplication.shared.registerForRemoteNotifications()
 
 			return true
 		}
 
-		print("Did not get push access.")
 		return false
 	}
 
