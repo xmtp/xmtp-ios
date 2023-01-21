@@ -13,7 +13,7 @@ struct Persistence {
 	var keychain: Keychain
 
 	init() {
-		keychain = Keychain(service: "group.chat.xmtp.example")
+		keychain = Keychain(service: "com.xmtp.XMTPiOSExample")
 	}
 
 	func saveKeys(_ keys: Data) {

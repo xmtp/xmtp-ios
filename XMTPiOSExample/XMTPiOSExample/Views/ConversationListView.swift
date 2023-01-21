@@ -78,7 +78,7 @@ struct ConversationListView: View {
 
 	func add(conversations: [Conversation]) async {
 		// Ensure we're subscribed to push notifications on these conversations
-		await XMTPPush.shared.subscribe(topics: conversations.map(\.topic))
+		try? await XMTPPush.shared.subscribe(topics: conversations.map(\.topic))
 
 		for conversation in conversations {
 			do {
