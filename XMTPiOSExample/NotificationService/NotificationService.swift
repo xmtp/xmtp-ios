@@ -16,22 +16,51 @@ class NotificationService: UNNotificationServiceExtension {
 		self.contentHandler = contentHandler
 		bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
 
-		guard let encryptedMessage = request.content.userInfo["encryptedMessage"] as? String,
-					let topic = request.content.userInfo["topic"] as? String,
-				  let encryptedMessageData = Data(base64Encoded: Data(encryptedMessage.utf8)) else {
-			return
-		}
+		do {
+			guard let encryptedMessage = request.content.userInfo["encryptedMessage"] as? String,
+						let topic = request.content.userInfo["topic"] as? String,
+						let encryptedMessageData = Data(base64Encoded: Data(encryptedMessage.utf8)) else {
+				print("Did not get correct message data from push")
+				return
+			}
 
-		let envelope = XMTP.Envelope.with { envelope in
-			envelope.message = encryptedMessageData
-			envelope.contentTopic = topic
-		}
+			let persistence = Persistence()
 
-		if let bestAttemptContent = bestAttemptContent {
-			// Modify the notification content here...
-			bestAttemptContent.title = "\(bestAttemptContent.title) [modified]"
+			let keysData = persistence.loadKeys()
+			print("keys data: \(keysData)")
 
-			contentHandler(bestAttemptContent)
+			let keys = try PrivateKeyBundleV1(serializedData: keysData!)
+			print("keys: \(keys)")
+
+			let conversationContainer = try persistence.load(conversationTopic: topic)
+			print("conversation container: \(conversationContainer)")
+
+			guard let keysData = persistence.loadKeys(),
+						let keys = try? PrivateKeyBundleV1(serializedData: keysData),
+						let conversationContainer = try persistence.load(conversationTopic: topic) else {
+				print("No keys or conversation persisted")
+				return
+			}
+
+			let client = try Client.from(bundle: keys)
+			let conversation = conversationContainer.decode(with: client)
+
+			let envelope = XMTP.Envelope.with { envelope in
+				envelope.message = encryptedMessageData
+				envelope.contentTopic = topic
+			}
+
+			if let bestAttemptContent = bestAttemptContent {
+				let decodedMessage = try conversation.decode(envelope)
+
+				// Modify the notification content here...
+				bestAttemptContent.body = (try? decodedMessage.content()) ?? "no content"
+				//			"\(bestAttemptContent.title) [modified]"
+
+				contentHandler(bestAttemptContent)
+			}
+		} catch {
+			print("Error receiving notification: \(error)")
 		}
 	}
 

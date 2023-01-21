@@ -77,6 +77,9 @@ struct ContentView: View {
 						if accountManager.account.isConnected {
 							let client = try await Client.create(account: accountManager.account)
 
+							let keysData = try client.v1keys.serializedData()
+							Persistence().saveKeys(keysData)
+
 							self.status = .connected(client)
 							self.isShowingQRCode = false
 							return
@@ -103,6 +106,9 @@ struct ContentView: View {
 			do {
 				let wallet = try PrivateKey.generate()
 				let client = try await Client.create(account: wallet)
+
+				let keysData = try client.v1keys.serializedData()
+				Persistence().saveKeys(keysData)
 
 				await MainActor.run {
 					self.status = .connected(client)
