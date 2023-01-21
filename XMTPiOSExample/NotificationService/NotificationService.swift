@@ -26,16 +26,6 @@ class NotificationService: UNNotificationServiceExtension {
 			}
 
 			let persistence = Persistence()
-
-			let keysData = persistence.loadKeys()
-			print("keys data: \(keysData)")
-
-			let keys = try PrivateKeyBundleV1(serializedData: keysData!)
-			print("keys: \(keys)")
-
-			let conversationContainer = try persistence.load(conversationTopic: topic)
-			print("conversation container: \(conversationContainer)")
-
 			guard let keysData = persistence.loadKeys(),
 			      let keys = try? PrivateKeyBundleV1(serializedData: keysData),
 			      let conversationContainer = try persistence.load(conversationTopic: topic)
