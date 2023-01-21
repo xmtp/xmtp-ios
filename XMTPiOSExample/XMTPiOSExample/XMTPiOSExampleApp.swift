@@ -18,7 +18,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 	func application(_: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 		Task {
 			let deviceTokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-			print("Got a push token: \(deviceTokenString)")
 			try? await XMTPPush.shared.register(token: deviceTokenString)
 		}
 	}
