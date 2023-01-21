@@ -26,6 +26,8 @@ class NotificationService: UNNotificationServiceExtension {
 			}
 
 			let persistence = Persistence()
+
+			// swiftlint:disable no_optional_try
 			guard let keysData = persistence.loadKeys(),
 			      let keys = try? PrivateKeyBundleV1(serializedData: keysData),
 			      let conversationContainer = try persistence.load(conversationTopic: topic)
@@ -49,6 +51,8 @@ class NotificationService: UNNotificationServiceExtension {
 
 				contentHandler(bestAttemptContent)
 			}
+
+			// swiftlint:enable no_optional_try
 		} catch {
 			print("Error receiving notification: \(error)")
 		}
