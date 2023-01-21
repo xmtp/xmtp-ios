@@ -18,8 +18,9 @@ class NotificationService: UNNotificationServiceExtension {
 
 		do {
 			guard let encryptedMessage = request.content.userInfo["encryptedMessage"] as? String,
-						let topic = request.content.userInfo["topic"] as? String,
-						let encryptedMessageData = Data(base64Encoded: Data(encryptedMessage.utf8)) else {
+			      let topic = request.content.userInfo["topic"] as? String,
+			      let encryptedMessageData = Data(base64Encoded: Data(encryptedMessage.utf8))
+			else {
 				print("Did not get correct message data from push")
 				return
 			}
@@ -36,8 +37,9 @@ class NotificationService: UNNotificationServiceExtension {
 			print("conversation container: \(conversationContainer)")
 
 			guard let keysData = persistence.loadKeys(),
-						let keys = try? PrivateKeyBundleV1(serializedData: keysData),
-						let conversationContainer = try persistence.load(conversationTopic: topic) else {
+			      let keys = try? PrivateKeyBundleV1(serializedData: keysData),
+			      let conversationContainer = try persistence.load(conversationTopic: topic)
+			else {
 				print("No keys or conversation persisted")
 				return
 			}

@@ -33,7 +33,7 @@ let package = Package(
 				.product(name: "secp256k1", package: "secp256k1.swift"),
 				"web3.swift",
 				.product(name: "Gzip", package: "GzipSwift"),
-				.product(name: "Connect", package: "connect-swift")
+				.product(name: "Connect", package: "connect-swift"),
 			]
 		),
 		.testTarget(

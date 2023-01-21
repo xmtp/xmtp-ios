@@ -34,8 +34,6 @@ public struct XMTPPush {
 	}
 
 	public func register(token: String) async {
-
-
 		let request = Notifications_V1_RegisterInstallationRequest.with { request in
 			request.installationID = installationID
 			request.deliveryMechanism = Notifications_V1_DeliveryMechanism.with { delivery in
