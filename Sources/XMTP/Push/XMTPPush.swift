@@ -20,6 +20,7 @@ public struct XMTPPush {
 			installationID = id
 		} else {
 			installationID = UUID().uuidString
+			UserDefaults.standard.set(installationID, forKey: installationIDKey)
 		}
 	}
 
