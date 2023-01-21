@@ -30,8 +30,8 @@ public struct XMTPPush {
 		}
 	}
 
-	mutating public func setPushServer(_ server: String) {
-		self.pushServer = server
+	public mutating func setPushServer(_ server: String) {
+		pushServer = server
 	}
 
 	public func request() async throws -> Bool {
