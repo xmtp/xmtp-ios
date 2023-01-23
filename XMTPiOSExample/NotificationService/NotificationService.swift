@@ -29,7 +29,7 @@ class NotificationService: UNNotificationServiceExtension {
 
 			// swiftlint:disable no_optional_try
 			guard let keysData = persistence.loadKeys(),
-			      let keys = try? PrivateKeyBundleV1(serializedData: keysData),
+			      let keys = try? PrivateKeyBundle(serializedData: keysData),
 			      let conversationContainer = try persistence.load(conversationTopic: topic)
 			else {
 				print("No keys or conversation persisted")

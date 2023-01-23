@@ -77,7 +77,7 @@ struct ContentView: View {
 						if accountManager.account.isConnected {
 							let client = try await Client.create(account: accountManager.account)
 
-							let keysData = try client.v1keys.serializedData()
+							let keysData = try client.privateKeyBundle.serializedData()
 							Persistence().saveKeys(keysData)
 
 							self.status = .connected(client)
@@ -107,7 +107,7 @@ struct ContentView: View {
 				let wallet = try PrivateKey.generate()
 				let client = try await Client.create(account: wallet)
 
-				let keysData = try client.v1keys.serializedData()
+				let keysData = try client.privateKeyBundle.serializedData()
 				Persistence().saveKeys(keysData)
 
 				await MainActor.run {
