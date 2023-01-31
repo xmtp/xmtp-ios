@@ -156,7 +156,14 @@ public struct Conversations {
 			}
 		}
 
-		return conversations.filter { $0.peerAddress != client.address }
+		return conversations.filter { conversation in
+			if conversation.peerAddress != client.address {
+				return true
+			} else {
+				print("[list()] Filtering out \(conversation.topic)")
+				return false
+			}
+		}
 	}
 
 	func listIntroductionPeers() async throws -> [String: Date] {
@@ -173,6 +180,7 @@ public struct Conversations {
 
 				return message
 			} catch {
+				print("[listIntroductionPeers] Error getting v1 message: \(error)")
 				return nil
 			}
 		}
@@ -180,8 +188,9 @@ public struct Conversations {
 		var seenPeers: [String: Date] = [:]
 		for message in messages {
 			guard let recipientAddress = message.recipientAddress,
-			      let senderAddress = message.senderAddress
+						let senderAddress = message.senderAddress
 			else {
+				print("[listIntroductionPeers] Missing recipient address or sender address. recip: \(message.recipientAddress). sender: \(message.senderAddress)")
 				continue
 			}
 
@@ -190,6 +199,7 @@ public struct Conversations {
 
 			guard let existing = seenPeers[peerAddress] else {
 				seenPeers[peerAddress] = sentAt
+				print("[listIntroductionPeers] already seen peer address: \(peerAddress), continuing")
 				continue
 			}
 
@@ -207,9 +217,12 @@ public struct Conversations {
 		], pagination: nil).envelopes
 
 		return envelopes.compactMap { envelope in
-			// swiftlint:disable no_optional_try
-			try? SealedInvitation(serializedData: envelope.message)
-			// swiftlint:enable no_optional_try
+			do {
+				return try SealedInvitation(serializedData: envelope.message)
+			} catch {
+				print("[listInvitations] error getting sealed invitation: \(error)")
+				return nil
+			}
 		}
 	}
 
