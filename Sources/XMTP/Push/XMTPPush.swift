@@ -79,10 +79,11 @@ public struct XMTPPush {
 
 	var client: Notifications_V1_NotificationsClient {
 		let protocolClient = ProtocolClient(
-			host: pushServer,
 			httpClient: URLSessionHTTPClient(),
-			ProtoClientOption(),
-			ConnectClientOption() // Use the Connect protocol
+			config: ProtocolClientConfig(
+				host: pushServer,
+				networkProtocol: .connect,
+				codec: ProtoCodec())
 		)
 
 		return Notifications_V1_NotificationsClient(client: protocolClient)
