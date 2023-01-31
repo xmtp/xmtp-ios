@@ -156,7 +156,14 @@ public struct Conversations {
 			}
 		}
 
-		return conversations.filter { $0.peerAddress != client.address }
+		return conversations.filter { conversation in
+			if conversation.peerAddress != client.address {
+				return true
+			} else {
+				print("[list()] Filtering out \(conversation.topic)")
+				return false
+			}
+		}
 	}
 
 	func listIntroductionPeers() async throws -> [String: Date] {
