@@ -126,6 +126,7 @@ public struct Conversations {
 
 		do {
 			let seenPeers = try await listIntroductionPeers()
+
 			for (peerAddress, sentAt) in seenPeers {
 				conversations.append(
 					Conversation.v1(
@@ -170,6 +171,7 @@ public struct Conversations {
 		let envelopes = try await client.apiClient.query(topics: [
 			.userIntro(client.address),
 		], pagination: nil).envelopes
+		print("seenPeer envelopes: \(envelopes.count)")
 
 		let messages = envelopes.compactMap { envelope in
 			do {
@@ -215,6 +217,8 @@ public struct Conversations {
 		let envelopes = try await client.apiClient.query(topics: [
 			.userInvite(client.address),
 		], pagination: nil).envelopes
+
+		print("invite envelopes: \(envelopes.count)")
 
 		return envelopes.compactMap { envelope in
 			do {
