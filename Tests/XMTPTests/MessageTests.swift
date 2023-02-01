@@ -5,24 +5,9 @@
 //  Created by Pat Nakajima on 11/27/22.
 //
 
-import XCTest
 import CryptoKit
+import XCTest
 @testable import XMTP
-
-// TODO: Make these match ConversationContainer
-struct ConversationExport: Codable {
-	var version: String
-	var topic: String
-	var keyMaterial: String
-	var peerAddress: String
-	var createdAt: String
-	var context: ConversationContextExport
-}
-
-struct ConversationContextExport: Codable {
-	var conversationId: String
-	var metadata: [String: String]
-}
 
 @available(iOS 16.0, *)
 class MessageTests: XCTestCase {
@@ -121,10 +106,10 @@ class MessageTests: XCTestCase {
 
 		let key = try PrivateKey.with { key in
 			key.secp256K1.bytes = Data([
-				80,  84,  15, 126,  14, 105, 216,  8,
-				61, 147, 153, 232, 103,  69, 219, 13,
-				99, 118,  68,  56, 160,  94,  58, 22,
-			 140, 247, 221, 172,  14, 188,  52, 88
+				80, 84, 15, 126, 14, 105, 216, 8,
+				61, 147, 153, 232, 103, 69, 219, 13,
+				99, 118, 68, 56, 160, 94, 58, 22,
+				140, 247, 221, 172, 14, 188, 52, 88,
 			])
 
 			key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: key.secp256K1.bytes)
@@ -142,10 +127,12 @@ class MessageTests: XCTestCase {
 		""".utf8)
 
 		let decoder = JSONDecoder()
-		let decodedConversation = try decoder.decode(ConversationExport.self, from: conversationJSON)
-		let keyMaterial = Data(base64Encoded: Data(decodedConversation.keyMaterial.utf8))!
+		guard case let .v2(decodedConversation) = try client.importConversation(from: conversationJSON) else {
+			XCTFail("did not get v2 conversation")
+			return
+		}
 
-		let conversation = ConversationV2(topic: decodedConversation.topic, keyMaterial: keyMaterial, context: InvitationV1.Context(), peerAddress: decodedConversation.peerAddress, client: client, header: SealedInvitationHeaderV1())
+		let conversation = ConversationV2(topic: decodedConversation.topic, keyMaterial: decodedConversation.keyMaterial, context: InvitationV1.Context(), peerAddress: decodedConversation.peerAddress, client: client, header: SealedInvitationHeaderV1())
 
 		let decodedMessage = try conversation.decode(envelope: envelope)
 		XCTAssertEqual(decodedMessage.id, "e42a7dd44d0e1214824eab093cb89cfe6f666298d0af2d54fe0c914c8b72eff3")
