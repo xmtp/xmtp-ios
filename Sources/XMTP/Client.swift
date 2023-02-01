@@ -186,8 +186,6 @@ public class Client {
 				throw ConversationImportError.invalidData
 			}
 		}
-
-		return nil
 	}
 
 	func importV2Conversation(export: ConversationV2Export) throws -> Conversation {
