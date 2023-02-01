@@ -191,7 +191,9 @@ public class Client {
 	}
 
 	func importV2Conversation(export: ConversationV2Export) throws -> Conversation {
-		let keyMaterial = Data(base64Encoded: Data(export.keyMaterial.utf8))!
+		guard let keyMaterial = Data(base64Encoded: Data(export.keyMaterial.utf8)) else {
+			throw ConversationImportError.invalidData
+		}
 
 		return .v2(ConversationV2(
 			topic: export.topic,
