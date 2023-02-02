@@ -197,8 +197,8 @@ public class Client {
 			topic: export.topic,
 			keyMaterial: keyMaterial,
 			context: InvitationV1.Context(
-				conversationID: export.context.conversationId,
-				metadata: export.context.metadata
+				conversationID: export.context?.conversationId ?? "",
+				metadata: export.context?.metadata ?? [:]
 			),
 			peerAddress: export.peerAddress,
 			client: self,

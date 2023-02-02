@@ -24,7 +24,7 @@ struct ConversationV2Export: Codable {
 	var keyMaterial: String
 	var peerAddress: String
 	var createdAt: String
-	var context: ConversationV2ContextExport
+	var context: ConversationV2ContextExport?
 }
 
 struct ConversationV2ContextExport: Codable {

@@ -485,6 +485,19 @@ class ConversationTests: XCTestCase {
 		XCTAssertEqual(conversation?.peerAddress, "0x436D906d1339fC4E951769b1699051f020373D04")
 	}
 
+	func testImportV2ConversationWithNoContextFromJS() async throws {
+		let jsExportJSONData = Data("""
+		{"version":"v2","topic":"/xmtp/0/m-2SkdN5Qa0ZmiFI5t3RFbfwIS-OLv5jusqndeenTLvNg/proto","keyMaterial":"ATA1L0O2aTxHmskmlGKCudqfGqwA1H+bad3W/GpGOr8=","peerAddress":"0x436D906d1339fC4E951769b1699051f020373D04","createdAt":"2023-01-26T22:58:45.068Z"}
+		""".utf8)
+
+		guard case let .v2(conversation) = try aliceClient.importConversation(from: jsExportJSONData) else {
+			XCTFail("did not get a v2 conversation")
+			return
+		}
+
+		XCTAssertEqual(conversation.peerAddress, "0x436D906d1339fC4E951769b1699051f020373D04")
+	}
+
 	func testV1ConversationCodable() async throws {
 		// Overwrite contact as legacy
 		try await publishLegacyContact(client: bobClient)
