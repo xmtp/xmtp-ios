@@ -101,6 +101,10 @@ public struct ConversationV2 {
 		}
 	}
 
+	public var createdAt: Date {
+		Date(timeIntervalSince1970: Double(header.createdNs / 1_000_000) / 1000)
+	}
+
 	public func decode(envelope: Envelope) throws -> DecodedMessage {
 		let message = try Message(serializedData: envelope.message)
 		var decoded = try decode(message.v2)
