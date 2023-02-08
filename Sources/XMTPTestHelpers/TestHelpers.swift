@@ -70,7 +70,9 @@ public class FakeApiClient: ApiClient {
 	public func assertNoPublish(callback: () async throws -> Void) async throws {
 		let oldCount = published.count
 		try await callback()
+		// swiftlint:disable no_optional_try
 		XCTAssertEqual(oldCount, published.count, "Published messages: \(String(describing: try? published[oldCount - 1 ..< published.count].map { try $0.jsonString() }))")
+		// swiftlint:enable no_optional_try
 	}
 
 	public func assertNoQuery(callback: () async throws -> Void) async throws {
@@ -212,6 +214,7 @@ public struct Fixtures {
 public extension XCTestCase {
 	@available(iOS 15, *)
 	func fixtures() async -> Fixtures {
+		// swiftlint:disable force_try
 		return try! await Fixtures()
 	}
 }
