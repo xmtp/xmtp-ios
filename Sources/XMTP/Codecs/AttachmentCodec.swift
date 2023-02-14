@@ -8,15 +8,15 @@
 import Foundation
 import XMTPProto
 
-let ContentTypeAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "attachment", versionMajor: 1, versionMinor: 0)
+public let ContentTypeAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "attachment", versionMajor: 1, versionMinor: 0)
 
 enum AttachmentCodecError: Error {
 	case invalidMimeType, unknownDecodingError
 }
 
-struct Attachment: Codable {
-	var mimeType: String
-	var data: Data
+public struct Attachment: Codable {
+	public var mimeType: String
+	public var data: Data
 }
 
 struct AttachmentCodec: ContentCodec {
