@@ -11,4 +11,10 @@ public struct SendOptions {
 	public var compression: EncodedContentCompression? = nil
 	public var contentType: ContentTypeID?
 	public var contentFallback: String?
+
+	public init(compression: EncodedContentCompression? = nil, contentType: ContentTypeID? = nil, contentFallback: String? = nil) {
+		self.compression = compression
+		self.contentType = contentType
+		self.contentFallback = contentFallback
+	}
 }
