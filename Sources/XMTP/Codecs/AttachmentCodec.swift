@@ -11,14 +11,16 @@ import XMTPProto
 public let ContentTypeAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "attachment", versionMajor: 1, versionMinor: 0)
 
 enum AttachmentCodecError: Error {
-	case invalidMimeType, unknownDecodingError
+	case invalidParameters, unknownDecodingError
 }
 
 public struct Attachment: Codable {
+	public var filename: String
 	public var mimeType: String
 	public var data: Data
 
-	public init(mimeType: String, data: Data) {
+	public init(filename: String, mimeType: String, data: Data) {
+		self.filename = filename
 		self.mimeType = mimeType
 		self.data = data
 	}
@@ -33,18 +35,22 @@ struct AttachmentCodec: ContentCodec {
 		var encodedContent = EncodedContent()
 
 		encodedContent.type = ContentTypeAttachment
-		encodedContent.parameters = ["mimeType": content.mimeType]
+		encodedContent.parameters = [
+			"filename": content.filename,
+			"mimeType": content.mimeType,
+		]
 		encodedContent.content = content.data
 
 		return encodedContent
 	}
 
 	func decode(content: EncodedContent) throws -> Attachment {
-		guard let mimeType = content.parameters["mimeType"] else {
-			throw AttachmentCodecError.invalidMimeType
+		guard let mimeType = content.parameters["mimeType"],
+					let filename = content.parameters["filename"] else {
+			throw AttachmentCodecError.invalidParameters
 		}
 
-		let attachment = Attachment(mimeType: mimeType, data: content.content)
+		let attachment = Attachment(filename: filename, mimeType: mimeType, data: content.content)
 
 		return attachment
 	}

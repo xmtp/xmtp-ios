@@ -19,13 +19,14 @@ class AttachmentsTests: XCTestCase {
 		let fixtures = await fixtures()
 		let conversation = try await fixtures.aliceClient.conversations.newConversation(with: fixtures.bobClient.address)
 
-		try await conversation.send(content: Attachment(mimeType: "image/png", data: iconData), options: .init(contentType: ContentTypeAttachment))
+		try await conversation.send(content: Attachment(filename: "icon.png", mimeType: "image/png", data: iconData), options: .init(contentType: ContentTypeAttachment))
 		let messages = try await conversation.messages()
 
 		XCTAssertEqual(1, messages.count)
 
 		let message = messages[0]
 		let attachment: Attachment = try message.content()
+		XCTAssertEqual("icon.png", attachment.filename)
 		XCTAssertEqual("image/png", attachment.mimeType)
 	}
 }
