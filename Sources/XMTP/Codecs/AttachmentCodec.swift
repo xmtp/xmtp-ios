@@ -17,6 +17,11 @@ enum AttachmentCodecError: Error {
 public struct Attachment: Codable {
 	public var mimeType: String
 	public var data: Data
+
+	public init(mimeType: String, data: Data) {
+		self.mimeType = mimeType
+		self.data = data
+	}
 }
 
 struct AttachmentCodec: ContentCodec {
