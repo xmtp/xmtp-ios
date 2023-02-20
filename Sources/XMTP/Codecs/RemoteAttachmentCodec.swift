@@ -29,12 +29,12 @@ public struct RemoteAttachment: Codable {
 	}
 }
 
-struct RemoteAttachmentCodec: ContentCodec {
-	typealias T = RemoteAttachment
+public struct RemoteAttachmentCodec: ContentCodec {
+	public typealias T = RemoteAttachment
 
-	var contentType = ContentTypeRemoteAttachment
+	public var contentType = ContentTypeRemoteAttachment
 
-	func encode(content: RemoteAttachment) throws -> EncodedContent {
+	public func encode(content: RemoteAttachment) throws -> EncodedContent {
 		var encodedContent = EncodedContent()
 
 		encodedContent.type = ContentTypeRemoteAttachment
@@ -43,7 +43,7 @@ struct RemoteAttachmentCodec: ContentCodec {
 		return encodedContent
 	}
 
-	func decode(content: EncodedContent) throws -> RemoteAttachment {
+	public func decode(content: EncodedContent) throws -> RemoteAttachment {
 		guard let url = String(data: content.content, encoding: .utf8) else {
 			throw RemoteAttachmentError.invalidURL
 		}
