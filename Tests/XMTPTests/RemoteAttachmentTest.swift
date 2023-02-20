@@ -21,21 +21,13 @@ class RemoteAttachmentTests: XCTestCase {
 			return
 		}
 
-		let message = try await MessageV2.encode(
-			client: fixtures.bobClient,
-			content: try AttachmentCodec().encode(content: Attachment(filename: "icon.png", mimeType: "image/png", data: iconData)),
-			topic: conversation.topic,
-			keyMaterial: conversation.keyMaterial
+		let remoteEnvelopeData = try await conversation.encode(
+			codec: AttachmentCodec(),
+			content: Attachment(filename: "icon.png", mimeType: "image/png", data: iconData)
 		)
 
-		let attachmentEnvelopeData = try Envelope(
-			topic: conversation.topic,
-			timestamp: Date(),
-			message: try Message(v2: message).serializedData()
-		).serializedData()
-
 		let tempFileURL = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-		try attachmentEnvelopeData.write(to: tempFileURL)
+		try remoteEnvelopeData.write(to: tempFileURL)
 
 		try await conversation.send(content: RemoteAttachment(url: tempFileURL.absoluteString), options: .init(contentType: ContentTypeRemoteAttachment))
 		let messages = try await conversation.messages()

@@ -11,7 +11,7 @@ import XMTPProto
 public let ContentTypeRemoteAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "remoteAttachment", versionMajor: 1, versionMinor: 0)
 
 public enum RemoteAttachmentError: Error {
-	case invalidURL
+	case invalidURL, v1NotSupported
 }
 
 public struct RemoteAttachment: Codable {

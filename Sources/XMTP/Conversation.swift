@@ -75,6 +75,15 @@ public enum Conversation {
 		}
 	}
 
+	public func encode<Codec: ContentCodec, T>(codec: Codec, content: T) async throws -> Data where Codec.T == T {
+		switch self {
+		case let .v1:
+			throw RemoteAttachmentError.v1NotSupported
+		case let .v2(conversationV2):
+			return try await conversationV2.encode(codec: codec, content: content)
+		}
+	}
+
 	public func send<T>(content: T, options: SendOptions? = nil, fallback _: String? = nil) async throws {
 		switch self {
 		case let .v1(conversationV1):

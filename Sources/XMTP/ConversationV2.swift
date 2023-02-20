@@ -139,6 +139,25 @@ public struct ConversationV2 {
 		try await send(content: encodedContent, options: options, sentAt: sentAt)
 	}
 
+	public func encode<Codec: ContentCodec, T>(codec: Codec, content: T) async throws -> Data where Codec.T == T {
+		let content = try codec.encode(content: content)
+
+		let message = try await MessageV2.encode(
+			client: client,
+			content: content,
+			topic: topic,
+			keyMaterial: keyMaterial
+		)
+
+		let envelope = try Envelope(
+			topic: topic,
+			timestamp: Date(),
+			message: try Message(v2: message).serializedData()
+		)
+
+		return try envelope.serializedData()
+	}
+
 	internal func send(content: EncodedContent, options: SendOptions? = nil, sentAt: Date) async throws {
 		guard try await client.getUserContact(peerAddress: peerAddress) != nil else {
 			throw ContactBundleError.notFound
