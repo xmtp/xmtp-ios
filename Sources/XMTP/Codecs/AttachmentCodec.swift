@@ -28,6 +28,8 @@ public struct Attachment: Codable {
 public struct AttachmentCodec: ContentCodec {
 	public typealias T = Attachment
 
+	public init() { }
+
 	public var contentType = ContentTypeAttachment
 
 	public func encode(content: Attachment) throws -> EncodedContent {

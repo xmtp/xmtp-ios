@@ -32,6 +32,8 @@ public struct RemoteAttachment: Codable {
 public struct RemoteAttachmentCodec: ContentCodec {
 	public typealias T = RemoteAttachment
 
+	public init() { }
+
 	public var contentType = ContentTypeRemoteAttachment
 
 	public func encode(content: RemoteAttachment) throws -> EncodedContent {
