@@ -13,7 +13,7 @@ import XMTPProto
 public let ContentTypeRemoteAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "remoteStaticAttachment", versionMajor: 1, versionMinor: 0)
 
 public enum RemoteAttachmentError: Error {
-	case invalidURL, v1NotSupported, invalidParameters, invalidDigest, invalidScheme
+	case invalidURL, v1NotSupported, invalidParameters(String), invalidDigest(String), invalidScheme(String)
 }
 
 protocol RemoteContentFetcher {
@@ -51,7 +51,7 @@ public struct RemoteAttachment {
 		self.nonce = nonce
 
 		self.scheme = scheme
-		self.fetcher = HTTPFetcher()
+		fetcher = HTTPFetcher()
 
 		try ensureSchemeMatches()
 	}
@@ -71,7 +71,7 @@ public struct RemoteAttachment {
 
 	func ensureSchemeMatches() throws {
 		if !url.hasPrefix(scheme.rawValue) {
-			throw RemoteAttachmentError.invalidScheme
+			throw RemoteAttachmentError.invalidScheme("scheme must be https://")
 		}
 	}
 
@@ -93,7 +93,7 @@ public struct RemoteAttachment {
 		let payload = try await fetcher.fetch(url)
 
 		if SHA256.hash(data: payload).description != contentDigest {
-			throw RemoteAttachmentError.invalidDigest
+			throw RemoteAttachmentError.invalidDigest("content digest does not match")
 		}
 
 		let ciphertext = CipherText.with {
@@ -130,7 +130,7 @@ public struct RemoteAttachmentCodec: ContentCodec {
 			"secret": content.secret.toHex,
 			"salt": content.salt.toHex,
 			"nonce": content.nonce.toHex,
-			"scheme": "https://"
+			"scheme": "https://",
 		]
 
 		return encodedContent
@@ -141,19 +141,34 @@ public struct RemoteAttachmentCodec: ContentCodec {
 			throw RemoteAttachmentError.invalidURL
 		}
 
-		guard let contentDigest = content.parameters["contentDigest"],
-		      let secretHex = content.parameters["secret"],
-		      let secret = secretHex.web3.bytesFromHex,
-		      let saltHex = content.parameters["salt"],
-		      let salt = saltHex.web3.bytesFromHex,
-		      let nonceNex = content.parameters["nonce"],
-		      let nonce = nonceNex.web3.bytesFromHex,
-					let schemeString = content.parameters["scheme"],
-					let scheme = RemoteAttachment.Scheme(rawValue: schemeString)
-		else {
-			throw RemoteAttachmentError.invalidParameters
+		guard let contentDigest = content.parameters["contentDigest"] else {
+			throw RemoteAttachmentError.invalidDigest("missing contentDigest parameter")
 		}
 
-		return try RemoteAttachment(url: url, contentDigest: contentDigest, secret: Data(secret), salt: Data(salt), nonce: Data(nonce), scheme: scheme)
+		let secret = try getHexParameter("secret", from: content.parameters)
+		let salt = try getHexParameter("salt", from: content.parameters)
+		let nonce = try getHexParameter("nonce", from: content.parameters)
+
+		guard let schemeString = content.parameters["scheme"] else {
+			throw RemoteAttachmentError.invalidScheme("no scheme parameter")
+		}
+
+		guard let scheme = RemoteAttachment.Scheme(rawValue: schemeString) else {
+			throw RemoteAttachmentError.invalidScheme("invalid scheme value. must be https://")
+		}
+
+		return try RemoteAttachment(url: url, contentDigest: contentDigest, secret: secret, salt: salt, nonce: nonce, scheme: scheme)
+	}
+
+	private func getHexParameter(_ name: String, from parameters: [String: String]) throws -> Data {
+		guard let parameterHex = parameters[name] else {
+			throw RemoteAttachmentError.invalidParameters("missing \(name) parameter")
+		}
+
+		guard let parameterData = parameterHex.web3.hexData else {
+			throw RemoteAttachmentError.invalidParameters("invalid \(name) value")
+		}
+
+		return Data(parameterData)
 	}
 }
