@@ -146,7 +146,7 @@ public struct ConversationV2 {
 
 		return EncryptedEncodedContent(
 			secret: secret,
-			digest: SHA256.hash(data: encodedContent).description,
+			digest: SHA256.hash(data: ciphertext.aes256GcmHkdfSha256.payload).description,
 			salt: ciphertext.aes256GcmHkdfSha256.hkdfSalt,
 			nonce: ciphertext.aes256GcmHkdfSha256.gcmNonce,
 			content: ciphertext.aes256GcmHkdfSha256.payload

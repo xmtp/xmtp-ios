@@ -8,11 +8,12 @@
 import Foundation
 import web3
 import XMTPProto
+import CryptoKit
 
 public let ContentTypeRemoteAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "remoteAttachment", versionMajor: 1, versionMinor: 0)
 
 public enum RemoteAttachmentError: Error {
-	case invalidURL, v1NotSupported, invalidParameters
+	case invalidURL, v1NotSupported, invalidParameters, invalidDigest
 }
 
 public struct RemoteAttachment: Codable {
@@ -30,18 +31,16 @@ public struct RemoteAttachment: Codable {
 		self.nonce = nonce
 	}
 
-	public func content<T>() throws -> T {
-		guard let url = URL(string: url) else {
-			throw RemoteAttachmentError.invalidURL
+	public func decode<T>(payload: Data) throws -> T {
+		if SHA256.hash(data: payload).description != contentDigest {
+			throw RemoteAttachmentError.invalidDigest
 		}
-
-		let data = try Data(contentsOf: url)
 
 		let ciphertext = CipherText.with {
 			let aes256GcmHkdfSha256 = CipherText.Aes256gcmHkdfsha256.with { aes in
 				aes.hkdfSalt = salt
 				aes.gcmNonce = nonce
-				aes.payload = data
+				aes.payload = payload
 			}
 
 			$0.aes256GcmHkdfSha256 = aes256GcmHkdfSha256
@@ -49,8 +48,6 @@ public struct RemoteAttachment: Codable {
 
 		let decryptedPayloadData = try Crypto.decrypt(secret, ciphertext)
 		let decryptedPayload = try EncodedContent(serializedData: decryptedPayloadData)
-
-		// TODO: check digest
 
 		return try decryptedPayload.decoded()
 	}

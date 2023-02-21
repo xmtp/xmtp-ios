@@ -37,7 +37,7 @@ class RemoteAttachmentTests: XCTestCase {
 		let receivedMessage = messages[0]
 		let remoteAttachment: RemoteAttachment = try receivedMessage.content()
 
-		let attachment: Attachment = try remoteAttachment.content()
+		let attachment: Attachment = try remoteAttachment.decode(payload: Data(contentsOf: tempFileURL))
 
 		XCTAssertEqual("icon.png", attachment.filename)
 		XCTAssertEqual("image/png", attachment.mimeType)
