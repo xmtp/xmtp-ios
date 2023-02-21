@@ -28,7 +28,7 @@ public struct Attachment: Codable {
 public struct AttachmentCodec: ContentCodec {
 	public typealias T = Attachment
 
-	public init() { }
+	public init() {}
 
 	public var contentType = ContentTypeAttachment
 
