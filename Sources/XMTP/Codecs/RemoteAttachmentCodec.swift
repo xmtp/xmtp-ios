@@ -13,30 +13,66 @@ import XMTPProto
 public let ContentTypeRemoteAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "remoteStaticAttachment", versionMajor: 1, versionMinor: 0)
 
 public enum RemoteAttachmentError: Error {
-	case invalidURL, v1NotSupported, invalidParameters, invalidDigest
+	case invalidURL, v1NotSupported, invalidParameters, invalidDigest, invalidScheme
 }
 
-public struct RemoteAttachment: Codable {
+protocol RemoteContentFetcher {
+	func fetch(_ url: String) async throws -> Data
+}
+
+struct HTTPFetcher: RemoteContentFetcher {
+	func fetch(_ url: String) async throws -> Data {
+		guard let url = URL(string: url) else {
+			throw RemoteAttachmentError.invalidURL
+		}
+
+		return try await URLSession.shared.data(from: url).0
+	}
+}
+
+public struct RemoteAttachment {
+	public enum Scheme: String {
+		case https = "https://"
+	}
+
 	public var url: String
 	public var contentDigest: String
 	public var secret: Data
 	public var salt: Data
 	public var nonce: Data
+	public var scheme: Scheme
+	var fetcher: RemoteContentFetcher
 
-	public init(url: String, contentDigest: String, secret: Data, salt: Data, nonce: Data) {
+	init(url: String, contentDigest: String, secret: Data, salt: Data, nonce: Data, scheme: Scheme) throws {
 		self.url = url
 		self.contentDigest = contentDigest
 		self.secret = secret
 		self.salt = salt
 		self.nonce = nonce
+
+		self.scheme = scheme
+		self.fetcher = HTTPFetcher()
+
+		try ensureSchemeMatches()
 	}
 
-	public init(url: String, encryptedEncodedContent: EncryptedEncodedContent) {
+	public init(url: String, encryptedEncodedContent: EncryptedEncodedContent) throws {
 		self.url = url
 		contentDigest = encryptedEncodedContent.digest
 		secret = encryptedEncodedContent.secret
 		salt = encryptedEncodedContent.salt
 		nonce = encryptedEncodedContent.nonce
+
+		scheme = .https
+		fetcher = HTTPFetcher()
+
+		try ensureSchemeMatches()
+	}
+
+	func ensureSchemeMatches() throws {
+		if !url.hasPrefix(scheme.rawValue) {
+			throw RemoteAttachmentError.invalidScheme
+		}
 	}
 
 	public static func encodeEncrypted<Codec: ContentCodec, T>(content: T, codec: Codec) throws -> EncryptedEncodedContent where Codec.T == T {
@@ -53,7 +89,9 @@ public struct RemoteAttachment: Codable {
 		)
 	}
 
-	public func decrypt(payload: Data) throws -> EncodedContent {
+	public func content() async throws -> EncodedContent {
+		let payload = try await fetcher.fetch(url)
+
 		if SHA256.hash(data: payload).description != contentDigest {
 			throw RemoteAttachmentError.invalidDigest
 		}
@@ -71,7 +109,7 @@ public struct RemoteAttachment: Codable {
 		let decryptedPayloadData = try Crypto.decrypt(secret, ciphertext)
 		let decryptedPayload = try EncodedContent(serializedData: decryptedPayloadData)
 
-		return try decryptedPayload
+		return decryptedPayload
 	}
 }
 
@@ -92,6 +130,7 @@ public struct RemoteAttachmentCodec: ContentCodec {
 			"secret": content.secret.toHex,
 			"salt": content.salt.toHex,
 			"nonce": content.nonce.toHex,
+			"scheme": "https://"
 		]
 
 		return encodedContent
@@ -108,11 +147,13 @@ public struct RemoteAttachmentCodec: ContentCodec {
 		      let saltHex = content.parameters["salt"],
 		      let salt = saltHex.web3.bytesFromHex,
 		      let nonceNex = content.parameters["nonce"],
-		      let nonce = nonceNex.web3.bytesFromHex
+		      let nonce = nonceNex.web3.bytesFromHex,
+					let schemeString = content.parameters["scheme"],
+					let scheme = RemoteAttachment.Scheme(rawValue: schemeString)
 		else {
 			throw RemoteAttachmentError.invalidParameters
 		}
 
-		return RemoteAttachment(url: url, contentDigest: contentDigest, secret: Data(secret), salt: Data(salt), nonce: Data(nonce))
+		return try RemoteAttachment(url: url, contentDigest: contentDigest, secret: Data(secret), salt: Data(salt), nonce: Data(nonce), scheme: scheme)
 	}
 }
