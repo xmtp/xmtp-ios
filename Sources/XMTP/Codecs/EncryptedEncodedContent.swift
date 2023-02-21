@@ -12,5 +12,5 @@ public struct EncryptedEncodedContent {
 	var digest: String
 	var salt: Data
 	var nonce: Data
-	var content: Data
+	public var payload: Data
 }

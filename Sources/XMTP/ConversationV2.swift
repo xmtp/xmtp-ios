@@ -139,20 +139,6 @@ public struct ConversationV2 {
 		try await send(content: encodedContent, options: options, sentAt: sentAt)
 	}
 
-	public func encodeEncrypted<Codec: ContentCodec, T>(content: T, codec: Codec) async throws -> EncryptedEncodedContent where Codec.T == T {
-		let secret = try Crypto.secureRandomBytes(count: 32)
-		let encodedContent = try codec.encode(content: content).serializedData()
-		let ciphertext = try Crypto.encrypt(secret, encodedContent)
-
-		return EncryptedEncodedContent(
-			secret: secret,
-			digest: SHA256.hash(data: ciphertext.aes256GcmHkdfSha256.payload).description,
-			salt: ciphertext.aes256GcmHkdfSha256.hkdfSalt,
-			nonce: ciphertext.aes256GcmHkdfSha256.gcmNonce,
-			content: ciphertext.aes256GcmHkdfSha256.payload
-		)
-	}
-
 	public func encode<Codec: ContentCodec, T>(codec: Codec, content: T) async throws -> Data where Codec.T == T {
 		let content = try codec.encode(content: content)
 

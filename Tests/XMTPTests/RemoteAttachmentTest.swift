@@ -21,15 +21,17 @@ class RemoteAttachmentTests: XCTestCase {
 			return
 		}
 
-		let encryptedEncodedContent = try await conversation.encodeEncrypted(
+		let encryptedEncodedContent = try RemoteAttachment.encodeEncrypted(
 			content: Attachment(filename: "icon.png", mimeType: "image/png", data: iconData),
 			codec: AttachmentCodec()
 		)
 
 		let tempFileURL = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-		try encryptedEncodedContent.content.write(to: tempFileURL)
+		try encryptedEncodedContent.payload.write(to: tempFileURL)
 
-		try await conversation.send(content: RemoteAttachment(url: tempFileURL.absoluteString, contentDigest: encryptedEncodedContent.digest, secret: encryptedEncodedContent.secret, salt: encryptedEncodedContent.salt, nonce: encryptedEncodedContent.nonce), options: .init(contentType: ContentTypeRemoteAttachment))
+		let content = RemoteAttachment(url: tempFileURL.absoluteString, encryptedEncodedContent: encryptedEncodedContent)
+
+		try await conversation.send(content: content, options: .init(contentType: ContentTypeRemoteAttachment))
 		let messages = try await conversation.messages()
 
 		XCTAssertEqual(1, messages.count)
