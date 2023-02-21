@@ -31,7 +31,7 @@ public struct RemoteAttachment: Codable {
 		self.nonce = nonce
 	}
 
-	public func decode<T>(payload: Data) throws -> T {
+	public func decrypt(payload: Data) throws -> EncodedContent {
 		if SHA256.hash(data: payload).description != contentDigest {
 			throw RemoteAttachmentError.invalidDigest
 		}
@@ -49,7 +49,7 @@ public struct RemoteAttachment: Codable {
 		let decryptedPayloadData = try Crypto.decrypt(secret, ciphertext)
 		let decryptedPayload = try EncodedContent(serializedData: decryptedPayloadData)
 
-		return try decryptedPayload.decoded()
+		return try decryptedPayload
 	}
 }
 
