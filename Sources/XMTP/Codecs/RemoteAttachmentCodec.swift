@@ -10,7 +10,7 @@ import Foundation
 import web3
 import XMTPProto
 
-public let ContentTypeRemoteAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "remoteAttachment", versionMajor: 1, versionMinor: 0)
+public let ContentTypeRemoteAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "remoteStaticAttachment", versionMajor: 1, versionMinor: 0)
 
 public enum RemoteAttachmentError: Error {
 	case invalidURL, v1NotSupported, invalidParameters, invalidDigest
@@ -85,16 +85,14 @@ public struct RemoteAttachmentCodec: ContentCodec {
 	public func encode(content: RemoteAttachment) throws -> EncodedContent {
 		var encodedContent = EncodedContent()
 
-		let parameters = [
+		encodedContent.type = ContentTypeRemoteAttachment
+		encodedContent.content = Data(content.url.utf8)
+		encodedContent.parameters = [
 			"contentDigest": content.contentDigest,
 			"secret": content.secret.toHex,
 			"salt": content.salt.toHex,
 			"nonce": content.nonce.toHex,
 		]
-
-		encodedContent.type = ContentTypeRemoteAttachment
-		encodedContent.content = Data(content.url.utf8)
-		encodedContent.parameters = parameters
 
 		return encodedContent
 	}
