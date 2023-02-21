@@ -15,7 +15,11 @@ public enum RemoteAttachmentError: Error {
 }
 
 public struct RemoteAttachment: Codable {
-	var url: String
+	public var url: String
+
+	public init(url: String) {
+		self.url = url
+	}
 
 	func envelope() async throws -> Envelope {
 		guard let url = URL(string: url) else {
