@@ -106,7 +106,7 @@ public struct RemoteAttachment {
 		let decryptedPayloadData = try Crypto.decrypt(secret, ciphertext)
 
 		if SHA256.hash(data: decryptedPayloadData).description != contentDigest {
-			throw RemoteAttachmentError.invalidDigest("content digest does not match. expected: \(contentDigest), got: \(SHA256.hash(data: payload).description)")
+			throw RemoteAttachmentError.invalidDigest("content digest does not match. expected: \(contentDigest), got: \(SHA256.hash(data: decryptedPayloadData).description)")
 		}
 
 		let decryptedPayload = try EncodedContent(serializedData: decryptedPayloadData)
