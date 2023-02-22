@@ -93,7 +93,7 @@ public struct RemoteAttachment {
 		let payload = try await fetcher.fetch(url)
 
 		if SHA256.hash(data: payload).description != contentDigest {
-			throw RemoteAttachmentError.invalidDigest("content digest does not match")
+			throw RemoteAttachmentError.invalidDigest("content digest does not match. expected: \(contentDigest), got: \(SHA256.hash(data: payload).description)")
 		}
 
 		let ciphertext = CipherText.with {
