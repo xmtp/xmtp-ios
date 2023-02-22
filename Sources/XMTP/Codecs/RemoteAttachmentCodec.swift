@@ -13,7 +13,7 @@ import XMTPProto
 public let ContentTypeRemoteAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "remoteStaticAttachment", versionMajor: 1, versionMinor: 0)
 
 public enum RemoteAttachmentError: Error {
-	case invalidURL, v1NotSupported, invalidParameters(String), invalidDigest(String), invalidScheme(String)
+	case invalidURL, v1NotSupported, invalidParameters(String), invalidDigest(String), invalidScheme(String), payloadNotFound
 }
 
 protocol RemoteContentFetcher {
@@ -92,6 +92,10 @@ public struct RemoteAttachment {
 
 	public func content() async throws -> EncodedContent {
 		let payload = try await fetcher.fetch(url)
+
+		if payload.isEmpty {
+			throw RemoteAttachmentError.payloadNotFound
+		}
 
 		let ciphertext = CipherText.with {
 			let aes256GcmHkdfSha256 = CipherText.Aes256gcmHkdfsha256.with { aes in
