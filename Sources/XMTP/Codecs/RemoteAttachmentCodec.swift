@@ -78,11 +78,12 @@ public struct RemoteAttachment {
 	public static func encodeEncrypted<Codec: ContentCodec, T>(content: T, codec: Codec) throws -> EncryptedEncodedContent where Codec.T == T {
 		let secret = try Crypto.secureRandomBytes(count: 32)
 		let encodedContent = try codec.encode(content: content).serializedData()
+		let contentDigest = SHA256.hash(data: encodedContent).description
 		let ciphertext = try Crypto.encrypt(secret, encodedContent)
 
 		return EncryptedEncodedContent(
 			secret: secret,
-			digest: SHA256.hash(data: ciphertext.aes256GcmHkdfSha256.payload).description,
+			digest: contentDigest,
 			salt: ciphertext.aes256GcmHkdfSha256.hkdfSalt,
 			nonce: ciphertext.aes256GcmHkdfSha256.gcmNonce,
 			payload: ciphertext.aes256GcmHkdfSha256.payload
@@ -91,10 +92,6 @@ public struct RemoteAttachment {
 
 	public func content() async throws -> EncodedContent {
 		let payload = try await fetcher.fetch(url)
-
-		if SHA256.hash(data: payload).description != contentDigest {
-			throw RemoteAttachmentError.invalidDigest("content digest does not match. expected: \(contentDigest), got: \(SHA256.hash(data: payload).description)")
-		}
 
 		let ciphertext = CipherText.with {
 			let aes256GcmHkdfSha256 = CipherText.Aes256gcmHkdfsha256.with { aes in
@@ -107,6 +104,11 @@ public struct RemoteAttachment {
 		}
 
 		let decryptedPayloadData = try Crypto.decrypt(secret, ciphertext)
+
+		if SHA256.hash(data: decryptedPayloadData).description != contentDigest {
+			throw RemoteAttachmentError.invalidDigest("content digest does not match. expected: \(contentDigest), got: \(SHA256.hash(data: payload).description)")
+		}
+
 		let decryptedPayload = try EncodedContent(serializedData: decryptedPayloadData)
 
 		return decryptedPayload
