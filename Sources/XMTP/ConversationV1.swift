@@ -42,7 +42,7 @@ public struct ConversationV1 {
 		return try await send(content: content, options: options, sentAt: nil)
 	}
 
-	internal func send(content: String, options: SendOptions? = nil, sentAt: Date? = nil) async throws -> String {
+	@discardableResult internal func send(content: String, options: SendOptions? = nil, sentAt: Date? = nil) async throws -> String {
 		let encoder = TextCodec()
 		let encodedContent = try encoder.encode(content: content)
 
