@@ -458,6 +458,8 @@ class ConversationTests: XCTestCase {
 		XCTAssertEqual(1, messages.count)
 		XCTAssertEqual("hey alice 3", messages[0].body)
 
+		try await Task.sleep(for: .milliseconds(20))
+
 		let messages2 = try await aliceConversation.messages(limit: 1, before: messages[0].sent)
 		XCTAssertEqual(1, messages2.count)
 		XCTAssertEqual("hey alice 2", messages2[0].body)

@@ -133,7 +133,7 @@ public struct ConversationV2 {
 		return try await send(content: encoded, options: options, sentAt: Date())
 	}
 
-	func send(content: String, options: SendOptions? = nil, sentAt: Date) async throws -> String {
+	@discardableResult func send(content: String, options: SendOptions? = nil, sentAt: Date) async throws -> String {
 		let encoder = TextCodec()
 		let encodedContent = try encoder.encode(content: content)
 		return try await send(content: encodedContent, options: options, sentAt: sentAt)
