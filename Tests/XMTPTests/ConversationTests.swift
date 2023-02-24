@@ -437,6 +437,9 @@ class ConversationTests: XCTestCase {
 		let messages2 = try await aliceConversation.messages(limit: 1, before: messages[0].sent)
 		XCTAssertEqual(1, messages2.count)
 		XCTAssertEqual("hey alice 2", messages2[0].body)
+
+		// This is just to verify that the fake API client can handle limits larger how many envelopes it knows about
+		_ = try await aliceConversation.messages(limit: 10)
 	}
 
 	func testCanPaginateV2Messages() async throws {

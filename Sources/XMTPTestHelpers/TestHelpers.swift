@@ -165,7 +165,7 @@ public class FakeApiClient: ApiClient {
 					result = []
 				}
 			} else {
-				result = Array(result[0 ... limit - 1])
+				result = Array(result[0 ... min(result.count, limit) - 1])
 			}
 		}
 
