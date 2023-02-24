@@ -117,7 +117,7 @@ public struct ConversationV2 {
 		try MessageV2.decode(message, keyMaterial: keyMaterial)
 	}
 
-	func send<T>(content: T, options: SendOptions? = nil) async throws {
+	func send<T>(content: T, options: SendOptions? = nil) async throws -> String {
 		let codec = Client.codecRegistry.find(for: options?.contentType)
 
 		func encode<Codec: ContentCodec>(codec: Codec, content: Any) throws -> EncodedContent {
@@ -130,14 +130,15 @@ public struct ConversationV2 {
 
 		var encoded = try encode(codec: codec, content: content)
 		encoded.fallback = options?.contentFallback ?? ""
-		try await send(content: encoded, options: options, sentAt: Date())
+		return try await send(content: encoded, options: options, sentAt: Date())
 	}
 
-	func send(content: String, options: SendOptions? = nil, sentAt: Date) async throws {
+	@discardableResult func send(content: String, options: SendOptions? = nil, sentAt: Date) async throws -> String {
 		let encoder = TextCodec()
 		let encodedContent = try encoder.encode(content: content)
-		try await send(content: encodedContent, options: options, sentAt: sentAt)
+		return try await send(content: encodedContent, options: options, sentAt: sentAt)
 	}
+
 
 	public func encode<Codec: ContentCodec, T>(codec: Codec, content: T) async throws -> Data where Codec.T == T {
 		let content = try codec.encode(content: content)
@@ -158,7 +159,7 @@ public struct ConversationV2 {
 		return try envelope.serializedData()
 	}
 
-	internal func send(content: EncodedContent, options: SendOptions? = nil, sentAt: Date) async throws {
+	internal func send(content: EncodedContent, options: SendOptions? = nil, sentAt: Date) async throws -> String {
 		guard try await client.getUserContact(peerAddress: peerAddress) != nil else {
 			throw ContactBundleError.notFound
 		}
@@ -176,13 +177,15 @@ public struct ConversationV2 {
 			keyMaterial: keyMaterial
 		)
 
-		try await client.publish(envelopes: [
-			Envelope(topic: topic, timestamp: sentAt, message: try Message(v2: message).serializedData()),
-		])
+		let envelope = Envelope(topic: topic, timestamp: sentAt, message: try Message(v2: message).serializedData())
+
+		try await client.publish(envelopes: [envelope])
+
+		return generateID(from: envelope)
 	}
 
-	func send(content: String, options: SendOptions? = nil) async throws {
-		try await send(content: content, options: options, sentAt: Date())
+	func send(content: String, options: SendOptions? = nil) async throws -> String {
+		return try await send(content: content, options: options, sentAt: Date())
 	}
 
 	private func generateID(from envelope: Envelope) -> String {
