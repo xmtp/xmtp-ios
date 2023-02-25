@@ -14,12 +14,12 @@ enum TextCodecError: Error {
 	case invalidEncoding, unknownDecodingError
 }
 
-struct TextCodec: ContentCodec {
-	typealias T = String
+public struct TextCodec: ContentCodec {
+	public typealias T = String
 
-	var contentType = ContentTypeText
+	public var contentType = ContentTypeText
 
-	func encode(content: String) throws -> EncodedContent {
+	public func encode(content: String) throws -> EncodedContent {
 		var encodedContent = EncodedContent()
 
 		encodedContent.type = ContentTypeText
@@ -29,7 +29,7 @@ struct TextCodec: ContentCodec {
 		return encodedContent
 	}
 
-	func decode(content: EncodedContent) throws -> String {
+	public func decode(content: EncodedContent) throws -> String {
 		if let encoding = content.parameters["encoding"], encoding != "UTF-8" {
 			throw TextCodecError.invalidEncoding
 		}
