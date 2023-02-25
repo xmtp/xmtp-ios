@@ -8,7 +8,7 @@
 import Foundation
 import XMTPProto
 
-public let ContentTypeText = ContentTypeID(authorityID: "xmtp.org", typeID: "text", versionMajor: 1, versionMinor: 0)
+public let ContentTypeText = ContentTypeID(authorityID: "xmtp.org", typeID: "text", versionMajor: 1, versionMinor: 1)
 
 enum TextCodecError: Error {
 	case invalidEncoding, unknownDecodingError
