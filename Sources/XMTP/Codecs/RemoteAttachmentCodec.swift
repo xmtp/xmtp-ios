@@ -43,6 +43,10 @@ public struct RemoteAttachment {
 	public var scheme: Scheme
 	var fetcher: RemoteContentFetcher
 
+	// Non standard
+	public var contentLength: Int?
+	public var filename: String?
+
 	init(url: String, contentDigest: String, secret: Data, salt: Data, nonce: Data, scheme: Scheme) throws {
 		self.url = url
 		self.contentDigest = contentDigest
@@ -137,6 +141,8 @@ public struct RemoteAttachmentCodec: ContentCodec {
 			"salt": content.salt.toHex,
 			"nonce": content.nonce.toHex,
 			"scheme": "https://",
+			"contentLength": String(content.contentLength ?? -1),
+			"filename": content.filename ?? ""
 		]
 
 		return encodedContent
@@ -163,7 +169,17 @@ public struct RemoteAttachmentCodec: ContentCodec {
 			throw RemoteAttachmentError.invalidScheme("invalid scheme value. must be https://")
 		}
 
-		return try RemoteAttachment(url: url, contentDigest: contentDigest, secret: secret, salt: salt, nonce: nonce, scheme: scheme)
+		var attachment = try RemoteAttachment(url: url, contentDigest: contentDigest, secret: secret, salt: salt, nonce: nonce, scheme: scheme)
+
+		if let contentLength = content.parameters["contentLength"] {
+			attachment.contentLength = Int(contentLength)
+		}
+
+		if let filename = content.parameters["filename"] {
+			attachment.filename = filename
+		}
+
+		return attachment
 	}
 
 	private func getHexParameter(_ name: String, from parameters: [String: String]) throws -> Data {

@@ -58,6 +58,10 @@ class RemoteAttachmentTests: XCTestCase {
 
 		let receivedMessage = messages[0]
 		var remoteAttachment: RemoteAttachment = try receivedMessage.content()
+
+		XCTAssertEqual(123, remoteAttachment.contentLength)
+		XCTAssertEqual("icon.png", remoteAttachment.filename)
+
 		remoteAttachment.fetcher = TestFetcher()
 
 		let encodedContent: EncodedContent = try await remoteAttachment.content()
