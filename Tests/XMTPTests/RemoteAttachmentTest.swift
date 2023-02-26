@@ -60,6 +60,8 @@ class RemoteAttachmentTests: XCTestCase {
 		let fakeHTTPSFileURL = URL(string: tempFileURL.absoluteString.replacingOccurrences(of: "file://", with: "https://"))!
 		print("\(fakeHTTPSFileURL)")
 		var content = try RemoteAttachment(url: fakeHTTPSFileURL.absoluteString, encryptedEncodedContent: encryptedEncodedContent)
+		content.filename = "icon.png"
+		content.contentLength = 123
 		content.fetcher = TestFetcher()
 
 		try await conversation.send(content: content, options: .init(contentType: ContentTypeRemoteAttachment))

@@ -117,7 +117,7 @@ public struct ConversationV2 {
 		try MessageV2.decode(message, keyMaterial: keyMaterial)
 	}
 
-	func send<T>(content: T, options: SendOptions? = nil) async throws -> String {
+	@discardableResult func send<T>(content: T, options: SendOptions? = nil) async throws -> String {
 		let codec = Client.codecRegistry.find(for: options?.contentType)
 
 		func encode<Codec: ContentCodec>(codec: Codec, content: Any) throws -> EncodedContent {
