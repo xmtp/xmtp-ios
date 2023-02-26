@@ -8,9 +8,9 @@
 import Foundation
 
 public struct EncryptedEncodedContent {
-	var secret: Data
-	var digest: String
-	var salt: Data
-	var nonce: Data
+	public var secret: Data
+	public var digest: String
+	public var salt: Data
+	public var nonce: Data
 	public var payload: Data
 }
