@@ -47,7 +47,7 @@ public struct RemoteAttachment {
 	public var contentLength: Int?
 	public var filename: String?
 
-	init(url: String, contentDigest: String, secret: Data, salt: Data, nonce: Data, scheme: Scheme) throws {
+	public init(url: String, contentDigest: String, secret: Data, salt: Data, nonce: Data, scheme: Scheme) throws {
 		self.url = url
 		self.contentDigest = contentDigest
 		self.secret = secret
