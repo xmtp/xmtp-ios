@@ -429,8 +429,20 @@ class ConversationTests: XCTestCase {
 		// This is just to verify that the fake API client can handle limits larger how many envelopes it knows about
 		_ = try await aliceConversation.messages(limit: -1)
 
-		try await bobConversation.send(content: "hey alice 1", sentAt: Date().addingTimeInterval(-10))
-		try await bobConversation.send(content: "hey alice 2", sentAt: Date().addingTimeInterval(-5))
+		try await bobConversation.send(content: "hey alice 1", sentAt: Date().addingTimeInterval(-1000))
+		if let lastEnvelopeIndex = fakeApiClient.published.firstIndex(where: { $0.contentTopic == bobConversation.topic.description }) {
+			var lastEnvelope = fakeApiClient.published[lastEnvelopeIndex]
+			lastEnvelope.timestampNs = UInt64(Date().addingTimeInterval(-1000).millisecondsSinceEpoch)
+			fakeApiClient.published[lastEnvelopeIndex] = lastEnvelope
+		}
+
+		try await bobConversation.send(content: "hey alice 2", sentAt: Date().addingTimeInterval(-500))
+		if let lastEnvelopeIndex = fakeApiClient.published.firstIndex(where: { $0.contentTopic == bobConversation.topic.description }) {
+			var lastEnvelope = fakeApiClient.published[lastEnvelopeIndex]
+			lastEnvelope.timestampNs = UInt64(Date().addingTimeInterval(-500).millisecondsSinceEpoch)
+			fakeApiClient.published[lastEnvelopeIndex] = lastEnvelope
+		}
+
 		try await bobConversation.send(content: "hey alice 3", sentAt: Date())
 
 		let messages = try await aliceConversation.messages(limit: 1)
@@ -457,14 +469,24 @@ class ConversationTests: XCTestCase {
 		}
 
 		try await bobConversation.send(content: "hey alice 1", sentAt: Date().addingTimeInterval(-1000))
+		if let lastEnvelopeIndex = fakeApiClient.published.firstIndex(where: { $0.contentTopic == bobConversation.topic.description }) {
+			var lastEnvelope = fakeApiClient.published[lastEnvelopeIndex]
+			lastEnvelope.timestampNs = UInt64(Date().addingTimeInterval(-1000).millisecondsSinceEpoch)
+			fakeApiClient.published[lastEnvelopeIndex] = lastEnvelope
+		}
+
 		try await bobConversation.send(content: "hey alice 2", sentAt: Date().addingTimeInterval(-500))
+		if let lastEnvelopeIndex = fakeApiClient.published.firstIndex(where: { $0.contentTopic == bobConversation.topic.description }) {
+			var lastEnvelope = fakeApiClient.published[lastEnvelopeIndex]
+			lastEnvelope.timestampNs = UInt64(Date().addingTimeInterval(-500).millisecondsSinceEpoch)
+			fakeApiClient.published[lastEnvelopeIndex] = lastEnvelope
+		}
+
 		try await bobConversation.send(content: "hey alice 3", sentAt: Date())
 
 		let messages = try await aliceConversation.messages(limit: 1)
 		XCTAssertEqual(1, messages.count)
 		XCTAssertEqual("hey alice 3", messages[0].body)
-
-		try await Task.sleep(for: .milliseconds(20))
 
 		let messages2 = try await aliceConversation.messages(limit: 1, before: messages[0].sent)
 		XCTAssertEqual(1, messages2.count)
