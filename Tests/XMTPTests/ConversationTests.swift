@@ -426,8 +426,8 @@ class ConversationTests: XCTestCase {
 			return
 		}
 
-		try await bobConversation.send(content: "hey alice 1", sentAt: Date().addingTimeInterval(-10))
-		try await bobConversation.send(content: "hey alice 2", sentAt: Date().addingTimeInterval(-5))
+		try await bobConversation.send(content: "hey alice 1", sentAt: Date().addingTimeInterval(-1000))
+		try await bobConversation.send(content: "hey alice 2", sentAt: Date().addingTimeInterval(-500))
 		try await bobConversation.send(content: "hey alice 3", sentAt: Date())
 
 		let messages = try await aliceConversation.messages(limit: 1)

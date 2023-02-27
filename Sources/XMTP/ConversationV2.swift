@@ -184,7 +184,7 @@ public struct ConversationV2 {
 		return generateID(from: envelope)
 	}
 
-	func send(content: String, options: SendOptions? = nil) async throws -> String {
+	@discardableResult func send(content: String, options: SendOptions? = nil) async throws -> String {
 		return try await send(content: content, options: options, sentAt: Date())
 	}
 
