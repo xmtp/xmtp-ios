@@ -463,15 +463,17 @@ class ConversationTests: XCTestCase {
 		}
 
 		try await bobConversation.send(content: "hey alice 1", sentAt: Date().addingTimeInterval(-1000))
-		if var lastEnvelope = fakeApiClient.published.last {
+		if let lastEnvelopeIndex = fakeApiClient.published.firstIndex(where: { $0.contentTopic == bobConversation.topic.description }) {
+			var lastEnvelope = fakeApiClient.published[lastEnvelopeIndex]
 			lastEnvelope.timestampNs = UInt64(Date().addingTimeInterval(-1000).millisecondsSinceEpoch)
-			fakeApiClient.published[fakeApiClient.published.count-1] = lastEnvelope
+			fakeApiClient.published[lastEnvelopeIndex] = lastEnvelope
 		}
 
 		try await bobConversation.send(content: "hey alice 2", sentAt: Date().addingTimeInterval(-500))
-		if var lastEnvelope = fakeApiClient.published.last {
+		if let lastEnvelopeIndex = fakeApiClient.published.firstIndex(where: { $0.contentTopic == bobConversation.topic.description }) {
+			var lastEnvelope = fakeApiClient.published[lastEnvelopeIndex]
 			lastEnvelope.timestampNs = UInt64(Date().addingTimeInterval(-500).millisecondsSinceEpoch)
-			fakeApiClient.published[fakeApiClient.published.count-1] = lastEnvelope
+			fakeApiClient.published[lastEnvelopeIndex] = lastEnvelope
 		}
 
 		try await bobConversation.send(content: "hey alice 3", sentAt: Date())
