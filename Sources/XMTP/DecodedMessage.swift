@@ -19,6 +19,10 @@ public struct DecodedMessage {
 	/// When the message was sent
 	public var sent: Date
 
+	public var contentType: ContentTypeID {
+		encodedContent.type
+	}
+
 	public init(encodedContent: EncodedContent, senderAddress: String, sent: Date) {
 		self.encodedContent = encodedContent
 		self.senderAddress = senderAddress
