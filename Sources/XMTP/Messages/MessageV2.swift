@@ -34,6 +34,8 @@ extension MessageV2 {
 			let senderPreKey = try PublicKey(signed.sender.preKey)
 			let senderIdentityKey = try PublicKey(signed.sender.identityKey)
 
+			// This is a bit confusing since we're passing keyBytes as the digest instead of a SHA256 hash.
+			// That's because our underlying crypto library always SHA256's whatever data is sent to it for this.
 			if !(try senderPreKey.signature.verify(signedBy: senderIdentityKey, digest: signed.sender.preKey.keyBytes)) {
 				throw MessageV2Error.decodeError("pre-key not signed by identity key")
 			}
