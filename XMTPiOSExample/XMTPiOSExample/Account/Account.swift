@@ -4,13 +4,16 @@
 //
 //  Created by Pat Nakajima on 11/22/22.
 //
-
 import Foundation
 import UIKit
+import XMTP
 
+/// Wrapper around a WalletConnect V1 wallet connection. Account conforms to ``SigningKey`` so
+/// you can use it to create a ``Client``.
+///
+/// > Warning: The WalletConnect V1 API will be deprecated soon.
 public struct Account {
-	public var connection: WalletConnection
-	var isConnected: Bool = false
+	var connection: WalletConnection
 
 	public static func create() throws -> Account {
 		let connection = WCWalletConnection()
@@ -19,6 +22,10 @@ public struct Account {
 
 	init(connection: WalletConnection) throws {
 		self.connection = connection
+	}
+
+	public var isConnected: Bool {
+		connection.isConnected
 	}
 
 	public var address: String {
@@ -35,7 +42,7 @@ public struct Account {
 }
 
 extension Account: SigningKey {
-	func sign(_ data: Data) async throws -> Signature {
+	public func sign(_ data: Data) async throws -> Signature {
 		let signatureData = try await connection.sign(data)
 
 		var signature = Signature()
@@ -46,7 +53,7 @@ extension Account: SigningKey {
 		return signature
 	}
 
-	func sign(message: String) async throws -> Signature {
+	public func sign(message: String) async throws -> Signature {
 		return try await sign(Data(message.utf8))
 	}
 }

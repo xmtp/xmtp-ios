@@ -8,18 +8,31 @@
 import GRPC
 import XMTPProto
 
-typealias Envelope = Xmtp_MessageApi_V1_Envelope
+typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse
+typealias QueryResponse = Xmtp_MessageApi_V1_QueryResponse
+typealias SubscribeRequest = Xmtp_MessageApi_V1_SubscribeRequest
 
-struct ApiClient {
+protocol ApiClient {
+	var environment: XMTPEnvironment { get }
+	init(environment: XMTPEnvironment, secure: Bool) throws
+	func setAuthToken(_ token: String)
+	func query(topics: [String], pagination: Pagination?, cursor: Xmtp_MessageApi_V1_Cursor?) async throws -> QueryResponse
+	func query(topics: [Topic], pagination: Pagination?) async throws -> QueryResponse
+	func envelopes(topics: [String], pagination: Pagination?) async throws -> [Envelope]
+	func publish(envelopes: [Envelope]) async throws -> PublishResponse
+	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error>
+}
+
+class GRPCApiClient: ApiClient {
 	let ClientVersionHeaderKey = "X-Client-Version"
 	let AppVersionHeaderKey = "X-App-Version"
 
-	var environment: Environment
+	var environment: XMTPEnvironment
 	var authToken = ""
 
 	private var client: Xmtp_MessageApi_V1_MessageApiAsyncClient!
 
-	init(environment: Environment, secure: Bool = true) throws {
+	required init(environment: XMTPEnvironment, secure: Bool = true) throws {
 		self.environment = environment
 		let group = PlatformSupport.makeEventLoopGroup(loopCount: 1)
 
@@ -33,13 +46,31 @@ struct ApiClient {
 		client = Xmtp_MessageApi_V1_MessageApiAsyncClient(channel: channel)
 	}
 
-	mutating func setAuthToken(_ token: String) {
+	func setAuthToken(_ token: String) {
 		authToken = token
 	}
 
-	func query(topics: [Topic]) async throws -> Xmtp_MessageApi_V1_QueryResponse {
+	func query(topics: [String], pagination: Pagination? = nil, cursor: Xmtp_MessageApi_V1_Cursor? = nil) async throws -> QueryResponse {
 		var request = Xmtp_MessageApi_V1_QueryRequest()
-		request.contentTopics = topics.map(\.description)
+		request.contentTopics = topics
+
+		if let pagination {
+			request.pagingInfo = pagination.pagingInfo
+		}
+
+		if let startAt = pagination?.startTime {
+			request.endTimeNs = UInt64(startAt.millisecondsSinceEpoch) * 1_000_000
+			request.pagingInfo.direction = .descending
+		}
+
+		if let endAt = pagination?.endTime {
+			request.startTimeNs = UInt64(endAt.millisecondsSinceEpoch) * 1_000_000
+			request.pagingInfo.direction = .descending
+		}
+
+		if let cursor {
+			request.pagingInfo.cursor = cursor
+		}
 
 		var options = CallOptions()
 		options.customMetadata.add(name: "authorization", value: "Bearer \(authToken)")
@@ -48,7 +79,41 @@ struct ApiClient {
 		return try await client.query(request, callOptions: options)
 	}
 
-	@discardableResult func publish(envelopes: [Envelope]) async throws -> Xmtp_MessageApi_V1_PublishResponse {
+	func envelopes(topics: [String], pagination: Pagination? = nil) async throws -> [Envelope] {
+		var envelopes: [Envelope] = []
+		var hasNextPage = true
+		var cursor: Xmtp_MessageApi_V1_Cursor?
+
+		while hasNextPage {
+			let response = try await query(topics: topics, pagination: pagination, cursor: cursor)
+
+			envelopes.append(contentsOf: response.envelopes)
+
+			cursor = response.pagingInfo.cursor
+			hasNextPage = !response.envelopes.isEmpty && response.pagingInfo.hasCursor
+		}
+
+		return envelopes
+	}
+
+	func query(topics: [Topic], pagination: Pagination? = nil) async throws -> Xmtp_MessageApi_V1_QueryResponse {
+		return try await query(topics: topics.map(\.description), pagination: pagination)
+	}
+
+	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
+		return AsyncThrowingStream { continuation in
+			Task {
+				var request = SubscribeRequest()
+				request.contentTopics = topics
+
+				for try await envelope in self.client.subscribe(request) {
+					continuation.yield(envelope)
+				}
+			}
+		}
+	}
+
+	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
 		var request = Xmtp_MessageApi_V1_PublishRequest()
 		request.envelopes = envelopes
 

@@ -10,27 +10,39 @@ import XMTP
 
 struct ContentView: View {
 	enum Status {
-		case unknown, connecting, connected, error(String)
+		case unknown, connecting, connected(Client), error(String)
 	}
 
-	@StateObject var walletManager = WalletManager()
+	@StateObject var accountManager = AccountManager()
 
 	@State private var status: Status = .unknown
 
 	@State private var isShowingQRCode = false
 	@State private var qrCodeImage: UIImage?
 
+	@State private var client: Client?
+
 	var body: some View {
 		VStack {
 			switch status {
 			case .unknown:
 				Button("Connect Wallet", action: connectWallet)
+				Button("Generate Wallet", action: generateWallet)
 			case .connecting:
 				ProgressView("Connecting…")
-			case .connected:
-				LoggedInView(wallet: walletManager.wallet)
+			case let .connected(client):
+				LoggedInView(client: client)
 			case let .error(error):
 				Text("Error: \(error)").foregroundColor(.red)
+			}
+		}
+		.task {
+			UIApplication.shared.registerForRemoteNotifications()
+
+			do {
+				_ = try await XMTPPush.shared.request()
+			} catch {
+				print("Error requesting push access: \(error)")
 			}
 		}
 		.sheet(isPresented: $isShowingQRCode) {
@@ -44,7 +56,7 @@ struct ContentView: View {
 		status = .connecting
 
 		do {
-			switch try walletManager.wallet.preferredConnectionMethod() {
+			switch try accountManager.account.preferredConnectionMethod() {
 			case let .qrCode(image):
 				qrCodeImage = image
 
@@ -59,13 +71,18 @@ struct ContentView: View {
 
 			Task {
 				do {
-					try await walletManager.wallet.connect()
+					try await accountManager.account.connect()
 
 					for _ in 0 ... 30 {
-						if walletManager.wallet.connection.isConnected {
-							self.status = .connected
+						if accountManager.account.isConnected {
+							let client = try await Client.create(account: accountManager.account)
+
+							let keysData = try client.privateKeyBundle.serializedData()
+							Persistence().saveKeys(keysData)
+
+							self.status = .connected(client)
 							self.isShowingQRCode = false
-							break
+							return
 						}
 
 						try await Task.sleep(for: .seconds(1))
@@ -81,6 +98,26 @@ struct ContentView: View {
 			}
 		} catch {
 			status = .error("No acceptable connection methods found \(error)")
+		}
+	}
+
+	func generateWallet() {
+		Task {
+			do {
+				let wallet = try PrivateKey.generate()
+				let client = try await Client.create(account: wallet)
+
+				let keysData = try client.privateKeyBundle.serializedData()
+				Persistence().saveKeys(keysData)
+
+				await MainActor.run {
+					self.status = .connected(client)
+				}
+			} catch {
+				await MainActor.run {
+					self.status = .error("Error generating wallet: \(error)")
+				}
+			}
 		}
 	}
 }
