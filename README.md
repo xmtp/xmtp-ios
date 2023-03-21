@@ -118,6 +118,8 @@ Client.register(AttachmentCodec())
 Client.register(RemoteAttachmentCodec())
 ```
 
+To learn more about using `AttachmentCodec` and `RemoteAttachmentCodec`, see [Handle different content types](#handle-different-content-types).
+
 ## Handle conversations
 
 Most of the time, when interacting with the network, you'll want to do it through `conversations`. Conversations are between two accounts.
@@ -298,6 +300,8 @@ try await decodedConversation.send(text: "hi")
 ## Handle different content types
 
 All of the send functions support `SendOptions` as an optional parameter. The `contentType` option allows specifying different types of content other than the default simple string standard content type, which is identified with content type identifier `ContentTypeText`. 
+
+To learn more about content types, see [Content types with XMTP](https://xmtp.org/docs/dev-concepts/content-types).
 
 Support for other content types can be added by registering additional `ContentCodec`s with the client. Every codec is associated with a content type identifier, `ContentTypeID`, which is used to signal to the client which codec should be used to process the content that is being sent or received. 
 
