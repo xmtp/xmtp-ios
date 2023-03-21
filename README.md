@@ -97,8 +97,6 @@ let client = try Client.from(bundle: keys, options: .init(api: .init(env: .produ
 
 You can configure the client's network connection and key storage method with these optional parameters of `Client.create`:
 
-<!--Pat: Added apiUrl, keyStoreType, maxContentSize, and appVersion to the table below.-->
-
 | Parameter | Default | Description |
 | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | env       | `dev`   | Connect to the specified XMTP network environment. Valid values include `.dev`, `.production`, or `.local`. For important details about working with these environments, see [XMTP `production` and `dev` network environments](#xmtp-production-and-dev-network-environments).        |
@@ -321,131 +319,100 @@ End-to-end encryption must apply not only to XMTP messages, but to message attac
 
 #### Create an attachment object
 
-<!--Pat: might we get a code sample for this step, please? For reference, I've provided the tsx code sample.-->
-
-```tsx
-const attachment: Attachment = {
+```swift
+let attachment = Attachment(
   filename: "screenshot.png",
   mimeType: "image/png",
-  data: [the PNG data]
-}
+  data: Data(somePNGData)
+)
 ```
 
 #### Encrypt the attachment
 
-<!--Pat: might we get text and a code sample for this step, please? For reference, I've provided the tsx text and code sample.-->
-
 Use the `RemoteAttachmentCodec.encodeEncrypted` to encrypt the attachment:
 
-```tsx
-// Import the codecs we're going to use
-import {
-  AttachmentCodec,
-  RemoteAttachmentCodec
-} from "xmtp-content-type-remote-attachment";
+```swift
 // Encode the attachment and encrypt that encoded content
-const encryptedAttachment = await RemoteAttachmentCodec.encodeEncrypted(
-  attachment,
-  new AttachmentCodec(),
+const encryptedAttachment = try RemoteAttachment.encodeEncrypted(
+	content: attachment,
+	codec: AttachmentCodec()
 )
 ```
 
 #### Upload the encrypted attachment
 
-<!--Pat: might we get a code sample for this step, please? For reference, I've provided the tsx code sample.-->
-
 Upload the encrypted attachment anywhere where it will be accessible via an HTTPS GET request. For example, you can use web3.storage:
 
-```tsx
-const web3Storage = new Web3Storage({
-    token: "your web3.storage token here"
-})
-const upload = new Upload("XMTPEncryptedContent", encryptedEncoded.payload)
-const cid = await web3Storage.put([upload]);
-const url = `https://${cid}.ipfs.w3s.link/XMTPEncryptedContent`
-```
+```swift
+func upload(data: Data, token: String): String {
+  let url = URL(string: "https://api.web3.storage/upload")!
+  var request = URLRequest(url: url)
+  request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+  request.addValue("XMTP", forHTTPHeaderField: "X-NAME")
+  request.httpMethod = "POST"
 
-*([Upload](https://github.com/xmtp-labs/xmtp-inbox-web/blob/5b45e05efbe0b0f49c17d66d7547be2c13a51eab/hooks/useSendMessage.ts#L15-L33) is a small class that implements Web3Storage's `Filelike` interface for uploading)*
+  let responseData = try await URLSession.shared.upload(for: request, from: data).0
+  let response = try JSONDecoder().decode(Web3Storage.Response.self, from: responseData)
+
+  return "https://\(response.cid).ipfs.w3s.link"
+}
+
+let url = upload(data: encryptedAttachment.payload, token: YOUR_WEB3_STORAGE_TOKEN)
+```
 
 #### Create a remote attachment
 
-<!--Pat: might we get text and a code sample for this step, please? For reference, I've provided the tsx text and code sample.-->
-
 Now that you have a `url`, you can create a `RemoteAttachment`.
 
-```tsx
-const remoteAttachment: RemoteAttachment = {
-  // This is the URL string where clients can download the encrypted
-  // encoded content
+```swift
+let remoteAttachment = try RemoteAttachment(
   url: url,
-  // We hash the encrypted encoded payload and send that along with the
-  // remote attachment. On the recipient side, clients can verify that the
-  // encrypted encoded payload they've downloaded matches what was uploaded.
-  // This is to prevent tampering with the content once it's been uploaded.
-  contentDigest: encryptedAttachment.digest,
-  // These are the encryption keys that will be used by the recipient to
-  // decrypt the remote payload
-  salt: encryptedAttachment.salt,
-  nonce: encryptedAttachment.nonce,
-  secret: encryptedAttachment.secret,
-  // For now, all remote attachments MUST be fetchable via HTTPS GET requests.
-  // We're investigating IPFS here among other options.
-  scheme: "https://",
-  // These fields are used by clients to display some information about
-  // the remote attachment before it is downloaded and decrypted.
-  filename: attachment.filename,
-  contentLength: attachment.data.byteLength,
-};
+  encryptedEncodedContent: encryptedEncodedContent
+)
 ```
 
 #### Send a remote attachment
 
-<!--Pat: might we get a code sample for this step, please? For reference, I've provided the tsx code sample.-->
-
 Now that you have a remote attachment, you can send it:
 
-```tsx
-await conversation.messages.send(remoteAttachment, {
-  contentType: ContentTypeRemoteAttachment,
-    contentFallback: "a screenshot of 1MB of text",
-})
+```swift
+try await conversation.send(
+	content: remoteAttachment,
+	options: .init(
+		contentType: ContentTypeRemoteAttachment,
+		contentFallback: "a description of the image"
+	)
+)
 ```
 
 Note that we’re using `contentFallback` to enable clients that don't support these content types to still display something. For cases where clients *do* support these types, they can use the content fallback as alt text for accessibility purposes.
 
 #### Receive a remote attachment
 
-<!--Pat: might we get a code sample for this step, please? For reference, I've provided the tsx code sample.-->
-
 Now that you can send a remote attachment, you need a way to receive a remote attachment. For example:
 
-```tsx
-// Assume `loadLastMessage` is a thing you have
-const message: DecodedMessage = await loadLastMessage()
-if (!message.contentType.sameAs(ContentTypeRemoteAttachment)) {
-    // We do not have a remote attachment. A topic for another blog post.
-    return
+```swift
+let messages = try await conversation.messages()
+let message = messages[0]
+
+guard message.encodedContent.contentType == ContentTypeRemoteAttachment else {
+	return
 }
-// We've got a remote attachment.
-const remoteAttachment: RemoteAttachment = message.content
+
+const remoteAttachment: RemoteAttachment = try message.content
 ```
 
 #### Download, decrypt, and decode the attachment
 
-<!--Pat: might we get a code sample for this step, please? For reference, I've provided the tsx code sample.-->
-
 Now that you can receive a remote attachment, you need to download, decrypt, and decode it so your app can display it. For example:
 
-```tsx
-const attachment: Attachment = await RemoteAttachmentCodec.load(
-    remoteAttachment,
-    client, // <- Your XMTP Client instance
-)
+```swift
+let attachment: Attachment = try await remoteAttachment.content()
 ```
 
 You now have the original attachment:
 
-```tsx
+```swift
 attachment.filename // => "screenshot.png"
 attachment.mimeType // => "image/png",
 attachment.data // => [the PNG data]
@@ -453,19 +420,18 @@ attachment.data // => [the PNG data]
 
 #### Display the attachment
 
-<!--Pat: might we get a code sample for this step, please? For reference, I've provided the tsx code sample.-->
-
 Display the attachment in your app as you please. For example, you can display it as an image:
 
-```tsx
-const objectURL = URL.createObjectURL(
-    new Blob([Buffer.from(attachment.data)], {
-    type: attachment.mimeType,
-  }),
-);
-const img = document.createElement('img')
-img.src = objectURL
-img.title = attachment.filename
+```swift
+import UIKIt
+import SwiftUI
+
+struct ContentView: View {
+	var body: some View {
+		Image(uiImage: UIImage(data: attachment.data))
+	}
+}
+
 ```
 
 #### Handle custom content types
