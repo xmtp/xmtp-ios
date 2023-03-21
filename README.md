@@ -399,7 +399,7 @@ guard message.encodedContent.contentType == ContentTypeRemoteAttachment else {
 	return
 }
 
-const remoteAttachment: RemoteAttachment = try message.content
+const remoteAttachment: RemoteAttachment = try message.content()
 ```
 
 #### Download, decrypt, and decode the attachment
