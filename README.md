@@ -102,11 +102,6 @@ You can configure the client's network connection and key storage method with th
 | Parameter | Default | Description |
 | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | env       | `dev`   | Connect to the specified XMTP network environment. Valid values include `.dev`, `.production`, or `.local`. For important details about working with these environments, see [XMTP `production` and `dev` network environments](#xmtp-production-and-dev-network-environments).        |
-| apiUrl         | Undefined             | Manually specify an API URL to use. If specified, value of `env` will be ignored.                   |
-| keyStoreType   | `networkTopicStoreV1` | Persist the wallet's key bundle to the network, or use `static` to provide private keys manually.   |
-| codecs         | `[TextCodec]`         | Add codecs to support additional content types. To learn more, see [Different types of content](#different-types-of-content). |
-| maxContentSize | `100M`                | Maximum message content size in bytes.                                                              |
-| appVersion     | Undefined             | Add a client app version identifier that's included with API requests. For example, you can use the following format: `appVersion: APP_NAME + '/' + APP_VERSION`. Setting this value provides telemetry that shows which apps are using the XMTP client SDK. This information can help XMTP developers provide app support, especially around communicating important SDK updates, including deprecations and required upgrades.      |
 
 #### Configure `env`
 
@@ -116,39 +111,13 @@ let clientOptions = ClientOptions(api: .init(env: .production))
 let client = try await Client.create(account: account, options: clientOptions)
 ```
 
-#### Configure `keyStore`
+## Configure content types
 
-<!--Pat: do we want to provide a code sample for this option?-->
-
-```swift
-placeholder
-```
-
-#### Configure `apiUrl`
-
-<!--Pat: I found this in the code - okay for a code sample?-->
+You can use custom content types by calling `Client.register`. The SDK comes with two commonly used content type codecs, `AttachmentCodec` and `RemoteAttachmentCodec`:
 
 ```swift
-// Configure the client to use a custom API URL
-const client = await Client.create(wallet, {
-  apiUrl: "http://wakunode:5555",
-});
-```
-
-#### Configure `maxContentSize`
-
-<!--Pat: do we want to provide a code sample for this option?-->
-
-```swift
-placeholder
-```
-
-#### Configure `appVersion`
-
-<!--Pat: we provide an example in the table above. But perhaps we can move it out of the table and put it in the context of a code sample here?-->
-
-```swift
-placeholder
+Client.register(AttachmentCodec())
+Client.register(RemoteAttachmentCodec())
 ```
 
 ## Handle conversations
