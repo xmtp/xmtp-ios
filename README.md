@@ -18,6 +18,10 @@ To learn more about XMTP and get answers to frequently asked questions, see [FAQ
 
 For a basic demonstration of the core concepts and capabilities of the `xmtp-ios` client SDK, see the [Example app project](https://github.com/xmtp/xmtp-ios/tree/main/XMTPiOSExample/XMTPiOSExample).
 
+## Reference docs
+
+> **View the reference**  
+> Access the [Swift client SDK reference documentation](https://pub.dev/documentation/xmtp/latest/xmtp/Client-class.html) on Swift Package Index.
 
 ## Install with Swift Package Manager
 
