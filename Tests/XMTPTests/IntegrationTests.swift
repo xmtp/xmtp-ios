@@ -282,6 +282,40 @@ final class IntegrationTests: XCTestCase {
 		await waitForExpectations(timeout: 3)
 	}
 
+	func testStreamEphemeralInV2Conversation() async throws {
+		let alice = try PrivateKey.generate()
+		let bob = try PrivateKey.generate()
+
+		let clientOptions = ClientOptions(api: .init(env: .local, isSecure: false))
+		let aliceClient = try await Client.create(account: alice, options: clientOptions)
+		let bobClient = try await Client.create(account: bob, options: clientOptions)
+
+		let aliceConversation = try await aliceClient.conversations.newConversation(with: bob.walletAddress, context: .init(conversationID: "https://example.com/3"))
+
+		let expectation = expectation(description: "bob gets a streamed message")
+
+		guard case let .v2(bobConversation) = try await
+						bobClient.conversations.newConversation(with: alice.walletAddress, context: .init(conversationID: "https://example.com/3")) else {
+			XCTFail("Did not create v2 convo")
+			return
+		}
+
+		XCTAssertEqual(bobConversation.topic, aliceConversation.topic)
+
+		Task(priority: .userInitiated) {
+			for try await _ in bobConversation.streamEphemeral() {
+				expectation.fulfill()
+			}
+		}
+
+		try await aliceConversation.sendEphemeral(content: "hi")
+
+		let messages = try await aliceConversation.messages()
+		XCTAssertEqual(0, messages.count)
+
+		await waitForExpectations(timeout: 3)
+	}
+
 	func testCanPaginateV1Messages() async throws {
 		throw XCTSkip("integration only (requires local node)")
 

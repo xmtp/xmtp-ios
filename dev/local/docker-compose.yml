@@ -8,6 +8,7 @@ services:
       - --ws
       - --store
       - --message-db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --message-db-reader-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
       - --lightpush
       - --filter
       - --ws-port=9001
@@ -28,9 +29,9 @@ services:
     image: postgres:13
     environment:
       POSTGRES_PASSWORD: xmtp
-  js:
-    restart: always
-    depends_on:
-      wakunode:
-        condition: service_healthy
-    build: ./dev/test
+  # js:
+  #   restart: always
+  #   depends_on:
+  #     wakunode:
+  #       condition: service_healthy
+  #   build: ./dev/test

@@ -73,7 +73,7 @@ public struct ConversationV2 {
 		ConversationV2Container(topic: topic, keyMaterial: keyMaterial, conversationID: context.conversationID, metadata: context.metadata, peerAddress: peerAddress, header: header)
 	}
 
-	func prepareMessage<T>(content: T, options: SendOptions?) async throws -> PreparedMessage {
+	func prepareMessage<T>(content: T, options: SendOptions?, ephemeral: Bool = false) async throws -> PreparedMessage {
 		let codec = Client.codecRegistry.find(for: options?.contentType)
 
 		func encode<Codec: ContentCodec>(codec: Codec, content: Any) throws -> EncodedContent {
@@ -90,6 +90,8 @@ public struct ConversationV2 {
 		if let compression = options?.compression {
 			encoded = try encoded.compress(compression)
 		}
+
+		let topic = ephemeral ? ephemeralTopic : topic
 
 		let message = try await MessageV2.encode(
 			client: client,
@@ -115,6 +117,24 @@ public struct ConversationV2 {
 			} catch {
 				print("Error decoding envelope \(error)")
 				return nil
+			}
+		}
+	}
+
+	var ephemeralTopic: String {
+		topic.replacingOccurrences(of: "/xmtp/0/m", with: "/xmtp/0/mE")
+	}
+
+	public func streamEphemeral() -> AsyncThrowingStream<Envelope, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				do {
+					for try await envelope in client.subscribe(topics: [ephemeralTopic]) {
+						continuation.yield(envelope)
+					}
+				} catch {
+					continuation.finish(throwing: error)
+				}
 			}
 		}
 	}
@@ -148,8 +168,8 @@ public struct ConversationV2 {
 		try MessageV2.decode(message, keyMaterial: keyMaterial)
 	}
 
-	@discardableResult func send<T>(content: T, options: SendOptions? = nil) async throws -> String {
-		let preparedMessage = try await prepareMessage(content: content, options: options)
+	@discardableResult func send<T>(content: T, options: SendOptions? = nil, ephemeral: Bool = false) async throws -> String {
+		let preparedMessage = try await prepareMessage(content: content, options: options, ephemeral: true)
 		try await preparedMessage.send()
 		return preparedMessage.messageID
 	}
