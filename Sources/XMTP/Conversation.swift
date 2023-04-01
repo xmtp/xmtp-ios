@@ -125,6 +125,10 @@ public enum Conversation {
 		}
 	}
 
+	public var clientAddress: String {
+		return client.address
+	}
+
 	/// The topic identifier for this conversation
 	public var topic: String {
 		switch self {
