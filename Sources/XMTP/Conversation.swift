@@ -137,7 +137,7 @@ public enum Conversation {
 
 	public func streamEphemeral() -> AsyncThrowingStream<Envelope, Error>? {
 		switch self {
-		case .v1(_):
+		case .v1:
 			return nil
 		case let .v2(conversation):
 			return conversation.streamEphemeral()
@@ -146,7 +146,7 @@ public enum Conversation {
 
 	@discardableResult public func sendEphemeral<T>(content: T, options: SendOptions? = nil) async throws -> String {
 		switch self {
-		case .v1(_):
+		case .v1:
 			throw ConversationError.v1NotSupported("ephemeral messages not supported for v1 conversations")
 		case let .v2(conversationV2):
 			return try await conversationV2.send(content: content, options: options, ephemeral: true)

@@ -295,7 +295,8 @@ final class IntegrationTests: XCTestCase {
 		let expectation = expectation(description: "bob gets a streamed message")
 
 		guard case let .v2(bobConversation) = try await
-						bobClient.conversations.newConversation(with: alice.walletAddress, context: .init(conversationID: "https://example.com/3")) else {
+			bobClient.conversations.newConversation(with: alice.walletAddress, context: .init(conversationID: "https://example.com/3"))
+		else {
 			XCTFail("Did not create v2 convo")
 			return
 		}
