@@ -1,4 +1,4 @@
-name: Build dosc
+name: Build docs
 
 on:
   push:
