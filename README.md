@@ -8,7 +8,7 @@ Use `xmtp-ios` to build with XMTP to send messages between blockchain accounts, 
 
 This SDK is in **General Availability** status and ready for use in production. 
 
-To keep up with the latest SDK developments, see the [Releases tab](https://github.com/xmtp/xmtp-js/releases) in this repo.
+To keep up with the latest SDK developments, see the [Issues tab](https://github.com/xmtp/xmtp-ios/issues) in this repo.
 
 To learn more about XMTP and get answers to frequently asked questions, see [FAQ about XMTP](https://xmtp.org/docs/dev-concepts/faq).
 
@@ -21,7 +21,7 @@ For a basic demonstration of the core concepts and capabilities of the `xmtp-ios
 ## Reference docs
 
 > **View the reference**  
-> Access the [Swift client SDK reference documentation](https://pub.dev/documentation/xmtp/latest/xmtp/Client-class.html) on Swift Package Index.
+> Access the [Swift client SDK reference documentation](https://xmtp.github.io/xmtp-ios/documentation/xmtp).
 
 ## Install with Swift Package Manager
 
@@ -150,14 +150,14 @@ for conversation in allConversations {
 
 These conversations include all conversations for a user **regardless of which app created the conversation.** This functionality provides the concept of an [interoperable inbox](https://xmtp.org/docs/dev-concepts/interoperable-inbox), which enables a user to access all of their conversations in any app built with XMTP.
 
-You might choose to provide an additional filtered view of conversations. To learn more, see [Handling multiple conversations with the same blockchain address](#handling-multiple-conversations-with-the-same-blockchain-address) and [Filter conversations using conversation IDs and metadata](https://xmtp.org/docs/client-sdk/javascript/tutorials/filter-conversations).
+You might choose to provide an additional filtered view of conversations. To learn more, see [Handle multiple conversations with the same blockchain address](#handle-multiple-conversations-with-the-same-blockchain-address) and [Filter conversations using conversation IDs and metadata](https://xmtp.org/docs/client-sdk/javascript/tutorials/filter-conversations).
 
 ### Listen for new conversations
 
 You can also listen for new conversations being started in real-time. This will allow apps to display incoming messages from new contacts.
 
 > **Warning:**  
-> This stream will continue infinitely. To end the stream, break from the loop.**
+> This stream will continue infinitely. To end the stream, break from the loop.
 
 ```swift
 for try await conversation in client.conversations.stream() {
@@ -313,7 +313,7 @@ For example, see the [Codecs](https://github.com/xmtp/xmtp-ios/tree/main/Sources
 
 ### Send a remote attachment
 
-Use the [RemoteAttachmentCodec](/blob/main/Sources/XMTP/Codecs/RemoteAttachmentCodec.swift) package to enable your app to send and receive message attachments.
+Use the [RemoteAttachmentCodec](https://github.com/xmtp/xmtp-ios/blob/main/Sources/XMTP/Codecs/RemoteAttachmentCodec.swift) package to enable your app to send and receive message attachments.
 
 Message attachments are files. More specifically, attachments are objects that have:
 
