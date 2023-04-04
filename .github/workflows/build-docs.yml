@@ -28,8 +28,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: macos-12
     steps:
-      - name: Checkout
-      - uses: maxim-lobanov/setup-xcode@v1
+      - name: Build
+        uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
         run: swift package --allow-writing-to-directory ./docs generate-documentation --target XMTP --disable-indexing --output-path ./docs
