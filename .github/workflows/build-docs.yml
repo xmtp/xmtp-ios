@@ -34,7 +34,7 @@ jobs:
         with:
           xcode-version: latest-stable
       - name: "Build docs"
-        run: swift package --allow-writing-to-directory ./docs generate-documentation --target XMTP --disable-indexing --output-path ./docs --hosting-base-path xmtp-ios
+        run: swift package --allow-writing-to-directory ./docs generate-documentation --target XMTP --disable-indexing --output-path ./docs --hosting-base-path xmtp-ios --transform-for-static-hosting 
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
