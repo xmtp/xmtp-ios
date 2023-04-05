@@ -148,15 +148,6 @@ public enum Conversation {
 		}
 	}
 
-	@discardableResult public func sendEphemeral<T>(content: T, options: SendOptions? = nil) async throws -> String {
-		switch self {
-		case .v1:
-			throw ConversationError.v1NotSupported("ephemeral messages not supported for v1 conversations")
-		case let .v2(conversationV2):
-			return try await conversationV2.send(content: content, options: options, ephemeral: true)
-		}
-	}
-
 	/// Returns a stream you can iterate through to receive new messages in this conversation.
 	///
 	/// > Note: All messages in the conversation are returned by this stream. If you want to filter out messages

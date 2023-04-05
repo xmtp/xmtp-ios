@@ -282,6 +282,36 @@ final class IntegrationTests: XCTestCase {
 		await waitForExpectations(timeout: 3)
 	}
 
+	func testStreamEphemeralInV1Conversation() async throws {
+		throw XCTSkip("integration only (requires local node)")
+
+		let alice = try PrivateKey.generate()
+		let bob = try PrivateKey.generate()
+
+		let clientOptions = ClientOptions(api: .init(env: .local, isSecure: false))
+		let aliceClient = try await Client.create(account: alice, options: clientOptions)
+		try await aliceClient.publishUserContact(legacy: true)
+		let bobClient = try await Client.create(account: bob, options: clientOptions)
+		try await bobClient.publishUserContact(legacy: true)
+
+		let expectation = expectation(description: "bob gets a streamed message")
+
+		let convo = ConversationV1(client: bobClient, peerAddress: alice.address, sentAt: Date())
+
+		Task(priority: .userInitiated) {
+			for try await _ in convo.streamEphemeral() {
+				expectation.fulfill()
+			}
+		}
+
+		try await convo.send(content: "hi", options: .init(ephemeral: true))
+
+		let messages = try await convo.messages()
+		XCTAssertEqual(0, messages.count)
+
+		await waitForExpectations(timeout: 3)
+	}
+
 	func testStreamEphemeralInV2Conversation() async throws {
 		throw XCTSkip("integration only (requires local node)")
 
@@ -311,7 +341,7 @@ final class IntegrationTests: XCTestCase {
 			}
 		}
 
-		try await aliceConversation.sendEphemeral(content: "hi")
+		try await aliceConversation.send(content: "hi", options: .init(ephemeral: true))
 
 		let messages = try await aliceConversation.messages()
 		XCTAssertEqual(0, messages.count)

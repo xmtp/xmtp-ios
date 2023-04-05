@@ -76,8 +76,15 @@ public struct ConversationV1 {
 			timestamp: date
 		)
 
+		let isEphemeral: Bool
+		if let options, options.ephemeral {
+			isEphemeral = true
+		} else {
+			isEphemeral = false
+		}
+
 		let messageEnvelope = Envelope(
-			topic: .directMessageV1(client.address, peerAddress),
+			topic: isEphemeral ? ephemeralTopic : topic.description,
 			timestamp: date,
 			message: try Message(v1: message).serializedData()
 		)
@@ -85,7 +92,7 @@ public struct ConversationV1 {
 		return PreparedMessage(messageEnvelope: messageEnvelope, conversation: .v1(self)) {
 			var envelopes = [messageEnvelope]
 
-			if client.contacts.needsIntroduction(peerAddress) {
+			if client.contacts.needsIntroduction(peerAddress) && !isEphemeral {
 				envelopes.append(contentsOf: [
 					Envelope(
 						topic: .userIntro(peerAddress),
@@ -128,6 +135,24 @@ public struct ConversationV1 {
 				for try await envelope in client.subscribe(topics: [topic.description]) {
 					let decoded = try decode(envelope: envelope)
 					continuation.yield(decoded)
+				}
+			}
+		}
+	}
+
+	var ephemeralTopic: String {
+		topic.description.replacingOccurrences(of: "/xmtp/0/dm-", with: "/xmtp/0/dmE-")
+	}
+
+	public func streamEphemeral() -> AsyncThrowingStream<Envelope, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				do {
+					for try await envelope in client.subscribe(topics: [ephemeralTopic]) {
+						continuation.yield(envelope)
+					}
+				} catch {
+					continuation.finish(throwing: error)
 				}
 			}
 		}
