@@ -141,8 +141,8 @@ public enum Conversation {
 
 	public func streamEphemeral() -> AsyncThrowingStream<Envelope, Error>? {
 		switch self {
-		case .v1:
-			return nil
+		case let .v1(conversation):
+			return conversation.streamEphemeral()
 		case let .v2(conversation):
 			return conversation.streamEphemeral()
 		}
