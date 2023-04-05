@@ -168,7 +168,7 @@ public struct ConversationV2 {
 		try MessageV2.decode(message, keyMaterial: keyMaterial)
 	}
 
-	@discardableResult func send<T>(content: T, options: SendOptions? = nil, ephemeral _: Bool = false) async throws -> String {
+	@discardableResult func send<T>(content: T, options: SendOptions? = nil) async throws -> String {
 		let preparedMessage = try await prepareMessage(content: content, options: options, ephemeral: options?.ephemeral == true)
 		try await preparedMessage.send()
 		return preparedMessage.messageID
