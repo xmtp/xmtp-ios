@@ -83,8 +83,13 @@ public class Client {
 		return try await create(account: account, apiClient: apiClient)
 	}
     
-    public static func testAdd() -> Int32 {
-        return XMTPRustSwift.add(5, 6)
+    public static func runSelfTests() -> Bool {
+        return XMTPRustSwift.encryption_selftest()
+    }
+    
+    public static func runNetworkingSelftest() -> String {
+        let statusCode = XMTPRustSwift.networking_selftest()
+        return "\(statusCode)"
     }
 
 	static func create(account: SigningKey, apiClient: ApiClient) async throws -> Client {
