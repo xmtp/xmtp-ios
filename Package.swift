@@ -41,15 +41,15 @@ let package = Package(
 				.product(name: "Gzip", package: "GzipSwift"),
 				.product(name: "Connect", package: "connect-swift"),
                 .product(name: "XMTPRustSwift", package: "xmtp-rust-swift")
-			]
-		),
-		.target(
-			name: "XMTPTestHelpers",
-			dependencies: ["XMTP"]
-		),
-		.testTarget(
-			name: "XMTPTests",
-			dependencies: ["XMTP", "XMTPTestHelpers"]
-		),
-	]
+            ]
+        ),
+        .target(
+            name: "XMTPTestHelpers",
+            dependencies: ["XMTP"]
+        ),
+        .testTarget(
+            name: "XMTPTests",
+            dependencies: ["XMTP", "XMTPTestHelpers"]
+        ),
+    ]
 )
