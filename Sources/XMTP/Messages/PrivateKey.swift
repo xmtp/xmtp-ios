@@ -54,7 +54,7 @@ public extension PrivateKey {
 		timestamp = UInt64(Date().millisecondsSinceEpoch)
 		secp256K1.bytes = privateKeyData
 
-		let publicData = try KeyUtil.generatePublicKey(from: privateKeyData)
+		let publicData = try KeyUtil.xmtpGeneratePublicKey(from: privateKeyData)
 		publicKey.secp256K1Uncompressed.bytes = publicData
 		publicKey.timestamp = timestamp
 	}

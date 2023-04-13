@@ -9,6 +9,7 @@ import Foundation
 import GRPC
 import web3
 import XMTPProto
+import XMTPRustSwift
 
 /// Specify configuration options for creating a ``Client``.
 public struct ClientOptions {
@@ -78,9 +79,13 @@ public class Client {
 			environment: options.api.env,
 			secure: options.api.isSecure
 		)
-
+        
 		return try await create(account: account, apiClient: apiClient)
 	}
+    
+    public static func testAdd() -> Int32 {
+        return XMTPRustSwift.add(5, 6)
+    }
 
 	static func create(account: SigningKey, apiClient: ApiClient) async throws -> Client {
 		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient)

@@ -17,6 +17,10 @@ class ClientTests: XCTestCase {
 		let fakeWallet = try PrivateKey.generate()
 		_ = try await Client.create(account: fakeWallet)
 	}
+    
+    func testXMTPRustSwift() async throws {
+        XCTAssertEqual(11, Client.testAdd())
+    }
 
 	func testCanMessage() async throws {
 		let fixtures = await fixtures()
