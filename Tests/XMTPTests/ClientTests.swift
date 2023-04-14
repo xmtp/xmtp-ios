@@ -27,6 +27,10 @@ class ClientTests: XCTestCase {
         XCTAssertEqual(str_result, "200")
     }
     
+    func testXMTPgRPC() async throws {
+        XCTAssertTrue(Client.runGrpcTest())
+    }
+    
     func testCanMessage() async throws {
         let fixtures = await fixtures()
         let notOnNetwork = try PrivateKey.generate()
