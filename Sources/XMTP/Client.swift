@@ -94,7 +94,8 @@ public class Client {
     
     public static func runGrpcTest() -> Bool {
         let code = XMTPRustSwift.grpc_selftest()
-        return true
+        print("grpc test code: \(code)")
+        return code == 0
     }
 
 	static func create(account: SigningKey, apiClient: ApiClient) async throws -> Client {
