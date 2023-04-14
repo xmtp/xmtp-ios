@@ -91,6 +91,11 @@ public class Client {
         let statusCode = XMTPRustSwift.networking_selftest()
         return "\(statusCode)"
     }
+    
+    public static func runGrpcTest() -> Bool {
+        let code = XMTPRustSwift.grpc_selftest()
+        return true
+    }
 
 	static func create(account: SigningKey, apiClient: ApiClient) async throws -> Client {
 		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient)
