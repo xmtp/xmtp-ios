@@ -18,17 +18,9 @@ class ClientTests: XCTestCase {
         _ = try await Client.create(account: fakeWallet)
     }
     
-    func testXMTPRustSwift() async throws {
-        XCTAssertTrue(Client.runSelfTests())
-    }
-    
-    func testXMTPRustNetworking() async throws {
-        let str_result = Client.runNetworkingSelftest()
-        XCTAssertEqual(str_result, "200")
-    }
-    
     func testXMTPgRPC() async throws {
-        XCTAssertTrue(Client.runGrpcTest())
+        let numEnvelopes = try await GRPCApiClient.runGrpcTest()
+        XCTAssertEqual(numEnvelopes, 0)
     }
     
     func testCanMessage() async throws {
