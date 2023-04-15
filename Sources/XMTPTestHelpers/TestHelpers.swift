@@ -195,7 +195,7 @@ public class FakeApiClient: ApiClient {
 }
 
 @available(iOS 15, *)
-public struct Fixtures {
+public class Fixtures {
 	public var fakeApiClient: FakeApiClient!
 
 	public var alice: PrivateKey!
