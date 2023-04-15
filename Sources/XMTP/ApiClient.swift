@@ -7,6 +7,7 @@
 
 import GRPC
 import XMTPProto
+import XMTPRust
 
 typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse
 typealias QueryResponse = Xmtp_MessageApi_V1_QueryResponse
@@ -125,4 +126,12 @@ class GRPCApiClient: ApiClient {
 
 		return try await client.publish(request, callOptions: options)
 	}
+    
+    public static func runGrpcTest() async throws -> Int {
+        let service = XMTPRust.ApiService(environment: "http://localhost:15555", secure: false)
+        let response = try await service.query(topic: "test", json_paging_info: "")
+        // Try to parse the response JSON into a QueryResponse
+        let queryResponse = try QueryResponse(jsonString: response)
+        return queryResponse.envelopes.count
+    }
 }

@@ -9,7 +9,6 @@ import Foundation
 import GRPC
 import web3
 import XMTPProto
-import XMTPRustSwift
 
 /// Specify configuration options for creating a ``Client``.
 public struct ClientOptions {
@@ -82,21 +81,7 @@ public class Client {
         
 		return try await create(account: account, apiClient: apiClient)
 	}
-    
-    public static func runSelfTests() -> Bool {
-        return XMTPRustSwift.encryption_selftest()
-    }
-    
-    public static func runNetworkingSelftest() -> String {
-        let statusCode = XMTPRustSwift.networking_selftest()
-        return "\(statusCode)"
-    }
-    
-    public static func runGrpcTest() -> Bool {
-        let code = XMTPRustSwift.grpc_selftest()
-        print("grpc test code: \(code)")
-        return code == 0
-    }
+
 
 	static func create(account: SigningKey, apiClient: ApiClient) async throws -> Client {
 		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient)
