@@ -124,10 +124,8 @@ class GRPCApiClient: ApiClient {
 	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
 		return AsyncThrowingStream { continuation in
 			Task {
-				var request = SubscribeRequest()
-				request.contentTopics = topics
-
-				for try await envelope in self.client.subscribe(request) {
+                for try await envelopeJson in self.rustClient.subscribe(topics: topics) {
+                    let envelope = try Envelope(jsonString: envelopeJson)
 					continuation.yield(envelope)
 				}
 			}
