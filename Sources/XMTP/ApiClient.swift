@@ -32,6 +32,7 @@ class GRPCApiClient: ApiClient {
 	var authToken = ""
 
 	private var client: Xmtp_MessageApi_V1_MessageApiAsyncClient!
+    private var rustClient: XMTPRust.ApiService!
 
 	required init(environment: XMTPEnvironment, secure: Bool = true) throws {
 		self.environment = environment
@@ -45,6 +46,7 @@ class GRPCApiClient: ApiClient {
 		)
 
 		client = Xmtp_MessageApi_V1_MessageApiAsyncClient(channel: channel)
+        rustClient = XMTPRust.ApiService(environment:"http://localhost:5556", secure:false)
 	}
 
 	func setAuthToken(_ token: String) {
@@ -73,11 +75,19 @@ class GRPCApiClient: ApiClient {
 			request.pagingInfo.cursor = cursor
 		}
 
-		var options = CallOptions()
-		options.customMetadata.add(name: "authorization", value: "Bearer \(authToken)")
-		options.timeLimit = .timeout(.seconds(5))
-
-		return try await client.query(request, callOptions: options)
+//		var options = CallOptions()
+//		options.customMetadata.add(name: "authorization", value: "Bearer \(authToken)")
+//		options.timeLimit = .timeout(.seconds(5))
+//
+//		return try await client.query(request, callOptions: options)
+        var encodedPaging = ""
+        if request.hasPagingInfo {
+            encodedPaging = try request.pagingInfo.jsonString()
+        }
+        let responseJson = try await rustClient.query(topic: topic, json_paging_info: encodedPaging)
+        // Decode the response as a QueryResponse
+        let decodedQueryResponse = try QueryResponse(jsonString: responseJson)
+        return decodedQueryResponse
 	}
 
 	func envelopes(topic: String, pagination: Pagination? = nil) async throws -> [Envelope] {
@@ -128,7 +138,7 @@ class GRPCApiClient: ApiClient {
 	}
     
     public static func runGrpcTest() async throws -> Int {
-        let service = XMTPRust.ApiService(environment: "http://localhost:15555", secure: false)
+        let service = XMTPRust.ApiService(environment: "http://localhost:5556", secure: false)
         let response = try await service.query(topic: "test", json_paging_info: "")
         // Try to parse the response JSON into a QueryResponse
         let queryResponse = try QueryResponse(jsonString: response)
