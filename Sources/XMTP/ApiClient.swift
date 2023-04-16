@@ -9,6 +9,7 @@ import GRPC
 import XMTPProto
 import XMTPRust
 
+
 typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse
 typealias QueryResponse = Xmtp_MessageApi_V1_QueryResponse
 typealias SubscribeRequest = Xmtp_MessageApi_V1_SubscribeRequest
@@ -143,10 +144,19 @@ class GRPCApiClient: ApiClient {
 		options.customMetadata.add(name: AppVersionHeaderKey, value: Constants.version)
 		options.timeLimit = .timeout(.seconds(5))
 
-		return try await client.publish(request, callOptions: options)
+		// return try await client.publish(request, callOptions: options)
+        // Use the JSON encoding api for rustClient to publish
+        let encodedEnvelopes = try envelopes.map { try $0.jsonString() }
+        let responseJson = try await rustClient.publish(token: authToken, envelopes: encodedEnvelopes)
+        // Decode the response as a PublishResponse
+        let decodedPublishResponse = try PublishResponse(jsonString: responseJson)
+        return decodedPublishResponse
 	}
     
     public static func runGrpcTest() async throws -> Int {
+        
+        let json = "{\"contentTopic\":\"/xmtp/0/privatestore-0x144a87F6dB31445B916BF4d896A425C91DbA7f84/key_bundle/proto\",\"timestampNs\":\"1681678277321011968\",\"message\":\"CvYDCiBPVY2cN8BNkvA2Ypoh0GvaMKNKmAtUsaPMNMwsRDRsmhLRAwrOAwogJ2zn2csOlNN6h2Llb9H4sAvp2Qs6x2L8Dra4ZTG9OvoSDIXSSqfFBhJgYMPSuxqbA68nOkGUPsV1WKjzs2LBuktCdGAEt3tWAbW1jNSF3KaA8XBkbhmM5zwSIbv69vszBzBp9/cYXxW4/rAJtkOuyNlsX04x/i+hswL4T6EkpTl/SGgzRfAHZs+SKbfhwsdcVC577r0u5mm7a9C/DOrsdo42zXDL1cKv8DGSmLzIMGQTrryo6bOH+6JhHUu0bVdXC8KF13zhQxnbdnjg5NMN7PRfUZWP5iz/bfv2H3FZC7fFfmkxIM+yn4y0XQCPjhrygAZyzMhiUC2cPWBj+iTX/lDRed3qy5RmvHhBiOVwumtzkSCy2kreZ2Kd6xMBk+mfKnjLU9cDd2QDmlyJDjZ8FZlk83AeJr7rPCdRDPVPCxUhFNET605QBrx90HoTr6o+EK8N9KUgCHGuijqLen1aARBpqsWkit2zn371Poi3zQvGL/gEQuR7yGd+0Gi+sx/A/08jxcqKNtNOSO0XbtWzASYnEc8gDup+1CsEkMpvKJ/F5CbmQN2yAV0ZIHhsCpdIQ9uUe3C8lwVkns5oWlfZNX/FWKrqRMk6Nlvobg==\"}"
+        let envelope = try Envelope(jsonString: json)
         let service = XMTPRust.ApiService(environment: "http://localhost:5556", secure: false)
         let response = try await service.query(topic: "test", json_paging_info: "")
         // Try to parse the response JSON into a QueryResponse
