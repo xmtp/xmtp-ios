@@ -46,8 +46,17 @@ class GRPCApiClient: ApiClient {
 		)
 
 		client = Xmtp_MessageApi_V1_MessageApiAsyncClient(channel: channel)
-        rustClient = XMTPRust.ApiService(environment:"http://localhost:5556", secure:false)
+        // Secure flag is useless for now, XMTPRust checks the URL scheme to see if it's https
+        rustClient = XMTPRust.ApiService(environment:envToUrl(env: environment), secure:true)
 	}
+    
+    func envToUrl(env: XMTPEnvironment) -> String {
+        switch (env) {
+        case XMTPEnvironment.local: return "http://localhost:5556";
+        case XMTPEnvironment.dev: return "https://dev.xmtp.network:5556";
+        case XMTPEnvironment.production: return "https://xmtp.network:5556";
+        }
+    }
 
 	func setAuthToken(_ token: String) {
 		authToken = token
