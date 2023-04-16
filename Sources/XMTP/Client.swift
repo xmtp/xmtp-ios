@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import GRPC
 import web3
 import XMTPProto
 
