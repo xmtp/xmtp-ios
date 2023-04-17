@@ -37,15 +37,6 @@
       }
     },
     {
-      "identity" : "grpc-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/grpc/grpc-swift",
-      "state" : {
-        "revision" : "3e17f2b847da39b50329b7a11c5ad23453190e8b",
-        "version" : "1.13.0"
-      }
-    },
-    {
       "identity" : "gzipswift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/1024jp/GzipSwift",
@@ -68,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/xmtp/proto",
       "state" : {
-        "branch" : "main",
-        "revision" : "6a8905a8b260406698433d210c25c4397a93cef1"
+        "branch" : "ios_minus_grpc_keeping_messageapi",
+        "revision" : "c74e3237e4de2aa481b91f91b1d23f6f9d87734e"
       }
     },
     {
@@ -136,24 +127,6 @@
       }
     },
     {
-      "identity" : "swift-nio-extras",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-nio-extras.git",
-      "state" : {
-        "revision" : "91dd2d61fb772e1311bb5f13b59266b579d77e42",
-        "version" : "1.15.0"
-      }
-    },
-    {
-      "identity" : "swift-nio-http2",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-nio-http2.git",
-      "state" : {
-        "revision" : "d6656967f33ed8b368b38e4b198631fc7c484a40",
-        "version" : "1.23.1"
-      }
-    },
-    {
       "identity" : "swift-nio-ssl",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio-ssl.git",
@@ -205,6 +178,15 @@
       "state" : {
         "revision" : "2d9d2188a08eef4a869d368daab21b3c08510991",
         "version" : "2.6.1"
+      }
+    },
+    {
+      "identity" : "xmtp-rust-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/xmtp/xmtp-rust-swift/",
+      "state" : {
+        "branch" : "local_only_test_008",
+        "revision" : "da21b494941cd867df5fc8071450c1b1f22712e8"
       }
     }
   ],
