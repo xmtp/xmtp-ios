@@ -8,11 +8,13 @@
 import Foundation
 import XMTPProto
 import XMTPRust
+import web3
+import CryptoKit
 
 typealias PublicKey = Xmtp_MessageContents_PublicKey
 
 enum PublicKeyError: String, Error {
-	case noSignature, invalidPreKey, addressNotFound
+	case noSignature, invalidPreKey, addressNotFound, invalidKeyString
 }
 
 extension PublicKey {
@@ -46,6 +48,16 @@ extension PublicKey {
 		secp256K1Uncompressed.bytes = data
 	}
 
+	init(_ string: String) throws {
+		self.init()
+
+		guard let bytes = string.web3.bytesFromHex else {
+			throw PublicKeyError.invalidKeyString
+		}
+
+		try self.init(Data(bytes))
+	}
+
 	func recoverWalletSignerPublicKey() throws -> PublicKey {
 		if !hasSignature {
 			throw PublicKeyError.noSignature
@@ -73,7 +85,7 @@ extension PublicKey {
 		slimKey.timestamp = timestamp
 		let bytesToSign = try slimKey.serializedData()
 
-        let pubKeyData = try KeyUtil.recoverPublicKey(message: Data(XMTPRust.CoreCrypto.sha256(data: bytesToSign)), signature: signature.rawData)
+        let pubKeyData = try KeyUtil.recoverPublicKey(message: Data(SHA256.hash(data: bytesToSign)), signature: signature.rawData)
 		return try PublicKey(pubKeyData)
 	}
 
