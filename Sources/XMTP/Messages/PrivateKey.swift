@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import secp256k1
+import secp256k1Swift
 import XMTPProto
 
 /// Represents a secp256k1 private key.  ``PrivateKey`` conforms to ``SigningKey`` so you can use it

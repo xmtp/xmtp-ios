@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import secp256k1
+import secp256k1Swift
 import XMTPProto
 
 /// Represents a secp256k1 compact recoverable signature.
@@ -103,9 +103,9 @@ extension Signature {
 	}
 
 	func verify(signedBy: PublicKey, digest: Data) throws -> Bool {
-		let recoverySignature = try secp256k1.Recovery.ECDSASignature(compactRepresentation: ecdsaCompact.bytes, recoveryId: Int32(ecdsaCompact.recovery))
+		let recoverySignature = try secp256k1.Recovery.ECDSASignature(compactRepresentation: ecdsaCompact.bytes.bytes, recoveryId: Int32(ecdsaCompact.recovery))
 		let ecdsaSignature = try recoverySignature.normalize
-		let signingKey = try secp256k1.Signing.PublicKey(rawRepresentation: signedBy.secp256K1Uncompressed.bytes, format: .uncompressed)
+		let signingKey = try secp256k1.Signing.PublicKey(rawRepresentation: signedBy.secp256K1Uncompressed.bytes.bytes, format: .uncompressed)
 
 		return signingKey.ecdsa.isValidSignature(ecdsaSignature, for: digest)
 	}

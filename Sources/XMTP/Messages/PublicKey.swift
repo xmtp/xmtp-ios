@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import secp256k1
+import secp256k1Swift
 import XMTPProto
 
 typealias PublicKey = Xmtp_MessageContents_PublicKey

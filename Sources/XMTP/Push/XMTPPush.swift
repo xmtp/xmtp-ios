@@ -40,7 +40,7 @@ public struct XMTPPush {
 		}
 
 		if try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge]) {
-			await UIApplication.shared.registerForRemoteNotifications()
+//			await UIApplication.shared.registerForRemoteNotifications()
 
 			return true
 		}
