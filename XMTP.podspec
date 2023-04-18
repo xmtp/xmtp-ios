@@ -131,6 +131,8 @@ Pod::Spec.new do |spec|
 
   # spec.requires_arc = true
 
+  spec.swift_version    = '5.3'
+
   # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
   spec.dependency "web3.swift"
   spec.dependency "GzipSwift"
