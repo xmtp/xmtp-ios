@@ -14,33 +14,39 @@ import XMTPTestHelpers
 
 @available(iOS 16, *)
 final class IntegrationTests: XCTestCase {
-	func testSaveKey() async throws {
-		throw XCTSkip("integration only (requires local node)")
+    func testSaveKey() async throws {
+        for i in 1...1 {
+            let alice = try PrivateKey.generate()
+            let identity = try PrivateKey.generate()
+            
+            let authorized = try await alice.createIdentity(identity)
+            
+            let authToken = try await authorized.createAuthToken()
+            
+            let api = try GRPCApiClient(environment: .local, secure: false)
+            api.setAuthToken(authToken)
+            
+            let encryptedBundle = try await authorized.toBundle.encrypted(with: alice)
+            
+            var envelope = Envelope()
+            envelope.contentTopic = Topic.userPrivateStoreKeyBundle(authorized.address).description
+            envelope.timestampNs = UInt64(Date().millisecondsSinceEpoch) * 1_000_000
+            envelope.message = try encryptedBundle.serializedData()
+            
+            try await api.publish(envelopes: [envelope])
+            
+            try await Task.sleep(nanoseconds: 20_000_000)
+            var result = try await api.query(topic: .userPrivateStoreKeyBundle(authorized.address))
+            let starttime = Date().millisecondsSinceEpoch
 
-		let alice = try PrivateKey.generate()
-		let identity = try PrivateKey.generate()
-
-		let authorized = try await alice.createIdentity(identity)
-
-		let authToken = try await authorized.createAuthToken()
-
-		let api = try GRPCApiClient(environment: .local, secure: false)
-		api.setAuthToken(authToken)
-
-		let encryptedBundle = try await authorized.toBundle.encrypted(with: alice)
-
-		var envelope = Envelope()
-		envelope.contentTopic = Topic.userPrivateStoreKeyBundle(authorized.address).description
-		envelope.timestampNs = UInt64(Date().millisecondsSinceEpoch) * 1_000_000
-		envelope.message = try encryptedBundle.serializedData()
-
-		try await api.publish(envelopes: [envelope])
-
-		try await Task.sleep(nanoseconds: 2_000_000_000)
-
-		let result = try await api.query(topic: .userPrivateStoreKeyBundle(authorized.address))
-		XCTAssert(result.envelopes.count == 1)
-	}
+            for u in 1...10000 {
+                result = try await api.query(topic: .userPrivateStoreKeyBundle(authorized.address))
+            }
+            XCTAssert(result.envelopes.count == 1)
+            let endtime = Date().millisecondsSinceEpoch
+            XCTAssertEqual(0.0, (endtime - starttime) / (10000000.0))
+        }
+    }
 
 	func testPublishingAndFetchingContactBundlesWithWhileGeneratingKeys() async throws {
 		throw XCTSkip("integration only (requires local node)")

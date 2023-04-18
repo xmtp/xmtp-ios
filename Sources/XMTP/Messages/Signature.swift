@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import secp256k1
+import XMTPRust
 import XMTPProto
 
 /// Represents a secp256k1 compact recoverable signature.
@@ -102,21 +102,16 @@ extension Signature {
 		}
 	}
 
-	func verify(signedBy: PublicKey, digest: Data) throws -> Bool {
-		let recoverySignature = try secp256k1.Recovery.ECDSASignature(compactRepresentation: ecdsaCompact.bytes, recoveryId: Int32(ecdsaCompact.recovery))
-		let ecdsaSignature = try recoverySignature.normalize
-		let signingKey = try secp256k1.Signing.PublicKey(rawRepresentation: signedBy.secp256K1Uncompressed.bytes, format: .uncompressed)
-
-		return signingKey.ecdsa.isValidSignature(ecdsaSignature, for: digest)
-	}
-
-	func verify(signedBy: PublicKey, digest: any Digest) throws -> Bool {
-		let recoverySignature = try secp256k1.Recovery.ECDSASignature(compactRepresentation: ecdsaCompact.bytes, recoveryId: Int32(ecdsaCompact.recovery))
-		let ecdsaSignature = try recoverySignature.normalize
-		let signingKey = try secp256k1.Signing.PublicKey(rawRepresentation: signedBy.secp256K1Uncompressed.bytes, format: .uncompressed)
-
-		return signingKey.ecdsa.isValidSignature(ecdsaSignature, for: digest)
-	}
+    func verify(signedBy: PublicKey, digest: Data) throws -> Bool {
+        //		let recoverySignature = try secp256k1.Recovery.ECDSASignature(compactRepresentation: ecdsaCompact.bytes, recoveryId: Int32(ecdsaCompact.recovery))
+        //		let ecdsaSignature = try recoverySignature.normalize
+        //		let signingKey = try secp256k1.Signing.PublicKey(rawRepresentation: signedBy.secp256K1Uncompressed.bytes, format: .uncompressed)
+        //
+        //		return signingKey.ecdsa.isValidSignature(ecdsaSignature, for: digest)
+        // NOTE: it says "digest" in this function header but really it's the message. The verify_k256_sha256 function does
+        // the additional sha256 operation to convert the message into 32 bytes.
+        return try XMTPRust.CoreCrypto.verify_k256_sha256(publicKeyBytes: signedBy.secp256K1Uncompressed.bytes, message: digest, signature: ecdsaCompact.bytes, recoveryId: UInt8(ecdsaCompact.recovery))
+    }
 }
 
 extension Signature: Codable {
