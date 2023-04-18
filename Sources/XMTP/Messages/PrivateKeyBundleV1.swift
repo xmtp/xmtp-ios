@@ -7,6 +7,8 @@
 
 import CryptoKit
 import Foundation
+import web3
+import XMTPRust
 import XMTPProto
 
 public typealias PrivateKeyBundleV1 = Xmtp_MessageContents_PrivateKeyBundleV1
@@ -32,6 +34,9 @@ extension PrivateKeyBundleV1 {
 		preKey.publicKey.signature = signedPublicKey.signature
 		bundle.v1.preKeys = [preKey]
 
+
+		print("authorized identity address: \(authorizedIdentity.address)")
+		print("wallet address: \(wallet.address)")
 		print("account private key: \(privateKey.secp256K1.bytes.toHex)")
 		print("account public key: \(privateKey.publicKey.secp256K1Uncompressed.bytes.toHex)")
 		print("identity private: \(bundle.v1.identityKey.secp256K1.bytes.toHex)")

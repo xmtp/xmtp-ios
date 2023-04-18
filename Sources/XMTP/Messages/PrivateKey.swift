@@ -8,6 +8,7 @@
 import Foundation
 import XMTPProto
 import XMTPRust
+import CryptoKit
 import web3
 
 /// Represents a secp256k1 private key.  ``PrivateKey`` conforms to ``SigningKey`` so you can use it
@@ -68,7 +69,8 @@ public extension PrivateKey {
 	}
 
 	static func generate() throws -> PrivateKey {
-		let data = Data(try Crypto.secureRandomBytes(count: 32))
+//		let data = Data(try Crypto.secureRandomBytes(count: 32))
+		let data = "7ec7bca44abcf7aefac9d6d0c99e532590a3478114a11759303cf72a72544473".web3.hexData!
 		return try PrivateKey(data)
 	}
 
@@ -78,8 +80,8 @@ public extension PrivateKey {
 
 	internal func sign(key: UnsignedPublicKey) async throws -> SignedPublicKey {
 		let bytes = try key.serializedData()
-        let digest = XMTPRust.CoreCrypto.sha256(data: bytes)
-		let signature = try await sign(digest)
+		let digest = SHA256.hash(data: bytes)
+		let signature = try await sign(Data(digest))
 
 		var signedPublicKey = SignedPublicKey()
 		signedPublicKey.signature = signature

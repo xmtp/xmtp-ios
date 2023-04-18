@@ -8,6 +8,7 @@
 import CryptoKit
 import Foundation
 import XMTPProto
+import XMTPRust
 import web3
 
 typealias MessageV2 = Xmtp_MessageContents_MessageV2
