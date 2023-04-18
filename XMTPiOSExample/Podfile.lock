@@ -16,32 +16,12 @@ PODS:
     - Connect-Swift
     - GzipSwift
     - web3.swift
-    - XMTP/XMTPProto (= 0.1.1)
-    - XMTP/XMTPRust (= 0.1.1)
-    - XMTPProto
-    - XMTPRust
-  - XMTP/XMTPProto (0.1.1):
-    - Connect-Swift
-    - GzipSwift
-    - SwiftProtobuf
-    - web3.swift
-    - XMTPProto
-    - XMTPRust
-  - XMTP/XMTPRust (0.1.1):
-    - Connect-Swift
-    - GzipSwift
-    - web3.swift
-    - XMTPProto
-    - XMTPRust
-  - XMTPProto (0.1.0):
-    - SwiftProtobuf
-  - XMTPRust (0.1.1)
+    - XMTPRust (= 0.1.2beta-0)
+  - XMTPRust (0.1.2-beta0)
 
 DEPENDENCIES:
   - web3.swift
   - XMTP (from `../`)
-  - XMTPProto (from `../../proto`)
-  - XMTPRust (from `../../xmtp-rust-swift`)
 
 SPEC REPOS:
   trunk:
@@ -53,14 +33,11 @@ SPEC REPOS:
     - secp256k1.swift
     - SwiftProtobuf
     - web3.swift
+    - XMTPRust
 
 EXTERNAL SOURCES:
   XMTP:
     :path: "../"
-  XMTPProto:
-    :path: "../../proto"
-  XMTPRust:
-    :path: "../../xmtp-rust-swift"
 
 SPEC CHECKSUMS:
   BigInt: 74b4d88367b0e819d9f77393549226d36faeb0d8
@@ -71,10 +48,9 @@ SPEC CHECKSUMS:
   secp256k1.swift: a7e7a214f6db6ce5db32cc6b2b45e5c4dd633634
   SwiftProtobuf: afced68785854575756db965e9da52bbf3dc45e7
   web3.swift: 2263d1e12e121b2c42ffb63a5a7beb1acaf33959
-  XMTP: 5a89e947bcfbf6f8dfb1f8e2dc708fa30753f3ee
-  XMTPProto: 8e329d4a799e6c5dea2e8c3988ec48d54571809b
-  XMTPRust: d7c7f090e9993bb8cf5517f11e1622ff3a0c29af
+  XMTP: 728019fe8723c98479ae09f4da82ae1c061eb632
+  XMTPRust: 2c356f57f034d771717933a6127a7d51667f9843
 
-PODFILE CHECKSUM: a5714547991f401af3096df5f89f36fa1e550806
+PODFILE CHECKSUM: 34395c840d082584c6758fd1e94cb68eaeb0c270
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

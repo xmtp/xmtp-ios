@@ -7,7 +7,6 @@
 
 import Foundation
 import web3
-import XMTPProto
 
 /// Specify configuration options for creating a ``Client``.
 public struct ClientOptions {

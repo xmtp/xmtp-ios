@@ -5,7 +5,7 @@
 //  Created by Pat Nakajima on 11/17/22.
 //
 
-import XMTPProto
+
 
 public enum Topic {
 	case userPrivateStoreKeyBundle(String),

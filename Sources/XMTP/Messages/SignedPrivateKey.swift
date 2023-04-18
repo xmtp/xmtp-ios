@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import XMTPProto
+
 
 public typealias SignedPrivateKey = Xmtp_MessageContents_SignedPrivateKey
 

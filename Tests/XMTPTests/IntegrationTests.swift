@@ -9,6 +9,7 @@ import Foundation
 import secp256k1
 import web3
 import XCTest
+import XMTPRust
 @testable import XMTP
 import XMTPTestHelpers
 
@@ -375,7 +376,7 @@ final class IntegrationTests: XCTestCase {
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = try XMTPRust.CoreCrypto.get_public_key_from_private(privateKeyBytes: Data(keyBytes))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -445,7 +446,7 @@ final class IntegrationTests: XCTestCase {
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtilx.generatePublicKey(from: Data(keyBytes))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -468,7 +469,7 @@ final class IntegrationTests: XCTestCase {
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtilx.generatePublicKey(from: Data(keyBytes))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -497,7 +498,7 @@ final class IntegrationTests: XCTestCase {
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtilx.generatePublicKey(from: Data(keyBytes))
 
 		let client = try await XMTP.Client.create(account: key)
 

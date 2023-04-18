@@ -7,6 +7,7 @@
 
 import CryptoKit
 import XCTest
+import XMTPRust
 @testable import XMTP
 import XMTPTestHelpers
 
@@ -114,7 +115,7 @@ class MessageTests: XCTestCase {
 				140, 247, 221, 172, 14, 188, 52, 88,
 			])
 
-			key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.xmtpGeneratePublicKey(from: key.secp256K1.bytes)
+			key.publicKey.secp256K1Uncompressed.bytes = try XMTPRust.CoreCrypto.get_public_key_from_private(privateKeyBytes: key.secp256K1.bytes)
 		}
 
 		let keyBundleData = Data(

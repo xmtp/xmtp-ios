@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import XMTPProto
+
 import XMTPRust
 import web3
 import CryptoKit
@@ -68,9 +68,9 @@ extension PublicKey {
 		slimKey.secp256K1Uncompressed.bytes = secp256K1Uncompressed.bytes
 
 		let sigText = Signature.createIdentityText(key: try slimKey.serializedData())
-		let sigHash = try Signature.ethHash(sigText)
+		let message = try Signature.ethPersonalMessage(sigText)
 
-		let pubKeyData = try KeyUtil.recoverPublicKey(message: sigHash, signature: signature.rawData)
+		let pubKeyData = try XMTPRust.CoreCrypto.recover_public_key_keccak256(message: message, signature: signature.rawData)
 		return try PublicKey(pubKeyData)
 	}
 
@@ -85,11 +85,11 @@ extension PublicKey {
 		slimKey.timestamp = timestamp
 		let bytesToSign = try slimKey.serializedData()
 
-        let pubKeyData = try KeyUtil.recoverPublicKey(message: Data(SHA256.hash(data: bytesToSign)), signature: signature.rawData)
+		let pubKeyData = try XMTPRust.CoreCrypto.recover_public_key_sha256(message: bytesToSign, signature: signature.rawData)
 		return try PublicKey(pubKeyData)
 	}
 
 	var walletAddress: String {
-		KeyUtil.generateAddress(from: secp256K1Uncompressed.bytes).toChecksumAddress()
+		KeyUtilx.generateAddress(from: secp256K1Uncompressed.bytes).toChecksumAddress()
 	}
 }

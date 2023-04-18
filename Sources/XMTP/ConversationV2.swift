@@ -7,7 +7,6 @@
 
 import CryptoKit
 import Foundation
-import XMTPProto
 
 // Save the non-client parts for a v2 conversation
 public struct ConversationV2Container: Codable {

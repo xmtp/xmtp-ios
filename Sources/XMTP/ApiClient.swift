@@ -6,7 +6,6 @@
 //
 
 import XMTPRust
-import XMTPProto
 
 public typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse
 public typealias QueryResponse = Xmtp_MessageApi_V1_QueryResponse

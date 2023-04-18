@@ -9,7 +9,7 @@
 import Combine
 import XCTest
 @testable import XMTP
-import XMTPProto
+
 
 public struct FakeWallet: SigningKey {
 	public static func generate() throws -> FakeWallet {
