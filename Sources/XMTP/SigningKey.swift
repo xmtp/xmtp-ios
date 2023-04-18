@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import secp256k1
+import secp256k1Swift
 
 /// Defines a type that is used by a ``Client`` to sign keys and messages.
 ///

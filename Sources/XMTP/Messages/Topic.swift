@@ -7,7 +7,7 @@
 
 import XMTPProto
 
-enum Topic {
+public enum Topic {
 	case userPrivateStoreKeyBundle(String),
 	     contact(String),
 	     userIntro(String),

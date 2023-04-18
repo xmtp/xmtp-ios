@@ -23,10 +23,10 @@ enum KeyUtil {
 		Logger(label: "web3.swift.key-util")
 	}
 
-	static func xmtpGeneratePublicKey(from privateKeyData: Data) throws -> Data {
-		let privateKey = try secp256k1.Signing.PrivateKey(rawRepresentation: privateKeyData, format: .uncompressed)
-		return privateKey.publicKey.rawRepresentation
-	}
+//	static func xmtpGeneratePublicKey(from privateKeyData: Data) throws -> Data {
+//		let privateKey = try secp256k1.Signing.PrivateKey(rawRepresentation: privateKeyData, format: .uncompressed)
+//		return privateKey.publicKey.rawRepresentation
+//	}
 
 	static func sign(message: Data, with privateKey: Data, hashing: Bool) throws -> Data {
 		guard let ctx = secp256k1_context_create(UInt32(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY)) else {

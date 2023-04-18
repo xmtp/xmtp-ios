@@ -5,13 +5,12 @@
 //  Created by Pat Nakajima on 11/17/22.
 //
 
-import XMTPProto
 import XMTPRust
+import XMTPProto
 
-
-typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse
-typealias QueryResponse = Xmtp_MessageApi_V1_QueryResponse
-typealias SubscribeRequest = Xmtp_MessageApi_V1_SubscribeRequest
+public typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse
+public typealias QueryResponse = Xmtp_MessageApi_V1_QueryResponse
+public typealias SubscribeRequest = Xmtp_MessageApi_V1_SubscribeRequest
 
 protocol ApiClient {
 	var environment: XMTPEnvironment { get }
