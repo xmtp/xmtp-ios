@@ -32,6 +32,16 @@ extension PrivateKeyBundleV1 {
 		preKey.publicKey.signature = signedPublicKey.signature
 		bundle.v1.preKeys = [preKey]
 
+		print("account private key: \(privateKey.secp256K1.bytes.toHex)")
+		print("account public key: \(privateKey.publicKey.secp256K1Uncompressed.bytes.toHex)")
+		print("identity private: \(bundle.v1.identityKey.secp256K1.bytes.toHex)")
+		print("identity public: \(bundle.v1.identityKey.publicKey.secp256K1Uncompressed.bytes.toHex)")
+		print("identity key signature: \(authorizedIdentity.identity.publicKey.signature.rawData.toHex)")
+		print("pre key private: \(preKey.secp256K1.bytes.toHex)")
+		print("pre key public: \(preKey.publicKey.secp256K1Uncompressed.bytes.toHex)")
+
+		print("pre key signature: \(signedPublicKey.signature.rawData.toHex)")
+
 		return bundle.v1
 	}
 

@@ -113,6 +113,8 @@ public class Client {
 			authorizedIdentity.address = account.address
 			let authToken = try await authorizedIdentity.createAuthToken()
 
+			print("authToken: \(authToken)")
+
 			let apiClient = apiClient
 			apiClient.setAuthToken(authToken)
 

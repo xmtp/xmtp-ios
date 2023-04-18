@@ -5,6 +5,7 @@
 //  Created by Pat Nakajima on 12/6/22.
 //
 
+#if canImport(XCTest)
 import Combine
 import XCTest
 @testable import XMTP
@@ -234,3 +235,4 @@ public extension XCTestCase {
 		return try! await Fixtures()
 	}
 }
+#endif
