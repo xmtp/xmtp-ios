@@ -7,7 +7,7 @@
 
 import Foundation
 import XMTPRust
-import XMTPProto
+
 
 public typealias PrivateKeyBundleV2 = Xmtp_MessageContents_PrivateKeyBundleV2
 

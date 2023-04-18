@@ -7,7 +7,6 @@
 
 import CryptoKit
 import Foundation
-import XMTPProto
 
 public typealias CipherText = Xmtp_MessageContents_Ciphertext
 

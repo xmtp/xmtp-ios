@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import XMTPProto
 
 typealias PagingInfo = Xmtp_MessageApi_V1_PagingInfo
 typealias PagingInfoCursor = Xmtp_MessageApi_V1_Cursor

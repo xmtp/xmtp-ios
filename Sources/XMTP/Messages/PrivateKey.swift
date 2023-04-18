@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import XMTPProto
 import XMTPRust
 import CryptoKit
 import web3
@@ -33,7 +32,7 @@ extension PrivateKey: SigningKey {
 	}
 
 	public func sign(_ data: Data) async throws -> Signature {
-		let signatureData = try KeyUtil.sign(message: data, with: secp256K1.bytes, hashing: false)
+		let signatureData = try KeyUtilx.sign(message: data, with: secp256K1.bytes, hashing: false)
 		var signature = Signature()
 
 		signature.ecdsaCompact.bytes = signatureData[0 ..< 64]
@@ -69,8 +68,7 @@ public extension PrivateKey {
 	}
 
 	static func generate() throws -> PrivateKey {
-//		let data = Data(try Crypto.secureRandomBytes(count: 32))
-		let data = "7ec7bca44abcf7aefac9d6d0c99e532590a3478114a11759303cf72a72544473".web3.hexData!
+		let data = Data(try Crypto.secureRandomBytes(count: 32))
 		return try PrivateKey(data)
 	}
 

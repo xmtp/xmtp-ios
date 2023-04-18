@@ -7,7 +7,6 @@
 
 import CryptoKit
 import Foundation
-import XMTPProto
 import XMTPRust
 import web3
 
@@ -43,14 +42,8 @@ extension MessageV2 {
 			}
 
 			// Verify content signature
-			let digest = SHA256.hash(data: message.headerBytes + signed.payload)
-
 			let key = try PublicKey.with { key in
-				guard let bytes = try KeyUtil.recoverPublicKey(message: Data(digest), signature: signed.signature.rawData).web3.bytesFromHex else {
-					throw MessageV2Error.decodeError("invalid bytes")
-				}
-
-				key.secp256K1Uncompressed.bytes = Data(bytes)
+				key.secp256K1Uncompressed.bytes = try XMTPRust.CoreCrypto.recover_public_key_sha256(message: Data(message.headerBytes + signed.payload), signature: signed.signature.rawData)
 			}
 
 			if key.walletAddress != (try PublicKey(signed.sender.preKey).walletAddress) {

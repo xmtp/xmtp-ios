@@ -135,17 +135,5 @@ Pod::Spec.new do |spec|
   spec.dependency "web3.swift"
   spec.dependency "GzipSwift"
   spec.dependency "Connect-Swift"
-
-  spec.subspec 'XMTPProto' do |subspec|
-    subspec.dependency "SwiftProtobuf"
-    subspec.source_files = "../proto/**/*.swift"
-  end
-
-  spec.subspec 'XMTPRust' do |subspec|
-    subspec.source_files = "../xmtp-rust-swift/**/*.swift"
-    subspec.vendored_frameworks = 'XMTPRustSwift.xcframework'
-  end
-
-  spec.dependency 'XMTPProto'
-  spec.dependency 'XMTPRust'
+  spec.dependency 'XMTPRust', '= 0.1.2beta-0'
 end

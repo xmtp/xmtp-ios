@@ -9,8 +9,8 @@ target 'NotificationService' do
 	# Pods for XMTPiOSExample
 	# pod "secp256k1Swift", git: "https://github.com/portto/secp256k1.swift"
   pod "web3.swift"
-  pod "XMTPProto", path: "../../proto"
-	pod "XMTPRust", path: '../../xmtp-rust-swift'
+#  pod "XMTPProto", path: "../../proto"
+#	pod "XMTPRust", path: '../../xmtp-rust-swift'
 	pod "XMTP", path: "../"
 end
 
@@ -21,8 +21,8 @@ target 'XMTPiOSExample' do
   # Pods for XMTPiOSExample
   # pod "secp256k1Swift", git: "https://github.com/portto/secp256k1.swift"
   pod "web3.swift"
-  pod "XMTPProto", path: "../../proto"
-  pod "XMTPRust", path: '../../xmtp-rust-swift'
+#  pod "XMTPProto", path: "../../proto"
+#  pod "XMTPRust", path: '../../xmtp-rust-swift'
 	pod "XMTP", path: "../"
 end
 
