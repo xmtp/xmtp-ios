@@ -27,7 +27,7 @@ let package = Package(
         .package(url: "https://github.com/1024jp/GzipSwift", from: "5.2.0"),
         .package(url: "https://github.com/bufbuild/connect-swift", from: "0.3.0"),
         .package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.0.0"),
-        .package(url: "https://github.com/xmtp/xmtp-rust-swift/", branch: "local_only_test_008")
+        .package(url: "../xmtp-rust-swift/", branch: "michaelx_secp256k1_wip")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

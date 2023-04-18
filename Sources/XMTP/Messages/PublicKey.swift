@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import secp256k1Swift
 import XMTPProto
+import XMTPRust
 
 typealias PublicKey = Xmtp_MessageContents_PublicKey
 
@@ -73,7 +73,7 @@ extension PublicKey {
 		slimKey.timestamp = timestamp
 		let bytesToSign = try slimKey.serializedData()
 
-		let pubKeyData = try KeyUtil.recoverPublicKey(message: Data(SHA256.hash(data: bytesToSign)), signature: signature.rawData)
+        let pubKeyData = try KeyUtil.recoverPublicKey(message: Data(XMTPRust.CoreCrypto.sha256(data: bytesToSign)), signature: signature.rawData)
 		return try PublicKey(pubKeyData)
 	}
 
