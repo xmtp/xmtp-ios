@@ -6,6 +6,7 @@
 //
 
 import XMTPProto
+import web3
 
 typealias ContactBundle = Xmtp_MessageContents_ContactBundle
 typealias ContactBundleV1 = Xmtp_MessageContents_ContactBundleV1

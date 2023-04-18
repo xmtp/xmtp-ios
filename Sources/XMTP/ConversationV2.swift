@@ -39,7 +39,7 @@ public struct ConversationV2 {
 		let peer = try myKeys.walletAddress == (try header.sender.walletAddress) ? header.recipient : header.sender
 		let peerAddress = try peer.walletAddress
 
-		let keyMaterial = Data(invitation.aes256GcmHkdfSha256.keyMaterial.bytes)
+		let keyMaterial = invitation.aes256GcmHkdfSha256.keyMaterial
 
 		return ConversationV2(
 			topic: invitation.topic,

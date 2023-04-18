@@ -6,9 +6,6 @@ PODS:
   - GzipSwift (5.1.1)
   - Logging (1.0.0)
   - secp256k1.swift (0.1.4)
-  - secp256k1Swift (0.7.4):
-    - secp256k1Wrapper (~> 0.0.5)
-  - secp256k1Wrapper (0.0.5)
   - SwiftProtobuf (1.21.0)
   - web3.swift (1.6.0):
     - BigInt (~> 5.0.0)
@@ -18,7 +15,6 @@ PODS:
   - XMTP (0.1.1):
     - Connect-Swift
     - GzipSwift
-    - secp256k1Swift
     - web3.swift
     - XMTP/XMTPProto (= 0.1.1)
     - XMTP/XMTPRust (= 0.1.1)
@@ -27,7 +23,6 @@ PODS:
   - XMTP/XMTPProto (0.1.1):
     - Connect-Swift
     - GzipSwift
-    - secp256k1Swift
     - SwiftProtobuf
     - web3.swift
     - XMTPProto
@@ -35,13 +30,12 @@ PODS:
   - XMTP/XMTPRust (0.1.1):
     - Connect-Swift
     - GzipSwift
-    - secp256k1Swift
     - web3.swift
     - XMTPProto
     - XMTPRust
   - XMTPProto (0.1.0):
     - SwiftProtobuf
-  - XMTPRust (0.1.0)
+  - XMTPRust (0.1.1)
 
 DEPENDENCIES:
   - web3.swift
@@ -57,8 +51,6 @@ SPEC REPOS:
     - GzipSwift
     - Logging
     - secp256k1.swift
-    - secp256k1Swift
-    - secp256k1Wrapper
     - SwiftProtobuf
     - web3.swift
 
@@ -77,13 +69,11 @@ SPEC CHECKSUMS:
   GzipSwift: 893f3e48e597a1a4f62fafcb6514220fcf8287fa
   Logging: 9ef4ecb546ad3169398d5a723bc9bea1c46bef26
   secp256k1.swift: a7e7a214f6db6ce5db32cc6b2b45e5c4dd633634
-  secp256k1Swift: ea49d2b06724444a03cf7938a2d3fc7acc4c0f08
-  secp256k1Wrapper: 0378417cd06d51187bbc9e178ec318e7902e2120
   SwiftProtobuf: afced68785854575756db965e9da52bbf3dc45e7
   web3.swift: 2263d1e12e121b2c42ffb63a5a7beb1acaf33959
-  XMTP: 05a334f36c98e8a05bef19c41372f87c1c487bdc
+  XMTP: 5a89e947bcfbf6f8dfb1f8e2dc708fa30753f3ee
   XMTPProto: 929b9d316e220ff9d321eea2318d8bdcb3d73991
-  XMTPRust: 7809eb7e3fda3d095f1359fa86de041b4d55bb73
+  XMTPRust: d7c7f090e9993bb8cf5517f11e1622ff3a0c29af
 
 PODFILE CHECKSUM: a5714547991f401af3096df5f89f36fa1e550806
 

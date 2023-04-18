@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import secp256k1Swift
+import XMTPRust
 import XMTPProto
 
 public typealias PrivateKeyBundleV2 = Xmtp_MessageContents_PrivateKeyBundleV2
@@ -35,11 +35,7 @@ extension PrivateKeyBundleV2 {
 	}
 
 	func sharedSecret(private privateData: Data, public publicData: Data) throws -> Data {
-		let publicKey = try secp256k1.Signing.PublicKey(rawRepresentation: publicData.bytes, format: .uncompressed)
-
-		let sharedSecret = try publicKey.multiply(privateData.bytes, format: .uncompressed)
-
-		return sharedSecret.rawRepresentation
+    return try XMTPRust.CoreCrypto.diffie_hellman_k256(privateKeyBytes: privateData, publicKeyBytes: publicData)
 	}
 
 	func findPreKey(_ myPreKey: SignedPublicKey) throws -> SignedPrivateKey {

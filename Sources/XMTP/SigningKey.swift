@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import secp256k1Swift
+import web3
 
 /// Defines a type that is used by a ``Client`` to sign keys and messages.
 ///
@@ -38,7 +38,7 @@ extension SigningKey {
 
 		let digest = try Signature.ethHash(signatureText)
 		let recoveredKey = try KeyUtil.recoverPublicKey(message: digest, signature: signature.rawData)
-		let address = KeyUtil.generateAddress(from: recoveredKey).toChecksumAddress()
+		let address = KeyUtil.generateAddress(from: Data(recoveredKey.web3.bytesFromHex ?? [])).toChecksumAddress()
 
 		var authorized = PublicKey()
 		authorized.secp256K1Uncompressed = slimKey.secp256K1Uncompressed

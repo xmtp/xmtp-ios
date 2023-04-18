@@ -8,6 +8,7 @@
 import CryptoKit
 import Foundation
 import XMTPProto
+import web3
 
 typealias MessageV2 = Xmtp_MessageContents_MessageV2
 
@@ -44,7 +45,11 @@ extension MessageV2 {
 			let digest = SHA256.hash(data: message.headerBytes + signed.payload)
 
 			let key = try PublicKey.with { key in
-				key.secp256K1Uncompressed.bytes = try KeyUtil.recoverPublicKey(message: Data(digest.bytes), signature: signed.signature.rawData)
+				guard let bytes = try KeyUtil.recoverPublicKey(message: Data(digest), signature: signed.signature.rawData).web3.bytesFromHex else {
+					throw MessageV2Error.decodeError("invalid bytes")
+				}
+
+				key.secp256K1Uncompressed.bytes = Data(bytes)
 			}
 
 			if key.walletAddress != (try PublicKey(signed.sender.preKey).walletAddress) {
