@@ -8,6 +8,7 @@
 import Foundation
 import XMTPProto
 import XMTPRust
+import web3
 
 /// Represents a secp256k1 private key.  ``PrivateKey`` conforms to ``SigningKey`` so you can use it
 /// to create a ``Client``.
@@ -54,7 +55,7 @@ public extension PrivateKey {
 		timestamp = UInt64(Date().millisecondsSinceEpoch)
 		secp256K1.bytes = privateKeyData
 
-		let publicData = try KeyUtil.xmtpGeneratePublicKey(from: privateKeyData)
+		let publicData = try XMTPRust.CoreCrypto.get_public_key_from_private(privateKeyBytes: privateKeyData)
 		publicKey.secp256K1Uncompressed.bytes = publicData
 		publicKey.timestamp = timestamp
 	}
@@ -78,7 +79,7 @@ public extension PrivateKey {
 	internal func sign(key: UnsignedPublicKey) async throws -> SignedPublicKey {
 		let bytes = try key.serializedData()
         let digest = XMTPRust.CoreCrypto.sha256(data: bytes)
-		let signature = try await sign(Data(digest.bytes))
+		let signature = try await sign(digest)
 
 		var signedPublicKey = SignedPublicKey()
 		signedPublicKey.signature = signature
