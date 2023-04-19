@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "XMTP"
-  spec.version      = "0.1.2-beta0"
+  spec.version      = "0.1.3-beta0"
   spec.summary      = "XMTP pod."
 
   # This description is used to generate tags and improve search results.
