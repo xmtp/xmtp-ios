@@ -14,12 +14,12 @@ public struct ClientOptions {
 	// Specify network options
 	public struct Api {
 		/// Specify which XMTP network to connect to. Defaults to ``.dev``
-		public var env: XMTPEnvironment = .dev
+		public var env: XMTPEnvironment = .local
 
 		/// Specify whether the API client should use TLS security. In general this should only be false when using the `.local` environment.
 		public var isSecure: Bool = true
 
-		public init(env: XMTPEnvironment = .dev, isSecure: Bool = true) {
+		public init(env: XMTPEnvironment = .local, isSecure: Bool = true) {
 			self.env = env
 			self.isSecure = isSecure
 		}

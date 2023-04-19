@@ -26,6 +26,7 @@ protocol ApiClient {
 }
 
 class GRPCApiClient: ApiClient {
+    
 	let ClientVersionHeaderKey = "X-Client-Version"
 	let AppVersionHeaderKey = "X-App-Version"
 
@@ -36,17 +37,31 @@ class GRPCApiClient: ApiClient {
 
 	required init(environment: XMTPEnvironment, secure: Bool = true) throws {
 		self.environment = environment
+        // TODO: this is a hack to do an async thing in a synchronous way
+        print("init client")
         Task {
-            self.rustClient = try! await XMTPRust.create_client(envToUrl(env: environment))
+            print("Initializing rustclient")
+            self.rustClient = try await XMTPRust.create_client(envToUrl(env: environment))
+            print("done initializing rustclient")
+
         }
+        print("exit init client")
 	}
     
     func dataToRustVec(data: Data) -> RustVec<UInt8> {
-        var rustVec = RustVec<UInt8>()
+        let rustVec = RustVec<UInt8>()
         for byte in data {
             rustVec.push(value: byte)
         }
         return rustVec
+    }
+    
+    func dataFromRustVec(rustVec: RustVec<UInt8>) -> Data {
+        var listBytes: [UInt8] = []
+        for byte in rustVec {
+            listBytes.append(byte)
+        }
+        return Data(listBytes)
     }
     
     func envToUrl(env: XMTPEnvironment) -> String {
@@ -62,6 +77,7 @@ class GRPCApiClient: ApiClient {
 	}
 
 	func query(topic: String, pagination: Pagination? = nil, cursor: Xmtp_MessageApi_V1_Cursor? = nil) async throws -> QueryResponse {
+        try await Task.sleep(nanoseconds: 1000_000_000)
 		var request = Xmtp_MessageApi_V1_QueryRequest()
 		request.contentTopics = [topic]
 
@@ -83,15 +99,17 @@ class GRPCApiClient: ApiClient {
 			request.pagingInfo.cursor = cursor
 		}
 
+        let paging = XMTPRust.PagingInfo(limit: 0, cursor: nil, direction: XMTPRust.SortDirection.Ascending)
         let response = try await self.rustClient.query(topic.intoRustString(), Optional.none, Optional.none, Optional.none)
         // response has .envelopes() and .paging_info() but the envelopes need to be mapped into Envelope objects that Swift understands
+        print("RESPONSE \(response)")
         var queryResponse = QueryResponse()
         // Build the query response from response fields
-        queryResponse.envelopes = response.envelopes().map { envelope in
+        queryResponse.envelopes = response.envelopes().map { rustEnvelope in
             var envelope = Envelope()
-            envelope.contentTopic = envelope.contentTopic
-            envelope.timestampNs = envelope.timestampNs
-            envelope.message = envelope.message
+            envelope.contentTopic = rustEnvelope.get_topic().toString()
+            envelope.timestampNs = rustEnvelope.get_sender_time_ns()
+            envelope.message = dataFromRustVec(rustVec: rustEnvelope.get_payload())
             return envelope
         }
     // Decode the response as a QueryResponse
@@ -119,7 +137,7 @@ class GRPCApiClient: ApiClient {
 		return try await query(topic: topic.description, pagination: pagination)
 	}
 
-    func subscribe(topics: [String]) async  -> AsyncThrowingStream<Envelope, Error> {
+    func subscribe(topics: [String])  -> AsyncThrowingStream<Envelope, Error> {
         var topicsVec = RustVec<RustString>()
         for topic in topics {
             topicsVec.push(value: topic.intoRustString())
@@ -146,14 +164,14 @@ class GRPCApiClient: ApiClient {
         // Then it needs to return the AsyncThrowingStream
         return AsyncThrowingStream { continuation in
             Task {
-                for await _ in 0... {
                     continuation.yield(Envelope())
                 }
-            }
         }
     }
 
 	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
+        try await Task.sleep(nanoseconds: 1000_000_000)
+
 		var request = Xmtp_MessageApi_V1_PublishRequest()
 		request.envelopes = envelopes
         
