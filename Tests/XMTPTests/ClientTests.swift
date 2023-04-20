@@ -49,7 +49,7 @@ class ClientTests: XCTestCase {
         let client = try await Client.create(account: fakeWallet)
         
         let bundle = client.privateKeyBundle
-        let clientFromV1Bundle = try Client.from(bundle: bundle)
+        let clientFromV1Bundle = try await Client.from(bundle: bundle)
         
         XCTAssertEqual(client.address, clientFromV1Bundle.address)
         XCTAssertEqual(client.privateKeyBundleV1.identityKey, clientFromV1Bundle.privateKeyBundleV1.identityKey)
@@ -61,7 +61,7 @@ class ClientTests: XCTestCase {
         let client = try await Client.create(account: fakeWallet)
         
         let bundleV1 = client.v1keys
-        let clientFromV1Bundle = try Client.from(v1Bundle: bundleV1)
+        let clientFromV1Bundle = try await Client.from(v1Bundle: bundleV1)
         
         XCTAssertEqual(client.address, clientFromV1Bundle.address)
         XCTAssertEqual(client.privateKeyBundleV1.identityKey, clientFromV1Bundle.privateKeyBundleV1.identityKey)

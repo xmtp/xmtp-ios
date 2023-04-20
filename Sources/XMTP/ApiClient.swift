@@ -16,7 +16,7 @@ typealias SubscribeRequest = Xmtp_MessageApi_V1_SubscribeRequest
 
 protocol ApiClient {
 	var environment: XMTPEnvironment { get }
-	init(environment: XMTPEnvironment, secure: Bool) throws
+    init(environment: XMTPEnvironment, secure: Bool, rustClient: XMTPRust.RustClient) throws
 	func setAuthToken(_ token: String)
 	func query(topic: String, pagination: Pagination?, cursor: Xmtp_MessageApi_V1_Cursor?) async throws -> QueryResponse
 	func query(topic: Topic, pagination: Pagination?) async throws -> QueryResponse
@@ -33,19 +33,12 @@ class GRPCApiClient: ApiClient {
 	var environment: XMTPEnvironment
 	var authToken = ""
 
-    private var rustClient: XMTPRust.RustClient!
+    var rustClient: XMTPRust.RustClient
 
-	required init(environment: XMTPEnvironment, secure: Bool = true) throws {
+    required init(environment: XMTPEnvironment, secure: Bool = true, rustClient: XMTPRust.RustClient) throws {
 		self.environment = environment
         // TODO: this is a hack to do an async thing in a synchronous way
-        print("init client")
-        Task {
-            print("Initializing rustclient")
-            self.rustClient = try await XMTPRust.create_client(envToUrl(env: environment))
-            print("done initializing rustclient")
-
-        }
-        print("exit init client")
+        self.rustClient = rustClient
 	}
     
     func dataToRustVec(data: Data) -> RustVec<UInt8> {
@@ -64,7 +57,7 @@ class GRPCApiClient: ApiClient {
         return Data(listBytes)
     }
     
-    func envToUrl(env: XMTPEnvironment) -> String {
+    static func envToUrl(env: XMTPEnvironment) -> String {
         switch (env) {
         case XMTPEnvironment.local: return "http://localhost:5556";
         case XMTPEnvironment.dev: return "https://dev.xmtp.network:5556";
@@ -77,7 +70,6 @@ class GRPCApiClient: ApiClient {
 	}
 
 	func query(topic: String, pagination: Pagination? = nil, cursor: Xmtp_MessageApi_V1_Cursor? = nil) async throws -> QueryResponse {
-        try await Task.sleep(nanoseconds: 1000_000_000)
 		var request = Xmtp_MessageApi_V1_QueryRequest()
 		request.contentTopics = [topic]
 
@@ -102,7 +94,6 @@ class GRPCApiClient: ApiClient {
         let paging = XMTPRust.PagingInfo(limit: 0, cursor: nil, direction: XMTPRust.SortDirection.Ascending)
         let response = try await self.rustClient.query(topic.intoRustString(), Optional.none, Optional.none, Optional.none)
         // response has .envelopes() and .paging_info() but the envelopes need to be mapped into Envelope objects that Swift understands
-        print("RESPONSE \(response)")
         var queryResponse = QueryResponse()
         // Build the query response from response fields
         queryResponse.envelopes = response.envelopes().map { rustEnvelope in
@@ -170,7 +161,6 @@ class GRPCApiClient: ApiClient {
     }
 
 	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
-        try await Task.sleep(nanoseconds: 1000_000_000)
 
 		var request = Xmtp_MessageApi_V1_PublishRequest()
 		request.envelopes = envelopes
@@ -188,13 +178,5 @@ class GRPCApiClient: ApiClient {
     
     public static func runGrpcTest() async throws -> Int {
         return 0
-//
-//        let json = "{\"contentTopic\":\"/xmtp/0/privatestore-0x144a87F6dB31445B916BF4d896A425C91DbA7f84/key_bundle/proto\",\"timestampNs\":\"1681678277321011968\",\"message\":\"CvYDCiBPVY2cN8BNkvA2Ypoh0GvaMKNKmAtUsaPMNMwsRDRsmhLRAwrOAwogJ2zn2csOlNN6h2Llb9H4sAvp2Qs6x2L8Dra4ZTG9OvoSDIXSSqfFBhJgYMPSuxqbA68nOkGUPsV1WKjzs2LBuktCdGAEt3tWAbW1jNSF3KaA8XBkbhmM5zwSIbv69vszBzBp9/cYXxW4/rAJtkOuyNlsX04x/i+hswL4T6EkpTl/SGgzRfAHZs+SKbfhwsdcVC577r0u5mm7a9C/DOrsdo42zXDL1cKv8DGSmLzIMGQTrryo6bOH+6JhHUu0bVdXC8KF13zhQxnbdnjg5NMN7PRfUZWP5iz/bfv2H3FZC7fFfmkxIM+yn4y0XQCPjhrygAZyzMhiUC2cPWBj+iTX/lDRed3qy5RmvHhBiOVwumtzkSCy2kreZ2Kd6xMBk+mfKnjLU9cDd2QDmlyJDjZ8FZlk83AeJr7rPCdRDPVPCxUhFNET605QBrx90HoTr6o+EK8N9KUgCHGuijqLen1aARBpqsWkit2zn371Poi3zQvGL/gEQuR7yGd+0Gi+sx/A/08jxcqKNtNOSO0XbtWzASYnEc8gDup+1CsEkMpvKJ/F5CbmQN2yAV0ZIHhsCpdIQ9uUe3C8lwVkns5oWlfZNX/FWKrqRMk6Nlvobg==\"}"
-//        let envelope = try Envelope(jsonString: json)
-//        let service = XMTPRust.ApiService(environment: "http://localhost:5556", secure: false)
-//        let response = try await service.query(topic: "test", json_paging_info: "")
-//        // Try to parse the response JSON into a QueryResponse
-//        let queryResponse = try QueryResponse(jsonString: response)
-//        return queryResponse.envelopes.count
     }
 }

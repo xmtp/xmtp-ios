@@ -8,6 +8,7 @@
 import Foundation
 import web3
 import XMTPProto
+import XMTPRust
 
 /// Specify configuration options for creating a ``Client``.
 public struct ClientOptions {
@@ -73,9 +74,11 @@ public class Client {
 	public static func create(account: SigningKey, options: ClientOptions? = nil) async throws -> Client {
 		let options = options ?? ClientOptions()
 
+        let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env))
 		let apiClient = try GRPCApiClient(
 			environment: options.api.env,
-			secure: options.api.isSecure
+			secure: options.api.isSecure,
+            rustClient: client
 		)
         
 		return try await create(account: account, apiClient: apiClient)
@@ -139,20 +142,22 @@ public class Client {
 		return nil
 	}
 
-	public static func from(bundle: PrivateKeyBundle, options: ClientOptions? = nil) throws -> Client {
-		return try from(v1Bundle: bundle.v1, options: options)
+	public static func from(bundle: PrivateKeyBundle, options: ClientOptions? = nil) async throws -> Client {
+		return try await from(v1Bundle: bundle.v1, options: options)
 	}
 
 	/// Create a Client from saved v1 key bundle.
-	public static func from(v1Bundle: PrivateKeyBundleV1, options: ClientOptions? = nil) throws -> Client {
+	public static func from(v1Bundle: PrivateKeyBundleV1, options: ClientOptions? = nil) async throws -> Client {
 		let address = try v1Bundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress
 
 		let options = options ?? ClientOptions()
 
-		let apiClient = try GRPCApiClient(
-			environment: options.api.env,
-			secure: options.api.isSecure
-		)
+        let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env))
+        let apiClient = try GRPCApiClient(
+            environment: options.api.env,
+            secure: options.api.isSecure,
+            rustClient: client
+        )
 
 		return try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient)
 	}
