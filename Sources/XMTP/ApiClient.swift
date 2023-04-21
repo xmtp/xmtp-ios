@@ -147,36 +147,38 @@ class GRPCApiClient: ApiClient {
 	}
 
     func subscribe(topics: [String])  -> AsyncThrowingStream<Envelope, Error> {
-        var topicsVec = RustVec<RustString>()
-        for topic in topics {
-            topicsVec.push(value: topic.intoRustString())
+
+        return AsyncThrowingStream { continuation in
+            Task {
+                let topicsVec = RustVec<RustString>()
+                for topic in topics {
+                    topicsVec.push(value: topic.intoRustString())
+                }
+                let subscription = try await self.rustClient.subscribe(topicsVec)
+                // Run a continuous for loop polling subscription.get_messages() and then waiting for 2 seconds
+                while true {
+                    let rustEnvelopes = try subscription.get_messages()
+                    for rustEnvelope in rustEnvelopes {
+                        var swiftEnvelope = Envelope()
+                        swiftEnvelope.contentTopic = rustEnvelope.get_topic().toString()
+                        swiftEnvelope.timestampNs = rustEnvelope.get_sender_time_ns()
+                        swiftEnvelope.message = Data().dataFromRustVec(rustVec: rustEnvelope.get_payload())
+                        continuation.yield(swiftEnvelope)
+                    }
+                    try await Task.sleep(nanoseconds: 1000_000_000)
+                }
+            }
         }
-        // let subscription = try await self.rustClient.subscribe(topicsVec)
-        // return AsyncThrowingStream { continuation in
-        //     Task {
-        // // Run a continuous for loop polling subscription.get_messages() and then waiting for 2 seconds
-        // for await _ in 0... {
-        //     let rustEnvelopes = try await subscription.get_messages()
-        //     for rustEnvelope in rustEnvelopes {
-        //         var swiftEnvelope = Envelope()
-        //         swiftEnvelope.contentTopic = rustEnvelope.contentTopic
-        //         swiftEnvelope.timestampNs = rustEnvelope.timestampNs
-        //         swiftEnvelope.message = rustEnvelope.message
-        //         continuation.yield(swiftEnvelope)
-        //     }
-        //         }
-        //     }
-        // }
+    }
         // Fix the code above to 1) return an AsyncThrowingStream and 2) initiate the subscription and call get_messages on it
         // It needs to run a for loop constantly calling get_messages and waiting a few seconds
         // Then it needs to yield the Envelope objects to the continuation
         // Then it needs to return the AsyncThrowingStream
-        return AsyncThrowingStream { continuation in
-            Task {
+//        return AsyncThrowingStream { continuation in
+//            Task {
 //                    continuation.yield(Envelope())
-                }
-        }
-    }
+//                }
+//        }
 
 	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
 
