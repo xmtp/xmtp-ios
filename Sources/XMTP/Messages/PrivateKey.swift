@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import secp256k1
 import XMTPProto
+import XMTPRust
 
 /// Represents a secp256k1 private key.  ``PrivateKey`` conforms to ``SigningKey`` so you can use it
 /// to create a ``Client``.
@@ -77,7 +77,7 @@ public extension PrivateKey {
 
 	internal func sign(key: UnsignedPublicKey) async throws -> SignedPublicKey {
 		let bytes = try key.serializedData()
-		let digest = SHA256.hash(data: bytes)
+        let digest = Data().dataFromRustVec(rustVec: XMTPRust.sha256(bytes.dataToRustVec()))
 		let signature = try await sign(Data(digest.bytes))
 
 		var signedPublicKey = SignedPublicKey()

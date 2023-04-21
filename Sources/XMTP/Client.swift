@@ -74,7 +74,7 @@ public class Client {
 	public static func create(account: SigningKey, options: ClientOptions? = nil) async throws -> Client {
 		let options = options ?? ClientOptions()
 
-        let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env))
+        let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env), options.api.env != .local)
 		let apiClient = try GRPCApiClient(
 			environment: options.api.env,
 			secure: options.api.isSecure,
@@ -152,7 +152,7 @@ public class Client {
 
 		let options = options ?? ClientOptions()
 
-        let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env))
+        let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env), options.api.env != .local)
         let apiClient = try GRPCApiClient(
             environment: options.api.env,
             secure: options.api.isSecure,

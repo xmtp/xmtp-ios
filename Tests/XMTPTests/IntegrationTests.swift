@@ -25,7 +25,7 @@ final class IntegrationTests: XCTestCase {
 
 		let authToken = try await authorized.createAuthToken()
 
-        let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local))
+        let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
         let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
 		api.setAuthToken(authToken)
 
@@ -74,7 +74,7 @@ final class IntegrationTests: XCTestCase {
 		let identity = try PrivateKey.generate()
 		let authorized = try await aliceWallet.createIdentity(identity)
 		let authToken = try await authorized.createAuthToken()
-        let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local))
+        let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
         let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
 		api.setAuthToken(authToken)
 		let encryptedBundle = try await PrivateKeyBundle(v1: alice).encrypted(with: aliceWallet)
