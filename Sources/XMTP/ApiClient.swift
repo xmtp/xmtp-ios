@@ -170,15 +170,6 @@ class GRPCApiClient: ApiClient {
             }
         }
     }
-        // Fix the code above to 1) return an AsyncThrowingStream and 2) initiate the subscription and call get_messages on it
-        // It needs to run a for loop constantly calling get_messages and waiting a few seconds
-        // Then it needs to yield the Envelope objects to the continuation
-        // Then it needs to return the AsyncThrowingStream
-//        return AsyncThrowingStream { continuation in
-//            Task {
-//                    continuation.yield(Envelope())
-//                }
-//        }
 
 	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
 
