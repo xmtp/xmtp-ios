@@ -257,7 +257,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testStreamMessagesInV2Conversation() async throws {
-		throw XCTSkip("integration only (requires local node)")
+//		throw XCTSkip("integration only (requires local node)")
 
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
@@ -363,16 +363,16 @@ final class IntegrationTests: XCTestCase {
 		throw XCTSkip("integration only (requires dev network)")
 
 		// Generated from JS script
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			31, 116, 198, 193, 189, 122, 19, 254,
 			191, 189, 211, 215, 255, 131, 171, 239,
 			243, 33, 4, 62, 143, 86, 18, 195,
 			251, 61, 128, 90, 34, 126, 219, 236,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -433,16 +433,16 @@ final class IntegrationTests: XCTestCase {
 	func testCanReadGzipCompressedMessages() async throws {
 		throw XCTSkip("integration only (requires dev network)")
 
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			225, 2, 36, 98, 37, 243, 68, 234,
 			42, 126, 248, 246, 126, 83, 186, 197,
 			204, 186, 19, 173, 51, 0, 64, 0,
 			155, 8, 249, 247, 163, 185, 124, 159,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -456,16 +456,16 @@ final class IntegrationTests: XCTestCase {
 	func testCanReadZipCompressedMessages() async throws {
 		throw XCTSkip("integration only (requires dev network)")
 
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			60, 45, 240, 192, 223, 2, 14, 166,
 			122, 65, 231, 31, 122, 178, 158, 137,
 			192, 97, 139, 83, 133, 245, 149, 250,
 			25, 125, 25, 11, 203, 97, 12, 200,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -485,16 +485,16 @@ final class IntegrationTests: XCTestCase {
 	func testCanLoadAllConversations() async throws {
 		throw XCTSkip("integration only (requires dev network)")
 
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			105, 207, 193, 11, 240, 115, 115, 204,
 			117, 134, 201, 10, 56, 59, 52, 90,
 			229, 103, 15, 66, 20, 113, 118, 137,
 			44, 62, 130, 90, 30, 158, 182, 178,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 
