@@ -6,10 +6,10 @@
 //
 
 import Foundation
+import UIKit
 import WalletConnectSwift
 import web3
 import XMTP
-import UIKit
 
 extension WCURL {
 	var asURL: URL {
