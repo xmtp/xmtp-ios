@@ -165,7 +165,7 @@ class GRPCApiClient: ApiClient {
                         swiftEnvelope.message = Data().dataFromRustVec(rustVec: rustEnvelope.get_payload())
                         continuation.yield(swiftEnvelope)
                     }
-                    try await Task.sleep(nanoseconds: 1000_000_000)
+                    try await Task.sleep(nanoseconds: 50_000_000) // 50ms
                 }
             }
         }

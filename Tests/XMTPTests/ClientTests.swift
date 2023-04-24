@@ -14,17 +14,18 @@ import XMTPRust
 
 @available(iOS 15, *)
 class ClientTests: XCTestCase {
-//    func testTakesAWallet() async {
-//        do {
-//            let fakeWallet = try PrivateKey.generate()
-//            _ = try await Client.create(account: fakeWallet)
-//        } catch let error where error is RustString {
-//            print("Hello \(error.localizedDescription) type: \(type(of: error))")
-//        } catch {
-//            print("\(error) \(type(of: error))")
-//        }
-//    }
-    func testTakesAWallet() async throws {
+    func testTakesAWallet() async {
+        do {
+            let fakeWallet = try PrivateKey.generate()
+            _ = try await Client.create(account: fakeWallet)
+        } catch let error where error is RustString {
+            print("Hello \(error.localizedDescription) type: \(type(of: error))")
+        } catch {
+            print("\(error) \(type(of: error))")
+        }
+    }
+
+    func testTakesAKeyAsWallet() async throws {
         let fakeWallet = try PrivateKey.generate()
         _ = try await Client.create(account: fakeWallet)
     }
@@ -46,7 +47,7 @@ class ClientTests: XCTestCase {
     
     func testHasPrivateKeyBundleV1() async throws {
         let fakeWallet = try PrivateKey.generate()
-        let client = try await Client.create(account: fakeWallet)
+        let client = try await Client.create(account: fakeWallet, apiClient: FakeApiClient())
         
         XCTAssertEqual(1, client.privateKeyBundleV1.preKeys.count)
         

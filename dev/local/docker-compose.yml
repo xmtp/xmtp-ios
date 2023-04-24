@@ -8,6 +8,7 @@ services:
       - --ws
       - --store
       - --message-db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --message-db-reader-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
       - --lightpush
       - --filter
       - --ws-port=9001
@@ -20,7 +21,7 @@ services:
     depends_on:
       - db
     healthcheck:
-      test: ["CMD", "lsof", "-i", ":5556"]
+      test: [ "CMD", "lsof", "-i", ":5556" ]
       interval: 3s
       timeout: 10s
       retries: 5
