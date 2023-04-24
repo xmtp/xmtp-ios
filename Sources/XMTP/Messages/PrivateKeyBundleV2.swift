@@ -35,7 +35,7 @@ extension PrivateKeyBundleV2 {
 	}
 
 	func sharedSecret(private privateData: Data, public publicData: Data) throws -> Data {
-        return try Data().dataFromRustVec(rustVec: XMTPRust.diffie_hellman_k256(privateData.dataToRustVec(), publicData.dataToRustVec()))
+		return try Data().dataFromRustVec(rustVec: XMTPRust.diffie_hellman_k256(privateData.dataToRustVec(), publicData.dataToRustVec()))
 	}
 
 	func findPreKey(_ myPreKey: SignedPublicKey) throws -> SignedPrivateKey {

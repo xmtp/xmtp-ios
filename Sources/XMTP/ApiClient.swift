@@ -5,10 +5,9 @@
 //  Created by Pat Nakajima on 11/17/22.
 //
 
+import Foundation
 import XMTPProto
 import XMTPRust
-import Foundation
-
 
 typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse
 typealias QueryResponse = Xmtp_MessageApi_V1_QueryResponse
@@ -16,7 +15,7 @@ typealias SubscribeRequest = Xmtp_MessageApi_V1_SubscribeRequest
 
 protocol ApiClient {
 	var environment: XMTPEnvironment { get }
-    init(environment: XMTPEnvironment, secure: Bool, rustClient: XMTPRust.RustClient) throws
+	init(environment: XMTPEnvironment, secure: Bool, rustClient: XMTPRust.RustClient) throws
 	func setAuthToken(_ token: String)
 	func query(topic: String, pagination: Pagination?, cursor: Xmtp_MessageApi_V1_Cursor?) async throws -> QueryResponse
 	func query(topic: Topic, pagination: Pagination?) async throws -> QueryResponse
@@ -26,62 +25,61 @@ protocol ApiClient {
 }
 
 extension Data {
-    func dataToRustVec() -> RustVec<UInt8> {
-        let rustVec = RustVec<UInt8>()
-        for byte in self {
-            rustVec.push(value: byte)
-        }
-        return rustVec
-    }
-    
-    func dataFromRustVec(rustVec: RustVec<UInt8>) -> Data {
-        var listBytes: [UInt8] = []
-        for byte in rustVec {
-            listBytes.append(byte)
-        }
-        return Data(listBytes)
-    }
+	func dataToRustVec() -> RustVec<UInt8> {
+		let rustVec = RustVec<UInt8>()
+		for byte in self {
+			rustVec.push(value: byte)
+		}
+		return rustVec
+	}
+
+	func dataFromRustVec(rustVec: RustVec<UInt8>) -> Data {
+		var listBytes: [UInt8] = []
+		for byte in rustVec {
+			listBytes.append(byte)
+		}
+		return Data(listBytes)
+	}
 }
 
 class GRPCApiClient: ApiClient {
-    
 	let ClientVersionHeaderKey = "X-Client-Version"
 	let AppVersionHeaderKey = "X-App-Version"
 
 	var environment: XMTPEnvironment
 	var authToken = ""
 
-    var rustClient: XMTPRust.RustClient
+	var rustClient: XMTPRust.RustClient
 
-    required init(environment: XMTPEnvironment, secure: Bool = true, rustClient: XMTPRust.RustClient) throws {
+	required init(environment: XMTPEnvironment, secure _: Bool = true, rustClient: XMTPRust.RustClient) throws {
 		self.environment = environment
-        // TODO: this is a hack to do an async thing in a synchronous way
-        self.rustClient = rustClient
+		// TODO: this is a hack to do an async thing in a synchronous way
+		self.rustClient = rustClient
 	}
-    
-    func dataToRustVec(data: Data) -> RustVec<UInt8> {
-        let rustVec = RustVec<UInt8>()
-        for byte in data {
-            rustVec.push(value: byte)
-        }
-        return rustVec
-    }
-    
-    func dataFromRustVec(rustVec: RustVec<UInt8>) -> Data {
-        var listBytes: [UInt8] = []
-        for byte in rustVec {
-            listBytes.append(byte)
-        }
-        return Data(listBytes)
-    }
-    
-    static func envToUrl(env: XMTPEnvironment) -> String {
-        switch (env) {
-        case XMTPEnvironment.local: return "http://localhost:5556";
-        case XMTPEnvironment.dev: return "https://dev.xmtp.network:5556";
-        case XMTPEnvironment.production: return "https://xmtp.network:5556";
-        }
-    }
+
+	func dataToRustVec(data: Data) -> RustVec<UInt8> {
+		let rustVec = RustVec<UInt8>()
+		for byte in data {
+			rustVec.push(value: byte)
+		}
+		return rustVec
+	}
+
+	func dataFromRustVec(rustVec: RustVec<UInt8>) -> Data {
+		var listBytes: [UInt8] = []
+		for byte in rustVec {
+			listBytes.append(byte)
+		}
+		return Data(listBytes)
+	}
+
+	static func envToUrl(env: XMTPEnvironment) -> String {
+		switch env {
+		case XMTPEnvironment.local: return "http://localhost:5556"
+		case XMTPEnvironment.dev: return "https://dev.xmtp.network:5556"
+		case XMTPEnvironment.production: return "https://xmtp.network:5556"
+		}
+	}
 
 	func setAuthToken(_ token: String) {
 		authToken = token
@@ -109,20 +107,20 @@ class GRPCApiClient: ApiClient {
 			request.pagingInfo.cursor = cursor
 		}
 
-        let paging = XMTPRust.PagingInfo(limit: 0, cursor: nil, direction: XMTPRust.SortDirection.Ascending)
-        let response = try await self.rustClient.query(topic.intoRustString(), Optional.none, Optional.none, Optional.none)
-        // response has .envelopes() and .paging_info() but the envelopes need to be mapped into Envelope objects that Swift understands
-        var queryResponse = QueryResponse()
-        // Build the query response from response fields
-        queryResponse.envelopes = response.envelopes().map { rustEnvelope in
-            var envelope = Envelope()
-            envelope.contentTopic = rustEnvelope.get_topic().toString()
-            envelope.timestampNs = rustEnvelope.get_sender_time_ns()
-            envelope.message = dataFromRustVec(rustVec: rustEnvelope.get_payload())
-            return envelope
-        }
-    // Decode the response as a QueryResponse
-    return queryResponse
+		let paging = XMTPRust.PagingInfo(limit: 0, cursor: nil, direction: XMTPRust.SortDirection.Ascending)
+		let response = try await rustClient.query(topic.intoRustString(), Optional.none, Optional.none, Optional.none)
+		// response has .envelopes() and .paging_info() but the envelopes need to be mapped into Envelope objects that Swift understands
+		var queryResponse = QueryResponse()
+		// Build the query response from response fields
+		queryResponse.envelopes = response.envelopes().map { rustEnvelope in
+			var envelope = Envelope()
+			envelope.contentTopic = rustEnvelope.get_topic().toString()
+			envelope.timestampNs = rustEnvelope.get_sender_time_ns()
+			envelope.message = dataFromRustVec(rustVec: rustEnvelope.get_payload())
+			return envelope
+		}
+		// Decode the response as a QueryResponse
+		return queryResponse
 	}
 
 	func envelopes(topic: String, pagination: Pagination? = nil) async throws -> [Envelope] {
@@ -146,48 +144,46 @@ class GRPCApiClient: ApiClient {
 		return try await query(topic: topic.description, pagination: pagination)
 	}
 
-    func subscribe(topics: [String])  -> AsyncThrowingStream<Envelope, Error> {
-
-        return AsyncThrowingStream { continuation in
-            Task {
-                let topicsVec = RustVec<RustString>()
-                for topic in topics {
-                    topicsVec.push(value: topic.intoRustString())
-                }
-                let subscription = try await self.rustClient.subscribe(topicsVec)
-                // Run a continuous for loop polling subscription.get_messages() and then waiting for 2 seconds
-                while true {
-                    let rustEnvelopes = try subscription.get_messages()
-                    for rustEnvelope in rustEnvelopes {
-                        var swiftEnvelope = Envelope()
-                        swiftEnvelope.contentTopic = rustEnvelope.get_topic().toString()
-                        swiftEnvelope.timestampNs = rustEnvelope.get_sender_time_ns()
-                        swiftEnvelope.message = Data().dataFromRustVec(rustVec: rustEnvelope.get_payload())
-                        continuation.yield(swiftEnvelope)
-                    }
-                    try await Task.sleep(nanoseconds: 50_000_000) // 50ms
-                }
-            }
-        }
-    }
+	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
+		return AsyncThrowingStream { continuation in
+			Task {
+				let topicsVec = RustVec<RustString>()
+				for topic in topics {
+					topicsVec.push(value: topic.intoRustString())
+				}
+				let subscription = try await self.rustClient.subscribe(topicsVec)
+				// Run a continuous for loop polling subscription.get_messages() and then waiting for 2 seconds
+				while true {
+					let rustEnvelopes = try subscription.get_messages()
+					for rustEnvelope in rustEnvelopes {
+						var swiftEnvelope = Envelope()
+						swiftEnvelope.contentTopic = rustEnvelope.get_topic().toString()
+						swiftEnvelope.timestampNs = rustEnvelope.get_sender_time_ns()
+						swiftEnvelope.message = Data().dataFromRustVec(rustVec: rustEnvelope.get_payload())
+						continuation.yield(swiftEnvelope)
+					}
+					try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+				}
+			}
+		}
+	}
 
 	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
-
 		var request = Xmtp_MessageApi_V1_PublishRequest()
 		request.envelopes = envelopes
-        
-        let envelopesVec = RustVec<XMTPRust.Envelope>()
-        
-        envelopes.forEach( { envelope in
-            let rustEnvelope = XMTPRust.create_envelope(envelope.contentTopic.intoRustString(), envelope.timestampNs, dataToRustVec(data: envelope.message))
-            envelopesVec.push(value: rustEnvelope)
-        })
-        let response = try await self.rustClient.publish(self.authToken.intoRustString(), envelopesVec)
-        let publishResponse = PublishResponse()
-        return publishResponse
+
+		let envelopesVec = RustVec<XMTPRust.Envelope>()
+
+		envelopes.forEach { envelope in
+			let rustEnvelope = XMTPRust.create_envelope(envelope.contentTopic.intoRustString(), envelope.timestampNs, dataToRustVec(data: envelope.message))
+			envelopesVec.push(value: rustEnvelope)
+		}
+		let response = try await rustClient.publish(authToken.intoRustString(), envelopesVec)
+		let publishResponse = PublishResponse()
+		return publishResponse
 	}
-    
-    public static func runGrpcTest() async throws -> Int {
-        return 0
-    }
+
+	public static func runGrpcTest() async throws -> Int {
+		return 0
+	}
 }

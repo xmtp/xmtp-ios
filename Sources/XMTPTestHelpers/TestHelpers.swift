@@ -43,9 +43,9 @@ enum FakeApiClientError: String, Error {
 }
 
 class FakeStreamHolder: ObservableObject {
-    @Published var envelope: XMTP.Envelope?
+	@Published var envelope: XMTP.Envelope?
 
-    func send(envelope: XMTP.Envelope) {
+	func send(envelope: XMTP.Envelope) {
 		self.envelope = envelope
 	}
 }
@@ -58,9 +58,9 @@ public class FakeApiClient: ApiClient {
 
 	public var environment: XMTPEnvironment
 	public var authToken: String = ""
-    private var responses: [String: [XMTP.Envelope]] = [:]
+	private var responses: [String: [XMTP.Envelope]] = [:]
 	private var stream = FakeStreamHolder()
-    public var published: [XMTP.Envelope] = []
+	public var published: [XMTP.Envelope] = []
 	var cancellable: AnyCancellable?
 	var forbiddingQueries = false
 
@@ -82,7 +82,7 @@ public class FakeApiClient: ApiClient {
 		forbiddingQueries = false
 	}
 
-    public func register(message: [XMTP.Envelope], for topic: Topic) {
+	public func register(message: [XMTP.Envelope], for topic: Topic) {
 		var responsesForTopic = responses[topic.description] ?? []
 		responsesForTopic.append(contentsOf: message)
 		responses[topic.description] = responsesForTopic
@@ -92,15 +92,15 @@ public class FakeApiClient: ApiClient {
 		environment = .local
 	}
 
-    public func send(envelope: XMTP.Envelope) {
+	public func send(envelope: XMTP.Envelope) {
 		stream.send(envelope: envelope)
 	}
 
-    public func findPublishedEnvelope(_ topic: Topic) -> XMTP.Envelope? {
+	public func findPublishedEnvelope(_ topic: Topic) -> XMTP.Envelope? {
 		return findPublishedEnvelope(topic.description)
 	}
 
-    public func findPublishedEnvelope(_ topic: String) -> XMTP.Envelope? {
+	public func findPublishedEnvelope(_ topic: String) -> XMTP.Envelope? {
 		for envelope in published.reversed() {
 			if envelope.contentTopic == topic.description {
 				return envelope
@@ -112,11 +112,11 @@ public class FakeApiClient: ApiClient {
 
 	// MARK: ApiClient conformance
 
-    public required init(environment: XMTP.XMTPEnvironment, secure _: Bool, rustClient: XMTPRust.RustClient) throws {
+	public required init(environment: XMTP.XMTPEnvironment, secure _: Bool, rustClient _: XMTPRust.RustClient) throws {
 		self.environment = environment
 	}
 
-    public func subscribe(topics: [String]) -> AsyncThrowingStream<XMTP.Envelope, Error> {
+	public func subscribe(topics: [String]) -> AsyncThrowingStream<XMTP.Envelope, Error> {
 		AsyncThrowingStream { continuation in
 			self.cancellable = stream.$envelope.sink(receiveValue: { env in
 				if let env, topics.contains(env.contentTopic) {
@@ -136,7 +136,7 @@ public class FakeApiClient: ApiClient {
 			throw FakeApiClientError.queryAssertionFailure
 		}
 
-        var result: [XMTP.Envelope] = []
+		var result: [XMTP.Envelope] = []
 
 		if let response = responses.removeValue(forKey: topic) {
 			result.append(contentsOf: response)

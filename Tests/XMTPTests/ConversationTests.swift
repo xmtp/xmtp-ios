@@ -356,9 +356,9 @@ class ConversationTests: XCTestCase {
 
 		Task(priority: .userInitiated) {
 			for try await message in conversation.streamMessages() {
-                if message.body == "hi alice" {
-                    expectation.fulfill()
-                }
+				if message.body == "hi alice" {
+					expectation.fulfill()
+				}
 			}
 		}
 

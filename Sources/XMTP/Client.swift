@@ -78,12 +78,11 @@ public class Client {
 		let apiClient = try GRPCApiClient(
 			environment: options.api.env,
 			secure: options.api.isSecure,
-            rustClient: client
+			rustClient: client
 		)
-        
+
 		return try await create(account: account, apiClient: apiClient)
 	}
-
 
 	static func create(account: SigningKey, apiClient: ApiClient) async throws -> Client {
 		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient)
@@ -152,12 +151,12 @@ public class Client {
 
 		let options = options ?? ClientOptions()
 
-        let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env), options.api.env != .local)
-        let apiClient = try GRPCApiClient(
-            environment: options.api.env,
-            secure: options.api.isSecure,
-            rustClient: client
-        )
+		let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env), options.api.env != .local)
+		let apiClient = try GRPCApiClient(
+			environment: options.api.env,
+			secure: options.api.isSecure,
+			rustClient: client
+		)
 
 		return try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient)
 	}

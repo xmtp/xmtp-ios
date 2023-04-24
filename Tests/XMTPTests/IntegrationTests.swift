@@ -10,8 +10,8 @@ import secp256k1
 import web3
 import XCTest
 @testable import XMTP
-import XMTPTestHelpers
 import XMTPRust
+import XMTPTestHelpers
 
 @available(iOS 16, *)
 final class IntegrationTests: XCTestCase {
@@ -25,8 +25,8 @@ final class IntegrationTests: XCTestCase {
 
 		let authToken = try await authorized.createAuthToken()
 
-        let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
-        let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
+		let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
+		let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
 		api.setAuthToken(authToken)
 
 		let encryptedBundle = try await authorized.toBundle.encrypted(with: alice)
@@ -74,8 +74,8 @@ final class IntegrationTests: XCTestCase {
 		let identity = try PrivateKey.generate()
 		let authorized = try await aliceWallet.createIdentity(identity)
 		let authToken = try await authorized.createAuthToken()
-        let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
-        let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
+		let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
+		let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
 		api.setAuthToken(authToken)
 		let encryptedBundle = try await PrivateKeyBundle(v1: alice).encrypted(with: aliceWallet)
 		var envelope = Envelope()

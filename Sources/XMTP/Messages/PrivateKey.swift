@@ -77,7 +77,7 @@ public extension PrivateKey {
 
 	internal func sign(key: UnsignedPublicKey) async throws -> SignedPublicKey {
 		let bytes = try key.serializedData()
-        let digest = Data().dataFromRustVec(rustVec: XMTPRust.sha256(bytes.dataToRustVec()))
+		let digest = Data().dataFromRustVec(rustVec: XMTPRust.sha256(bytes.dataToRustVec()))
 		let signature = try await sign(Data(digest.bytes))
 
 		var signedPublicKey = SignedPublicKey()
