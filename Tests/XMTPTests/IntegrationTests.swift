@@ -9,6 +9,7 @@ import Foundation
 import secp256k1
 import web3
 import XCTest
+import XMTPRust
 @testable import XMTP
 import XMTPRust
 import XMTPTestHelpers
@@ -495,6 +496,7 @@ final class IntegrationTests: XCTestCase {
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
 		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
+
 
 		let client = try await XMTP.Client.create(account: key)
 

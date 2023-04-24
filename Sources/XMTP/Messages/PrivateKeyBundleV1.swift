@@ -7,7 +7,9 @@
 
 import CryptoKit
 import Foundation
-import XMTPProto
+import web3
+import XMTPRust
+
 
 public typealias PrivateKeyBundleV1 = Xmtp_MessageContents_PrivateKeyBundleV1
 
@@ -21,6 +23,13 @@ extension PrivateKeyBundleV1 {
 
 		let bytesToSign = try UnsignedPublicKey(preKey.publicKey).serializedData()
 		let signature = try await privateKey.sign(Data(SHA256.hash(data: bytesToSign)))
+
+
+		print("Signature: \(signature.rawData)")
+
+		print("KeyUtilx recovered: \(try KeyUtilx.recoverPublicKey(message: Data(SHA256.hash(data: bytesToSign)), signature: signature.rawData).toHex)")
+		print("XMTPRust recovered: \(try XMTPRust.CoreCrypto.recover_public_key_sha256(message: Data(SHA256.hash(data: bytesToSign)), signature: signature.rawData).toHex)")
+
 
 		bundle.v1.identityKey = authorizedIdentity.identity
 		bundle.v1.identityKey.publicKey = authorizedIdentity.authorized

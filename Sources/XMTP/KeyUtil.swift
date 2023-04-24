@@ -6,6 +6,7 @@ import Foundation
 import Logging
 import secp256k1
 import web3
+import XMTPRust
 
 enum KeyUtilError: Error {
 	case invalidContext
@@ -18,14 +19,13 @@ enum KeyUtilError: Error {
 }
 
 // Copied from web3.swift since its version is `internal`
-enum KeyUtil {
+enum KeyUtilx {
 	private static var logger: Logger {
 		Logger(label: "web3.swift.key-util")
 	}
 
-	static func xmtpGeneratePublicKey(from privateKeyData: Data) throws -> Data {
-		let privateKey = try secp256k1.Signing.PrivateKey(rawRepresentation: privateKeyData, format: .uncompressed)
-		return privateKey.publicKey.rawRepresentation
+	static func generatePublicKey(from data: Data) throws -> Data {
+		try XMTPRust.CoreCrypto.get_public_key_from_private(privateKeyBytes: data)
 	}
 
 	static func sign(message: Data, with privateKey: Data, hashing: Bool) throws -> Data {
