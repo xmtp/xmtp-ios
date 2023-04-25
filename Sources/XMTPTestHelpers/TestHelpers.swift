@@ -9,7 +9,6 @@
 import Combine
 import XCTest
 @testable import XMTP
-import XMTPProto
 import XMTPRust
 
 public struct FakeWallet: SigningKey {
