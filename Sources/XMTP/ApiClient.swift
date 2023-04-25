@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import XMTPProto
 import XMTPRust
 
 typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse

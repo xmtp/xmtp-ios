@@ -38,7 +38,7 @@ extension SigningKey {
 		let signature = try await sign(message: signatureText)
 
 		let message = try Signature.ethPersonalMessage(signatureText)
-		let recoveredKey = try XMTPRust.CoreCrypto.recover_public_key_keccak256(message: message, signature: signature.rawData)
+		let recoveredKey = try KeyUtilx.recoverPublicKeyKeccak256(from: signature.rawData, message: message)
 		let address = KeyUtilx.generateAddress(from: recoveredKey).toChecksumAddress()
 
 		var authorized = PublicKey()

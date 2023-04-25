@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import XMTPProto
-import XMTPRust
 import XMTPRust
 import CryptoKit
 
@@ -56,7 +54,7 @@ public extension PrivateKey {
 		timestamp = UInt64(Date().millisecondsSinceEpoch)
 		secp256K1.bytes = privateKeyData
 
-		let publicData = try XMTPRust.CoreCrypto.get_public_key_from_private(privateKeyBytes: privateKeyData)
+		let publicData = try KeyUtilx.generatePublicKey(from: privateKeyData)
 		publicKey.secp256K1Uncompressed.bytes = publicData
 		publicKey.timestamp = timestamp
 	}

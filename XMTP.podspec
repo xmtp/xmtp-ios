@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "XMTP"
-  spec.version      = "0.1.2"
+  spec.version      = "0.2.0"
   spec.summary      = "XMTP pod."
 
   # This description is used to generate tags and improve search results.
@@ -47,7 +47,7 @@ Pod::Spec.new do |spec|
   spec.dependency 'XMTPRust', '= 0.2.0-beta0'
 
   spec.xcconfig = {'VALID_ARCHS' =>  'arm64' }
-  spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+#  spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
   def spec.post_install(target)
     target.build_configurations.each do |config|

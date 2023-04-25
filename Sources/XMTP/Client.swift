@@ -7,7 +7,6 @@
 
 import Foundation
 import web3
-import XMTPProto
 import XMTPRust
 
 /// Specify configuration options for creating a ``Client``.

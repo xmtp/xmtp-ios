@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import XMTPProto
 import XMTPRust
 
 /// Represents a secp256k1 compact recoverable signature.

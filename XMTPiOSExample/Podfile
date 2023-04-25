@@ -11,7 +11,7 @@ target 'NotificationService' do
   pod "web3.swift"
 #  pod "XMTPProto", path: "../../proto"
 #	pod "XMTPRust", path: '../../xmtp-rust-swift'
-	pod "XMTP", path: ".."
+	pod "XMTP", path: "../"
 end
 
 target 'XMTPiOSExample' do
@@ -20,10 +20,11 @@ target 'XMTPiOSExample' do
 
   # Pods for XMTPiOSExample
   # pod "secp256k1Swift", git: "https://github.com/portto/secp256k1.swift"
+	pod 'WalletConnectSwift'
   pod "web3.swift"
 #  pod "XMTPProto", path: "../../proto"
 #  pod "XMTPRust", path: '../../xmtp-rust-swift'
-	pod "XMTP", path: ".."
+	pod "XMTP", path: "../"
 end
 
 post_install do |installer|

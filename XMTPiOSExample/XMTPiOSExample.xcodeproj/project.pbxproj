@@ -18,7 +18,6 @@
 		A6557A312941166E00CC4C7B /* MessageCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6557A302941166E00CC4C7B /* MessageCellView.swift */; };
 		A6557A3329411F4F00CC4C7B /* NewConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6557A3229411F4F00CC4C7B /* NewConversationView.swift */; };
 		A65F0704297B5D4E00C3C76E /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A65F0703297B5D4E00C3C76E /* Persistence.swift */; };
-		A65F0707297B5E7600C3C76E /* WalletConnectSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A65F0706297B5E7600C3C76E /* WalletConnectSwift */; };
 		A65F070A297B5E8600C3C76E /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A65F0709297B5E8600C3C76E /* KeychainAccess */; };
 		A67CCEC129355B4B00131F5C /* AccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67CCEC029355B4B00131F5C /* AccountManager.swift */; };
 		A683860C293EA862006336FF /* MessageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A683860B293EA862006336FF /* MessageListView.swift */; };
@@ -85,6 +84,7 @@
 		A6AE5180297B61AE006FDD0F /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6AE518B297B61C8006FDD0F /* NotificationService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationService.entitlements; sourceTree = "<group>"; };
 		A6AE518C297B6210006FDD0F /* NotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		A6CB98CB29F85D9200F2DC58 /* XMTP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XMTP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6D192CF293A7B97006B49F2 /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
 		AC94A32B5A9066C82DCAD2EB /* Pods-NotificationService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService.release.xcconfig"; path = "Target Support Files/Pods-NotificationService/Pods-NotificationService.release.xcconfig"; sourceTree = "<group>"; };
 		B1A60F43A14DA4C930D19139 /* Pods_NotificationService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NotificationService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -96,7 +96,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A65F0707297B5E7600C3C76E /* WalletConnectSwift in Frameworks */,
 				A65F070A297B5E8600C3C76E /* KeychainAccess in Frameworks */,
 				B815305000C45E0BDC765F4E /* Pods_XMTPiOSExample.framework in Frameworks */,
 			);
@@ -128,6 +127,7 @@
 		A6281986292DC825004B9117 = {
 			isa = PBXGroup;
 			children = (
+				A6CB98C829F85CE600F2DC58 /* Packages */,
 				A6281991292DC825004B9117 /* XMTPiOSExample */,
 				A6AE5181297B61AE006FDD0F /* NotificationService */,
 				A6281990292DC825004B9117 /* Products */,
@@ -182,6 +182,7 @@
 		A69F33C4292DC992005A5556 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A6CB98CB29F85D9200F2DC58 /* XMTP.framework */,
 				B1A60F43A14DA4C930D19139 /* Pods_NotificationService.framework */,
 				01A605D7B630CB965056BE4D /* Pods_XMTPiOSExample.framework */,
 			);
@@ -213,6 +214,13 @@
 			path = NotificationService;
 			sourceTree = "<group>";
 		};
+		A6CB98C829F85CE600F2DC58 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -234,7 +242,6 @@
 			);
 			name = XMTPiOSExample;
 			packageProductDependencies = (
-				A65F0706297B5E7600C3C76E /* WalletConnectSwift */,
 				A65F0709297B5E8600C3C76E /* KeychainAccess */,
 			);
 			productName = XMTPiOSExample;
@@ -290,7 +297,6 @@
 			);
 			mainGroup = A6281986292DC825004B9117;
 			packageReferences = (
-				A65F0705297B5E7500C3C76E /* XCRemoteSwiftPackageReference "WalletConnectSwift" */,
 				A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 			);
 			productRefGroup = A6281990292DC825004B9117 /* Products */;
@@ -712,14 +718,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		A65F0705297B5E7500C3C76E /* XCRemoteSwiftPackageReference "WalletConnectSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/WalletConnect/WalletConnectSwift";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
@@ -731,11 +729,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A65F0706297B5E7600C3C76E /* WalletConnectSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A65F0705297B5E7500C3C76E /* XCRemoteSwiftPackageReference "WalletConnectSwift" */;
-			productName = WalletConnectSwift;
-		};
 		A65F0709297B5E8600C3C76E /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */;

@@ -43,7 +43,7 @@ extension MessageV2 {
 
 			// Verify content signature
 			let key = try PublicKey.with { key in
-				key.secp256K1Uncompressed.bytes = try XMTPRust.CoreCrypto.recover_public_key_sha256(message: Data(message.headerBytes + signed.payload), signature: signed.signature.rawData)
+				key.secp256K1Uncompressed.bytes = try KeyUtilx.recoverPublicKeySHA256(from: signed.signature.rawData, message: Data(message.headerBytes + signed.payload))
 			}
 
 			if key.walletAddress != (try PublicKey(signed.sender.preKey).walletAddress) {
