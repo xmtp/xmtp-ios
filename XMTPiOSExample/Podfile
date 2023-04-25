@@ -9,6 +9,7 @@ target 'NotificationService' do
 	# Pods for XMTPiOSExample
 	# pod "secp256k1Swift", git: "https://github.com/portto/secp256k1.swift"
   pod "web3.swift"
+	pod 'KeychainAccess'
 #  pod "XMTPProto", path: "../../proto"
 #	pod "XMTPRust", path: '../../xmtp-rust-swift'
 	pod "XMTP", path: "../"
@@ -22,6 +23,7 @@ target 'XMTPiOSExample' do
   # pod "secp256k1Swift", git: "https://github.com/portto/secp256k1.swift"
 	pod 'WalletConnectSwift'
   pod "web3.swift"
+	pod 'KeychainAccess'
 #  pod "XMTPProto", path: "../../proto"
 #  pod "XMTPRust", path: '../../xmtp-rust-swift'
 	pod "XMTP", path: "../"

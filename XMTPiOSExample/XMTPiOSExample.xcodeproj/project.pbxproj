@@ -18,7 +18,6 @@
 		A6557A312941166E00CC4C7B /* MessageCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6557A302941166E00CC4C7B /* MessageCellView.swift */; };
 		A6557A3329411F4F00CC4C7B /* NewConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6557A3229411F4F00CC4C7B /* NewConversationView.swift */; };
 		A65F0704297B5D4E00C3C76E /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A65F0703297B5D4E00C3C76E /* Persistence.swift */; };
-		A65F070A297B5E8600C3C76E /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A65F0709297B5E8600C3C76E /* KeychainAccess */; };
 		A67CCEC129355B4B00131F5C /* AccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67CCEC029355B4B00131F5C /* AccountManager.swift */; };
 		A683860C293EA862006336FF /* MessageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A683860B293EA862006336FF /* MessageListView.swift */; };
 		A687810729679BC700042FAB /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = A687810629679BC700042FAB /* Account.swift */; };
@@ -29,7 +28,6 @@
 		A6AE5187297B61AE006FDD0F /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A6AE5180297B61AE006FDD0F /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A6AE518E297B6210006FDD0F /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AE518C297B6210006FDD0F /* NotificationService.swift */; };
 		A6AE5192297B6270006FDD0F /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A65F0703297B5D4E00C3C76E /* Persistence.swift */; };
-		A6AE5194297B62C8006FDD0F /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A6AE5193297B62C8006FDD0F /* KeychainAccess */; };
 		A6D192D0293A7B97006B49F2 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D192CF293A7B97006B49F2 /* ConversationListView.swift */; };
 		B815305000C45E0BDC765F4E /* Pods_XMTPiOSExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01A605D7B630CB965056BE4D /* Pods_XMTPiOSExample.framework */; };
 /* End PBXBuildFile section */
@@ -96,7 +94,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A65F070A297B5E8600C3C76E /* KeychainAccess in Frameworks */,
 				B815305000C45E0BDC765F4E /* Pods_XMTPiOSExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -105,7 +102,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A6AE5194297B62C8006FDD0F /* KeychainAccess in Frameworks */,
 				32C62D213641651EBC32117E /* Pods_NotificationService.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -242,7 +238,6 @@
 			);
 			name = XMTPiOSExample;
 			packageProductDependencies = (
-				A65F0709297B5E8600C3C76E /* KeychainAccess */,
 			);
 			productName = XMTPiOSExample;
 			productReference = A628198F292DC825004B9117 /* XMTPiOSExample.app */;
@@ -263,7 +258,6 @@
 			);
 			name = NotificationService;
 			packageProductDependencies = (
-				A6AE5193297B62C8006FDD0F /* KeychainAccess */,
 			);
 			productName = NotificationService;
 			productReference = A6AE5180297B61AE006FDD0F /* NotificationService.appex */;
@@ -297,7 +291,6 @@
 			);
 			mainGroup = A6281986292DC825004B9117;
 			packageReferences = (
-				A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 			);
 			productRefGroup = A6281990292DC825004B9117 /* Products */;
 			projectDirPath = "";
@@ -716,30 +709,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		A65F0709297B5E8600C3C76E /* KeychainAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
-		};
-		A6AE5193297B62C8006FDD0F /* KeychainAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A6281987292DC825004B9117 /* Project object */;
 }

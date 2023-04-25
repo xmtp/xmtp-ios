@@ -1,4 +1,5 @@
 XMTPiOSExample/Pods/
+XMTPiOSExample/build
 
 .DS_Store
 /.build

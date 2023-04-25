@@ -5,6 +5,7 @@ PODS:
   - CryptoSwift (1.6.0)
   - GenericJSON (2.0.2)
   - GzipSwift (5.1.1)
+  - KeychainAccess (4.2.2)
   - Logging (1.0.0)
   - secp256k1.swift (0.1.4)
   - SwiftProtobuf (1.21.0)
@@ -23,6 +24,7 @@ PODS:
   - XMTPRust (0.2.0-beta0)
 
 DEPENDENCIES:
+  - KeychainAccess
   - WalletConnectSwift
   - web3.swift
   - XMTP (from `../`)
@@ -34,6 +36,7 @@ SPEC REPOS:
     - CryptoSwift
     - GenericJSON
     - GzipSwift
+    - KeychainAccess
     - Logging
     - secp256k1.swift
     - SwiftProtobuf
@@ -51,6 +54,7 @@ SPEC CHECKSUMS:
   CryptoSwift: 562f8eceb40e80796fffc668b0cad9313284cfa6
   GenericJSON: 79a840eeb77030962e8cf02a62d36bd413b67626
   GzipSwift: 893f3e48e597a1a4f62fafcb6514220fcf8287fa
+  KeychainAccess: c0c4f7f38f6fc7bbe58f5702e25f7bd2f65abf51
   Logging: 9ef4ecb546ad3169398d5a723bc9bea1c46bef26
   secp256k1.swift: a7e7a214f6db6ce5db32cc6b2b45e5c4dd633634
   SwiftProtobuf: afced68785854575756db965e9da52bbf3dc45e7
@@ -59,6 +63,6 @@ SPEC CHECKSUMS:
   XMTP: 0a8f3478a8739d526404b61dfaa9538a187577c6
   XMTPRust: 7eb2da98f2bdb6d5d1a1d648dc0e9a91365ed211
 
-PODFILE CHECKSUM: 0d36d817e59812aadf84a0f7c5c9e548fa4923c3
+PODFILE CHECKSUM: b08ce1433b369fe0cf978eda8c1642c21fe389d6
 
 COCOAPODS: 1.12.1
