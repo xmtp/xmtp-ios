@@ -94,9 +94,10 @@ public class Client {
 
 	static func loadOrCreateKeys(for account: SigningKey, apiClient: ApiClient) async throws -> PrivateKeyBundleV1 {
 		// swiftlint:disable no_optional_try
+        print("Loadind loadOrCreateKeys")
 		if let keys = try await loadPrivateKeys(for: account, apiClient: apiClient) {
 			// swiftlint:enable no_optional_try
-
+            print("loading existing private keys.")
 			#if DEBUG
 				print("Loaded existing private keys.")
 			#endif
@@ -105,18 +106,20 @@ public class Client {
 			#if DEBUG
 				print("No existing keys found, creating new bundle.")
 			#endif
+            print("generating new private keys.")
 
 			let keys = try await PrivateKeyBundleV1.generate(wallet: account)
 			let keyBundle = PrivateKeyBundle(v1: keys)
 			let encryptedKeys = try await keyBundle.encrypted(with: account)
 
+            print("Got to authorized identity, trying it now")
 			var authorizedIdentity = AuthorizedIdentity(privateKeyBundleV1: keys)
 			authorizedIdentity.address = account.address
 			let authToken = try await authorizedIdentity.createAuthToken()
-
+            print("Generated auth token")
 			let apiClient = apiClient
 			apiClient.setAuthToken(authToken)
-
+            print("made it to setAuthToken")
 			_ = try await apiClient.publish(envelopes: [
 				Envelope(topic: .userPrivateStoreKeyBundle(account.address), timestamp: Date(), message: try encryptedKeys.serializedData()),
 			])

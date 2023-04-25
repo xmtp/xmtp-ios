@@ -155,11 +155,11 @@
     },
     {
       "identity" : "xmtp-rust-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/xmtp/xmtp-rust-swift",
+      "kind" : "localSourceControl",
+      "location" : "/Users/michaelx/Code/xmtp-rust-swift",
       "state" : {
-        "revision" : "f6b8cb1a9e35bca87af62a9986e6524d73bc888a",
-        "version" : "0.2.0-beta0"
+        "branch" : "michaelx-0.2.1-attempt",
+        "revision" : "018b95f6294b3266ca6db452b480c696943a7ba7"
       }
     }
   ],

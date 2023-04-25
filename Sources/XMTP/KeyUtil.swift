@@ -26,12 +26,12 @@ enum KeyUtilx {
 	}
 
 	static func recoverPublicKeySHA256(from data: Data, message: Data) throws -> Data {
-		let vec = try XMTPRust.recover_public_key_k256_sha256(RustVec<UInt8>(data), RustVec<UInt8>(message))
+		let vec = try XMTPRust.recover_public_key_k256_sha256(RustVec<UInt8>(message), RustVec<UInt8>(data))
 		return Data(vec)
 	}
 
 	static func recoverPublicKeyKeccak256(from data: Data, message: Data) throws -> Data {
-		let vec = try XMTPRust.recover_public_key_k256_keccak256(RustVec<UInt8>(data), RustVec<UInt8>(message))
+		let vec = try XMTPRust.recover_public_key_k256_keccak256(RustVec<UInt8>(message), RustVec<UInt8>(data))
 		return Data(vec)
 	}
 
