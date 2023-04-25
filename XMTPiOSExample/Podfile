@@ -11,7 +11,7 @@ target 'NotificationService' do
   pod "web3.swift"
 #  pod "XMTPProto", path: "../../proto"
 #	pod "XMTPRust", path: '../../xmtp-rust-swift'
-	pod "XMTP", "= 0.1.3-beta0"
+	pod "XMTP", path: ".."
 end
 
 target 'XMTPiOSExample' do
@@ -23,7 +23,7 @@ target 'XMTPiOSExample' do
   pod "web3.swift"
 #  pod "XMTPProto", path: "../../proto"
 #  pod "XMTPRust", path: '../../xmtp-rust-swift'
-	pod "XMTP", "= 0.1.3-beta0"
+	pod "XMTP", path: ".."
 end
 
 post_install do |installer|

@@ -12,16 +12,16 @@ PODS:
     - GenericJSON (~> 2.0)
     - Logging (~> 1.0.0)
     - secp256k1.swift (~> 0.1)
-  - XMTP (0.1.3-beta0):
+  - XMTP (0.1.2):
     - Connect-Swift
     - GzipSwift
     - web3.swift
-    - XMTPRust (= 0.1.2-beta0)
-  - XMTPRust (0.1.2-beta0)
+    - XMTPRust (= 0.2.0-beta0)
+  - XMTPRust (0.2.0-beta0)
 
 DEPENDENCIES:
   - web3.swift
-  - XMTP (= 0.1.3-beta0)
+  - XMTP (from `..`)
 
 SPEC REPOS:
   trunk:
@@ -33,8 +33,11 @@ SPEC REPOS:
     - secp256k1.swift
     - SwiftProtobuf
     - web3.swift
-    - XMTP
     - XMTPRust
+
+EXTERNAL SOURCES:
+  XMTP:
+    :path: ".."
 
 SPEC CHECKSUMS:
   BigInt: 74b4d88367b0e819d9f77393549226d36faeb0d8
@@ -45,9 +48,9 @@ SPEC CHECKSUMS:
   secp256k1.swift: a7e7a214f6db6ce5db32cc6b2b45e5c4dd633634
   SwiftProtobuf: afced68785854575756db965e9da52bbf3dc45e7
   web3.swift: 2263d1e12e121b2c42ffb63a5a7beb1acaf33959
-  XMTP: b2286639f0cff509e909eed5b0ce2aed7eea3e77
-  XMTPRust: 2c356f57f034d771717933a6127a7d51667f9843
+  XMTP: e7ef286366f900a4eea0036b5aa9b445b5785fc9
+  XMTPRust: 7eb2da98f2bdb6d5d1a1d648dc0e9a91365ed211
 
-PODFILE CHECKSUM: d9fbbf316ab667de683316f535cf4628a28f6000
+PODFILE CHECKSUM: af8ff0e8e85b76a290f79732a71a40b866863451
 
 COCOAPODS: 1.12.1
