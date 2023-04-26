@@ -83,6 +83,52 @@ class GRPCApiClient: ApiClient {
 	func setAuthToken(_ token: String) {
 		authToken = token
 	}
+	
+	func rustPagingInfoFromRequest(request: Xmtp_MessageApi_V1_QueryRequest) -> XMTPRust.PagingInfo {
+		var rustPaging = XMTPRust.PagingInfo(limit: 0, cursor: nil, direction: XMTPRust.SortDirection.Ascending)
+		rustPaging.limit = request.pagingInfo.limit
+		if request.hasPagingInfo && request.pagingInfo.hasCursor {
+			let cursor = request.pagingInfo.cursor;
+			let digest = cursor.index.digest.dataToRustVec()
+			let senderTimeNs = cursor.index.senderTimeNs
+			rustPaging.cursor = XMTPRust.IndexCursor(digest: digest, sender_time_ns: senderTimeNs)
+		}
+
+		// Set rustPaging.direction based off a switch-case conversion
+		switch request.pagingInfo.direction {
+		case .ascending:
+		rustPaging.direction = XMTPRust.SortDirection.Ascending
+		case .descending:
+			rustPaging.direction = XMTPRust.SortDirection.Descending
+		case .unspecified:
+			rustPaging.direction = XMTPRust.SortDirection.Unspecified
+		case .UNRECOGNIZED(_):
+		rustPaging.direction = XMTPRust.SortDirection.Unspecified
+		}
+
+		return rustPaging;
+	}
+	
+	func parseRustPagingInfoFromResponse(response: XMTPRust.QueryResponse) -> PagingInfo {
+        var pagingInfo = PagingInfo()
+        if let rustPaging = response.paging_info() {
+            pagingInfo.limit = rustPaging.limit
+            if let rustCursor = rustPaging.cursor {
+                var cursor = PagingInfoCursor()
+                cursor.index.digest = Data(rustCursor.digest)
+                cursor.index.senderTimeNs = rustCursor.sender_time_ns
+            }
+            switch rustPaging.direction {
+                case XMTPRust.SortDirection.Ascending:
+                pagingInfo.direction = .ascending
+                case XMTPRust.SortDirection.Descending:
+                pagingInfo.direction = .descending
+                case XMTPRust.SortDirection.Unspecified:
+                pagingInfo.direction = .unspecified
+            }
+        }
+        return pagingInfo
+	}
 
 	func query(topic: String, pagination: Pagination? = nil, cursor: Xmtp_MessageApi_V1_Cursor? = nil) async throws -> QueryResponse {
 		var request = Xmtp_MessageApi_V1_QueryRequest()
@@ -106,8 +152,11 @@ class GRPCApiClient: ApiClient {
 			request.pagingInfo.cursor = cursor
 		}
 
-		let paging = XMTPRust.PagingInfo(limit: 0, cursor: nil, direction: XMTPRust.SortDirection.Ascending)
-		let response = try await rustClient.query(topic.intoRustString(), Optional.none, Optional.none, Optional.none)
+		
+		let startTimeParam: UInt64? = pagination == nil ? nil : request.startTimeNs
+		let endTimeParam: UInt64? = pagination == nil ? nil : request.endTimeNs
+		let rustPagingInfo = rustPagingInfoFromRequest(request: request)
+		let response = try await rustClient.query(topic.intoRustString(), startTimeParam, endTimeParam, rustPagingInfo)
 		// response has .envelopes() and .paging_info() but the envelopes need to be mapped into Envelope objects that Swift understands
 		var queryResponse = QueryResponse()
 		// Build the query response from response fields
@@ -118,7 +167,10 @@ class GRPCApiClient: ApiClient {
 			envelope.message = dataFromRustVec(rustVec: rustEnvelope.get_payload())
 			return envelope
 		}
-		// Decode the response as a QueryResponse
+        // TODO: uncomment this once we clear up ownership issues on QueryResponse for the Rust side
+//        if let responsePagingInfo = response.paging_info() {
+//			queryResponse.pagingInfo = parseRustPagingInfoFromResponse(response: response)
+//		}
 		return queryResponse
 	}
 
