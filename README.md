@@ -1,5 +1,7 @@
 # XMTP-iOS
 
+- just a test run for xcode cloud tests
+
 ![Lint](https://github.com/xmtp/xmtp-ios/actions/workflows/lint.yml/badge.svg) ![Status](https://img.shields.io/badge/Project_Status-General_Availability-31CA54)
 
 `xmtp-ios` provides a Swift implementation of an XMTP message API client for use with iOS apps.
