@@ -17,8 +17,6 @@ struct AuthorizedIdentity {
 		let authDataBytes = try authData.serializedData()
 		let signature = try await identity.sign(Util.keccak256(authDataBytes))
 
-		print("SIG: \(signature.rawData.toHex)")
-
 		var token = Token()
 
 		token.identityKey = authorized

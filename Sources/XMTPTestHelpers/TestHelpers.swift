@@ -9,7 +9,7 @@
 import Combine
 import XCTest
 @testable import XMTP
-
+import XMTPRust
 
 public struct FakeWallet: SigningKey {
 	public static func generate() throws -> FakeWallet {
@@ -43,9 +43,9 @@ enum FakeApiClientError: String, Error {
 }
 
 class FakeStreamHolder: ObservableObject {
-	@Published var envelope: Envelope?
+	@Published var envelope: XMTP.Envelope?
 
-	func send(envelope: Envelope) {
+	func send(envelope: XMTP.Envelope) {
 		self.envelope = envelope
 	}
 }
@@ -58,9 +58,9 @@ public class FakeApiClient: ApiClient {
 
 	public var environment: XMTPEnvironment
 	public var authToken: String = ""
-	private var responses: [String: [Envelope]] = [:]
+	private var responses: [String: [XMTP.Envelope]] = [:]
 	private var stream = FakeStreamHolder()
-	public var published: [Envelope] = []
+	public var published: [XMTP.Envelope] = []
 	var cancellable: AnyCancellable?
 	var forbiddingQueries = false
 
@@ -82,7 +82,7 @@ public class FakeApiClient: ApiClient {
 		forbiddingQueries = false
 	}
 
-	public func register(message: [Envelope], for topic: Topic) {
+	public func register(message: [XMTP.Envelope], for topic: Topic) {
 		var responsesForTopic = responses[topic.description] ?? []
 		responsesForTopic.append(contentsOf: message)
 		responses[topic.description] = responsesForTopic
@@ -92,15 +92,15 @@ public class FakeApiClient: ApiClient {
 		environment = .local
 	}
 
-	public func send(envelope: Envelope) {
+	public func send(envelope: XMTP.Envelope) {
 		stream.send(envelope: envelope)
 	}
 
-	public func findPublishedEnvelope(_ topic: Topic) -> Envelope? {
+	public func findPublishedEnvelope(_ topic: Topic) -> XMTP.Envelope? {
 		return findPublishedEnvelope(topic.description)
 	}
 
-	public func findPublishedEnvelope(_ topic: String) -> Envelope? {
+	public func findPublishedEnvelope(_ topic: String) -> XMTP.Envelope? {
 		for envelope in published.reversed() {
 			if envelope.contentTopic == topic.description {
 				return envelope
@@ -112,11 +112,11 @@ public class FakeApiClient: ApiClient {
 
 	// MARK: ApiClient conformance
 
-	public required init(environment: XMTP.XMTPEnvironment, secure _: Bool) throws {
+	public required init(environment: XMTP.XMTPEnvironment, secure _: Bool, rustClient _: XMTPRust.RustClient) throws {
 		self.environment = environment
 	}
 
-	public func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
+	public func subscribe(topics: [String]) -> AsyncThrowingStream<XMTP.Envelope, Error> {
 		AsyncThrowingStream { continuation in
 			self.cancellable = stream.$envelope.sink(receiveValue: { env in
 				if let env, topics.contains(env.contentTopic) {
@@ -136,7 +136,7 @@ public class FakeApiClient: ApiClient {
 			throw FakeApiClientError.queryAssertionFailure
 		}
 
-		var result: [Envelope] = []
+		var result: [XMTP.Envelope] = []
 
 		if let response = responses.removeValue(forKey: topic) {
 			result.append(contentsOf: response)
@@ -231,6 +231,11 @@ public struct Fixtures {
 public extension XCTestCase {
 	@available(iOS 15, *)
 	func fixtures() async -> Fixtures {
+        do {
+            try await Fixtures()
+        } catch {
+            print("ERROR: \(error.localizedDescription)")
+        }
 		// swiftlint:disable force_try
 		return try! await Fixtures()
 	}

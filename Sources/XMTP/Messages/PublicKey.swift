@@ -70,7 +70,7 @@ extension PublicKey {
 		let sigText = Signature.createIdentityText(key: try slimKey.serializedData())
 		let message = try Signature.ethPersonalMessage(sigText)
 
-		let pubKeyData = try XMTPRust.CoreCrypto.recover_public_key_keccak256(message: message, signature: signature.rawData)
+		let pubKeyData = try KeyUtilx.recoverPublicKeyKeccak256(from: signature.rawData, message: message)
 		return try PublicKey(pubKeyData)
 	}
 
@@ -85,7 +85,7 @@ extension PublicKey {
 		slimKey.timestamp = timestamp
 		let bytesToSign = try slimKey.serializedData()
 
-		let pubKeyData = try XMTPRust.CoreCrypto.recover_public_key_sha256(message: bytesToSign, signature: signature.rawData)
+		let pubKeyData = try KeyUtilx.recoverPublicKeySHA256(from: signature.rawData, message: bytesToSign)
 		return try PublicKey(pubKeyData)
 	}
 

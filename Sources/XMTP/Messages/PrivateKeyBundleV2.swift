@@ -8,7 +8,6 @@
 import Foundation
 import XMTPRust
 
-
 public typealias PrivateKeyBundleV2 = Xmtp_MessageContents_PrivateKeyBundleV2
 
 extension PrivateKeyBundleV2 {
@@ -35,7 +34,7 @@ extension PrivateKeyBundleV2 {
 	}
 
 	func sharedSecret(private privateData: Data, public publicData: Data) throws -> Data {
-        return try XMTPRust.CoreCrypto.diffie_hellman_k256(privateKeyBytes: privateData, publicKeyBytes: publicData)
+		return Data(try XMTPRust.diffie_hellman_k256(privateData.dataToRustVec(), publicData.dataToRustVec()))
 	}
 
 	func findPreKey(_ myPreKey: SignedPublicKey) throws -> SignedPrivateKey {
