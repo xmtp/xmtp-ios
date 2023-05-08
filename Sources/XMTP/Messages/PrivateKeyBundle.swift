@@ -29,7 +29,7 @@ extension PrivateKeyBundle {
 
 		var encryptedBundle = EncryptedPrivateKeyBundle()
 		encryptedBundle.v1.walletPreKey = walletPreKey
-		encryptedBundle.v1.ciphertext = cipherText
+        encryptedBundle.v1.ciphertext = cipherText
 
 		return encryptedBundle
 	}

@@ -8,7 +8,6 @@
 import Foundation
 import XMTPRust
 import CryptoKit
-import web3
 
 /// Represents a secp256k1 private key.  ``PrivateKey`` conforms to ``SigningKey`` so you can use it
 /// to create a ``Client``.
@@ -55,7 +54,7 @@ public extension PrivateKey {
 		timestamp = UInt64(Date().millisecondsSinceEpoch)
 		secp256K1.bytes = privateKeyData
 
-		let publicData = try XMTPRust.CoreCrypto.get_public_key_from_private(privateKeyBytes: privateKeyData)
+		let publicData = try KeyUtilx.generatePublicKey(from: privateKeyData)
 		publicKey.secp256K1Uncompressed.bytes = publicData
 		publicKey.timestamp = timestamp
 	}

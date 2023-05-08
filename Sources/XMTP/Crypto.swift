@@ -47,11 +47,11 @@ enum Crypto {
 		let salt = ciphertext.aes256GcmHkdfSha256.hkdfSalt
 		let nonceData = ciphertext.aes256GcmHkdfSha256.gcmNonce
 		let nonce = try AES.GCM.Nonce(data: nonceData)
-		let payload = ciphertext.aes256GcmHkdfSha256.payload
+        let payload = ciphertext.aes256GcmHkdfSha256.payload.bytes
 
-		let ciphertext = payload[0 ..< payload.count - 16]
+		let ciphertextBytes = payload[0 ..< payload.count - 16]
 		let tag = payload[payload.count - 16 ..< payload.count]
-		let box = try AES.GCM.SealedBox(nonce: nonce, ciphertext: ciphertext, tag: tag)
+		let box = try AES.GCM.SealedBox(nonce: nonce, ciphertext: ciphertextBytes, tag: tag)
 
 		let resultKey = HKDF<SHA256>.deriveKey(
 			inputKeyMaterial: SymmetricKey(data: secret),

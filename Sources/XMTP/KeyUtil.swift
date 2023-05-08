@@ -20,17 +20,23 @@ enum KeyUtilError: Error {
 
 // Copied from web3.swift since its version is `internal`
 enum KeyUtilx {
-	private static var logger: Logger {
-		Logger(label: "web3.swift.key-util")
+	static func generatePublicKey(from data: Data) throws -> Data {
+		let vec = try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(data))
+		return Data(vec)
 	}
 
-	static func generatePublicKey(from data: Data) throws -> Data {
-		try XMTPRust.CoreCrypto.get_public_key_from_private(privateKeyBytes: data)
+	static func recoverPublicKeySHA256(from data: Data, message: Data) throws -> Data {
+		let vec = try XMTPRust.recover_public_key_k256_sha256(RustVec<UInt8>(message), RustVec<UInt8>(data))
+		return Data(vec)
+	}
+
+	static func recoverPublicKeyKeccak256(from data: Data, message: Data) throws -> Data {
+		let vec = try XMTPRust.recover_public_key_k256_keccak256(RustVec<UInt8>(message), RustVec<UInt8>(data))
+		return Data(vec)
 	}
 
 	static func sign(message: Data, with privateKey: Data, hashing: Bool) throws -> Data {
 		guard let ctx = secp256k1_context_create(UInt32(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY)) else {
-			logger.warning("Failed to sign message: invalid context.")
 			throw KeyUtilError.invalidContext
 		}
 
@@ -46,7 +52,6 @@ enum KeyUtilx {
 			signaturePtr.deallocate()
 		}
 		guard secp256k1_ecdsa_sign_recoverable(ctx, signaturePtr, msg, privateKeyPtr, nil, nil) == 1 else {
-			logger.warning("Failed to sign message: recoverable ECDSA signature creation failed.")
 			throw KeyUtilError.signatureFailure
 		}
 
@@ -79,7 +84,6 @@ enum KeyUtilx {
 
 	static func recoverPublicKey(message: Data, signature: Data) throws -> Data {
 		guard let ctx = secp256k1_context_create(UInt32(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY)) else {
-			logger.warning("Failed to sign message: invalid context.")
 			throw KeyUtilError.invalidContext
 		}
 		defer { secp256k1_context_destroy(ctx) }
@@ -101,7 +105,6 @@ enum KeyUtilx {
 		// swiftlint:disable force_unwrapping
 		try serializedSignature.withUnsafeBytes {
 			guard secp256k1_ecdsa_recoverable_signature_parse_compact(ctx, signaturePtr, $0.bindMemory(to: UInt8.self).baseAddress!, v) == 1 else {
-				logger.warning("Failed to parse signature: recoverable ECDSA signature parse failed.")
 				throw KeyUtilError.signatureParseFailure
 			}
 		}

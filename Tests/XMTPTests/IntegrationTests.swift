@@ -11,43 +11,39 @@ import web3
 import XCTest
 import XMTPRust
 @testable import XMTP
+import XMTPRust
 import XMTPTestHelpers
 
 @available(iOS 16, *)
 final class IntegrationTests: XCTestCase {
-    func testSaveKey() async throws {
-        for i in 1...1 {
-            let alice = try PrivateKey.generate()
-            let identity = try PrivateKey.generate()
-            
-            let authorized = try await alice.createIdentity(identity)
-            
-            let authToken = try await authorized.createAuthToken()
-            
-            let api = try GRPCApiClient(environment: .local, secure: false)
-            api.setAuthToken(authToken)
-            
-            let encryptedBundle = try await authorized.toBundle.encrypted(with: alice)
-            
-            var envelope = Envelope()
-            envelope.contentTopic = Topic.userPrivateStoreKeyBundle(authorized.address).description
-            envelope.timestampNs = UInt64(Date().millisecondsSinceEpoch) * 1_000_000
-            envelope.message = try encryptedBundle.serializedData()
-            
-            try await api.publish(envelopes: [envelope])
-            
-            try await Task.sleep(nanoseconds: 20_000_000)
-            var result = try await api.query(topic: .userPrivateStoreKeyBundle(authorized.address))
-            let starttime = Date().millisecondsSinceEpoch
+	func testSaveKey() async throws {
+		throw XCTSkip("integration only (requires local node)")
 
-            for u in 1...10000 {
-                result = try await api.query(topic: .userPrivateStoreKeyBundle(authorized.address))
-            }
-            XCTAssert(result.envelopes.count == 1)
-            let endtime = Date().millisecondsSinceEpoch
-            XCTAssertEqual(0.0, (endtime - starttime) / (10000000.0))
-        }
-    }
+		let alice = try PrivateKey.generate()
+		let identity = try PrivateKey.generate()
+
+		let authorized = try await alice.createIdentity(identity)
+
+		let authToken = try await authorized.createAuthToken()
+
+		let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
+		let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
+		api.setAuthToken(authToken)
+
+		let encryptedBundle = try await authorized.toBundle.encrypted(with: alice)
+
+		var envelope = Envelope()
+		envelope.contentTopic = Topic.userPrivateStoreKeyBundle(authorized.address).description
+		envelope.timestampNs = UInt64(Date().millisecondsSinceEpoch) * 1_000_000
+		envelope.message = try encryptedBundle.serializedData()
+
+		try await api.publish(envelopes: [envelope])
+
+		try await Task.sleep(nanoseconds: 2_000_000_000)
+
+		let result = try await api.query(topic: .userPrivateStoreKeyBundle(authorized.address))
+		XCTAssert(result.envelopes.count == 1)
+	}
 
 	func testPublishingAndFetchingContactBundlesWithWhileGeneratingKeys() async throws {
 		throw XCTSkip("integration only (requires local node)")
@@ -79,7 +75,8 @@ final class IntegrationTests: XCTestCase {
 		let identity = try PrivateKey.generate()
 		let authorized = try await aliceWallet.createIdentity(identity)
 		let authToken = try await authorized.createAuthToken()
-		var api = try GRPCApiClient(environment: .local, secure: false)
+		let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
+		let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
 		api.setAuthToken(authToken)
 		let encryptedBundle = try await PrivateKeyBundle(v1: alice).encrypted(with: aliceWallet)
 		var envelope = Envelope()
@@ -367,16 +364,16 @@ final class IntegrationTests: XCTestCase {
 		throw XCTSkip("integration only (requires dev network)")
 
 		// Generated from JS script
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			31, 116, 198, 193, 189, 122, 19, 254,
 			191, 189, 211, 215, 255, 131, 171, 239,
 			243, 33, 4, 62, 143, 86, 18, 195,
 			251, 61, 128, 90, 34, 126, 219, 236,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try XMTPRust.CoreCrypto.get_public_key_from_private(privateKeyBytes: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -437,16 +434,16 @@ final class IntegrationTests: XCTestCase {
 	func testCanReadGzipCompressedMessages() async throws {
 		throw XCTSkip("integration only (requires dev network)")
 
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			225, 2, 36, 98, 37, 243, 68, 234,
 			42, 126, 248, 246, 126, 83, 186, 197,
 			204, 186, 19, 173, 51, 0, 64, 0,
 			155, 8, 249, 247, 163, 185, 124, 159,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtilx.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -460,16 +457,16 @@ final class IntegrationTests: XCTestCase {
 	func testCanReadZipCompressedMessages() async throws {
 		throw XCTSkip("integration only (requires dev network)")
 
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			60, 45, 240, 192, 223, 2, 14, 166,
 			122, 65, 231, 31, 122, 178, 158, 137,
 			192, 97, 139, 83, 133, 245, 149, 250,
 			25, 125, 25, 11, 203, 97, 12, 200,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtilx.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -489,16 +486,17 @@ final class IntegrationTests: XCTestCase {
 	func testCanLoadAllConversations() async throws {
 		throw XCTSkip("integration only (requires dev network)")
 
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			105, 207, 193, 11, 240, 115, 115, 204,
 			117, 134, 201, 10, 56, 59, 52, 90,
 			229, 103, 15, 66, 20, 113, 118, 137,
 			44, 62, 130, 90, 30, 158, 182, 178,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtilx.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
+
 
 		let client = try await XMTP.Client.create(account: key)
 
