@@ -21,7 +21,6 @@ let package = Package(
 		// Dependencies declare other packages that this package depends on.
 		// .package(url: /* package url */, from: "1.0.0"),
 
-		.package(url: "https://github.com/xmtp/proto", branch: "ios_minus_grpc_keeping_messageapi"),
 		.package(url: "https://github.com/GigaBitcoin/secp256k1.swift.git", branch: "main"),
 		.package(url: "https://github.com/argentlabs/web3.swift", from: "1.1.0"),
 		.package(url: "https://github.com/1024jp/GzipSwift", from: "5.2.0"),
@@ -35,7 +34,6 @@ let package = Package(
 		.target(
 			name: "XMTP",
 			dependencies: [
-				.product(name: "XMTPProto", package: "proto"),
 				.product(name: "secp256k1", package: "secp256k1.swift"),
 				"web3.swift",
 				.product(name: "Gzip", package: "GzipSwift"),
