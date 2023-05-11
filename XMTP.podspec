@@ -33,7 +33,7 @@ Pod::Spec.new do |spec|
   spec.license      	= "MIT"
   spec.author       	= { "Pat Nakajima" => "pat@xmtp.com" }
 
-	spec.platform      	= :ios, '13.0', :macos, '11.0'
+	spec.platform      	= :ios, '14.0', :macos, '11.0'
 
   spec.swift_version  = '5.3'
 
@@ -49,9 +49,9 @@ Pod::Spec.new do |spec|
   spec.xcconfig = {'VALID_ARCHS' =>  'arm64' }
 #  spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
-  def spec.post_install(target)
-    target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-    end
-  end
+#  def spec.post_install(target)
+#    target.build_configurations.each do |config|
+#      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+#    end
+#  end
 end
