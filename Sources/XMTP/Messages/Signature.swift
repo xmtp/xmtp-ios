@@ -103,7 +103,7 @@ extension Signature {
 
 	func verify(signedBy: PublicKey, digest: Data) throws -> Bool {
 		do {
-			try XMTPRust.verify_k256_sha256(signedBy.secp256K1Uncompressed.bytes.dataToRustVec(), digest.dataToRustVec(), ecdsaCompact.bytes.dataToRustVec(), UInt8(ecdsaCompact.recovery))
+			let _ = try XMTPRust.verify_k256_sha256(signedBy.secp256K1Uncompressed.bytes.dataToRustVec(), digest.dataToRustVec(), ecdsaCompact.bytes.dataToRustVec(), UInt8(ecdsaCompact.recovery))
 		} catch {
 			return false
 		}
