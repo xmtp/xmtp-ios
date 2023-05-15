@@ -167,10 +167,9 @@ class GRPCApiClient: ApiClient {
 			envelope.message = dataFromRustVec(rustVec: rustEnvelope.get_payload())
 			return envelope
 		}
-        // TODO: uncomment this once we clear up ownership issues on QueryResponse for the Rust side
-//        if let responsePagingInfo = response.paging_info() {
-//			queryResponse.pagingInfo = parseRustPagingInfoFromResponse(response: response)
-//		}
+		if let _ = response.paging_info() {
+			queryResponse.pagingInfo = parseRustPagingInfoFromResponse(response: response)
+		}
 		return queryResponse
 	}
 
