@@ -48,7 +48,7 @@ Pod::Spec.new do |spec|
 
   spec.xcconfig = {'VALID_ARCHS' =>  'arm64' }
 #  spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-
+#
 #  def spec.post_install(target)
 #    target.build_configurations.each do |config|
 #      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
