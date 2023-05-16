@@ -97,38 +97,38 @@ class GRPCApiClient: ApiClient {
 		// Set rustPaging.direction based off a switch-case conversion
 		switch request.pagingInfo.direction {
 		case .ascending:
-		rustPaging.direction = XMTPRust.SortDirection.Ascending
+			rustPaging.direction = XMTPRust.SortDirection.Ascending
 		case .descending:
 			rustPaging.direction = XMTPRust.SortDirection.Descending
 		case .unspecified:
 			rustPaging.direction = XMTPRust.SortDirection.Unspecified
 		case .UNRECOGNIZED(_):
-		rustPaging.direction = XMTPRust.SortDirection.Unspecified
+			rustPaging.direction = XMTPRust.SortDirection.Unspecified
 		}
 
 		return rustPaging;
 	}
 	
 	func parseRustPagingInfoFromResponse(response: XMTPRust.QueryResponse) -> PagingInfo {
-        var pagingInfo = PagingInfo()
-        if let rustPaging = response.paging_info() {
-            pagingInfo.limit = rustPaging.limit
-            if let rustCursor = rustPaging.cursor {
-                var cursor = PagingInfoCursor()
-                cursor.index.digest = Data(rustCursor.digest)
-                cursor.index.senderTimeNs = rustCursor.sender_time_ns
-                pagingInfo.cursor = cursor
-            }
-            switch rustPaging.direction {
-                case XMTPRust.SortDirection.Ascending:
-                pagingInfo.direction = .ascending
-                case XMTPRust.SortDirection.Descending:
-                pagingInfo.direction = .descending
-                case XMTPRust.SortDirection.Unspecified:
-                pagingInfo.direction = .unspecified
-            }
-        }
-        return pagingInfo
+		var pagingInfo = PagingInfo()
+		if let rustPaging = response.paging_info() {
+			pagingInfo.limit = rustPaging.limit
+			if let rustCursor = rustPaging.cursor {
+				var cursor = PagingInfoCursor()
+				cursor.index.digest = Data(rustCursor.digest)
+				cursor.index.senderTimeNs = rustCursor.sender_time_ns
+				pagingInfo.cursor = cursor
+			}
+			switch rustPaging.direction {
+			case XMTPRust.SortDirection.Ascending:
+				pagingInfo.direction = .ascending
+			case XMTPRust.SortDirection.Descending:
+				pagingInfo.direction = .descending
+			case XMTPRust.SortDirection.Unspecified:
+				pagingInfo.direction = .unspecified
+			}
+		}
+		return pagingInfo
 	}
 
 	func query(topic: String, pagination: Pagination? = nil, cursor: Xmtp_MessageApi_V1_Cursor? = nil) async throws -> QueryResponse {
