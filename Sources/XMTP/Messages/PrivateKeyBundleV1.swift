@@ -7,7 +7,6 @@
 
 import CryptoKit
 import Foundation
-import web3
 import XMTPRust
 
 
