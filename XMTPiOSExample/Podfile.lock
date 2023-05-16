@@ -2,7 +2,7 @@ PODS:
   - BigInt (5.0.0)
   - Connect-Swift (0.5.0):
     - SwiftProtobuf (~> 1.21.0)
-  - CryptoSwift (1.6.0)
+  - CryptoSwift (1.7.1)
   - GenericJSON (2.0.2)
   - GzipSwift (5.1.1)
   - KeychainAccess (4.2.2)
@@ -16,12 +16,12 @@ PODS:
     - GenericJSON (~> 2.0)
     - Logging (~> 1.0.0)
     - secp256k1.swift (~> 0.1)
-  - XMTP (0.2.0):
+  - XMTP (0.2.0-alpha0):
     - Connect-Swift
     - GzipSwift
     - web3.swift
-    - XMTPRust (= 0.2.0-beta0)
-  - XMTPRust (0.2.0-beta0)
+    - XMTPRust (= 0.2.2-beta0)
+  - XMTPRust (0.2.2-beta0)
 
 DEPENDENCIES:
   - KeychainAccess
@@ -51,7 +51,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   BigInt: 74b4d88367b0e819d9f77393549226d36faeb0d8
   Connect-Swift: a75380c30c1341e483012444044105ff49b6093a
-  CryptoSwift: 562f8eceb40e80796fffc668b0cad9313284cfa6
+  CryptoSwift: d3d18dc357932f7e6d580689e065cf1f176007c1
   GenericJSON: 79a840eeb77030962e8cf02a62d36bd413b67626
   GzipSwift: 893f3e48e597a1a4f62fafcb6514220fcf8287fa
   KeychainAccess: c0c4f7f38f6fc7bbe58f5702e25f7bd2f65abf51
@@ -60,8 +60,8 @@ SPEC CHECKSUMS:
   SwiftProtobuf: afced68785854575756db965e9da52bbf3dc45e7
   WalletConnectSwift: 6309bf3011b0b30e3e9d1e7449535302a9240f71
   web3.swift: 2263d1e12e121b2c42ffb63a5a7beb1acaf33959
-  XMTP: d54871c3b0037c652dc8e61d3ed4d1f7ae1f9f55
-  XMTPRust: 7eb2da98f2bdb6d5d1a1d648dc0e9a91365ed211
+  XMTP: 21d0ab77de34cd2ec2310d52f568f9752f2cd22c
+  XMTPRust: 10f79ec17747b15d3c626984f433b4f5ce948fff
 
 PODFILE CHECKSUM: b08ce1433b369fe0cf978eda8c1642c21fe389d6
 
