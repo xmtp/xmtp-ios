@@ -117,6 +117,7 @@ class GRPCApiClient: ApiClient {
                 var cursor = PagingInfoCursor()
                 cursor.index.digest = Data(rustCursor.digest)
                 cursor.index.senderTimeNs = rustCursor.sender_time_ns
+                pagingInfo.cursor = cursor
             }
             switch rustPaging.direction {
                 case XMTPRust.SortDirection.Ascending:
