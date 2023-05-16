@@ -233,8 +233,4 @@ class GRPCApiClient: ApiClient {
 		let publishResponse = PublishResponse()
 		return publishResponse
 	}
-
-	public static func runGrpcTest() async throws -> Int {
-		return 0
-	}
 }

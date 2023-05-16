@@ -30,11 +30,6 @@ class ClientTests: XCTestCase {
 		_ = try await Client.create(account: fakeWallet)
 	}
 
-	func testXMTPgRPC() async throws {
-		let numEnvelopes = try await GRPCApiClient.runGrpcTest()
-		XCTAssertEqual(numEnvelopes, 0)
-	}
-
 	func testCanMessage() async throws {
 		let fixtures = await fixtures()
 		let notOnNetwork = try PrivateKey.generate()
