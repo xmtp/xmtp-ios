@@ -23,24 +23,6 @@ protocol ApiClient {
 	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error>
 }
 
-extension Data {
-	func dataToRustVec() -> RustVec<UInt8> {
-		let rustVec = RustVec<UInt8>()
-		for byte in self {
-			rustVec.push(value: byte)
-		}
-		return rustVec
-	}
-
-	func dataFromRustVec(rustVec: RustVec<UInt8>) -> Data {
-		var listBytes: [UInt8] = []
-		for byte in rustVec {
-			listBytes.append(byte)
-		}
-		return Data(listBytes)
-	}
-}
-
 class GRPCApiClient: ApiClient {
 	let ClientVersionHeaderKey = "X-Client-Version"
 	let AppVersionHeaderKey = "X-App-Version"
@@ -89,7 +71,7 @@ class GRPCApiClient: ApiClient {
 		rustPaging.limit = request.pagingInfo.limit
 		if request.hasPagingInfo && request.pagingInfo.hasCursor {
 			let cursor = request.pagingInfo.cursor;
-			let digest = cursor.index.digest.dataToRustVec()
+			let digest = RustVec<UInt8>(cursor.index.digest)
 			let senderTimeNs = cursor.index.senderTimeNs
 			rustPaging.cursor = XMTPRust.IndexCursor(digest: digest, sender_time_ns: senderTimeNs)
 		}
@@ -210,7 +192,7 @@ class GRPCApiClient: ApiClient {
 						var swiftEnvelope = Envelope()
 						swiftEnvelope.contentTopic = rustEnvelope.get_topic().toString()
 						swiftEnvelope.timestampNs = rustEnvelope.get_sender_time_ns()
-						swiftEnvelope.message = Data().dataFromRustVec(rustVec: rustEnvelope.get_payload())
+						swiftEnvelope.message = Data(rustEnvelope.get_payload())
 						continuation.yield(swiftEnvelope)
 					}
 					try await Task.sleep(nanoseconds: 50_000_000) // 50ms
