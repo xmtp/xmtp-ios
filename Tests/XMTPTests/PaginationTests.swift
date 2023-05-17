@@ -73,12 +73,15 @@ class PaginationTests: XCTestCase {
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
 		
+		// Need to upload Alice's contact bundle
+		let _ = try await newClientHelper(account: alice)
 		let bobClient = try await newClientHelper(account: bob)
 		let expectation1 = expectation(description: "got a conversation")
 		expectation1.expectedFulfillmentCount = 2
 
 		Task(priority: .userInitiated) {
 			for try await _ in bobClient.conversations.stream() {
+				print("Got one conversation")
 				expectation1.fulfill()
 			}
 		}
@@ -98,7 +101,8 @@ class PaginationTests: XCTestCase {
 		try await conversation.send(content: "hi again")
 
 		let newWallet = try PrivateKey.generate()
-
+		// Need to upload contact bundle
+		let _ = try await newClientHelper(account: newWallet)
 		guard case let .v2(conversation2) = try await bobClient.conversations.newConversation(with: newWallet.walletAddress) else {
 			XCTFail("Did not create a v2 convo")
 			return
