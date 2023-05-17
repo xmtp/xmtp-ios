@@ -34,24 +34,7 @@ class GRPCApiClient: ApiClient {
 
 	required init(environment: XMTPEnvironment, secure _: Bool = true, rustClient: XMTPRust.RustClient) throws {
 		self.environment = environment
-		// TODO: this is a hack to do an async thing in a synchronous way
 		self.rustClient = rustClient
-	}
-
-	func dataToRustVec(data: Data) -> RustVec<UInt8> {
-		let rustVec = RustVec<UInt8>()
-		for byte in data {
-			rustVec.push(value: byte)
-		}
-		return rustVec
-	}
-
-	func dataFromRustVec(rustVec: RustVec<UInt8>) -> Data {
-		var listBytes: [UInt8] = []
-		for byte in rustVec {
-			listBytes.append(byte)
-		}
-		return Data(listBytes)
 	}
 
 	static func envToUrl(env: XMTPEnvironment) -> String {
@@ -147,7 +130,7 @@ class GRPCApiClient: ApiClient {
 			var envelope = Envelope()
 			envelope.contentTopic = rustEnvelope.get_topic().toString()
 			envelope.timestampNs = rustEnvelope.get_sender_time_ns()
-			envelope.message = dataFromRustVec(rustVec: rustEnvelope.get_payload())
+			envelope.message = Data(rustEnvelope.get_payload())
 			return envelope
 		}
 		if let _ = response.paging_info() {
@@ -208,7 +191,7 @@ class GRPCApiClient: ApiClient {
 		let envelopesVec = RustVec<XMTPRust.Envelope>()
 
 		envelopes.forEach { envelope in
-			let rustEnvelope = XMTPRust.create_envelope(envelope.contentTopic.intoRustString(), envelope.timestampNs, dataToRustVec(data: envelope.message))
+			let rustEnvelope = XMTPRust.create_envelope(envelope.contentTopic.intoRustString(), envelope.timestampNs, RustVec<UInt8>(envelope.message))
 			envelopesVec.push(value: rustEnvelope)
 		}
 		let response = try await rustClient.publish(authToken.intoRustString(), envelopesVec)
