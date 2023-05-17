@@ -6,9 +6,8 @@ target 'NotificationService' do
   use_frameworks!
 
   # Pods for NotificationService
-  pod "web3.swift"
-  pod 'KeychainAccess'
-  pod "XMTP", path: '../'
+#  pod "web3.swift"
+#  pod 'KeychainAccess'
 end
 
 target 'XMTPiOSExample' do
@@ -16,10 +15,10 @@ target 'XMTPiOSExample' do
   use_frameworks!
 
   # Pods for XMTPiOSExample
-  pod 'WalletConnectSwift'
-  pod "web3.swift"
-  pod 'KeychainAccess'
-  pod "XMTP", path: '../'
+#  pod 'WalletConnectSwift'
+#  pod "web3.swift"
+#  pod 'KeychainAccess'
+#  pod "XMTP", path: '../'
 end
 
 post_install do |installer|
