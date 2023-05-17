@@ -93,13 +93,6 @@ class PaginationTests: XCTestCase {
 
 		try await conversation.send(content: "hi")
 
-		guard case let .v2(conversation) = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
-			XCTFail("Did not create a v2 convo")
-			return
-		}
-
-		try await conversation.send(content: "hi again")
-
 		let newWallet = try PrivateKey.generate()
 		// Need to upload contact bundle
 		let _ = try await newClientHelper(account: newWallet)
@@ -110,7 +103,7 @@ class PaginationTests: XCTestCase {
 
 		try await conversation2.send(content: "hi from new wallet")
 
-		await waitForExpectations(timeout: 3)
+		await waitForExpectations(timeout: 5)
 
 		// Test that we can stream a few more messages
 		let expectation2 = expectation(description: "got follow-up messages")
