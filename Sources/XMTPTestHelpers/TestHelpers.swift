@@ -231,11 +231,6 @@ public struct Fixtures {
 public extension XCTestCase {
 	@available(iOS 15, *)
 	func fixtures() async -> Fixtures {
-        do {
-            try await Fixtures()
-        } catch {
-            print("ERROR: \(error.localizedDescription)")
-        }
 		// swiftlint:disable force_try
 		return try! await Fixtures()
 	}
