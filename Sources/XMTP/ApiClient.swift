@@ -194,9 +194,9 @@ class GRPCApiClient: ApiClient {
 			let rustEnvelope = XMTPRust.create_envelope(envelope.contentTopic.intoRustString(), envelope.timestampNs, RustVec<UInt8>(envelope.message))
 			envelopesVec.push(value: rustEnvelope)
 		}
-		let response = try await rustClient.publish(authToken.intoRustString(), envelopesVec)
+		let _ = try await rustClient.publish(authToken.intoRustString(), envelopesVec)
+		// NOTE: PublishResponse proto has no fields
 		let publishResponse = PublishResponse()
-		// TODO: do we need to populate anything from response into PublishResponse?
 		return publishResponse
 	}
 }
