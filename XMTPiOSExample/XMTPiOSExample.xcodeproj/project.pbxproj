@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6AEE396E29F330CD0027B657 /* secp256k1 in Frameworks */ = {isa = PBXBuildFile; productRef = 6AEE396D29F330CD0027B657 /* secp256k1 */; };
 		A60FC8BF293AD054001697E3 /* MessageComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60FC8BE293AD054001697E3 /* MessageComposerView.swift */; };
 		A60FC8C1293AD171001697E3 /* ConversationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60FC8C0293AD171001697E3 /* ConversationDetailView.swift */; };
 		A60FC8C3293AD18A001697E3 /* PreviewClientProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60FC8C2293AD18A001697E3 /* PreviewClientProvider.swift */; };
@@ -17,24 +18,22 @@
 		A6557A312941166E00CC4C7B /* MessageCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6557A302941166E00CC4C7B /* MessageCellView.swift */; };
 		A6557A3329411F4F00CC4C7B /* NewConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6557A3229411F4F00CC4C7B /* NewConversationView.swift */; };
 		A65F0704297B5D4E00C3C76E /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A65F0703297B5D4E00C3C76E /* Persistence.swift */; };
-		A678243129F8660F00D30FF7 /* WalletConnectSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A678243029F8660F00D30FF7 /* WalletConnectSwift */; };
-		A678243429F8661F00D30FF7 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A678243329F8661F00D30FF7 /* KeychainAccess */; };
-		A678243729F8666F00D30FF7 /* XMTP in Frameworks */ = {isa = PBXBuildFile; productRef = A678243629F8666F00D30FF7 /* XMTP */; };
-		A678243929F8667A00D30FF7 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A678243829F8667A00D30FF7 /* KeychainAccess */; };
-		A678243B29F8669600D30FF7 /* XMTP in Frameworks */ = {isa = PBXBuildFile; productRef = A678243A29F8669600D30FF7 /* XMTP */; };
+		A65F0707297B5E7600C3C76E /* WalletConnectSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A65F0706297B5E7600C3C76E /* WalletConnectSwift */; };
+		A65F070A297B5E8600C3C76E /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A65F0709297B5E8600C3C76E /* KeychainAccess */; };
 		A67CCEC129355B4B00131F5C /* AccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67CCEC029355B4B00131F5C /* AccountManager.swift */; };
 		A683860C293EA862006336FF /* MessageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A683860B293EA862006336FF /* MessageListView.swift */; };
 		A687810729679BC700042FAB /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = A687810629679BC700042FAB /* Account.swift */; };
 		A687810C29679BFC00042FAB /* WalletConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A687810B29679BFC00042FAB /* WalletConnection.swift */; };
 		A687810E29679C0D00042FAB /* WalletConnectionMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A687810D29679C0D00042FAB /* WalletConnectionMethod.swift */; };
+		A69F33C6292DC992005A5556 /* XMTP in Frameworks */ = {isa = PBXBuildFile; productRef = A69F33C5292DC992005A5556 /* XMTP */; };
 		A69F33CA292DD557005A5556 /* LoggedInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F33C9292DD557005A5556 /* LoggedInView.swift */; };
 		A69F33CC292DD568005A5556 /* QRCodeSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F33CB292DD568005A5556 /* QRCodeSheetView.swift */; };
 		A6AE5187297B61AE006FDD0F /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A6AE5180297B61AE006FDD0F /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A6AE518E297B6210006FDD0F /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AE518C297B6210006FDD0F /* NotificationService.swift */; };
+		A6AE5191297B625F006FDD0F /* XMTP in Frameworks */ = {isa = PBXBuildFile; productRef = A6AE5190297B625F006FDD0F /* XMTP */; };
 		A6AE5192297B6270006FDD0F /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A65F0703297B5D4E00C3C76E /* Persistence.swift */; };
+		A6AE5194297B62C8006FDD0F /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = A6AE5193297B62C8006FDD0F /* KeychainAccess */; };
 		A6D192D0293A7B97006B49F2 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D192CF293A7B97006B49F2 /* ConversationListView.swift */; };
-		BE941824EC1DA5A7E1ED4B38 /* Pods_NotificationService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B6B2CD0D9BFE5805FD75F1B /* Pods_NotificationService.framework */; };
-		F72E430B9719F31B6C1C4E10 /* Pods_XMTPiOSExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 714523F2DE15A728DCD1342D /* Pods_XMTPiOSExample.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,12 +61,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		26935F0C8B18F5FBC9FAF3A9 /* Pods-XMTPiOSExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XMTPiOSExample.debug.xcconfig"; path = "Target Support Files/Pods-XMTPiOSExample/Pods-XMTPiOSExample.debug.xcconfig"; sourceTree = "<group>"; };
-		3AE2571C02A5EC2D3BE73E10 /* Pods-NotificationService.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService.debug.xcconfig"; path = "Target Support Files/Pods-NotificationService/Pods-NotificationService.debug.xcconfig"; sourceTree = "<group>"; };
-		3B6B2CD0D9BFE5805FD75F1B /* Pods_NotificationService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NotificationService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		67E3F3B7A7EDC1AF97AC0439 /* Pods-NotificationService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService.release.xcconfig"; path = "Target Support Files/Pods-NotificationService/Pods-NotificationService.release.xcconfig"; sourceTree = "<group>"; };
-		714523F2DE15A728DCD1342D /* Pods_XMTPiOSExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XMTPiOSExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		84D6E12168D73497F2E0F6E3 /* Pods-XMTPiOSExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XMTPiOSExample.release.xcconfig"; path = "Target Support Files/Pods-XMTPiOSExample/Pods-XMTPiOSExample.release.xcconfig"; sourceTree = "<group>"; };
 		A60FC8BE293AD054001697E3 /* MessageComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageComposerView.swift; sourceTree = "<group>"; };
 		A60FC8C0293AD171001697E3 /* ConversationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationDetailView.swift; sourceTree = "<group>"; };
 		A60FC8C2293AD18A001697E3 /* PreviewClientProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewClientProvider.swift; sourceTree = "<group>"; };
@@ -80,18 +73,17 @@
 		A6557A302941166E00CC4C7B /* MessageCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCellView.swift; sourceTree = "<group>"; };
 		A6557A3229411F4F00CC4C7B /* NewConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationView.swift; sourceTree = "<group>"; };
 		A65F0703297B5D4E00C3C76E /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
-		A678243529F8662800D30FF7 /* xmtp-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "xmtp-ios"; path = ..; sourceTree = "<group>"; };
 		A67CCEC029355B4B00131F5C /* AccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountManager.swift; sourceTree = "<group>"; };
 		A683860B293EA862006336FF /* MessageListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageListView.swift; sourceTree = "<group>"; };
 		A687810629679BC700042FAB /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		A687810B29679BFC00042FAB /* WalletConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletConnection.swift; sourceTree = "<group>"; };
 		A687810D29679C0D00042FAB /* WalletConnectionMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletConnectionMethod.swift; sourceTree = "<group>"; };
+		A69F33C7292DD3A9005A5556 /* xmtp-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "xmtp-ios"; path = ..; sourceTree = "<group>"; };
 		A69F33C9292DD557005A5556 /* LoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedInView.swift; sourceTree = "<group>"; };
 		A69F33CB292DD568005A5556 /* QRCodeSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeSheetView.swift; sourceTree = "<group>"; };
 		A6AE5180297B61AE006FDD0F /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6AE518B297B61C8006FDD0F /* NotificationService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationService.entitlements; sourceTree = "<group>"; };
 		A6AE518C297B6210006FDD0F /* NotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
-		A6CB98CB29F85D9200F2DC58 /* XMTP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XMTP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6D192CF293A7B97006B49F2 /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -100,10 +92,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A678243B29F8669600D30FF7 /* XMTP in Frameworks */,
-				A678243429F8661F00D30FF7 /* KeychainAccess in Frameworks */,
-				A678243129F8660F00D30FF7 /* WalletConnectSwift in Frameworks */,
-				F72E430B9719F31B6C1C4E10 /* Pods_XMTPiOSExample.framework in Frameworks */,
+				A65F0707297B5E7600C3C76E /* WalletConnectSwift in Frameworks */,
+				6AEE396E29F330CD0027B657 /* secp256k1 in Frameworks */,
+				A69F33C6292DC992005A5556 /* XMTP in Frameworks */,
+				A65F070A297B5E8600C3C76E /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,35 +103,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A678243929F8667A00D30FF7 /* KeychainAccess in Frameworks */,
-				A678243729F8666F00D30FF7 /* XMTP in Frameworks */,
-				BE941824EC1DA5A7E1ED4B38 /* Pods_NotificationService.framework in Frameworks */,
+				A6AE5194297B62C8006FDD0F /* KeychainAccess in Frameworks */,
+				A6AE5191297B625F006FDD0F /* XMTP in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3F738A9EAAA632479874E954 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				3AE2571C02A5EC2D3BE73E10 /* Pods-NotificationService.debug.xcconfig */,
-				67E3F3B7A7EDC1AF97AC0439 /* Pods-NotificationService.release.xcconfig */,
-				26935F0C8B18F5FBC9FAF3A9 /* Pods-XMTPiOSExample.debug.xcconfig */,
-				84D6E12168D73497F2E0F6E3 /* Pods-XMTPiOSExample.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		A6281986292DC825004B9117 = {
 			isa = PBXGroup;
 			children = (
-				A6CB98C829F85CE600F2DC58 /* Packages */,
+				A69F33C7292DD3A9005A5556 /* xmtp-ios */,
 				A6281991292DC825004B9117 /* XMTPiOSExample */,
 				A6AE5181297B61AE006FDD0F /* NotificationService */,
 				A6281990292DC825004B9117 /* Products */,
 				A69F33C4292DC992005A5556 /* Frameworks */,
-				3F738A9EAAA632479874E954 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -189,9 +168,6 @@
 		A69F33C4292DC992005A5556 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A6CB98CB29F85D9200F2DC58 /* XMTP.framework */,
-				3B6B2CD0D9BFE5805FD75F1B /* Pods_NotificationService.framework */,
-				714523F2DE15A728DCD1342D /* Pods_XMTPiOSExample.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -221,14 +197,6 @@
 			path = NotificationService;
 			sourceTree = "<group>";
 		};
-		A6CB98C829F85CE600F2DC58 /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				A678243529F8662800D30FF7 /* xmtp-ios */,
-			);
-			name = Packages;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -236,7 +204,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A628199E292DC826004B9117 /* Build configuration list for PBXNativeTarget "XMTPiOSExample" */;
 			buildPhases = (
-				8F079FC76F159362232F01B5 /* [CP] Check Pods Manifest.lock */,
 				A628198B292DC825004B9117 /* Sources */,
 				A628198C292DC825004B9117 /* Frameworks */,
 				A628198D292DC825004B9117 /* Resources */,
@@ -249,9 +216,10 @@
 			);
 			name = XMTPiOSExample;
 			packageProductDependencies = (
-				A678243029F8660F00D30FF7 /* WalletConnectSwift */,
-				A678243329F8661F00D30FF7 /* KeychainAccess */,
-				A678243A29F8669600D30FF7 /* XMTP */,
+				A69F33C5292DC992005A5556 /* XMTP */,
+				A65F0706297B5E7600C3C76E /* WalletConnectSwift */,
+				A65F0709297B5E8600C3C76E /* KeychainAccess */,
+				6AEE396D29F330CD0027B657 /* secp256k1 */,
 			);
 			productName = XMTPiOSExample;
 			productReference = A628198F292DC825004B9117 /* XMTPiOSExample.app */;
@@ -261,7 +229,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A6AE5188297B61AE006FDD0F /* Build configuration list for PBXNativeTarget "NotificationService" */;
 			buildPhases = (
-				312007D7F759D2B7DA4EB709 /* [CP] Check Pods Manifest.lock */,
 				A6AE517C297B61AE006FDD0F /* Sources */,
 				A6AE517D297B61AE006FDD0F /* Frameworks */,
 				A6AE517E297B61AE006FDD0F /* Resources */,
@@ -272,8 +239,8 @@
 			);
 			name = NotificationService;
 			packageProductDependencies = (
-				A678243629F8666F00D30FF7 /* XMTP */,
-				A678243829F8667A00D30FF7 /* KeychainAccess */,
+				A6AE5190297B625F006FDD0F /* XMTP */,
+				A6AE5193297B62C8006FDD0F /* KeychainAccess */,
 			);
 			productName = NotificationService;
 			productReference = A6AE5180297B61AE006FDD0F /* NotificationService.appex */;
@@ -307,8 +274,9 @@
 			);
 			mainGroup = A6281986292DC825004B9117;
 			packageReferences = (
-				A678242F29F8660F00D30FF7 /* XCRemoteSwiftPackageReference "WalletConnectSwift" */,
-				A678243229F8661F00D30FF7 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				A65F0705297B5E7500C3C76E /* XCRemoteSwiftPackageReference "WalletConnectSwift" */,
+				A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				6AEE396C29F330CD0027B657 /* XCRemoteSwiftPackageReference "secp256k1.swift" */,
 			);
 			productRefGroup = A6281990292DC825004B9117 /* Products */;
 			projectDirPath = "";
@@ -338,53 +306,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		312007D7F759D2B7DA4EB709 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-NotificationService-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8F079FC76F159362232F01B5 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-XMTPiOSExample-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A628198B292DC825004B9117 /* Sources */ = {
@@ -541,7 +462,6 @@
 		};
 		A628199F292DC826004B9117 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 26935F0C8B18F5FBC9FAF3A9 /* Pods-XMTPiOSExample.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -582,7 +502,6 @@
 		};
 		A62819A0292DC826004B9117 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 84D6E12168D73497F2E0F6E3 /* Pods-XMTPiOSExample.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -622,7 +541,6 @@
 		};
 		A6AE5189297B61AE006FDD0F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AE2571C02A5EC2D3BE73E10 /* Pods-NotificationService.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -651,7 +569,6 @@
 		};
 		A6AE518A297B61AE006FDD0F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 67E3F3B7A7EDC1AF97AC0439 /* Pods-NotificationService.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -712,15 +629,23 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		A678242F29F8660F00D30FF7 /* XCRemoteSwiftPackageReference "WalletConnectSwift" */ = {
+		6AEE396C29F330CD0027B657 /* XCRemoteSwiftPackageReference "secp256k1.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GigaBitcoin/secp256k1.swift.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.10.0;
+			};
+		};
+		A65F0705297B5E7500C3C76E /* XCRemoteSwiftPackageReference "WalletConnectSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/WalletConnect/WalletConnectSwift";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				branch = master;
+				kind = branch;
 			};
 		};
-		A678243229F8661F00D30FF7 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+		A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
 			requirement = {
@@ -731,28 +656,33 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A678243029F8660F00D30FF7 /* WalletConnectSwift */ = {
+		6AEE396D29F330CD0027B657 /* secp256k1 */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A678242F29F8660F00D30FF7 /* XCRemoteSwiftPackageReference "WalletConnectSwift" */;
+			package = 6AEE396C29F330CD0027B657 /* XCRemoteSwiftPackageReference "secp256k1.swift" */;
+			productName = secp256k1;
+		};
+		A65F0706297B5E7600C3C76E /* WalletConnectSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A65F0705297B5E7500C3C76E /* XCRemoteSwiftPackageReference "WalletConnectSwift" */;
 			productName = WalletConnectSwift;
 		};
-		A678243329F8661F00D30FF7 /* KeychainAccess */ = {
+		A65F0709297B5E8600C3C76E /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A678243229F8661F00D30FF7 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			package = A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
 		};
-		A678243629F8666F00D30FF7 /* XMTP */ = {
+		A69F33C5292DC992005A5556 /* XMTP */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = XMTP;
 		};
-		A678243829F8667A00D30FF7 /* KeychainAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A678243229F8661F00D30FF7 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
-		};
-		A678243A29F8669600D30FF7 /* XMTP */ = {
+		A6AE5190297B625F006FDD0F /* XMTP */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = XMTP;
+		};
+		A6AE5193297B62C8006FDD0F /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
