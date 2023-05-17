@@ -16,8 +16,8 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "XMTP"
-  spec.version      = "0.2.1-alpha0"
-  spec.summary      = "XMTP pod."
+  spec.version      = "0.2.2-alpha0"
+  spec.summary      = "XMTP SDK Cocoapod"
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -25,7 +25,7 @@ Pod::Spec.new do |spec|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   spec.description  = <<-DESC
-  TODO
+  The XMTP cocoapod implements the XMTP protocol for iOS. It handles cryptographic operations and network communication with the XMTP network.
                    DESC
 
   spec.homepage     	= "https://github.com/xmtp/xmtp-ios"

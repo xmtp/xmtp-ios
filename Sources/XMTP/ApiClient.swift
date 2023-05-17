@@ -196,6 +196,7 @@ class GRPCApiClient: ApiClient {
 		}
 		let response = try await rustClient.publish(authToken.intoRustString(), envelopesVec)
 		let publishResponse = PublishResponse()
+		// TODO: do we need to populate anything from response into PublishResponse?
 		return publishResponse
 	}
 }
