@@ -6,13 +6,9 @@ target 'NotificationService' do
   use_frameworks!
 
   # Pods for NotificationService
-	# Pods for XMTPiOSExample
-	# pod "secp256k1Swift", git: "https://github.com/portto/secp256k1.swift"
   pod "web3.swift"
-	pod 'KeychainAccess'
-#  pod "XMTPProto", path: "../../proto"
-#	pod "XMTPRust", path: '../../xmtp-rust-swift'
-	pod "XMTP", path: "../"
+  pod 'KeychainAccess'
+  pod "XMTP", path: '../'
 end
 
 target 'XMTPiOSExample' do
@@ -20,21 +16,18 @@ target 'XMTPiOSExample' do
   use_frameworks!
 
   # Pods for XMTPiOSExample
-  # pod "secp256k1Swift", git: "https://github.com/portto/secp256k1.swift"
-	pod 'WalletConnectSwift'
+  pod 'WalletConnectSwift'
   pod "web3.swift"
-	pod 'KeychainAccess'
-#  pod "XMTPProto", path: "../../proto"
-#  pod "XMTPRust", path: '../../xmtp-rust-swift'
-	pod "XMTP", path: "../"
+  pod 'KeychainAccess'
+  pod "XMTP", path: '../'
 end
 
 post_install do |installer|
-	installer.generated_projects.each do |project|
-		project.targets.each do |target|
-			target.build_configurations.each do |config|
-				config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-			 end
-		end
-	end
+  installer.generated_projects.each do |project|
+    project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+       end
+    end
+  end
 end
