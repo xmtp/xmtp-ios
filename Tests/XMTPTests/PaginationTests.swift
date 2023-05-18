@@ -20,6 +20,8 @@ class PaginationTests: XCTestCase {
 	}
 
 	func testLongConvo() async throws {
+		throw XCTSkip("integration only (requires local node)")
+
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
 
@@ -70,6 +72,8 @@ class PaginationTests: XCTestCase {
 	}
 	
 	func testCanStreamConversationsV2() async throws {
+		throw XCTSkip("integration only (requires local node)")
+
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
 		
