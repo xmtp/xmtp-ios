@@ -21,7 +21,7 @@ public enum ConversationContainer: Codable {
 }
 
 /// Wrapper that provides a common interface between ``ConversationV1`` and ``ConversationV2`` objects.
-public enum Conversation {
+public enum Conversation: Sendable {
 	// TODO: It'd be nice to not have to expose these types as public, maybe we make this a struct with an enum prop instead of just an enum
 	case v1(ConversationV1), v2(ConversationV2)
 

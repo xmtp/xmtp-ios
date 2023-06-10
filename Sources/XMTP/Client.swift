@@ -42,7 +42,7 @@ public struct ClientOptions {
 /// 2. To sign a random salt used to encrypt the key bundle in storage. This happens every time the client is started, including the very first time).
 ///
 /// > Important: The client connects to the XMTP `dev` environment by default. Use ``ClientOptions`` to change this and other parameters of the network connection.
-public class Client {
+public class Client: Sendable {
 	/// The wallet address of the ``SigningKey`` used to create this Client.
 	public var address: String
 	var privateKeyBundleV1: PrivateKeyBundleV1
