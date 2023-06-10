@@ -19,21 +19,21 @@
       }
     },
     {
-      "identity" : "cryptoswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",
-      "state" : {
-        "revision" : "039f56c5d7960f277087a0be51f5eb04ed0ec073",
-        "version" : "1.5.1"
-      }
-    },
-    {
       "identity" : "generic-json-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/zoul/generic-json-swift",
       "state" : {
         "revision" : "0a06575f4038b504e78ac330913d920f1630f510",
         "version" : "2.0.2"
+      }
+    },
+    {
+      "identity" : "grpc-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/grpc/grpc-swift",
+      "state" : {
+        "revision" : "3e17f2b847da39b50329b7a11c5ad23453190e8b",
+        "version" : "1.13.0"
       }
     },
     {
@@ -46,12 +46,12 @@
       }
     },
     {
-      "identity" : "keychainaccess",
+      "identity" : "proto",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
+      "location" : "https://github.com/xmtp/proto",
       "state" : {
-        "branch" : "master",
-        "revision" : "6299daec1d74be12164fec090faf9ed14d0da9d6"
+        "branch" : "main",
+        "revision" : "6a8905a8b260406698433d210c25c4397a93cef1"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/GigaBitcoin/secp256k1.swift.git",
       "state" : {
-        "revision" : "48fb20fce4ca3aad89180448a127d5bc16f0e44c",
-        "version" : "0.10.0"
+        "branch" : "main",
+        "revision" : "9bfd1a648d0867d5491f56f237c58bc0bd105fc3"
       }
     },
     {
@@ -118,6 +118,24 @@
       }
     },
     {
+      "identity" : "swift-nio-extras",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-nio-extras.git",
+      "state" : {
+        "revision" : "91dd2d61fb772e1311bb5f13b59266b579d77e42",
+        "version" : "1.15.0"
+      }
+    },
+    {
+      "identity" : "swift-nio-http2",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-nio-http2.git",
+      "state" : {
+        "revision" : "d6656967f33ed8b368b38e4b198631fc7c484a40",
+        "version" : "1.23.1"
+      }
+    },
+    {
       "identity" : "swift-nio-ssl",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio-ssl.git",
@@ -145,15 +163,6 @@
       }
     },
     {
-      "identity" : "walletconnectswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/WalletConnect/WalletConnectSwift",
-      "state" : {
-        "branch" : "master",
-        "revision" : "9e4dfba34fb35336fd5da551285d7986ff536cb8"
-      }
-    },
-    {
       "identity" : "web3.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/argentlabs/web3.swift",
@@ -169,15 +178,6 @@
       "state" : {
         "revision" : "2d9d2188a08eef4a869d368daab21b3c08510991",
         "version" : "2.6.1"
-      }
-    },
-    {
-      "identity" : "xmtp-rust-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/xmtp/xmtp-rust-swift",
-      "state" : {
-         "revision" : "41a1161cf06a86bab0aa886e450584a1191429b1",
-         "version" : "0.3.0-beta0"
       }
     }
   ],
