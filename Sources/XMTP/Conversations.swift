@@ -291,10 +291,17 @@ public class Conversations {
 	}
 
 	func listInvitations() async throws -> [SealedInvitation] {
-		let envelopes = try await client.apiClient.envelopes(
+		var envelopes = try await client.apiClient.envelopes(
 			topic: Topic.userInvite(client.address).description,
 			pagination: nil
 		)
+
+		if client.isGroupChatEnabled {
+			envelopes.append(contentsOf: try await client.apiClient.envelopes(
+				topic: Topic.groupInvite(client.address).description,
+				pagination: nil
+		 ))
+		}
 
 		return envelopes.compactMap { envelope in
 			// swiftlint:disable no_optional_try
