@@ -1,16 +1,14 @@
 # XMTP-iOS
 
-![Lint](https://github.com/xmtp/xmtp-ios/actions/workflows/lint.yml/badge.svg) ![Status](https://img.shields.io/badge/Project_Status-General_Availability-31CA54)
+![Lint](https://github.com/xmtp/xmtp-ios/actions/workflows/lint.yml/badge.svg) ![Status](https://img.shields.io/badge/Project_Status-Production-31CA54)
 
 `xmtp-ios` provides a Swift implementation of an XMTP message API client for use with iOS apps.
 
 Use `xmtp-ios` to build with XMTP to send messages between blockchain accounts, including DMs, notifications, announcements, and more.
 
-This SDK is in **General Availability** status and ready for use in production. 
-
 To keep up with the latest SDK developments, see the [Issues tab](https://github.com/xmtp/xmtp-ios/issues) in this repo.
 
-To learn more about XMTP and get answers to frequently asked questions, see [FAQ about XMTP](https://xmtp.org/docs/dev-concepts/faq).
+To learn more about XMTP and get answers to frequently asked questions, see the [XMTP documentation](https://xmtp.org/docs).
 
 ![x-red-sm](https://user-images.githubusercontent.com/510695/163488403-1fb37e86-c673-4b48-954e-8460ae4d4b05.png)
 
@@ -66,7 +64,7 @@ A client is created with `Client.create(account: SigningKey) async throws -> Cli
 2. To sign a random salt used to encrypt the key bundle in storage. This happens every time the client is started, including the very first time).
 
 > **Important:**  
-> The client connects to the XMTP `dev` environment by default. [Use `ClientOptions`](#configuring-the-client) to change this and other parameters of the network connection.
+> The client connects to the XMTP `dev` environment by default. [Use `ClientOptions`](#configure-the-client) to change this and other parameters of the network connection.
 
 ```swift
 import XMTP
@@ -75,7 +73,7 @@ import XMTP
 let client = try await Client.create(account: account, options: .init(api: .init(env: .production)))
 ```
 
-### Creating a client from saved keys
+### Create a client from saved keys
 
 You can save your keys from the client via the `privateKeyBundle` property:
 
@@ -148,9 +146,7 @@ for conversation in allConversations {
 }
 ```
 
-These conversations include all conversations for a user **regardless of which app created the conversation.** This functionality provides the concept of an [interoperable inbox](https://xmtp.org/docs/dev-concepts/interoperable-inbox), which enables a user to access all of their conversations in any app built with XMTP.
-
-You might choose to provide an additional filtered view of conversations. To learn more, see [Handle multiple conversations with the same blockchain address](#handle-multiple-conversations-with-the-same-blockchain-address) and [Filter conversations using conversation IDs and metadata](https://xmtp.org/docs/client-sdk/javascript/tutorials/filter-conversations).
+These conversations include all conversations for a user **regardless of which app created the conversation.** This functionality provides the concept of an [interoperable inbox](https://xmtp.org/docs/concepts/interoperable-inbox), which enables a user to access all of their conversations in any app built with XMTP.
 
 ### Listen for new conversations
 
@@ -232,38 +228,6 @@ for try await message in conversation.streamMessages() {
 }
 ```
 
-### Handle multiple conversations with the same blockchain address
-
-With XMTP, you can have multiple ongoing conversations with the same blockchain address. For example, you might want to have a conversation scoped to your particular app, or even a conversation scoped to a particular item in your app.
-
-To accomplish this, you can pass a context with a `conversationId` when you are creating a conversation. We recommend conversation IDs start with a domain, to help avoid unwanted collisions between your app and other apps on the XMTP network.
-
-```swift
-// Start a scoped conversation with ID mydomain.xyz/foo
-let conversation1 = try await client.conversations.newConversation(
-  with: "0x3F11b27F323b62B159D2642964fa27C46C841897",
-  context: .init(conversationID: "mydomain.xyz/foo")
-)
-
-// Start a scoped conversation with ID mydomain.xyz/bar. And add some metadata
-let conversation2 = try await client.conversations.newConversation(
-  with: "0x3F11b27F323b62B159D2642964fa27C46C841897",
-  context: .init(conversationID: "mydomain.xyz/bar", metadata: ["title": "Bar conversation"])
-)
-
-// Get all the conversations
-let conversations = try await client.conversations.list()
-
-// Filter for the ones from your app
-let myAppConversations = conversations.filter {
-  guard let conversationID = $0.context?.conversationID else {
-    return false
-  }
-
-  return conversationID.hasPrefix("mydomain.xyz/")
-}
-```
-
 ### Decode a single message
 
 You can decode a single `Envelope` from XMTP using the `decode` method:
@@ -305,7 +269,7 @@ try await decodedConversation.send(text: "hi")
 
 All of the send functions support `SendOptions` as an optional parameter. The `contentType` option allows specifying different types of content other than the default simple string standard content type, which is identified with content type identifier `ContentTypeText`. 
 
-To learn more about content types, see [Content types with XMTP](https://xmtp.org/docs/dev-concepts/content-types).
+To learn more about content types, see [Content types with XMTP](https://xmtp.org/docs/concepts/content-types).
 
 Support for other content types can be added by registering additional `ContentCodec`s with the client. Every codec is associated with a content type identifier, `ContentTypeID`, which is used to signal to the client which codec should be used to process the content that is being sent or received. 
 
@@ -456,7 +420,7 @@ Content will be decompressed transparently on the receiving end. Note that Clien
 try await conversation.send(text: '#'.repeat(1000), options: .init(compression: .gzip))
 ```
 
-## 🏗 **Breaking revisions**
+## 🏗 Breaking revisions
 
 Because `xmtp-ios` is in active development, you should expect breaking revisions that might require you to adopt the latest SDK release to enable your app to continue working as expected.
 
