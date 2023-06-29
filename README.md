@@ -1,6 +1,7 @@
 # XMTP-iOS
 
 ![Lint](https://github.com/xmtp/xmtp-ios/actions/workflows/lint.yml/badge.svg) ![Status](https://img.shields.io/badge/Project_Status-Production-31CA54)
+![Lint](https://github.com/xmtp/xmtp-ios/actions/workflows/lint.yml/badge.svg) ![Status](https://img.shields.io/badge/Project_Status-Production-31CA54)
 
 `xmtp-ios` provides a Swift implementation of an XMTP message API client for use with iOS apps.
 
@@ -12,9 +13,11 @@ To learn more about XMTP and get answers to frequently asked questions, see the 
 
 ![x-red-sm](https://user-images.githubusercontent.com/510695/163488403-1fb37e86-c673-4b48-954e-8460ae4d4b05.png)
 
-## Example app
+## Quickstart and example apps built with `xmtp-ios`
 
-For a basic demonstration of the core concepts and capabilities of the `xmtp-ios` client SDK, see the [Example app project](https://github.com/xmtp/xmtp-ios/tree/main/XMTPiOSExample/XMTPiOSExample).
+- Use the [XMTP iOS quickstart app](https://github.com/xmtp/xmtp-ios/tree/main/XMTPiOSExample/XMTPiOSExample) as a tool to start building an app with XMTP. This basic messaging app has an intentionally unopinionated UI to help make it easier for you to build with.
+
+- Use the [XMTP Inbox iOS example app](https://github.com/xmtp-labs/xmtp-inbox-ios) as a reference implementation to understand how to implement features following developer and user experience best practices.
 
 ## Reference docs
 
@@ -61,9 +64,9 @@ for try await message in conversation.streamMessages() {
 A client is created with `Client.create(account: SigningKey) async throws -> Client` that requires passing in an object capable of creating signatures on your behalf. The client will request a signature in two cases:
 
 1. To sign the newly generated key bundle. This happens only the very first time when a key bundle is not found in storage.
-2. To sign a random salt used to encrypt the key bundle in storage. This happens every time the client is started, including the very first time).
+2. To sign a random salt used to encrypt the key bundle in storage. This happens every time the client is started, including the very first time.
 
-> **Important:**  
+> **Important**  
 > The client connects to the XMTP `dev` environment by default. [Use `ClientOptions`](#configure-the-client) to change this and other parameters of the network connection.
 
 ```swift
@@ -152,7 +155,7 @@ These conversations include all conversations for a user **regardless of which a
 
 You can also listen for new conversations being started in real-time. This will allow apps to display incoming messages from new contacts.
 
-> **Warning:**  
+> **Warning**  
 > This stream will continue infinitely. To end the stream, break from the loop.
 
 ```swift
@@ -249,7 +252,7 @@ You can save a conversation object locally using its `encodedContainer` property
 // Get a conversation
 let conversation = try await client.conversations.newConversation(with: "0x3F11b27F323b62B159D2642964fa27C46C841897")
 
-// Get a container.
+// Get a container
 let container = conversation.encodedContainer
 
 // Dump it to JSON
@@ -403,7 +406,6 @@ struct ContentView: View {
 		Image(uiImage: UIImage(data: attachment.data))
 	}
 }
-
 ```
 
 #### Handle custom content types
@@ -448,7 +450,7 @@ XMTP provides both `production` and `dev` network environments to support the de
 The `production` and `dev` networks are completely separate and not interchangeable.
 For example, for a given blockchain account, its XMTP identity on `dev` network is completely distinct from its XMTP identity on the `production` network, as are the messages associated with these identities. In addition, XMTP identities and messages created on the `dev` network can't be accessed from or moved to the `production` network, and vice versa.
 
-> **Important:**  
+> **Important**  
 > When you [create a client](#create-a-client), it connects to the XMTP `dev` environment by default. To learn how to use the `env` parameter to set your client's network environment, see [Configure the client](#configure-the-client).
 
 The `env` parameter accepts one of three valid values: `dev`, `production`, or `local`. Here are some best practices for when to use each environment:
