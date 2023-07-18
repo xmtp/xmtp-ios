@@ -32,11 +32,12 @@ public class Conversations {
         conversationsByTopic[conversation.topic] = conversation
         return conversation
     }
+    
+    public typealias Query = (topic: String, pagination: Pagination?)
 
-    public func listBatchMessages(topics: [String], limit: Int? = nil, before: Date? = nil, after: Date? = nil) async throws -> [DecodedMessage] {
-        let pagination = Pagination(limit: limit, before: before, after: after)
-        let requests = topics.map { (topic) in
-            makeQueryRequest(topic: topic, pagination: pagination)
+    public func listBatchMessages(topics: [Query]) async throws -> [DecodedMessage] {
+        let requests = topics.map { (topic, page) in
+            makeQueryRequest(topic: topic, pagination: page)
         }
         /// The maximum number of requests permitted in a single batch call.
         let maxQueryRequestsPerBatch = 50
