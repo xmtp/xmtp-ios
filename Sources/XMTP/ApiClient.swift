@@ -27,7 +27,7 @@ public enum ApiClientError: Error {
 
 protocol ApiClient {
 	var environment: XMTPEnvironment { get }
-	init(environment: XMTPEnvironment, secure: Bool, rustClient: XMTPRust.RustClient) throws
+    init(environment: XMTPEnvironment, secure: Bool, rustClient: XMTPRust.RustClient, appVersion: String?) throws
 	func setAuthToken(_ token: String)
     func batchQuery(request: BatchQueryRequest) async throws -> BatchQueryResponse
 	func query(topic: String, pagination: Pagination?, cursor: Xmtp_MessageApi_V1_Cursor?) async throws -> QueryResponse
@@ -67,10 +67,12 @@ class GRPCApiClient: ApiClient {
 	var authToken = ""
 
 	var rustClient: XMTPRust.RustClient
+    var appVersion: String
 
-	required init(environment: XMTPEnvironment, secure _: Bool = true, rustClient: XMTPRust.RustClient) throws {
+    required init(environment: XMTPEnvironment, secure _: Bool = true, rustClient: XMTPRust.RustClient, appVersion: String? = nil) throws {
 		self.environment = environment
 		self.rustClient = rustClient
+        self.appVersion = appVersion ?? "0.0.0"
 	}
 
 	static func envToUrl(env: XMTPEnvironment) -> String {
@@ -88,7 +90,7 @@ class GRPCApiClient: ApiClient {
     func batchQuery(request: BatchQueryRequest) async throws -> BatchQueryResponse {
         do {
             let req = RustVec<UInt8>(try request.serializedData())
-            let res: RustVec<UInt8> = try await rustClient.batch_query(req)
+            let res: RustVec<UInt8> = try await rustClient.batch_query(req, appVersion.intoRustString())
             return try BatchQueryResponse(serializedData: Data(res))
         } catch let error as RustString {
             throw ApiClientError.batchQueryError(error.toString())
@@ -98,7 +100,7 @@ class GRPCApiClient: ApiClient {
     func query(request: QueryRequest) async throws -> QueryResponse {
         do {
             let req = RustVec<UInt8>(try request.serializedData())
-            let res: RustVec<UInt8> = try await rustClient.query(req)
+            let res: RustVec<UInt8> = try await rustClient.query(req, appVersion.intoRustString())
             return try QueryResponse(serializedData: Data(res))
         } catch let error as RustString {
             throw ApiClientError.queryError(error.toString())
@@ -136,7 +138,7 @@ class GRPCApiClient: ApiClient {
                 let request = SubscribeRequest.with { $0.contentTopics = topics }
                 let req = RustVec<UInt8>(try request.serializedData())
                 do {
-                    let subscription = try await self.rustClient.subscribe(req)
+                    let subscription = try await self.rustClient.subscribe(req, appVersion.intoRustString())
                     // Run a continuous for loop polling and sleeping for a bit each loop.
                     while true {
                         let buf = try subscription.get_envelopes_as_query_response()
@@ -157,7 +159,7 @@ class GRPCApiClient: ApiClient {
     func publish(request: PublishRequest) async throws -> PublishResponse {
         do {
             let req = RustVec<UInt8>(try request.serializedData())
-            let res: RustVec<UInt8> = try await rustClient.publish(authToken.intoRustString(), req)
+            let res: RustVec<UInt8> = try await rustClient.publish(authToken.intoRustString(), req, appVersion.intoRustString())
             return try PublishResponse(serializedData: Data(res))
         } catch let error as RustString {
             throw ApiClientError.publishError(error.toString())
