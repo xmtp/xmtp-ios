@@ -33,9 +33,8 @@ public class Conversations {
         return conversation
     }
     
-    public typealias Query = (topic: String, pagination: Pagination?)
 
-    public func listBatchMessages(topics: [Query]) async throws -> [DecodedMessage] {
+    public func listBatchMessages(topics: [String: Pagination?]) async throws -> [DecodedMessage] {
         let requests = topics.map { (topic, page) in
             makeQueryRequest(topic: topic, pagination: page)
         }
