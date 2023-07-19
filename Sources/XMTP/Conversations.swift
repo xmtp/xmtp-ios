@@ -32,7 +32,6 @@ public class Conversations {
         conversationsByTopic[conversation.topic] = conversation
         return conversation
     }
-    
 
     public func listBatchMessages(topics: [String: Pagination?]) async throws -> [DecodedMessage] {
         let requests = topics.map { (topic, page) in
