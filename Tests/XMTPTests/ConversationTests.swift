@@ -424,7 +424,7 @@ class ConversationTests: XCTestCase {
         }
 
         let messages = try await aliceClient.conversations.listBatchMessages(
-            topics: [bobConversation.topic : Pagination(limit:1)]
+            topics: [bobConversation.topic : Pagination(limit:3)]
         )
         XCTAssertEqual(3, messages.count)
     }
