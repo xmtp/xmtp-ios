@@ -17,7 +17,7 @@ public struct Pagination {
     public var after: Date?
     var direction: PagingInfoSortDirection?
         
-    public init(limit: Int?, before: Date?, after: Date?) {
+    public init(limit: Int? = nil, before: Date? = nil, after: Date? = nil) {
         self.limit = limit
         self.before = before
         self.after = after
