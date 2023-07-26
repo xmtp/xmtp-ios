@@ -24,9 +24,9 @@ class ReactionTests: XCTestCase {
 
         let reaction = Reaction(
             reference: messageToReact.id,
-            action: .ADDED,
+            action: .added,
             content: "U+1F603",
-            schema: .UNICODE
+            schema: .unicode
         )
 
         try await conversation.send(
@@ -40,7 +40,7 @@ class ReactionTests: XCTestCase {
         let content: Reaction = try message.content()
         XCTAssertEqual("U+1F603", content.content)
         XCTAssertEqual(messageToReact.id, content.reference)
-        XCTAssertEqual(ReactionAction.ADDED, content.action)
-        XCTAssertEqual(ReactionSchema.UNICODE, content.schema)
+        XCTAssertEqual(ReactionAction.added, content.action)
+        XCTAssertEqual(ReactionSchema.unicode, content.schema)
     }
 }

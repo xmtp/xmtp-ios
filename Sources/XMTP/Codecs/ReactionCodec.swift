@@ -18,11 +18,11 @@ public struct Reaction: Codable {
 }
 
 public enum ReactionAction: String, Codable {
-    case ADDED, REMOVED
+    case added, removed
 }
 
 public enum ReactionSchema: String, Codable {
-    case UNICODE, SHORTCODE, CUSTOM
+    case unicode, shortcode, custom
 }
 
 public struct ReactionCodec: ContentCodec {
