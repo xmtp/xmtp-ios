@@ -31,7 +31,6 @@ public struct ReactionCodec: ContentCodec {
 
     public init() {}
 
-    
     public func encode(content: Reaction) throws -> EncodedContent {
         var encodedContent = EncodedContent()
 
