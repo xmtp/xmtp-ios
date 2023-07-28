@@ -17,7 +17,10 @@ public struct Reply: Codable {
 }
 
 public struct ReplyCodec: ContentCodec {
+    public typealias T = Reply
     public var contentType = ContentTypeReply
+
+    public init() {}
 
     public func encode(content: Reply) throws -> EncodedContent {
         var encodedContent = EncodedContent()
