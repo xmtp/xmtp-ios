@@ -7,17 +7,16 @@
 
 import Foundation
 
-
 public let ContentTypeReply = ContentTypeID(authorityID: "xmtp.org", typeID: "reply", versionMajor: 1, versionMinor: 0)
 
 public struct Reply {
-    public var reference: String
-    public var content: Any
-    public var contentType: ContentTypeID
+	public var reference: String
+	public var content: Any
+	public var contentType: ContentTypeID
 }
 
 public struct ReplyCodec: ContentCodec {
-  public var contentType = ContentTypeReply
+	public var contentType = ContentTypeReply
 
 	public init() {}
 
