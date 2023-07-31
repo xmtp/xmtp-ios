@@ -11,33 +11,33 @@ import XCTest
 
 @available(iOS 15, *)
 class ReplyTests: XCTestCase {
-    func testCanUseReplyCodec() async throws {
-        Client.register(codec: ReplyCodec())
+	func testCanUseReplyCodec() async throws {
+		Client.register(codec: ReplyCodec())
 
-        let fixtures = await fixtures()
-        let conversation = try await fixtures.aliceClient.conversations.newConversation(with: fixtures.bobClient.address)
+		let fixtures = await fixtures()
+		let conversation = try await fixtures.aliceClient.conversations.newConversation(with: fixtures.bobClient.address)
 
-        try await conversation.send(text: "hey alice 2 bob")
+		try await conversation.send(text: "hey alice 2 bob")
 
-        let messageToReply = try await conversation.messages()[0]
+		let messageToReply = try await conversation.messages()[0]
 
-        let reply = Reply(
-            reference: messageToReply.id,
-            content: "Hello",
-            contentType: ContentTypeText
-        )
+		let reply = Reply(
+			reference: messageToReply.id,
+			content: "Hello",
+			contentType: ContentTypeText
+		)
 
-        try await conversation.send(
-            content: reply,
-            options: .init(contentType: ContentTypeReply)
-        )
+		try await conversation.send(
+			content: reply,
+			options: .init(contentType: ContentTypeReply)
+		)
 
-        let updatedMessages = try await conversation.messages()
+		let updatedMessages = try await conversation.messages()
 
-        let message = try await conversation.messages()[0]
-        let content: Reply = try message.content()
-        XCTAssertEqual("Hello", content.content as? String)
-        XCTAssertEqual(messageToReply.id, content.reference)
-        XCTAssertEqual(ContentTypeText, content.contentType)
-    }
+		let message = try await conversation.messages()[0]
+		let content: Reply = try message.content()
+		XCTAssertEqual("Hello", content.content as? String)
+		XCTAssertEqual(messageToReply.id, content.reference)
+		XCTAssertEqual(ContentTypeText, content.contentType)
+	}
 }
