@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 public typealias SignedPrivateKey = Xmtp_MessageContents_SignedPrivateKey
 
 extension SignedPrivateKey {
