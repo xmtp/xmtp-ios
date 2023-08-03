@@ -11,6 +11,10 @@ public let ContentTypeReadReceipt = ContentTypeID(authorityID: "xmtp.org", typeI
 
 public struct ReadReceipt {
     public var timestamp: String
+    
+    public init(timestamp: String) {
+        self.timestamp = timestamp
+    }
 }
 
 public struct ReadReceiptCodec: ContentCodec {
