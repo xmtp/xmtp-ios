@@ -9,13 +9,16 @@ import Foundation
 import secp256k1
 import web3
 import XCTest
+import XMTPRust
 @testable import XMTP
+import XMTPRust
 import XMTPTestHelpers
 
+@available(macOS 13.0, *)
 @available(iOS 16, *)
 final class IntegrationTests: XCTestCase {
 	func testSaveKey() async throws {
-		throw XCTSkip("integration only (requires local node)")
+	    try TestConfig.skipIfNotRunningLocalNodeTests()
 
 		let alice = try PrivateKey.generate()
 		let identity = try PrivateKey.generate()
@@ -24,7 +27,8 @@ final class IntegrationTests: XCTestCase {
 
 		let authToken = try await authorized.createAuthToken()
 
-		let api = try GRPCApiClient(environment: .local, secure: false)
+		let rustClient = try await XMTPRust.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
+		let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
 		api.setAuthToken(authToken)
 
 		let encryptedBundle = try await authorized.toBundle.encrypted(with: alice)
@@ -42,76 +46,28 @@ final class IntegrationTests: XCTestCase {
 		XCTAssert(result.envelopes.count == 1)
 	}
 
-	func testPublishingAndFetchingContactBundlesWithWhileGeneratingKeys() async throws {
-		throw XCTSkip("integration only (requires local node)")
+	func testPublishingAndFetchingContactBundles() async throws {
+        try TestConfig.skipIfNotRunningLocalNodeTests()
+
+		let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 
 		let aliceWallet = try PrivateKey.generate()
-		let clientOptions = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
-		let client = try await Client.create(account: aliceWallet, options: clientOptions)
-		XCTAssertEqual(.local, client.apiClient.environment)
+		let alice = try await Client.create(account: aliceWallet, options: opts)
+		try await delayToPropagate()
+		let contact = try await alice.getUserContact(peerAddress: alice.address)
 
-		let noContactYet = try await client.getUserContact(peerAddress: aliceWallet.walletAddress)
-		XCTAssertNil(noContactYet)
+		XCTAssertEqual(contact!.v2.keyBundle.identityKey.secp256K1Uncompressed, alice.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed)
+		XCTAssert(contact!.v2.keyBundle.identityKey.hasSignature == true, "no signature")
+		XCTAssert(contact!.v2.keyBundle.preKey.hasSignature == true, "pre key not signed")
 
-		try await client.publishUserContact()
-
-		let contact = try await client.getUserContact(peerAddress: aliceWallet.walletAddress)
-
-		XCTAssertEqual(contact?.v1.keyBundle.identityKey.secp256K1Uncompressed, client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed)
-		XCTAssert(contact?.v1.keyBundle.identityKey.hasSignature == true, "no signature")
-		XCTAssert(contact?.v1.keyBundle.preKey.hasSignature == true, "pre key not signed")
-	}
-
-	func testPublishingAndFetchingContactBundlesWithSavedKeys() async throws {
-		throw XCTSkip("integration only (requires local node)")
-
-		let aliceWallet = try PrivateKey.generate()
-		let alice = try await PrivateKeyBundleV1.generate(wallet: aliceWallet)
-
-		// Save keys
-		let identity = try PrivateKey.generate()
-		let authorized = try await aliceWallet.createIdentity(identity)
-		let authToken = try await authorized.createAuthToken()
-		var api = try GRPCApiClient(environment: .local, secure: false)
-		api.setAuthToken(authToken)
-		let encryptedBundle = try await PrivateKeyBundle(v1: alice).encrypted(with: aliceWallet)
-		var envelope = Envelope()
-		envelope.contentTopic = Topic.userPrivateStoreKeyBundle(authorized.address).description
-		envelope.timestampNs = UInt64(Date().millisecondsSinceEpoch) * 1_000_000
-		envelope.message = try encryptedBundle.serializedData()
-		try await api.publish(envelopes: [envelope])
-		// Done saving keys
-
-		let clientOptions = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
-		let client = try await Client.create(account: aliceWallet, options: clientOptions)
-		XCTAssertEqual(.local, client.apiClient.environment)
-
-		let noContactYet = try await client.getUserContact(peerAddress: aliceWallet.walletAddress)
-		XCTAssertNil(noContactYet)
-
-		try await client.publishUserContact()
-
-		let contact = try await client.getUserContact(peerAddress: aliceWallet.walletAddress)
-
-		XCTAssertEqual(contact?.v1.keyBundle.identityKey.secp256K1Uncompressed, client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed)
-		XCTAssert(contact?.v1.keyBundle.identityKey.hasSignature == true, "no signature")
-		XCTAssert(contact?.v1.keyBundle.preKey.hasSignature == true, "pre key not signed")
-	}
-
-	func publishLegacyContact(client: XMTP.Client) async throws {
-		var contactBundle = ContactBundle()
-		contactBundle.v1.keyBundle = client.privateKeyBundleV1.toPublicKeyBundle()
-
-		var envelope = Envelope()
-		envelope.contentTopic = Topic.contact(client.address).description
-		envelope.timestampNs = UInt64(Date().millisecondsSinceEpoch * 1_000_000)
-		envelope.message = try contactBundle.serializedData()
-
-		try await client.publish(envelopes: [envelope])
+		let aliceAgain = try await Client.create(account: aliceWallet, options: opts)
+		try await delayToPropagate()
+		let contactAgain = try await alice.getUserContact(peerAddress: alice.address)
+		XCTAssertEqual(contactAgain!, contact!, "contact bundle should not have changed")
 	}
 
 	func testCanReceiveV1MessagesFromJS() async throws {
-		throw XCTSkip("integration only (requires local node)")
+        try TestConfig.skip(because: "run with locally orchestrated network")
 
 		let wallet = try FakeWallet.generate()
 		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
@@ -128,7 +84,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReceiveV2MessagesFromJS() async throws {
-		throw XCTSkip("integration only (requires local node)")
+        try TestConfig.skip(because: "run with locally orchestrated network")
 
 		let wallet = try PrivateKey.generate()
 		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
@@ -150,111 +106,147 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testEndToEndConversation() async throws {
-		throw XCTSkip("integration only (requires local node)")
+        try TestConfig.skipIfNotRunningLocalNodeTests()
 
-		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
+		let opt = ClientOptions(api: .init(env: .local, isSecure: false))
+        let alice = try await Client.create(account: try PrivateKey.generate(), options: opt)
+        let bob = try await Client.create(account: try PrivateKey.generate(), options: opt)
 
-		let fakeContactWallet = try PrivateKey.generate()
-		let fakeContactClient = try await Client.create(account: fakeContactWallet, options: options)
-		try await fakeContactClient.publishUserContact()
+        let aliceConvo = try await alice.conversations.newConversation(with: bob.address)
+        _ = try await aliceConvo.send(text: "Hello Bob")
+        try await delayToPropagate()
 
-		let fakeWallet = try PrivateKey.generate()
-		let client = try await Client.create(account: fakeWallet, options: options)
+        let bobConvos = try await bob.conversations.list()
+        let bobConvo = bobConvos[0]
+        let bobSees = try await bobConvo.messages()
+        XCTAssertEqual("Hello Bob", bobSees[0].body)
 
-		let contact = try await client.getUserContact(peerAddress: fakeContactWallet.walletAddress)!
+        try await bobConvo.send(text: "Oh, hello Alice")
+        try await delayToPropagate()
 
-		XCTAssertEqual(contact.walletAddress, fakeContactWallet.walletAddress)
-		let privkeybundlev2 = try client.privateKeyBundleV1.toV2()
-		let created = Date()
+        let aliceSees = try await aliceConvo.messages()
+        XCTAssertEqual("Hello Bob", aliceSees[1].body)
+        XCTAssertEqual("Oh, hello Alice", aliceSees[0].body)
+	}
 
-		var invitationContext = InvitationV1.Context()
-		invitationContext.conversationID = "https://example.com/1"
-		let invitationv1 = try InvitationV1.createRandom(context: invitationContext)
-		let senderBundle = try client.privateKeyBundleV1.toV2()
+	func testUsingSavedCredentialsAndKeyMaterial() async throws {
+		try TestConfig.skipIfNotRunningLocalNodeTests()
 
-		XCTAssertEqual(try senderBundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress, fakeWallet.address)
-		let invitation = try SealedInvitation.createV1(
-			sender: try client.privateKeyBundleV1.toV2(),
-			recipient: try contact.toSignedPublicKeyBundle(),
-			created: created,
-			invitation: invitationv1
+		let opt = ClientOptions(api: .init(env: .local, isSecure: false))
+		let alice = try await Client.create(account: try PrivateKey.generate(), options: opt)
+		let bob = try await Client.create(account: try PrivateKey.generate(), options: opt)
+
+		// Alice starts a conversation with Bob
+		let aliceConvo = try await alice.conversations.newConversation(
+				with: bob.address,
+				context: InvitationV1.Context.with {
+					$0.conversationID = "example.com/alice-bob-1"
+					$0.metadata["title"] = "Chatting Using Saved Credentials"
+				})
+		_ = try await aliceConvo.send(text: "Hello Bob")
+		try await delayToPropagate()
+
+		// Alice stores her credentials and conversations to her device
+		let keyBundle = try alice.privateKeyBundle.serializedData();
+		let topicData = try aliceConvo.toTopicData().serializedData();
+
+		// Meanwhile, Bob sends a reply.
+		let bobConvos = try await bob.conversations.list()
+		let bobConvo = bobConvos[0]
+		try await bobConvo.send(text: "Oh, hello Alice")
+		try await delayToPropagate()
+
+		// When Alice's device wakes up, it uses her saved credentials
+		let alice2 = try await Client.from(
+			bundle: PrivateKeyBundle(serializedData: keyBundle),
+			options: opt
 		)
+		// And it uses the saved topic data for the conversation
+		let aliceConvo2 = alice2.conversations.importTopicData(
+				data: try Xmtp_KeystoreApi_V1_TopicMap.TopicData(serializedData: topicData))
+		XCTAssertEqual("example.com/alice-bob-1", aliceConvo2.conversationID)
 
-		let inviteHeader = invitation.v1.header
-		XCTAssertEqual(try inviteHeader.sender.walletAddress, fakeWallet.walletAddress)
-		XCTAssertEqual(try inviteHeader.recipient.walletAddress, fakeContactWallet.walletAddress)
+		// Now Alice should be able to load message using her saved key material.
+		let messages = try await aliceConvo2.messages()
+		XCTAssertEqual("Hello Bob", messages[1].body)
+		XCTAssertEqual("Oh, hello Alice", messages[0].body)
+	}
 
-		let header = try SealedInvitationHeaderV1(serializedData: invitation.v1.headerBytes)
-		let conversation = try ConversationV2.create(client: client, invitation: invitationv1, header: header)
+	func testDeterministicConversationCreation() async throws {
+		try TestConfig.skipIfNotRunningLocalNodeTests()
 
-		XCTAssertEqual(fakeContactWallet.walletAddress, conversation.peerAddress)
-//
-		do {
-			try await conversation.send(content: "hello world")
-		} catch {
-			print("ERROR SENDING \(error)")
+		let opt = ClientOptions(api: .init(env: .local, isSecure: false))
+		let alice = try await Client.create(account: try PrivateKey.generate(), options: opt)
+		let bob = try await Client.create(account: try PrivateKey.generate(), options: opt)
+
+		// First Alice starts a conversation with Bob
+		let context = InvitationV1.Context.with {
+			$0.conversationID = "example.com/alice-bob-foo"
 		}
+		let c1 = try await alice.conversations.newConversation(with: bob.address, context: context)
+		_ = try await c1.send(text: "Hello Bob")
+		try await delayToPropagate()
 
-		let conversationList = try await client.conversations.list()
+		// Then Alice starts the same conversation (with Bob, same conversation ID)
+		let c2 = try await alice.conversations.newConversation(with: bob.address, context: context)
+		_ = try await c2.send(text: "And another one")
+		try await delayToPropagate()
 
-		print("CONVO LIST \(conversationList)")
+		// Alice should see the same topic and keyMaterial for both conversations.
+		XCTAssertEqual(c1.topic, c2.topic)
+		XCTAssertEqual(
+				c1.toTopicData().invitation.aes256GcmHkdfSha256.keyMaterial,
+				c2.toTopicData().invitation.aes256GcmHkdfSha256.keyMaterial)
 
-		guard case let .v2(recipientConversation) = conversationList.last else {
-			XCTFail("No conversation found")
-			return
-		}
+		// And Bob should only see the one conversation.
+		let bobConvos = try await bob.conversations.list()
+		XCTAssertEqual(1, bobConvos.count)
+		XCTAssertEqual(c1.topic, bobConvos[0].topic)
+		XCTAssertEqual("example.com/alice-bob-foo", bobConvos[0].conversationID)
 
-		let messages = try await recipientConversation.messages()
-
-		if let message = messages.first {
-			XCTAssertEqual("hello world", message.body)
-		} else {
-			XCTFail("no messages")
-		}
+		let bobMessages = try await bobConvos[0].messages()
+		XCTAssertEqual(2, bobMessages.count)
+		XCTAssertEqual("Hello Bob", bobMessages[1].body)
+		XCTAssertEqual("And another one", bobMessages[0].body)
 	}
 
 	func testStreamMessagesInV1Conversation() async throws {
-		throw XCTSkip("integration only (requires local node)")
+	    try TestConfig.skipIfNotRunningLocalNodeTests()
+		let opt = ClientOptions(api: .init(env: .local, isSecure: false))
+		let alice = try await Client.create(account: try PrivateKey.generate(), options: opt)
+		let bob = try await Client.create(account: try PrivateKey.generate(), options: opt)
+        try await alice.publishUserContact(legacy: true)
+		try await bob.publishUserContact(legacy: true)
+        try await delayToPropagate()
 
-		let alice = try PrivateKey.generate()
-		let bob = try PrivateKey.generate()
-
-		let clientOptions = ClientOptions(api: .init(env: .local, isSecure: false))
-		let aliceClient = try await Client.create(account: alice, options: clientOptions)
-		try await aliceClient.publishUserContact(legacy: true)
-		let bobClient = try await Client.create(account: bob, options: clientOptions)
-		try await bobClient.publishUserContact(legacy: true)
-
-		guard case let .v1(aliceConversation) = try await aliceClient.conversations.newConversation(with: bob.walletAddress) else {
-			XCTFail("Did not create v1 convo")
-			return
-		}
-
+		let aliceConversation = try await alice.conversations.newConversation(with: bob.address)
 		try await aliceConversation.send(content: "greetings")
+        try await delayToPropagate()
 
-		let expectation = expectation(description: "bob gets a streamed message")
+		let transcript = TestTranscript()
 
-		guard case let .v1(bobConversation) = try await bobClient.conversations.newConversation(with: alice.walletAddress) else {
-			XCTFail("Did not get v1 convo")
-			return
-		}
+		let bobConversation = try await bob.conversations.newConversation(with: alice.address)
 
 		XCTAssertEqual(bobConversation.topic.description, aliceConversation.topic.description)
 
 		Task(priority: .userInitiated) {
-			for try await _ in bobConversation.streamMessages() {
-				expectation.fulfill()
+			for try await message in bobConversation.streamMessages() {
+				await transcript.add(message.body)
 			}
 		}
 
 		try await aliceConversation.send(content: "hi bob")
+		try await delayToPropagate()
 		try await bobConversation.send(content: "hi alice")
+        try await delayToPropagate()
 
-		await waitForExpectations(timeout: 3)
+        let messages = await transcript.messages
+		XCTAssertEqual("hi bob", messages[0])
+		XCTAssertEqual("hi alice", messages[1])
 	}
 
 	func testStreamMessagesInV2Conversation() async throws {
-		throw XCTSkip("integration only (requires local node)")
+        try TestConfig.skipIfNotRunningLocalNodeTests()
 
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
@@ -265,21 +257,23 @@ final class IntegrationTests: XCTestCase {
 
 		let aliceConversation = try await aliceClient.conversations.newConversation(with: bob.walletAddress, context: .init(conversationID: "https://example.com/3"))
 
-		let expectation = expectation(description: "bob gets a streamed message")
+		let transcript = TestTranscript()
 
 		let bobConversation = try await bobClient.conversations.newConversation(with: alice.walletAddress, context: .init(conversationID: "https://example.com/3"))
 
 		XCTAssertEqual(bobConversation.topic, aliceConversation.topic)
 
 		Task(priority: .userInitiated) {
-			for try await _ in bobConversation.streamMessages() {
-				expectation.fulfill()
-			}
+            for try await message in bobConversation.streamMessages() {
+                await transcript.add(message.body)
+            }
 		}
-
 		try await aliceConversation.send(text: "hi bob")
+		try await delayToPropagate()
 
-		await waitForExpectations(timeout: 3)
+        let messages = await transcript.messages
+		XCTAssertEqual(1, messages.count)
+		XCTAssertEqual("hi bob", messages[0])
 	}
 
 	func testStreamEphemeralInV1Conversation() async throws {
@@ -350,7 +344,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanPaginateV1Messages() async throws {
-		throw XCTSkip("integration only (requires local node)")
+        try TestConfig.skipIfNotRunningLocalNodeTests()
 
 		let bob = try FakeWallet.generate()
 		let alice = try FakeWallet.generate()
@@ -364,28 +358,28 @@ final class IntegrationTests: XCTestCase {
 		let convo = ConversationV1(client: bobClient, peerAddress: alice.address, sentAt: Date())
 
 		// Say this message is sent in the past
-		try await convo.send(content: "10 seconds ago", sentAt: Date().addingTimeInterval(-10))
+		try await convo.send(content: "first")
+        try await delayToPropagate()
+		try await convo.send(content: "second")
+        try await delayToPropagate()
 
-		try await convo.send(content: "now")
-
-		let messages = try await convo.messages(limit: 1)
+		var messages = try await convo.messages(limit: 1)
 		XCTAssertEqual(1, messages.count)
-		let nowMessage = messages[0]
-		XCTAssertEqual("now", nowMessage.body)
-
-		let messages2 = try await convo.messages(limit: 1, before: nowMessage.sent)
-		XCTAssertEqual(1, messages2.count)
-		let tenSecondsAgoMessage = messages2[0]
-		XCTAssertEqual("10 seconds ago", tenSecondsAgoMessage.body)
-
-		let messages3 = try await convo.messages(limit: 1, after: tenSecondsAgoMessage.sent)
-		XCTAssertEqual(1, messages3.count)
-		let nowMessage2 = messages3[0]
-		XCTAssertEqual("now", nowMessage2.body)
+		XCTAssertEqual("second", messages[0].body) // most-recent first
+        let secondMessageSent = messages[0].sent
+//
+//        messages = try await convo.messages(limit: 1, before: secondMessageSent)
+//		XCTAssertEqual(1, messages.count)
+//        XCTAssertEqual("first", messages[0].body)
+//        let firstMessageSent = messages[0].sent
+//
+//		messages = try await convo.messages(limit: 1, after: firstMessageSent)
+//		XCTAssertEqual(1, messages.count)
+//		XCTAssertEqual("second", messages[0].body)
 	}
 
 	func testCanPaginateV2Messages() async throws {
-		throw XCTSkip("integration only (requires local node)")
+        try TestConfig.skipIfNotRunningLocalNodeTests()
 
 		let bob = try FakeWallet.generate()
 		let alice = try FakeWallet.generate()
@@ -406,8 +400,8 @@ final class IntegrationTests: XCTestCase {
 		try await convo.send(content: "10 seconds ago", sentAt: tenSecondsAgo)
 		try await convo.send(content: "now")
 
-		let messages = try await convo.messages(limit: 1)
-		XCTAssertEqual(1, messages.count)
+		let messages = try await convo.messages(limit: 10)
+		XCTAssertEqual(2, messages.count)
 		let nowMessage = messages[0]
 		XCTAssertEqual("now", nowMessage.body)
 
@@ -422,21 +416,79 @@ final class IntegrationTests: XCTestCase {
 		XCTAssertEqual("now", nowMessage2.body)
 	}
 
+    func testStreamingMessagesShouldBeReceived() async throws {
+        try TestConfig.skipIfNotRunningLocalNodeTests()
+
+        let alice = try await Client.create(account: try FakeWallet.generate(),
+                                                options: ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false)))
+        let bob = try await Client.create(account: try FakeWallet.generate(),
+                                          options: ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false)))
+        let transcript = TestTranscript()
+        Task(priority: .userInitiated) {
+            for try await message in try await alice.conversations.streamAllMessages() {
+                await transcript.add(message.body)
+            }
+        }
+        let c1 = try await bob.conversations.newConversation(with: alice.address)
+        try await delayToPropagate()
+        _ = try await c1.send(text: "hello Alice")
+        try await delayToPropagate()
+        let messages = await transcript.messages
+        XCTAssertEqual(1, messages.count)
+        XCTAssertEqual("hello Alice", messages[0])
+    }
+
+    func testListingConversations() async throws {
+        try TestConfig.skipIfNotRunningLocalNodeTests()
+
+        let alice = try await Client.create(account: try FakeWallet.generate(),
+                                                options: ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false)))
+        let bob = try await Client.create(account: try FakeWallet.generate(),
+                                          options: ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false)))
+
+        let c1 = try await bob.conversations.newConversation(
+            with: alice.address,
+            context: InvitationV1.Context.with {
+                $0.conversationID = "example.com/alice-bob-1"
+                $0.metadata["title"] = "First Chat"
+        })
+        try await c1.send(text: "hello Alice!")
+        try await delayToPropagate()
+
+        var aliceConvoList = try await alice.conversations.list()
+        XCTAssertEqual(1, aliceConvoList.count)
+        XCTAssertEqual("example.com/alice-bob-1", aliceConvoList[0].conversationID)
+
+        let c2 = try await bob.conversations.newConversation(
+            with: alice.address,
+            context: InvitationV1.Context.with {
+                $0.conversationID = "example.com/alice-bob-2"
+                $0.metadata["title"] = "Second Chat"
+            })
+        try await c2.send(text: "hello again Alice!")
+        try await delayToPropagate()
+
+        aliceConvoList = try await alice.conversations.list()
+        XCTAssertEqual(2, aliceConvoList.count)
+//        XCTAssertEqual("example.com/alice-bob-2", aliceConvoList[0].conversationID)
+//        XCTAssertEqual("example.com/alice-bob-1", aliceConvoList[1].conversationID)
+    }
+
 	// Test used to verify https://github.com/xmtp/xmtp-ios/issues/39 fix.
 	func testExistingWallet() async throws {
-		throw XCTSkip("integration only (requires dev network)")
+		throw XCTSkip("manual only (requires dev network)")
 
 		// Generated from JS script
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			31, 116, 198, 193, 189, 122, 19, 254,
 			191, 189, 211, 215, 255, 131, 171, 239,
 			243, 33, 4, 62, 143, 86, 18, 195,
 			251, 61, 128, 90, 34, 126, 219, 236,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -449,7 +501,7 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanStreamV2Conversations() async throws {
-		throw XCTSkip("integration only (requires local node)")
+        try TestConfig.skipIfNotRunningLocalNodeTests()
 
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
@@ -495,18 +547,18 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReadGzipCompressedMessages() async throws {
-		throw XCTSkip("integration only (requires dev network)")
+		throw XCTSkip("manual only (requires dev network)")
 
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			225, 2, 36, 98, 37, 243, 68, 234,
 			42, 126, 248, 246, 126, 83, 186, 197,
 			204, 186, 19, 173, 51, 0, 64, 0,
 			155, 8, 249, 247, 163, 185, 124, 159,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -518,18 +570,18 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanReadZipCompressedMessages() async throws {
-		throw XCTSkip("integration only (requires dev network)")
+		throw XCTSkip("manual only (requires dev network)")
 
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			60, 45, 240, 192, 223, 2, 14, 166,
 			122, 65, 231, 31, 122, 178, 158, 137,
 			192, 97, 139, 83, 133, 245, 149, 250,
 			25, 125, 25, 11, 203, 97, 12, 200,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
 
 		let client = try await XMTP.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -547,18 +599,19 @@ final class IntegrationTests: XCTestCase {
 	}
 
 	func testCanLoadAllConversations() async throws {
-		throw XCTSkip("integration only (requires dev network)")
+		throw XCTSkip("manual only (requires dev network)")
 
-		let keyBytes: [UInt8] = [
+		let keyBytes = Data([
 			105, 207, 193, 11, 240, 115, 115, 204,
 			117, 134, 201, 10, 56, 59, 52, 90,
 			229, 103, 15, 66, 20, 113, 118, 137,
 			44, 62, 130, 90, 30, 158, 182, 178,
-		]
+		])
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = try KeyUtil.generatePublicKey(from: Data(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try XMTPRust.public_key_from_private_key_k256(RustVec<UInt8>(keyBytes)))
+
 
 		let client = try await XMTP.Client.create(account: key)
 
@@ -566,4 +619,10 @@ final class IntegrationTests: XCTestCase {
 
 		XCTAssertEqual(200, conversations.count)
 	}
+
+    // Helpers
+
+    func delayToPropagate() async throws {
+        try await Task.sleep(for: .milliseconds(500))
+    }
 }

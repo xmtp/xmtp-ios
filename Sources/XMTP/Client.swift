@@ -6,9 +6,12 @@
 //
 
 import Foundation
-import GRPC
 import web3
-import XMTPProto
+import XMTPRust
+
+public enum ClientError: Error {
+    case creationError(String)
+}
 
 /// Specify configuration options for creating a ``Client``.
 public struct ClientOptions {
@@ -17,12 +20,16 @@ public struct ClientOptions {
 		/// Specify which XMTP network to connect to. Defaults to ``.dev``
 		public var env: XMTPEnvironment = .dev
 
-		/// Specify whether the API client should use TLS security. In general this should only be false when using the `.local` environment.
+		/// Optional: Specify self-reported version e.g. XMTPInbox/v1.0.0.
 		public var isSecure: Bool = true
+        
+        /// Specify whether the API client should use TLS security. In general this should only be false when using the `.local` environment.
+        public var appVersion: String? = nil
 
-		public init(env: XMTPEnvironment = .dev, isSecure: Bool = true) {
+        public init(env: XMTPEnvironment = .dev, isSecure: Bool = true, appVersion: String? = nil) {
 			self.env = env
 			self.isSecure = isSecure
+            self.appVersion = appVersion
 		}
 	}
 
@@ -49,6 +56,8 @@ public class Client {
 	var privateKeyBundleV1: PrivateKeyBundleV1
 	var apiClient: ApiClient
 
+	public private(set) var isGroupChatEnabled = false
+
 	/// Access ``Conversations`` for this Client.
 	public lazy var conversations: Conversations = .init(client: self)
 
@@ -73,13 +82,17 @@ public class Client {
 	/// Creates a client.
 	public static func create(account: SigningKey, options: ClientOptions? = nil) async throws -> Client {
 		let options = options ?? ClientOptions()
-
+        do {
+		let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env), options.api.env != .local)
 		let apiClient = try GRPCApiClient(
 			environment: options.api.env,
-			secure: options.api.isSecure
+			secure: options.api.isSecure,
+			rustClient: client
 		)
-
 		return try await create(account: account, apiClient: apiClient)
+        } catch let error as RustString {
+            throw ClientError.creationError(error.toString())
+        }
 	}
 
 	static func create(account: SigningKey, apiClient: ApiClient) async throws -> Client {
@@ -95,7 +108,7 @@ public class Client {
 		// swiftlint:disable no_optional_try
 		if let keys = try await loadPrivateKeys(for: account, apiClient: apiClient) {
 			// swiftlint:enable no_optional_try
-
+            print("loading existing private keys.")
 			#if DEBUG
 				print("Loaded existing private keys.")
 			#endif
@@ -112,10 +125,8 @@ public class Client {
 			var authorizedIdentity = AuthorizedIdentity(privateKeyBundleV1: keys)
 			authorizedIdentity.address = account.address
 			let authToken = try await authorizedIdentity.createAuthToken()
-
 			let apiClient = apiClient
 			apiClient.setAuthToken(authToken)
-
 			_ = try await apiClient.publish(envelopes: [
 				Envelope(topic: .userPrivateStoreKeyBundle(account.address), timestamp: Date(), message: try encryptedKeys.serializedData()),
 			])
@@ -133,25 +144,30 @@ public class Client {
 		for envelope in res.envelopes {
 			let encryptedBundle = try EncryptedPrivateKeyBundle(serializedData: envelope.message)
 			let bundle = try await encryptedBundle.decrypted(with: account)
-			return bundle.v1
+            if case .v1 = bundle.version {
+                return bundle.v1
+            }
+            print("discarding unsupported stored key bundle")
 		}
 
 		return nil
 	}
 
-	public static func from(bundle: PrivateKeyBundle, options: ClientOptions? = nil) throws -> Client {
-		return try from(v1Bundle: bundle.v1, options: options)
+	public static func from(bundle: PrivateKeyBundle, options: ClientOptions? = nil) async throws -> Client {
+		return try await from(v1Bundle: bundle.v1, options: options)
 	}
 
 	/// Create a Client from saved v1 key bundle.
-	public static func from(v1Bundle: PrivateKeyBundleV1, options: ClientOptions? = nil) throws -> Client {
+	public static func from(v1Bundle: PrivateKeyBundleV1, options: ClientOptions? = nil) async throws -> Client {
 		let address = try v1Bundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress
 
 		let options = options ?? ClientOptions()
 
+		let client = try await XMTPRust.create_client(GRPCApiClient.envToUrl(env: options.api.env), options.api.env != .local)
 		let apiClient = try GRPCApiClient(
 			environment: options.api.env,
-			secure: options.api.isSecure
+			secure: options.api.isSecure,
+			rustClient: client
 		)
 
 		return try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient)
@@ -161,6 +177,11 @@ public class Client {
 		self.address = address
 		self.privateKeyBundleV1 = privateKeyBundleV1
 		self.apiClient = apiClient
+	}
+
+	public func enableGroupChat() {
+		self.isGroupChatEnabled = true
+		GroupChat.registerCodecs()
 	}
 
 	public var privateKeyBundle: PrivateKeyBundle {
@@ -273,6 +294,10 @@ public class Client {
 			pagination: pagination
 		)
 	}
+
+    func batchQuery(request: BatchQueryRequest) async throws -> BatchQueryResponse {
+        return try await apiClient.batchQuery(request: request)
+    }
 
 	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
 		let authorized = AuthorizedIdentity(address: address, authorized: privateKeyBundleV1.identityKey.publicKey, identity: privateKeyBundleV1.identityKey)

@@ -6,17 +6,22 @@
 //
 
 import Foundation
-import XMTPProto
 
 typealias PagingInfo = Xmtp_MessageApi_V1_PagingInfo
 typealias PagingInfoCursor = Xmtp_MessageApi_V1_Cursor
 typealias PagingInfoSortDirection = Xmtp_MessageApi_V1_SortDirection
 
-struct Pagination {
-	var limit: Int?
-	var direction: PagingInfoSortDirection?
-	var startTime: Date?
-	var endTime: Date?
+public struct Pagination {
+	public var limit: Int?
+    public var before: Date?
+    public var after: Date?
+    var direction: PagingInfoSortDirection?
+        
+    public init(limit: Int? = nil, before: Date? = nil, after: Date? = nil) {
+        self.limit = limit
+        self.before = before
+        self.after = after
+    }
 
 	var pagingInfo: PagingInfo {
 		var info = PagingInfo()
@@ -24,11 +29,7 @@ struct Pagination {
 		if let limit {
 			info.limit = UInt32(limit)
 		}
-
-		if let direction {
-			info.direction = direction
-		}
-
+        info.direction = direction ?? Xmtp_MessageApi_V1_SortDirection.descending
 		return info
 	}
 }

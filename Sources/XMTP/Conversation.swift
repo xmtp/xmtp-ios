@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import XMTPProto
 
 public enum ConversationContainer: Codable {
 	case v1(ConversationV1Container), v2(ConversationV2Container)
@@ -22,7 +21,7 @@ public enum ConversationContainer: Codable {
 }
 
 /// Wrapper that provides a common interface between ``ConversationV1`` and ``ConversationV2`` objects.
-public enum Conversation {
+public enum Conversation: Sendable {
 	// TODO: It'd be nice to not have to expose these types as public, maybe we make this a struct with an enum prop instead of just an enum
 	case v1(ConversationV1), v2(ConversationV2)
 
@@ -30,11 +29,20 @@ public enum Conversation {
 		case v1, v2
 	}
 
+	public var isGroup: Bool {
+		switch self {
+		case .v1:
+			return false
+		case let .v2(conversationV2):
+			return conversationV2.isGroup
+		}
+	}
+
 	public var version: Version {
 		switch self {
-		case let .v1:
+		case .v1:
 			return .v1
-		case let .v2:
+		case .v2:
 			return .v2
 		}
 	}
@@ -79,6 +87,24 @@ public enum Conversation {
 		}
 	}
 
+	/// Exports the serializable topic data required for later import.
+	/// See Conversations.importTopicData()
+	public func toTopicData() -> Xmtp_KeystoreApi_V1_TopicMap.TopicData {
+		Xmtp_KeystoreApi_V1_TopicMap.TopicData.with {
+			$0.createdNs = UInt64(createdAt.timeIntervalSince1970 * 1_000) * 1_000_000
+			$0.peerAddress = peerAddress
+			if case let .v2(cv2) = self {
+				$0.invitation = Xmtp_MessageContents_InvitationV1.with {
+					$0.topic = cv2.topic
+					$0.context = cv2.context
+					$0.aes256GcmHkdfSha256 = Xmtp_MessageContents_InvitationV1.Aes256gcmHkdfsha256.with {
+						$0.keyMaterial = cv2.keyMaterial
+					}
+				}
+			}
+		}
+	}
+
 	public func decode(_ envelope: Envelope) throws -> DecodedMessage {
 		switch self {
 		case let .v1(conversationV1):
@@ -112,6 +138,15 @@ public enum Conversation {
 			return try await conversationV1.send(content: content, options: options)
 		case let .v2(conversationV2):
 			return try await conversationV2.send(content: content, options: options)
+		}
+	}
+
+	@discardableResult public func send(encodedContent: EncodedContent, options: SendOptions? = nil) async throws -> String {
+		switch self {
+		case let .v1(conversationV1):
+			return try await conversationV1.send(encodedContent: encodedContent, options: options)
+		case let .v2(conversationV2):
+			return try await conversationV2.send(encodedContent: encodedContent, options: options)
 		}
 	}
 

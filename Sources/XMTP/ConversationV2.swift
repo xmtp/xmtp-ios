@@ -7,7 +7,6 @@
 
 import CryptoKit
 import Foundation
-import XMTPProto
 
 // Save the non-client parts for a v2 conversation
 public struct ConversationV2Container: Codable {
@@ -31,15 +30,16 @@ public struct ConversationV2 {
 	public var context: InvitationV1.Context
 	public var peerAddress: String
 	public var client: Client
+	public var isGroup = false
 	private var header: SealedInvitationHeaderV1
 
-	static func create(client: Client, invitation: InvitationV1, header: SealedInvitationHeaderV1) throws -> ConversationV2 {
+	static func create(client: Client, invitation: InvitationV1, header: SealedInvitationHeaderV1, isGroup: Bool = false) throws -> ConversationV2 {
 		let myKeys = client.keys.getPublicKeyBundle()
 
 		let peer = try myKeys.walletAddress == (try header.sender.walletAddress) ? header.recipient : header.sender
 		let peerAddress = try peer.walletAddress
 
-		let keyMaterial = Data(invitation.aes256GcmHkdfSha256.keyMaterial.bytes)
+		let keyMaterial = Data(invitation.aes256GcmHkdfSha256.keyMaterial)
 
 		return ConversationV2(
 			topic: invitation.topic,
@@ -47,7 +47,8 @@ public struct ConversationV2 {
 			context: invitation.context,
 			peerAddress: peerAddress,
 			client: client,
-			header: header
+			header: header,
+			isGroup: isGroup
 		)
 	}
 
@@ -60,20 +61,37 @@ public struct ConversationV2 {
 		header = SealedInvitationHeaderV1()
 	}
 
-	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, header: SealedInvitationHeaderV1) {
+	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, header: SealedInvitationHeaderV1, isGroup: Bool = false) {
 		self.topic = topic
 		self.keyMaterial = keyMaterial
 		self.context = context
 		self.peerAddress = peerAddress
 		self.client = client
 		self.header = header
+		self.isGroup = isGroup
 	}
 
 	public var encodedContainer: ConversationV2Container {
 		ConversationV2Container(topic: topic, keyMaterial: keyMaterial, conversationID: context.conversationID, metadata: context.metadata, peerAddress: peerAddress, header: header)
 	}
 
-	func prepareMessage<T>(content: T, options: SendOptions?, ephemeral: Bool = false) async throws -> PreparedMessage {
+	func prepareMessage(encodedContent: EncodedContent, options: SendOptions?) async throws -> PreparedMessage {
+		let message = try await MessageV2.encode(
+			client: client,
+			content: encodedContent,
+			topic: topic,
+			keyMaterial: keyMaterial
+		)
+
+		let topic = options?.ephemeral == true ? ephemeralTopic : topic
+
+		let envelope = Envelope(topic: topic, timestamp: Date(), message: try Message(v2: message).serializedData())
+		return PreparedMessage(messageEnvelope: envelope, conversation: .v2(self)) {
+			try await client.publish(envelopes: [envelope])
+		}
+	}
+
+	func prepareMessage<T>(content: T, options: SendOptions?) async throws -> PreparedMessage {
 		let codec = Client.codecRegistry.find(for: options?.contentType)
 
 		func encode<Codec: ContentCodec>(codec: Codec, content: Any) throws -> EncodedContent {
@@ -91,29 +109,16 @@ public struct ConversationV2 {
 			encoded = try encoded.compress(compression)
 		}
 
-		let topic = ephemeral ? ephemeralTopic : topic
-
-		let message = try await MessageV2.encode(
-			client: client,
-			content: encoded,
-			topic: topic,
-			keyMaterial: keyMaterial
-		)
-
-		let envelope = Envelope(topic: topic, timestamp: Date(), message: try Message(v2: message).serializedData())
-		return PreparedMessage(messageEnvelope: envelope, conversation: .v2(self)) {
-			try await client.publish(envelopes: [envelope])
-		}
+		return try await prepareMessage(encodedContent: encoded, options: options)
 	}
 
 	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil) async throws -> [DecodedMessage] {
-		let pagination = Pagination(limit: limit, startTime: before, endTime: after)
-
-		let envelopes = try await client.apiClient.query(topic: topic, pagination: pagination, cursor: nil).envelopes
+		let pagination = Pagination(limit: limit, before: before, after: after)
+		let envelopes = try await client.apiClient.envelopes(topic: topic.description, pagination: pagination)
 
 		return envelopes.compactMap { envelope in
 			do {
-				return try decode(envelope: envelope)
+            return try decode(envelope: envelope)
 			} catch {
 				print("Error decoding envelope \(error)")
 				return nil
@@ -169,13 +174,19 @@ public struct ConversationV2 {
 	}
 
 	@discardableResult func send<T>(content: T, options: SendOptions? = nil) async throws -> String {
-		let preparedMessage = try await prepareMessage(content: content, options: options, ephemeral: options?.ephemeral == true)
+		let preparedMessage = try await prepareMessage(content: content, options: options)
 		try await preparedMessage.send()
 		return preparedMessage.messageID
 	}
 
 	@discardableResult func send(content: String, options: SendOptions? = nil, sentAt _: Date) async throws -> String {
 		let preparedMessage = try await prepareMessage(content: content, options: options)
+		try await preparedMessage.send()
+		return preparedMessage.messageID
+	}
+
+	@discardableResult func send(encodedContent: EncodedContent, options: SendOptions? = nil) async throws -> String {
+		let preparedMessage = try await prepareMessage(encodedContent: encodedContent, options: options)
 		try await preparedMessage.send()
 		return preparedMessage.messageID
 	}

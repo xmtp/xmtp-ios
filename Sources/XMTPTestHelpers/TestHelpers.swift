@@ -5,10 +5,40 @@
 //  Created by Pat Nakajima on 12/6/22.
 //
 
+#if canImport(XCTest)
 import Combine
 import XCTest
 @testable import XMTP
-import XMTPProto
+import XMTPRust
+
+public struct TestConfig {
+    static let TEST_SERVER_ENABLED = _env("TEST_SERVER_ENABLED") == "true"
+    // TODO: change Client constructor to accept these explicitly (so we can config CI):
+    // static let TEST_SERVER_HOST = _env("TEST_SERVER_HOST") ?? "127.0.0.1"
+    // static let TEST_SERVER_PORT = Int(_env("TEST_SERVER_PORT")) ?? 5556
+    // static let TEST_SERVER_IS_SECURE = _env("TEST_SERVER_IS_SECURE") == "true"
+
+    static private func _env(_ key: String) -> String? {
+        ProcessInfo.processInfo.environment[key]
+    }
+
+    static public func skipIfNotRunningLocalNodeTests() throws {
+        try XCTSkipIf(!TEST_SERVER_ENABLED, "requires local node")
+    }
+
+    static public func skip(because: String) throws {
+        try XCTSkipIf(true, because)
+    }
+}
+
+// Helper for tests gathering transcripts in a background task.
+public actor TestTranscript {
+    public var messages: [String] = []
+    public init() {}
+    public func add(_ message: String) {
+        messages.append(message)
+    }
+}
 
 public struct FakeWallet: SigningKey {
 	public static func generate() throws -> FakeWallet {
@@ -42,9 +72,9 @@ enum FakeApiClientError: String, Error {
 }
 
 class FakeStreamHolder: ObservableObject {
-	@Published var envelope: Envelope?
+	@Published var envelope: XMTP.Envelope?
 
-	func send(envelope: Envelope) {
+	func send(envelope: XMTP.Envelope) {
 		self.envelope = envelope
 	}
 }
@@ -57,9 +87,10 @@ public class FakeApiClient: ApiClient {
 
 	public var environment: XMTPEnvironment
 	public var authToken: String = ""
-	private var responses: [String: [Envelope]] = [:]
+    public var appVersion: String
+	private var responses: [String: [XMTP.Envelope]] = [:]
 	private var stream = FakeStreamHolder()
-	public var published: [Envelope] = []
+	public var published: [XMTP.Envelope] = []
 	var cancellable: AnyCancellable?
 	var forbiddingQueries = false
 
@@ -81,7 +112,7 @@ public class FakeApiClient: ApiClient {
 		forbiddingQueries = false
 	}
 
-	public func register(message: [Envelope], for topic: Topic) {
+	public func register(message: [XMTP.Envelope], for topic: Topic) {
 		var responsesForTopic = responses[topic.description] ?? []
 		responsesForTopic.append(contentsOf: message)
 		responses[topic.description] = responsesForTopic
@@ -89,33 +120,29 @@ public class FakeApiClient: ApiClient {
 
 	public init() {
 		environment = .local
+        appVersion = "test/0.0.0"
 	}
 
-	public func send(envelope: Envelope) {
+	public func send(envelope: XMTP.Envelope) {
 		stream.send(envelope: envelope)
 	}
 
-	public func findPublishedEnvelope(_ topic: Topic) -> Envelope? {
+	public func findPublishedEnvelope(_ topic: Topic) -> XMTP.Envelope? {
 		return findPublishedEnvelope(topic.description)
 	}
 
-	public func findPublishedEnvelope(_ topic: String) -> Envelope? {
-		for envelope in published.reversed() {
-			if envelope.contentTopic == topic.description {
-				return envelope
-			}
-		}
-
-		return nil
+	public func findPublishedEnvelope(_ topic: String) -> XMTP.Envelope? {
+		return published.reversed().first { $0.contentTopic == topic.description }
 	}
 
 	// MARK: ApiClient conformance
 
-	public required init(environment: XMTP.XMTPEnvironment, secure _: Bool) throws {
+	public required init(environment: XMTP.XMTPEnvironment, secure _: Bool, rustClient _: XMTPRust.RustClient, appVersion: String?) throws {
 		self.environment = environment
+        self.appVersion = appVersion ?? "0.0.0"
 	}
 
-	public func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
+	public func subscribe(topics: [String]) -> AsyncThrowingStream<XMTP.Envelope, Error> {
 		AsyncThrowingStream { continuation in
 			self.cancellable = stream.$envelope.sink(receiveValue: { env in
 				if let env, topics.contains(env.contentTopic) {
@@ -135,7 +162,7 @@ public class FakeApiClient: ApiClient {
 			throw FakeApiClientError.queryAssertionFailure
 		}
 
-		var result: [Envelope] = []
+		var result: [XMTP.Envelope] = []
 
 		if let response = responses.removeValue(forKey: topic) {
 			result.append(contentsOf: response)
@@ -143,16 +170,14 @@ public class FakeApiClient: ApiClient {
 
 		result.append(contentsOf: published.filter { $0.contentTopic == topic }.reversed())
 
-		if let startAt = pagination?.startTime {
+		if let startAt = pagination?.after {
 			result = result
-				.filter { $0.timestampNs < UInt64(startAt.millisecondsSinceEpoch * 1_000_000) }
-				.sorted(by: { $0.timestampNs > $1.timestampNs })
+				.filter { $0.timestampNs > UInt64(startAt.millisecondsSinceEpoch * 1_000_000) }
 		}
 
-		if let endAt = pagination?.endTime {
+		if let endAt = pagination?.before {
 			result = result
-				.filter { $0.timestampNs > UInt64(endAt.millisecondsSinceEpoch * 1_000_000) }
-				.sorted(by: { $0.timestampNs < $1.timestampNs })
+				.filter { $0.timestampNs < UInt64(endAt.millisecondsSinceEpoch * 1_000_000) }
 		}
 
 		if let limit = pagination?.limit {
@@ -192,6 +217,37 @@ public class FakeApiClient: ApiClient {
 
 		return PublishResponse()
 	}
+
+    public func batchQuery(request: XMTP.BatchQueryRequest) async throws -> XMTP.BatchQueryResponse {
+        let responses = try await withThrowingTaskGroup(of: QueryResponse.self) { group in
+            for r in request.requests {
+                group.addTask {
+                    try await self.query(topic: r.contentTopics[0], pagination: Pagination(after: Date(timeIntervalSince1970: Double(r.startTimeNs / 1_000_000) / 1000)))
+                }
+            }
+
+          var results: [QueryResponse] = []
+          for try await response in group {
+            results.append(response)
+          }
+
+          return results
+        }
+
+        var queryResponse = XMTP.BatchQueryResponse()
+        queryResponse.responses = responses
+        return queryResponse
+     
+    }
+
+    public func query(request: XMTP.QueryRequest) async throws -> XMTP.QueryResponse {
+        abort() // Not supported on Fake
+    }
+
+    public func publish(request: XMTP.PublishRequest) async throws -> XMTP.PublishResponse {
+        abort() // Not supported on Fake
+    }
+
 }
 
 @available(iOS 15, *)
@@ -232,5 +288,7 @@ public extension XCTestCase {
 	func fixtures() async -> Fixtures {
 		// swiftlint:disable force_try
 		return try! await Fixtures()
+		// swiftlint:enable force_try
 	}
 }
+#endif

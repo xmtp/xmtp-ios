@@ -9,11 +9,13 @@ import Foundation
 
 import XCTest
 @testable import XMTP
+import XMTPRust
 import XMTPTestHelpers
 
 @available(iOS 15, *)
 class ClientTests: XCTestCase {
 	func testTakesAWallet() async throws {
+	    try TestConfig.skip(because: "run manually against dev")
 		let fakeWallet = try PrivateKey.generate()
 		_ = try await Client.create(account: fakeWallet)
 	}
@@ -30,7 +32,7 @@ class ClientTests: XCTestCase {
 
 	func testHasPrivateKeyBundleV1() async throws {
 		let fakeWallet = try PrivateKey.generate()
-		let client = try await Client.create(account: fakeWallet)
+		let client = try await Client.create(account: fakeWallet, apiClient: FakeApiClient())
 
 		XCTAssertEqual(1, client.privateKeyBundleV1.preKeys.count)
 
@@ -40,11 +42,12 @@ class ClientTests: XCTestCase {
 	}
 
 	func testCanBeCreatedWithBundle() async throws {
+        try TestConfig.skip(because: "run manually against dev")
 		let fakeWallet = try PrivateKey.generate()
 		let client = try await Client.create(account: fakeWallet)
 
 		let bundle = client.privateKeyBundle
-		let clientFromV1Bundle = try Client.from(bundle: bundle)
+		let clientFromV1Bundle = try await Client.from(bundle: bundle)
 
 		XCTAssertEqual(client.address, clientFromV1Bundle.address)
 		XCTAssertEqual(client.privateKeyBundleV1.identityKey, clientFromV1Bundle.privateKeyBundleV1.identityKey)
@@ -52,11 +55,12 @@ class ClientTests: XCTestCase {
 	}
 
 	func testCanBeCreatedWithV1Bundle() async throws {
+        try TestConfig.skip(because: "run manually against dev")
 		let fakeWallet = try PrivateKey.generate()
 		let client = try await Client.create(account: fakeWallet)
 
 		let bundleV1 = client.v1keys
-		let clientFromV1Bundle = try Client.from(v1Bundle: bundleV1)
+		let clientFromV1Bundle = try await Client.from(v1Bundle: bundleV1)
 
 		XCTAssertEqual(client.address, clientFromV1Bundle.address)
 		XCTAssertEqual(client.privateKeyBundleV1.identityKey, clientFromV1Bundle.privateKeyBundleV1.identityKey)

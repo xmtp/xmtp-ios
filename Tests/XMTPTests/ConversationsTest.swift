@@ -9,6 +9,7 @@ import Foundation
 import XCTest
 @testable import XMTP
 
+@available(macOS 13.0, *)
 @available(iOS 15, *)
 class ConversationsTests: XCTestCase {
 	func testCanGetConversationFromIntroEnvelope() async throws {
@@ -35,13 +36,15 @@ class ConversationsTests: XCTestCase {
 
 	func testCanGetConversationFromInviteEnvelope() async throws {
 		let fixtures = await fixtures()
-		let client = fixtures.aliceClient!
+		let client: Client = fixtures.aliceClient!
 
 		let created = Date()
 		let newWallet = try PrivateKey.generate()
 		let newClient = try await Client.create(account: newWallet, apiClient: fixtures.fakeApiClient)
 
-		let invitation = try InvitationV1.createRandom(context: nil)
+		let invitation = try InvitationV1.createDeterministic(
+				sender: newClient.keys,
+				recipient: client.keys.getPublicKeyBundle())
 		let sealed = try SealedInvitation.createV1(
 			sender: newClient.keys,
 			recipient: client.keys.getPublicKeyBundle(),
@@ -71,52 +74,6 @@ class ConversationsTests: XCTestCase {
 			}
 		}
 
-		_ = try await bobConversation.send(text: "hi")
-
-		await waitForExpectations(timeout: 3)
-	}
-
-	@available(iOS 16.0, *)
-	func testStreamAllMessagesWorksWithInvites() async throws {
-		let fixtures = await fixtures()
-		let client = fixtures.aliceClient!
-
-		let expectation1 = expectation(description: "got a message")
-
-		Task(priority: .userInitiated) {
-			for try await _ in try await client.conversations.streamAllMessages() {
-				expectation1.fulfill()
-			}
-		}
-
-		let bobConversation = try await fixtures.bobClient.conversations.newConversation(with: client.address)
-		try await Task.sleep(for: .milliseconds(100))
-		_ = try await bobConversation.send(text: "hi")
-
-		await waitForExpectations(timeout: 3)
-	}
-
-	@available(iOS 16.0, *)
-	func testStreamAllMessagesWorksWithIntros() async throws {
-		let fixtures = await fixtures()
-		let client = fixtures.aliceClient!
-
-		// Overwrite contact as legacy
-		try await fixtures.publishLegacyContact(client: fixtures.bobClient)
-		try await fixtures.publishLegacyContact(client: fixtures.aliceClient)
-
-		let expectation1 = expectation(description: "got a message")
-
-		Task(priority: .userInitiated) {
-			for try await _ in try await client.conversations.streamAllMessages() {
-				expectation1.fulfill()
-			}
-		}
-
-		let bobConversation = try await fixtures.bobClient.conversations.newConversation(with: client.address)
-		XCTAssertEqual(bobConversation.version, .v1)
-
-		try await Task.sleep(for: .milliseconds(100))
 		_ = try await bobConversation.send(text: "hi")
 
 		await waitForExpectations(timeout: 3)

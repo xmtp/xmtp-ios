@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import UIKit
 import WalletConnectSwift
 import web3
 import XMTP
+import UIKit
 
 extension WCURL {
 	var asURL: URL {
@@ -60,7 +62,7 @@ class WCWalletConnection: WalletConnection, WalletConnectSwift.ClientDelegate {
 		walletConnectClient = WalletConnectSwift.Client(delegate: self, dAppInfo: dAppInfo)
 	}
 
-	func preferredConnectionMethod() throws -> WalletConnectionMethodType {
+	@MainActor func preferredConnectionMethod() throws -> WalletConnectionMethodType {
 		guard let url = walletConnectURL?.asURL else {
 			throw WalletConnectionError.walletConnectURL
 		}
