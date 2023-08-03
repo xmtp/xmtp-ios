@@ -17,8 +17,12 @@ public extension ContentTypeID {
 	}
 }
 
-extension ContentTypeID {
+public extension ContentTypeID {
 	var id: String {
 		"\(authorityID):\(typeID)"
+	}
+
+	var description: String {
+		"\(authorityID)/\(typeID):\(versionMajor).\(versionMinor)"
 	}
 }
