@@ -67,13 +67,13 @@ class GRPCApiClient: ApiClient {
 	var authToken = ""
 
 	var rustClient: XMTPRust.RustClient
-    var appVersion: String
 
     required init(environment: XMTPEnvironment, secure _: Bool = true, rustClient: XMTPRust.RustClient, appVersion: String? = nil) throws {
 		self.environment = environment
 		self.rustClient = rustClient
-        self.appVersion = appVersion ?? "0.0.0"
-        rustClient.set_app_version(self.appVersion.intoRustString())
+        if let appVersion = appVersion {
+            rustClient.set_app_version(appVersion.intoRustString())
+        }
 	}
 
 	static func envToUrl(env: XMTPEnvironment) -> String {
