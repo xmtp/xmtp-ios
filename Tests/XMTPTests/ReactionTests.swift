@@ -20,13 +20,13 @@ class ReactionTests: XCTestCase {
         let canonicalEncoded = EncodedContent.with {
             $0.type = ContentTypeReaction
             $0.content = Data("""
-{
-  "action": "added",
-  "content": "smile",
-  "reference": "abc123",
-  "schema": "shortcode"
-}
-""".utf8)
+            {
+              "action": "added",
+              "content": "smile",
+              "reference": "abc123",
+              "schema": "shortcode"
+            }
+            """.utf8)
         }
 
         // Previously, some clients sent reactions like this.
