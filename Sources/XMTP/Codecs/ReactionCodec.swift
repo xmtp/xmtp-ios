@@ -64,4 +64,8 @@ public struct ReactionCodec: ContentCodec {
         )
         //swiftlint:disable force_unwrapping
     }
+    
+    public func fallback(content: Reaction) throws -> String? {
+        return "Error: Sorry, this app cannot display reactions"
+    }
 }

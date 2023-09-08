@@ -62,4 +62,8 @@ public struct ReplyCodec: ContentCodec {
 			throw CodecError.invalidContent
 		}
 	}
+    
+    public func fallback(content: Reply) throws -> String? {
+        return "Error: Sorry, this app cannot display quote replies"
+    }
 }

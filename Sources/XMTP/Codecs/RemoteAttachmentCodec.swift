@@ -132,6 +132,7 @@ public struct RemoteAttachment {
 }
 
 public struct RemoteAttachmentCodec: ContentCodec {
+    
 	public typealias T = RemoteAttachment
 
 	public init() {}
@@ -189,6 +190,10 @@ public struct RemoteAttachmentCodec: ContentCodec {
 
 		return attachment
 	}
+    
+    public func fallback(content: RemoteAttachment) throws -> String? {
+        return "Error: Sorry, this app cannot display attachments"
+    }
 
 	private func getHexParameter(_ name: String, from parameters: [String: String]) throws -> Data {
 		guard let parameterHex = parameters[name] else {
