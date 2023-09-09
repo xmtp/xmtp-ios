@@ -66,6 +66,11 @@ public struct ReactionCodec: ContentCodec {
     }
     
     public func fallback(content: Reaction) throws -> String? {
-        return "Error: Sorry, this app cannot display reactions"
+        switch content.action {
+        case .added:
+            return "Reacted “\(content.content)” to an earlier message"
+        case .removed:
+            return "Removed “\(content.content)” from an earlier message"
+        }
     }
 }

@@ -192,7 +192,7 @@ public struct RemoteAttachmentCodec: ContentCodec {
 	}
     
     public func fallback(content: RemoteAttachment) throws -> String? {
-        return "Error: Sorry, this app cannot display attachments"
+        return "Can’t display “\(String(describing: content.filename))”. This app doesn’t support attachments."
     }
 
 	private func getHexParameter(_ name: String, from parameters: [String: String]) throws -> Data {

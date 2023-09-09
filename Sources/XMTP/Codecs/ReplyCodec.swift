@@ -64,6 +64,6 @@ public struct ReplyCodec: ContentCodec {
 	}
     
     public func fallback(content: Reply) throws -> String? {
-        return "Error: Sorry, this app cannot display quote replies"
+        return "Replied with “\(content.content)” to an earlier message"
     }
 }
