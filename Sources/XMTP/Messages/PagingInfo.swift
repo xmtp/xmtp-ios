@@ -21,6 +21,7 @@ public struct Pagination {
         self.limit = limit
         self.before = before
         self.after = after
+        self.direction = direction
     }
 
 	var pagingInfo: PagingInfo {
