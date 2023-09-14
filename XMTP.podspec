@@ -46,5 +46,8 @@ Pod::Spec.new do |spec|
   spec.dependency "Connect-Swift"
   spec.dependency 'XMTPRust', '= 0.3.1-beta0'
 
-  spec.xcconfig = {'VALID_ARCHS' =>  'arm64' }
+  spec.pod_target_xcconfig = {
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'
+  }
+  spec.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 end
