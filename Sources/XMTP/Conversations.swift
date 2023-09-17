@@ -7,7 +7,7 @@ public enum ConversationError: Error {
 /// Handles listing and creating Conversations.
 public class Conversations {
     var client: Client
-    var conversationsByTopic: [String: Conversation] = [:]
+    @MainActor var conversationsByTopic: [String: Conversation] = [:]
 
     init(client: Client) {
         self.client = client
