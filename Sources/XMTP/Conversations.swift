@@ -29,7 +29,9 @@ public class Conversations {
                     client: client
             ))
         }
-        conversationsByTopic[conversation.topic] = conversation
+        async {
+            conversationsByTopic[conversation.topic] = conversation
+        }
         return conversation
     }
 
@@ -47,7 +49,7 @@ public class Conversations {
             messages += try await client.apiClient.batchQuery(request: batch)
                 .responses.flatMap { (res) in
                     res.envelopes.compactMap { (envelope) in
-                        let conversation = conversationsByTopic[envelope.contentTopic]
+                        let conversation = await conversationsByTopic[envelope.contentTopic]
                         if conversation == nil {
                             print("discarding message, unknown conversation \(envelope)")
                             return nil
@@ -79,16 +81,20 @@ public class Conversations {
 
                     do {
                         for try await envelope in client.subscribe(topics: topics) {
-                            if let conversation = conversationsByTopic[envelope.contentTopic] {
+                            if let conversation = await conversationsByTopic[envelope.contentTopic] {
                                 let decoded = try conversation.decode(envelope)
                                 continuation.yield(decoded)
                             } else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
                                 let conversation = try fromInvite(envelope: envelope)
-                                conversationsByTopic[conversation.topic] = conversation
+                                async {
+                                    conversationsByTopic[conversation.topic] = conversation
+                                }
                                 break // Break so we can resubscribe with the new conversation
                             } else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
                                 let conversation = try fromIntro(envelope: envelope)
-                                conversationsByTopic[conversation.topic] = conversation
+                                async {
+                                    conversationsByTopic[conversation.topic] = conversation
+                                }
                                 let decoded = try conversation.decode(envelope)
                                 continuation.yield(decoded)
                                 break // Break so we can resubscribe with the new conversation
@@ -123,7 +129,7 @@ public class Conversations {
     }
 
     private func findExistingConversation(with peerAddress: String, conversationID: String?) -> Conversation? {
-        return conversationsByTopic.first(where: { $0.value.peerAddress == peerAddress &&
+        return await conversationsByTopic.first(where: { $0.value.peerAddress == peerAddress &&
             (($0.value.conversationID ?? "") == (conversationID ?? ""))
         })?.value
     }
@@ -156,7 +162,9 @@ public class Conversations {
         let conversationV2 = try ConversationV2.create(client: client, invitation: invitation, header: sealedInvitation.v1.header)
 
         let conversation: Conversation = .v2(conversationV2)
-        conversationsByTopic[conversation.topic] = conversation
+        async {
+            conversationsByTopic[conversation.topic] = conversation
+        }
         return conversation
     }
 
@@ -202,7 +210,7 @@ public class Conversations {
 
     public func list() async throws -> [Conversation] {
         var newConversations: [Conversation] = []
-        let mostRecent = conversationsByTopic.values.max { a, b in
+        let mostRecent = await conversationsByTopic.values.max { a, b in
             a.createdAt < b.createdAt
         }
         let pagination = Pagination(after: mostRecent?.createdAt)
@@ -235,10 +243,14 @@ public class Conversations {
 
         newConversations
             .filter { $0.peerAddress != client.address }
-            .forEach { conversationsByTopic[$0.topic] = $0 }
+            .forEach {
+                async {
+                    conversationsByTopic[$0.topic] = $0
+                }
+            }
 
         // TODO(perf): use DB to persist + sort
-        return conversationsByTopic.values.sorted { a, b in
+        return await conversationsByTopic.values.sorted { a, b in
             a.createdAt < b.createdAt
         }
     }
