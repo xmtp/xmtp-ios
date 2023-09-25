@@ -23,6 +23,8 @@ struct SocketFactory: WebSocketFactory {
 	}
 }
 
+// WalletConnectV2's ModalSheet doesn't have any public initializers so we need
+// to wrap their UIKit API
 struct ModalWrapper: UIViewControllerRepresentable {
 	func makeUIViewController(context: Context) -> UIViewController {
 		let controller = UIViewController()
@@ -39,6 +41,7 @@ struct ModalWrapper: UIViewControllerRepresentable {
 	}
 }
 
+// Conformance to XMTP iOS's SigningKey protocol
 class Signer: SigningKey {
 	var account: WalletConnectUtils.Account
 	var session: WalletConnectSign.Session
@@ -51,18 +54,13 @@ class Signer: SigningKey {
 		self.session = session
 		self.account = account
 		self.cancellable = Sign.instance.sessionResponsePublisher.sink { response in
-			print("RESPONSE: \(response)")
-
 			guard case let .response(codable) = response.result else {
-				print("NO RESPONSE")
 				return
 			}
 
 			let signatureData = Data(hexString: codable.value as! String)
-			print("SIGNATURE DATA: \(signatureData)")
-			print("GOT A RESPONSE: \(response) signature: \(signatureData)")
-
 			let signature = Signature(bytes: signatureData[0..<64], recovery: Int(signatureData[64]))
+
 			self.continuation?.resume(returning: signature)
 			self.continuation = nil
 		}
@@ -105,21 +103,15 @@ class Signer: SigningKey {
 }
 
 struct LoginView: View {
-	var onTryDemo: () -> Void
-	var onConnecting: () -> Void
 	var onConnected: (Client) -> Void
 	var publishers: [AnyCancellable] = []
 
 	@State private var isShowingWebview = true
 
 	init(
-		onTryDemo: @escaping () -> Void,
-		onConnecting: @escaping () -> Void,
 		onConnected: @escaping (Client) -> Void
 	) {
-		self.onTryDemo = onTryDemo
 		self.onConnected = onConnected
-		self.onConnecting = onConnecting
 
 		Networking.configure(
 			projectId: "YOUR PROJECT ID",
@@ -183,5 +175,5 @@ struct LoginView: View {
 }
 
 #Preview {
-	LoginView(onTryDemo: {}, onConnecting: {}, onConnected: { _ in })
+	LoginView(onConnected: { _ in })
 }

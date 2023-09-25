@@ -29,7 +29,7 @@ struct ContentView: View {
 			case .unknown:
 				Button("Connect Wallet") { isConnectingWallet = true }
 					.sheet(isPresented: $isConnectingWallet) {
-						LoginView(onTryDemo: {}, onConnecting: {}, onConnected: { client in
+						LoginView(onConnected: { client in
 							do {
 								let keysData = try client.privateKeyBundle.serializedData()
 								Persistence().saveKeys(keysData)
