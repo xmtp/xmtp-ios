@@ -7,7 +7,6 @@
 
 import Foundation
 import web3
-import XMTPRust
 
 public enum ClientError: Error {
     case creationError(String)

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import XMTPRust
 
 /// Represents a secp256k1 compact recoverable signature.
 public typealias Signature = Xmtp_MessageContents_Signature

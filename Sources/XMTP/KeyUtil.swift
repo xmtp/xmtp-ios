@@ -6,7 +6,6 @@ import Foundation
 import Logging
 import secp256k1
 import web3
-import XMTPRust
 
 enum KeyUtilError: Error {
 	case invalidContext

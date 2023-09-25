@@ -7,7 +7,6 @@
 
 import CryptoKit
 import Foundation
-import XMTPRust
 
 typealias MessageV2 = Xmtp_MessageContents_MessageV2
 

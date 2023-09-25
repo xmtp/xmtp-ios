@@ -7,7 +7,6 @@
 
 import Foundation
 import web3
-import XMTPRust
 
 /// Defines a type that is used by a ``Client`` to sign keys and messages.
 ///

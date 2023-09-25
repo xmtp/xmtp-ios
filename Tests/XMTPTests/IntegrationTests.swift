@@ -9,9 +9,7 @@ import Foundation
 import secp256k1
 import web3
 import XCTest
-import XMTPRust
 @testable import XMTP
-import XMTPRust
 import XMTPTestHelpers
 
 @available(macOS 13.0, *)

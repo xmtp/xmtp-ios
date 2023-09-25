@@ -9,7 +9,6 @@
 import Combine
 import XCTest
 @testable import XMTP
-import XMTPRust
 
 public struct TestConfig {
     static let TEST_SERVER_ENABLED = _env("TEST_SERVER_ENABLED") == "true"

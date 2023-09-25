@@ -7,7 +7,6 @@
 
 import CryptoKit
 import XCTest
-import XMTPRust
 @testable import XMTP
 import XMTPTestHelpers
 

@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import XMTPRust
-import XMTPRustSwift
 
 public typealias PublishRequest = Xmtp_MessageApi_V1_PublishRequest
 public typealias PublishResponse = Xmtp_MessageApi_V1_PublishResponse

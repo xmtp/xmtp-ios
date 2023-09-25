@@ -6,8 +6,6 @@
 //
 
 import Foundation
-
-import XMTPRust
 import web3
 import CryptoKit
 
