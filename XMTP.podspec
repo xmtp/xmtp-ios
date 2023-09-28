@@ -44,7 +44,7 @@ Pod::Spec.new do |spec|
   spec.dependency "web3.swift"
   spec.dependency "GzipSwift"
   spec.dependency "Connect-Swift"
-  spec.dependency 'XMTPRust', '= test-timeout2'
+  spec.dependency 'LibXMTP', '= test-timeout2'
 
   spec.xcconfig = {'VALID_ARCHS' =>  'arm64' }
 end
