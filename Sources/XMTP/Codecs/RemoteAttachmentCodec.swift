@@ -74,7 +74,7 @@ public struct RemoteAttachment {
 
 	func ensureSchemeMatches() throws {
 		if !url.hasPrefix(scheme.rawValue) {
-			throw RemoteAttachmentError.invalidScheme("scheme must be https://")
+			throw RemoteAttachmentError.invalidScheme("scheme must be https")
 		}
 	}
 
