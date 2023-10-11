@@ -174,7 +174,7 @@ public struct RemoteAttachmentCodec: ContentCodec {
 			throw RemoteAttachmentError.invalidScheme("no scheme parameter")
 		}
 
-        if (!schemeString.starts(with: "https")) {
+        if (!schemeString.hasPrefix(RemoteAttachment.Scheme.https.rawValue)) {
 			throw RemoteAttachmentError.invalidScheme("invalid scheme value. must start with https")
 		}
 
