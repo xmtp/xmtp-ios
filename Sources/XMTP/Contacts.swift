@@ -34,12 +34,15 @@ class AllowList {
 	var entries: [String: AllowState] = [:]
 
 	static func load(from client: Client) async throws -> AllowList {
-		let envelopes = try await client.query(topic: .allowList(client.address))
+		let publicKey = client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed.bytes
+		let privateKey = client.privateKeyBundleV1.identityKey.secp256K1.bytes
+
+		let identifier = try XMTPRust.generate_private_preferences_topic_identifier(RustVec(privateKey)).toString()
+		let envelopes = try await client.query(topic: .allowList(identifier))
 		let allowList = AllowList()
 
 		for envelope in envelopes.envelopes {
-			let publicKey = client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed.bytes
-			let privateKey = client.privateKeyBundleV1.identityKey.secp256K1.bytes
+
 
 			let payload = try XMTPRust.ecies_decrypt_k256_sha3_256(
 				RustVec(publicKey),
@@ -60,6 +63,7 @@ class AllowList {
 
 		let publicKey = client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed.bytes
 		let privateKey = client.privateKeyBundleV1.identityKey.secp256K1.bytes
+		let identifier = try XMTPRust.generate_private_preferences_topic_identifier(RustVec(privateKey)).toString()
 
 		let message = try XMTPRust.ecies_encrypt_k256_sha3_256(
 			RustVec(publicKey),
@@ -68,7 +72,7 @@ class AllowList {
 		)
 
 		let envelope = Envelope(
-			topic: Topic.allowList(client.address),
+			topic: Topic.allowList(identifier),
 			timestamp: Date(),
 			message: Data(message)
 		)
