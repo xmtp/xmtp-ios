@@ -619,7 +619,7 @@ class ConversationTests: XCTestCase {
 		// Conversations started with you should start as unknown
 		XCTAssertTrue(isUnknown)
 
-		await aliceClient.contacts.allow(addresses: [bob.address])
+		try await aliceClient.contacts.allow(addresses: [bob.address])
 
 		let isBobAllowed = (await aliceConversation.allowState()) == .allowed
 		XCTAssertTrue(isBobAllowed)
@@ -627,8 +627,11 @@ class ConversationTests: XCTestCase {
 		let aliceClient2 = try await Client.create(account: alice, apiClient: fakeApiClient)
 		let aliceConversation2 = (try await aliceClient2.conversations.list())[0]
 
+		try await aliceClient2.contacts.refreshAllowList()
+
 		// Allow state should sync across clients
 		let isBobAllowed2 = (await aliceConversation2.allowState()) == .allowed
+
 		XCTAssertTrue(isBobAllowed2)
 	}
 }

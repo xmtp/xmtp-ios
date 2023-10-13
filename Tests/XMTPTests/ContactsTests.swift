@@ -62,7 +62,7 @@ class ContactsTests: XCTestCase {
 
 		XCTAssertFalse(result)
 
-		await contacts.allow(addresses: [fixtures.alice.address])
+		try await contacts.allow(addresses: [fixtures.alice.address])
 
 		result = await contacts.isAllowed(fixtures.alice.address)
 		XCTAssertTrue(result)
@@ -76,7 +76,7 @@ class ContactsTests: XCTestCase {
 
 		XCTAssertFalse(result)
 
-		await contacts.block(addresses: [fixtures.alice.address])
+		try await contacts.block(addresses: [fixtures.alice.address])
 
 		result = await contacts.isBlocked(fixtures.alice.address)
 		XCTAssertTrue(result)

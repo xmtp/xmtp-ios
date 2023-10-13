@@ -155,7 +155,7 @@ public actor Conversations {
         let sealedInvitation = try await sendInvitation(recipient: recipient, invitation: invitation, created: Date())
         let conversationV2 = try ConversationV2.create(client: client, invitation: invitation, header: sealedInvitation.v1.header)
 
-				await client.contacts.allow(addresses: [peerAddress])
+				try await client.contacts.allow(addresses: [peerAddress])
 
         let conversation: Conversation = .v2(conversationV2)
         conversationsByTopic[conversation.topic] = conversation
