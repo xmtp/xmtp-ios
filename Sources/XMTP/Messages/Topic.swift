@@ -32,7 +32,7 @@ public enum Topic {
 		case let .directMessageV2(randomString):
 			return wrap("m-\(randomString)")
 		case let .allowList(identifier):
-			return wrap("privatestore-\(identifier)/allowlist")
+			return wrap("pppp-\(identifier)")
 		}
 	}
 
