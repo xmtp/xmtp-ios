@@ -8,6 +8,9 @@
 import Foundation
 import XMTPRust
 
+
+public typealias PrivatePreferencesAction = Xmtp_MessageContents_PrivatePreferencesAction
+
 public enum AllowState: String, Codable {
 	case allowed, blocked, unknown
 }
@@ -40,6 +43,8 @@ class AllowList {
 		let identifier = try XMTPRust.generate_private_preferences_topic_identifier(RustVec(privateKey)).toString()
 		let envelopes = try await client.query(topic: .allowList(identifier))
 		let allowList = AllowList()
+        
+        var preferences: [PrivatePreferencesAction] = []
 
 		for envelope in envelopes.envelopes {
 
@@ -50,16 +55,32 @@ class AllowList {
 				RustVec(envelope.message)
 			)
 
-			let entry = try JSONDecoder().decode(AllowListEntry.self, from: Data(payload))
-
-			allowList.entries[entry.key] = entry.permissionType
+            preferences.append(try PrivatePreferencesAction(contiguousBytes: Data(payload).bytes))
 		}
+        
+        preferences.forEach { preference in
+            preference.allow.walletAddresses.forEach { address in
+                allowList.allow(address: address)
+            }
+            preference.block.walletAddresses.forEach { address in
+                allowList.block(address: address)
+            }
+        }
 
 		return allowList
 	}
 
 	static func publish(entry: AllowListEntry, to client: Client) async throws {
-		let payload = try JSONEncoder().encode(entry)
+        
+        var payload = PrivatePreferencesAction()
+        switch entry.permissionType {
+        case .allowed:
+            payload.allow.walletAddresses = [entry.value]
+        case .blocked:
+            payload.block.walletAddresses = [entry.value]
+        case .unknown:
+            payload.unknownFields
+        }
 
 		let publicKey = client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed.bytes
 		let privateKey = client.privateKeyBundleV1.identityKey.secp256K1.bytes
@@ -68,7 +89,7 @@ class AllowList {
 		let message = try XMTPRust.ecies_encrypt_k256_sha3_256(
 			RustVec(publicKey),
 			RustVec(privateKey),
-			RustVec(payload)
+            RustVec(payload.serializedData())
 		)
 
 		let envelope = Envelope(
