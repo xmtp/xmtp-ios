@@ -57,7 +57,7 @@ class AllowList {
             throw ContactError.invalidIdentifier
         }        
         
-        let envelopes = try await client.query(topic: .allowList(identifier))
+        let envelopes = try await client.query(topic: .preferenceList(identifier))
 
 		let allowList = AllowList(client: client)
         
@@ -109,7 +109,7 @@ class AllowList {
 		)
 
 		let envelope = Envelope(
-			topic: Topic.allowList(identifier),
+			topic: Topic.preferenceList(identifier),
 			timestamp: Date(),
 			message: Data(message)
 		)

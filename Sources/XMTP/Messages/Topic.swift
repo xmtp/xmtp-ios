@@ -14,7 +14,7 @@ public enum Topic {
 	     userInvite(String),
 	     directMessageV1(String, String),
 	     directMessageV2(String),
-			 allowList(String)
+         preferenceList(String)
 
 	var description: String {
 		switch self {
@@ -31,7 +31,7 @@ public enum Topic {
 			return wrap("dm-\(addresses)")
 		case let .directMessageV2(randomString):
 			return wrap("m-\(randomString)")
-		case let .allowList(identifier):
+		case let .preferenceList(identifier):
 			return wrap("pppp-\(identifier)")
 		}
 	}
