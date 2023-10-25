@@ -33,16 +33,33 @@ struct AllowListEntry: Codable, Hashable {
 	}
 }
 
+public enum ContactError: Error {
+    case invalidIdentifier
+}
+
 class AllowList {
 	var entries: [String: AllowState] = [:]
+    var publicKey: Data
+    var privateKey: Data
+    var identifier: String?
+    
+    var client: Client
 
-	static func load(from client: Client) async throws -> AllowList {
-		let publicKey = client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed.bytes
-		let privateKey = client.privateKeyBundleV1.identityKey.secp256K1.bytes
+    init(client: Client) {
+        self.client = client
+        self.privateKey = client.privateKeyBundleV1.identityKey.secp256K1.bytes
+        self.publicKey = client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed.bytes
+        self.identifier = try? XMTPRust.generate_private_preferences_topic_identifier(RustVec(privateKey)).toString()
+    }
 
-		let identifier = try XMTPRust.generate_private_preferences_topic_identifier(RustVec(privateKey)).toString()
-		let envelopes = try await client.query(topic: .allowList(identifier))
-		let allowList = AllowList()
+    func load() async throws -> AllowList {
+        guard let identifier = identifier else {
+            throw ContactError.invalidIdentifier
+        }        
+        
+        let envelopes = try await client.query(topic: .allowList(identifier))
+
+		let allowList = AllowList(client: client)
         
         var preferences: [PrivatePreferencesAction] = []
 
@@ -70,8 +87,11 @@ class AllowList {
 		return allowList
 	}
 
-	static func publish(entry: AllowListEntry, to client: Client) async throws {
-        
+	func publish(entry: AllowListEntry) async throws {
+        guard let identifier = identifier else {
+            throw ContactError.invalidIdentifier
+        }
+
         var payload = PrivatePreferencesAction()
         switch entry.permissionType {
         case .allowed:
@@ -81,10 +101,6 @@ class AllowList {
         case .unknown:
             payload.unknownFields
         }
-
-		let publicKey = client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed.bytes
-		let privateKey = client.privateKeyBundleV1.identityKey.secp256K1.bytes
-		let identifier = try XMTPRust.generate_private_preferences_topic_identifier(RustVec(privateKey)).toString()
 
 		let message = try XMTPRust.ecies_encrypt_k256_sha3_256(
 			RustVec(publicKey),
@@ -130,14 +146,15 @@ public actor Contacts {
 	// Whether or not we have sent invite/intro to this contact
 	var hasIntroduced: [String: Bool] = [:]
 
-	var allowList = AllowList()
-
-	init(client: Client) {
+    var allowList: AllowList
+	
+    init(client: Client) {
 		self.client = client
+        self.allowList = AllowList(client: client)
 	}
 
 	public func refreshAllowList() async throws {
-		self.allowList = try await AllowList.load(from: client)
+		self.allowList = try await AllowList(client: client).load()
 	}
 
 	public func isAllowed(_ address: String) -> Bool {
@@ -150,13 +167,13 @@ public actor Contacts {
 
 	public func allow(addresses: [String]) async throws {
 		for address in addresses {
-			try await AllowList.publish(entry: allowList.allow(address: address), to: client)
+			try await AllowList(client: client).publish(entry: allowList.allow(address: address))
 		}
 	}
 
 	public func block(addresses: [String]) async throws {
 		for address in addresses {
-			try await AllowList.publish(entry: allowList.block(address: address), to: client)
+			try await AllowList(client: client).publish(entry: allowList.block(address: address))
 		}
 	}
 
