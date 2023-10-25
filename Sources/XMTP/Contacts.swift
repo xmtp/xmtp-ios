@@ -49,7 +49,9 @@ class AllowList {
         self.client = client
         self.privateKey = client.privateKeyBundleV1.identityKey.secp256K1.bytes
         self.publicKey = client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed.bytes
+        // swiftlint:disable no_optional_try
         self.identifier = try? XMTPRust.generate_private_preferences_topic_identifier(RustVec(privateKey)).toString()
+        // swiftlint:enable no_optional_try
     }
 
     func load() async throws -> AllowList {
