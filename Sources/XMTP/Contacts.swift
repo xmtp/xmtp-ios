@@ -12,7 +12,7 @@ import XMTPRust
 public typealias PrivatePreferencesAction = Xmtp_MessageContents_PrivatePreferencesAction
 
 public enum ConsentState: String, Codable {
-	case allow, block, unknown
+	case allowed, blocked, unknown
 }
 
 struct ConsentListEntry: Codable, Hashable {
@@ -96,9 +96,9 @@ class ConsentList {
 
         var payload = PrivatePreferencesAction()
         switch entry.consentType {
-        case .allow:
+        case .allowed:
             payload.allow.walletAddresses = [entry.value]
-        case .block:
+        case .blocked:
             payload.block.walletAddresses = [entry.value]
         case .unknown:
             payload.messageType = nil
@@ -120,15 +120,15 @@ class ConsentList {
 	}
 
 	func allow(address: String) -> ConsentListEntry {
-		entries[ConsentListEntry.address(address).key] = .allow
+		entries[ConsentListEntry.address(address).key] = .allowed
 
-		return .address(address, type: .allow)
+		return .address(address, type: .allowed)
 	}
 
 	func block(address: String) -> ConsentListEntry {
-		entries[ConsentListEntry.address(address).key] = .block
+		entries[ConsentListEntry.address(address).key] = .blocked
 
-		return .address(address, type: .block)
+		return .address(address, type: .blocked)
 	}
 
 	func state(address: String) -> ConsentState {
@@ -160,11 +160,11 @@ public actor Contacts {
 	}
 
 	public func isAllowed(_ address: String) -> Bool {
-		return consentList.state(address: address) == .allow
+		return consentList.state(address: address) == .allowed
 	}
 
 	public func isBlocked(_ address: String) -> Bool {
-		return consentList.state(address: address) == .block
+		return consentList.state(address: address) == .blocked
 	}
 
 	public func allow(addresses: [String]) async throws {

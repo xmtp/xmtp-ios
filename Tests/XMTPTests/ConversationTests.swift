@@ -608,7 +608,7 @@ class ConversationTests: XCTestCase {
 
 	func testCanHaveConsentState() async throws {
 		let bobConversation = try await bobClient.conversations.newConversation(with: alice.address, context: InvitationV1.Context(conversationID: "hi"))
-		let isAllowed = (await bobConversation.consentState()) == .allow
+		let isAllowed = (await bobConversation.consentState()) == .allowed
 
 		// Conversations you start should start as allowed
 		XCTAssertTrue(isAllowed)
@@ -621,7 +621,7 @@ class ConversationTests: XCTestCase {
 
 		try await aliceClient.contacts.allow(addresses: [bob.address])
 
-		let isBobAllowed = (await aliceConversation.consentState()) == .allow
+		let isBobAllowed = (await aliceConversation.consentState()) == .allowed
 		XCTAssertTrue(isBobAllowed)
 
 		let aliceClient2 = try await Client.create(account: alice, apiClient: fakeApiClient)
@@ -630,7 +630,7 @@ class ConversationTests: XCTestCase {
 		try await aliceClient2.contacts.refreshConsentList()
 
 		// Allow state should sync across clients
-		let isBobAllowed2 = (await aliceConversation2.consentState()) == .allow
+		let isBobAllowed2 = (await aliceConversation2.consentState()) == .allowed
 
 		XCTAssertTrue(isBobAllowed2)
 	}
