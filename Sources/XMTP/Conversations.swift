@@ -223,6 +223,7 @@ public actor Conversations {
             }
         } catch {
             print("Error loading introduction peers: \(error)")
+            throw error // To bubble up to client for handling
         }
 
         for sealedInvitation in try await listInvitations(pagination: pagination) {
