@@ -641,4 +641,26 @@ class ConversationTests: XCTestCase {
 
 		XCTAssertTrue(isBobAllowed2)
 	}
+    
+    func testCanHaveImplicitConsentOnMessageSend() async throws {
+        let bobConversation = try await bobClient.conversations.newConversation(with: alice.address, context: InvitationV1.Context(conversationID: "hi"))
+        let isAllowed = (await bobConversation.consentState()) == .allowed
+
+        // Conversations you start should start as allowed
+        XCTAssertTrue(isAllowed)
+
+
+        let aliceConversation = (try await aliceClient.conversations.list())[0]
+        let isUnknown = (await aliceConversation.consentState()) == .unknown
+
+        // Conversations started with you should start as unknown
+        XCTAssertTrue(isUnknown)
+
+        try await aliceConversation.send(content: "hey bob")
+        try await aliceClient.contacts.refreshConsentList()
+        let isNowAllowed = (await aliceConversation.consentState()) == .allowed
+
+        // Conversations you send a message to get marked as allowed
+        XCTAssertTrue(isNowAllowed)
+    }
 }
