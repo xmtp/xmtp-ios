@@ -59,7 +59,7 @@ class ConsentList {
             throw ContactError.invalidIdentifier
         }        
         
-        let envelopes = try await client.query(topic: .preferenceList(identifier))
+        let envelopes = try await client.query(topic: .preferenceList(identifier), pagination: Pagination(direction: .ascending))
 
 		let consentList = ConsentList(client: client)
         
@@ -77,7 +77,7 @@ class ConsentList {
             preferences.append(try PrivatePreferencesAction(serializedData: Data(payload)))
 		}
         
-        preferences.reversed().forEach { preference in
+        preferences.forEach { preference in
             preference.allow.walletAddresses.forEach { address in
                 consentList.allow(address: address)
             }
