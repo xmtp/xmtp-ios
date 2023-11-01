@@ -67,7 +67,7 @@ public struct Xmtp_MessageContents_PrivatePreferencesAction {
         guard case .allow(let l) = lhs, case .allow(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
-      case (.block, .block): return {
+      case (.deny, .deny): return {
         guard case .block(let l) = lhs, case .block(let r) = rhs else { preconditionFailure() }
         return l == r
       }()

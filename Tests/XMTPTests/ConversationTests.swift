@@ -613,10 +613,10 @@ class ConversationTests: XCTestCase {
 		// Conversations you start should start as allowed
 		XCTAssertTrue(isAllowed)
         
-        try await bobClient.contacts.block(addresses: [alice.address])
+        try await bobClient.contacts.deny(addresses: [alice.address])
         try await bobClient.contacts.refreshConsentList()
 
-        let isBlocked = (await bobConversation.consentState()) == .blocked
+        let isBlocked = (await bobConversation.consentState()) == .denied
 
         XCTAssertTrue(isBlocked)
 
