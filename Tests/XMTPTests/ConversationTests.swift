@@ -616,9 +616,9 @@ class ConversationTests: XCTestCase {
         try await bobClient.contacts.deny(addresses: [alice.address])
         try await bobClient.contacts.refreshConsentList()
 
-        let isBlocked = (await bobConversation.consentState()) == .denied
+        let isDenied = (await bobConversation.consentState()) == .denied
 
-        XCTAssertTrue(isBlocked)
+        XCTAssertTrue(isDenied)
 
 		let aliceConversation = (try await aliceClient.conversations.list())[0]
 		let isUnknown = (await aliceConversation.consentState()) == .unknown
