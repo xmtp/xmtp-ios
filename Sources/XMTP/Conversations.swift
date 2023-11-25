@@ -236,13 +236,26 @@ public actor Conversations {
         }
 
         newConversations
-            .filter { $0.peerAddress != client.address }
+            .filter { $0.peerAddress != client.address && isValidTopic(topic: $0.topic) }
             .forEach { conversationsByTopic[$0.topic] = $0 }
 
         // TODO(perf): use DB to persist + sort
         return conversationsByTopic.values.sorted { a, b in
             a.createdAt < b.createdAt
         }
+    }
+    
+    public func isValidTopic(topic: String) -> Bool {
+        let regex = "^[\\x00-\\x7F]+$"
+        let initialIndex = String.Index(utf16Offset: 8, in: topic)
+        let finalIndex = topic.lastIndex(of: "/")
+        if finalIndex != nil {
+            let unwrappedTopic = String(topic[initialIndex..<finalIndex!])
+            let indices = unwrappedTopic.startIndex..<unwrappedTopic.endIndex
+            let resultMatch = unwrappedTopic.range(of: regex, options: .regularExpression)
+            return indices == resultMatch
+        }
+        return false
     }
 
     private func listIntroductionPeers(pagination: Pagination?) async throws -> [String: Date] {

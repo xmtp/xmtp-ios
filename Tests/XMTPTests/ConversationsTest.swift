@@ -78,4 +78,64 @@ class ConversationsTests: XCTestCase {
 
 		await waitForExpectations(timeout: 3)
 	}
+    
+    func testCanValidateTopicsInsideConversation() async throws {
+        let validId = "sdfsadf095b97a9284dcd82b2274856ccac8a21de57bebe34e7f9eeb855fb21126d3b8f"
+        let fixtures = await fixtures()
+        
+        // Creation of all known types of topics
+        let privateStore = Topic.userPrivateStoreKeyBundle(validId).description
+        let contact = Topic.contact(validId).description
+        let userIntro = Topic.userIntro(validId).description
+        let userInvite = Topic.userInvite(validId).description
+        let directMessageV1 = Topic.directMessageV1(validId, "sd").description
+        let directMessageV2 = Topic.directMessageV2(validId).description
+        let preferenceList = Topic.preferenceList(validId).description
+        let conversations = fixtures.bobClient.conversations
+        
+        // check if validation of topics accepts all types
+        Task(priority: .userInitiated) {
+            let resultPrivateStore = await conversations.isValidTopic(topic: privateStore)
+            let resultContact = await conversations.isValidTopic(topic: contact)
+            let resultUserIntro = await conversations.isValidTopic(topic: userIntro)
+            let resultUserInvite = await conversations.isValidTopic(topic: userInvite)
+            let resultDirectMessageV1 = await conversations.isValidTopic(topic: directMessageV1)
+            let resultDirectMessageV2 = await conversations.isValidTopic(topic: directMessageV2)
+            let resultPreferenceList = await conversations.isValidTopic(topic: preferenceList)
+            XCTAssertTrue(
+                resultPrivateStore && resultContact && resultUserIntro && resultUserInvite &&
+                resultDirectMessageV1 && resultDirectMessageV2 && resultPreferenceList
+            )
+        }
+    }
+    
+    func testCannotValidateTopicsInsideConversation() async throws {
+        let invalidId = "��\\u0005�!\\u000b���5\\u00001\\u0007�蛨\\u001f\\u00172��.����K9K`�"
+        let fixtures = await fixtures()
+        
+        // Creation of all known types of topics
+        let privateStore = Topic.userPrivateStoreKeyBundle(invalidId).description
+        let contact = Topic.contact(invalidId).description
+        let userIntro = Topic.userIntro(invalidId).description
+        let userInvite = Topic.userInvite(invalidId).description
+        let directMessageV1 = Topic.directMessageV1(invalidId, "sd").description
+        let directMessageV2 = Topic.directMessageV2(invalidId).description
+        let preferenceList = Topic.preferenceList(invalidId).description
+        let conversations = fixtures.bobClient.conversations
+        
+        // check if validation of topics declines all types
+        Task(priority: .userInitiated) {
+            let resultPrivateStore = await conversations.isValidTopic(topic: privateStore)
+            let resultContact = await conversations.isValidTopic(topic: contact)
+            let resultUserIntro = await conversations.isValidTopic(topic: userIntro)
+            let resultUserInvite = await conversations.isValidTopic(topic: userInvite)
+            let resultDirectMessageV1 = await conversations.isValidTopic(topic: directMessageV1)
+            let resultDirectMessageV2 = await conversations.isValidTopic(topic: directMessageV2)
+            let resultPreferenceList = await conversations.isValidTopic(topic: preferenceList)
+            XCTAssertFalse(
+                resultPrivateStore && resultContact && resultUserIntro && resultUserInvite &&
+                resultDirectMessageV1 && resultDirectMessageV2 && resultPreferenceList
+            )
+        }
+    }
 }
