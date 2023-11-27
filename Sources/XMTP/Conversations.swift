@@ -248,9 +248,8 @@ public actor Conversations {
     public func isValidTopic(topic: String) -> Bool {
         let regex = "^[\\x00-\\x7F]+$"
         let initialIndex = String.Index(utf16Offset: 8, in: topic)
-        let finalIndex = topic.lastIndex(of: "/")
-        if finalIndex != nil {
-            let unwrappedTopic = String(topic[initialIndex..<finalIndex!])
+        if let finalIndex = topic.lastIndex(of: "/") { 
+            let unwrappedTopic = String(topic[initialIndex..<finalIndex])
             let indices = unwrappedTopic.startIndex..<unwrappedTopic.endIndex
             let resultMatch = unwrappedTopic.range(of: regex, options: .regularExpression)
             return indices == resultMatch
