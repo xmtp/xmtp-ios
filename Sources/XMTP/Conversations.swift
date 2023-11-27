@@ -135,6 +135,46 @@ public actor Conversations {
 		}
 	}
 
+	public func streamAllDecryptedMessages() async throws -> AsyncThrowingStream<DecryptedMessage, Error> {
+		return AsyncThrowingStream { continuation in
+			Task {
+				while true {
+					var topics: [String] = [
+						Topic.userInvite(client.address).description,
+						Topic.userIntro(client.address).description,
+					]
+
+					for conversation in try await list() {
+						topics.append(conversation.topic)
+					}
+
+					do {
+						for try await envelope in client.subscribe(topics: topics) {
+							if let conversation = conversationsByTopic[envelope.contentTopic] {
+								let decoded = try conversation.decrypt(envelope)
+								continuation.yield(decoded)
+							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
+								let conversation = try fromInvite(envelope: envelope)
+								conversationsByTopic[conversation.topic] = conversation
+								break // Break so we can resubscribe with the new conversation
+							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
+								let conversation = try fromIntro(envelope: envelope)
+								conversationsByTopic[conversation.topic] = conversation
+								let decoded = try conversation.decrypt(envelope)
+								continuation.yield(decoded)
+								break // Break so we can resubscribe with the new conversation
+							} else {
+								print("huh \(envelope)")
+							}
+						}
+					} catch {
+						continuation.finish(throwing: error)
+					}
+				}
+			}
+		}
+	}
+
 	public func fromInvite(envelope: Envelope) throws -> Conversation {
 		let sealedInvitation = try SealedInvitation(serializedData: envelope.message)
 		let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)
