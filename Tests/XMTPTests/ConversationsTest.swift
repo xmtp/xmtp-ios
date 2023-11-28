@@ -81,7 +81,6 @@ class ConversationsTests: XCTestCase {
     
     func testCanValidateTopicsInsideConversation() async throws {
         let validId = "sdfsadf095b97a9284dcd82b2274856ccac8a21de57bebe34e7f9eeb855fb21126d3b8f"
-        let fixtures = await fixtures()
         
         // Creation of all known types of topics
         let privateStore = Topic.userPrivateStoreKeyBundle(validId).description
@@ -93,24 +92,17 @@ class ConversationsTests: XCTestCase {
         let preferenceList = Topic.preferenceList(validId).description
         
         // check if validation of topics accepts all types
-        Task(priority: .userInitiated) {
-            let resultPrivateStore = Topic.isValidTopic(topic: privateStore)
-            let resultContact = Topic.isValidTopic(topic: contact)
-            let resultUserIntro = Topic.isValidTopic(topic: userIntro)
-            let resultUserInvite = Topic.isValidTopic(topic: userInvite)
-            let resultDirectMessageV1 = Topic.isValidTopic(topic: directMessageV1)
-            let resultDirectMessageV2 = Topic.isValidTopic(topic: directMessageV2)
-            let resultPreferenceList = Topic.isValidTopic(topic: preferenceList)
-            XCTAssertTrue(
-                resultPrivateStore && resultContact && resultUserIntro && resultUserInvite &&
-                resultDirectMessageV1 && resultDirectMessageV2 && resultPreferenceList
-            )
-        }
+        XCTAssertTrue(Topic.isValidTopic(topic: privateStore))
+        XCTAssertTrue(Topic.isValidTopic(topic: contact))
+        XCTAssertTrue(Topic.isValidTopic(topic: userIntro))
+        XCTAssertTrue(Topic.isValidTopic(topic: userInvite))
+        XCTAssertTrue(Topic.isValidTopic(topic: directMessageV1))
+        XCTAssertTrue(Topic.isValidTopic(topic: directMessageV2))
+        XCTAssertTrue(Topic.isValidTopic(topic: preferenceList))
     }
     
     func testCannotValidateTopicsInsideConversation() async throws {
         let invalidId = "��\\u0005�!\\u000b���5\\u00001\\u0007�蛨\\u001f\\u00172��.����K9K`�"
-        let fixtures = await fixtures()
         
         // Creation of all known types of topics
         let privateStore = Topic.userPrivateStoreKeyBundle(invalidId).description
@@ -122,18 +114,12 @@ class ConversationsTests: XCTestCase {
         let preferenceList = Topic.preferenceList(invalidId).description
         
         // check if validation of topics declines all types
-        Task(priority: .userInitiated) {
-            let resultPrivateStore = Topic.isValidTopic(topic: privateStore)
-            let resultContact = Topic.isValidTopic(topic: contact)
-            let resultUserIntro = Topic.isValidTopic(topic: userIntro)
-            let resultUserInvite = Topic.isValidTopic(topic: userInvite)
-            let resultDirectMessageV1 = Topic.isValidTopic(topic: directMessageV1)
-            let resultDirectMessageV2 = Topic.isValidTopic(topic: directMessageV2)
-            let resultPreferenceList = Topic.isValidTopic(topic: preferenceList)
-            XCTAssertFalse(
-                resultPrivateStore && resultContact && resultUserIntro && resultUserInvite &&
-                resultDirectMessageV1 && resultDirectMessageV2 && resultPreferenceList
-            )
-        }
+        XCTAssertFalse(Topic.isValidTopic(topic: privateStore))
+        XCTAssertFalse(Topic.isValidTopic(topic: contact))
+        XCTAssertFalse(Topic.isValidTopic(topic: userIntro))
+        XCTAssertFalse(Topic.isValidTopic(topic: userInvite))
+        XCTAssertFalse(Topic.isValidTopic(topic: directMessageV1))
+        XCTAssertFalse(Topic.isValidTopic(topic: directMessageV2))
+        XCTAssertFalse(Topic.isValidTopic(topic: preferenceList))
     }
 }
