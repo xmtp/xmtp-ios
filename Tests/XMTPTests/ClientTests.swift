@@ -31,12 +31,14 @@ class ClientTests: XCTestCase {
 	}
 
   func testStaticCanMessage() async throws {
-    try TestConfig.skip(because: "run manually against dev")
-    let fixtures = await fixtures()
-    let notOnNetwork = try PrivateKey.generate()
-    let opts = ClientOptions(api: .init(env: .local, isSecure: false))
+    let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 
-    let canMessage = try await Client.canMessage(fixtures.bobClient.address, options: opts)
+    let aliceWallet = try PrivateKey.generate()
+    let notOnNetwork = try PrivateKey.generate()
+    let alice = try await Client.create(account: aliceWallet, options: opts)
+    _ = try await alice.getUserContact(peerAddress: alice.address)
+
+    let canMessage = try await Client.canMessage(alice.address, options: opts)
     let cannotMessage = try await Client.canMessage(notOnNetwork.address, options: opts)
     XCTAssertTrue(canMessage)
     XCTAssertFalse(cannotMessage)
