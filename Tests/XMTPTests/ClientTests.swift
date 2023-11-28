@@ -31,6 +31,7 @@ class ClientTests: XCTestCase {
 	}
 
   func testStaticCanMessage() async throws {
+      try TestConfig.skip(because: "run manually against dev")
     let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 
     let aliceWallet = try PrivateKey.generate()
