@@ -91,17 +91,16 @@ class ConversationsTests: XCTestCase {
         let directMessageV1 = Topic.directMessageV1(validId, "sd").description
         let directMessageV2 = Topic.directMessageV2(validId).description
         let preferenceList = Topic.preferenceList(validId).description
-        let conversations = fixtures.bobClient.conversations
         
         // check if validation of topics accepts all types
         Task(priority: .userInitiated) {
-            let resultPrivateStore = await conversations.isValidTopic(topic: privateStore)
-            let resultContact = await conversations.isValidTopic(topic: contact)
-            let resultUserIntro = await conversations.isValidTopic(topic: userIntro)
-            let resultUserInvite = await conversations.isValidTopic(topic: userInvite)
-            let resultDirectMessageV1 = await conversations.isValidTopic(topic: directMessageV1)
-            let resultDirectMessageV2 = await conversations.isValidTopic(topic: directMessageV2)
-            let resultPreferenceList = await conversations.isValidTopic(topic: preferenceList)
+            let resultPrivateStore = Topic.isValidTopic(topic: privateStore)
+            let resultContact = Topic.isValidTopic(topic: contact)
+            let resultUserIntro = Topic.isValidTopic(topic: userIntro)
+            let resultUserInvite = Topic.isValidTopic(topic: userInvite)
+            let resultDirectMessageV1 = Topic.isValidTopic(topic: directMessageV1)
+            let resultDirectMessageV2 = Topic.isValidTopic(topic: directMessageV2)
+            let resultPreferenceList = Topic.isValidTopic(topic: preferenceList)
             XCTAssertTrue(
                 resultPrivateStore && resultContact && resultUserIntro && resultUserInvite &&
                 resultDirectMessageV1 && resultDirectMessageV2 && resultPreferenceList
@@ -121,17 +120,16 @@ class ConversationsTests: XCTestCase {
         let directMessageV1 = Topic.directMessageV1(invalidId, "sd").description
         let directMessageV2 = Topic.directMessageV2(invalidId).description
         let preferenceList = Topic.preferenceList(invalidId).description
-        let conversations = fixtures.bobClient.conversations
         
         // check if validation of topics declines all types
         Task(priority: .userInitiated) {
-            let resultPrivateStore = await conversations.isValidTopic(topic: privateStore)
-            let resultContact = await conversations.isValidTopic(topic: contact)
-            let resultUserIntro = await conversations.isValidTopic(topic: userIntro)
-            let resultUserInvite = await conversations.isValidTopic(topic: userInvite)
-            let resultDirectMessageV1 = await conversations.isValidTopic(topic: directMessageV1)
-            let resultDirectMessageV2 = await conversations.isValidTopic(topic: directMessageV2)
-            let resultPreferenceList = await conversations.isValidTopic(topic: preferenceList)
+            let resultPrivateStore = Topic.isValidTopic(topic: privateStore)
+            let resultContact = Topic.isValidTopic(topic: contact)
+            let resultUserIntro = Topic.isValidTopic(topic: userIntro)
+            let resultUserInvite = Topic.isValidTopic(topic: userInvite)
+            let resultDirectMessageV1 = Topic.isValidTopic(topic: directMessageV1)
+            let resultDirectMessageV2 = Topic.isValidTopic(topic: directMessageV2)
+            let resultPreferenceList = Topic.isValidTopic(topic: preferenceList)
             XCTAssertFalse(
                 resultPrivateStore && resultContact && resultUserIntro && resultUserInvite &&
                 resultDirectMessageV1 && resultDirectMessageV2 && resultPreferenceList
