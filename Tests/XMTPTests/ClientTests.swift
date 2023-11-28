@@ -37,7 +37,6 @@ class ClientTests: XCTestCase {
     let aliceWallet = try PrivateKey.generate()
     let notOnNetwork = try PrivateKey.generate()
     let alice = try await Client.create(account: aliceWallet, options: opts)
-    _ = try await alice.getUserContact(peerAddress: alice.address)
 
     let canMessage = try await Client.canMessage(alice.address, options: opts)
     let cannotMessage = try await Client.canMessage(notOnNetwork.address, options: opts)
