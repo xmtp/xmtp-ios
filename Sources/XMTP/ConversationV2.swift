@@ -137,9 +137,13 @@ public struct ConversationV2 {
 		let envelopes = try await client.apiClient.envelopes(topic: topic.description, pagination: pagination)
 
 		return try envelopes.map { envelope in
-			let message = try Message(serializedData: envelope.message)
-			return try MessageV2.decrypt(generateID(from: envelope), topic, message.v2, keyMaterial: keyMaterial, client: client)
+			try decrypt(envelope: envelope)
 		}
+	}
+
+	func decrypt(envelope: Envelope) throws -> DecryptedMessage {
+		let message = try Message(serializedData: envelope.message)
+		return try MessageV2.decrypt(generateID(from: envelope), topic, message.v2, keyMaterial: keyMaterial, client: client)
 	}
 
 	var ephemeralTopic: String {
@@ -165,6 +169,18 @@ public struct ConversationV2 {
 			Task {
 				for try await envelope in client.subscribe(topics: [topic.description]) {
 					let decoded = try decode(envelope: envelope)
+
+					continuation.yield(decoded)
+				}
+			}
+		}
+	}
+
+	public func streamDecryptedMessages() -> AsyncThrowingStream<DecryptedMessage, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				for try await envelope in client.subscribe(topics: [topic.description]) {
+					let decoded = try decrypt(envelope: envelope)
 
 					continuation.yield(decoded)
 				}
