@@ -123,8 +123,7 @@ public final class Client: Sendable {
 			#endif
       let keys = try await PrivateKeyBundleV1.generate(wallet: account, options: options)
 			let keyBundle = PrivateKeyBundle(v1: keys)
-			let encryptedKeys = try await keyBundle.encrypted(with: account)
-
+      let encryptedKeys = try await keyBundle.encrypted(with: account, preEnableIdentityCallback: options?.preEnableIdentityCallback)
 			var authorizedIdentity = AuthorizedIdentity(privateKeyBundleV1: keys)
 			authorizedIdentity.address = account.address
 			let authToken = try await authorizedIdentity.createAuthToken()
