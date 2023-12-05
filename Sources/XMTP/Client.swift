@@ -25,30 +25,30 @@ public struct ClientOptions {
 		/// Optional: Specify self-reported version e.g. XMTPInbox/v1.0.0.
 		public var isSecure: Bool = true
         
-    /// Specify whether the API client should use TLS security. In general this should only be false when using the `.local` environment.
-    public var appVersion: String? = nil
+		/// Specify whether the API client should use TLS security. In general this should only be false when using the `.local` environment.
+		public var appVersion: String? = nil
 
-    public init(env: XMTPEnvironment = .dev, isSecure: Bool = true, appVersion: String? = nil) {
+		public init(env: XMTPEnvironment = .dev, isSecure: Bool = true, appVersion: String? = nil) {
 			self.env = env
 			self.isSecure = isSecure
-      self.appVersion = appVersion
+			self.appVersion = appVersion
 		}
 	}
 
 	public var api = Api()
 	public var codecs: [any ContentCodec] = []
   
-  /// `preEnableIdentityCallback` will be called immediately before an Enable Identity wallet signature is requested from the user.
-  public var preEnableIdentityCallback: PreEventCallback? = nil
+	/// `preEnableIdentityCallback` will be called immediately before an Enable Identity wallet signature is requested from the user.
+	public var preEnableIdentityCallback: PreEventCallback? = nil
+	  
+	/// `preCreateIdentityCallback` will be called immediately before a Create Identity wallet signature is requested from the user.
+	public var preCreateIdentityCallback: PreEventCallback? = nil
   
-  /// `preCreateIdentityCallback` will be called immediately before a Create Identity wallet signature is requested from the user.
-  public var preCreateIdentityCallback: PreEventCallback? = nil
-  
-  public init(api: Api = Api(), codecs: [any ContentCodec] = [], preEnableIdentityCallback: PreEventCallback? = nil, preCreateIdentityCallback: PreEventCallback? = nil) {
+    public init(api: Api = Api(), codecs: [any ContentCodec] = [], preEnableIdentityCallback: PreEventCallback? = nil, preCreateIdentityCallback: PreEventCallback? = nil) {
 		self.api = api
 		self.codecs = codecs
-    self.preEnableIdentityCallback = preEnableIdentityCallback
-    self.preCreateIdentityCallback = preCreateIdentityCallback
+		self.preEnableIdentityCallback = preEnableIdentityCallback
+		self.preCreateIdentityCallback = preCreateIdentityCallback
 	}
 }
 
@@ -93,14 +93,14 @@ public final class Client: Sendable {
 			secure: options.api.isSecure,
 			rustClient: client
 		)
-          return try await create(account: account, apiClient: apiClient, options: options)
+		return try await create(account: account, apiClient: apiClient, options: options)
         } catch let error as RustString {
             throw ClientError.creationError(error.toString())
         }
 	}
 
-  static func create(account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> Client {
-    let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient, options: options)
+	static func create(account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> Client {
+		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient, options: options)
 
 		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient)
 		try await client.ensureUserContactPublished()
@@ -108,9 +108,9 @@ public final class Client: Sendable {
 		return client
 	}
 
-  static func loadOrCreateKeys(for account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> PrivateKeyBundleV1 {
+	static func loadOrCreateKeys(for account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> PrivateKeyBundleV1 {
 		// swiftlint:disable no_optional_try
-    if let keys = try await loadPrivateKeys(for: account, apiClient: apiClient, options: options) {
+		if let keys = try await loadPrivateKeys(for: account, apiClient: apiClient, options: options) {
 			// swiftlint:enable no_optional_try
             print("loading existing private keys.")
 			#if DEBUG
@@ -121,9 +121,9 @@ public final class Client: Sendable {
 			#if DEBUG
 				print("No existing keys found, creating new bundle.")
 			#endif
-      let keys = try await PrivateKeyBundleV1.generate(wallet: account, options: options)
+			let keys = try await PrivateKeyBundleV1.generate(wallet: account, options: options)
 			let keyBundle = PrivateKeyBundle(v1: keys)
-      let encryptedKeys = try await keyBundle.encrypted(with: account, preEnableIdentityCallback: options?.preEnableIdentityCallback)
+			let encryptedKeys = try await keyBundle.encrypted(with: account, preEnableIdentityCallback: options?.preEnableIdentityCallback)
 			var authorizedIdentity = AuthorizedIdentity(privateKeyBundleV1: keys)
 			authorizedIdentity.address = account.address
 			let authToken = try await authorizedIdentity.createAuthToken()
