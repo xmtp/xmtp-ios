@@ -29,7 +29,9 @@ struct ModalWrapper: UIViewControllerRepresentable {
 	func makeUIViewController(context: Context) -> UIViewController {
 		let controller = UIViewController()
 		Task {
+			// swiftlint:disable no_optional_try
 			try? await Task.sleep(for: .seconds(0.4))
+			// swiftlint:enable no_optional_try
 			await MainActor.run {
 				WalletConnectModal.present(from: controller)
 			}
@@ -58,7 +60,9 @@ class Signer: SigningKey {
 				return
 			}
 
+			// swiftlint:disable force_cast
 			let signatureData = Data(hexString: codable.value as! String)
+			// swiftlint:enable force_cast
 			let signature = Signature(bytes: signatureData[0..<64], recovery: Int(signatureData[64]))
 
 			self.continuation?.resume(returning: signature)
