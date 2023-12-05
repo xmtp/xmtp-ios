@@ -118,18 +118,32 @@ public struct ConversationV2 {
 		return try await prepareMessage(encodedContent: encoded, options: options)
 	}
 
-    func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil, direction: PagingInfoSortDirection? = .descending) async throws -> [DecodedMessage] {
-        let pagination = Pagination(limit: limit, before: before, after: after, direction: direction)
+	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil, direction: PagingInfoSortDirection? = .descending) async throws -> [DecodedMessage] {
+		let pagination = Pagination(limit: limit, before: before, after: after, direction: direction)
 		let envelopes = try await client.apiClient.envelopes(topic: topic.description, pagination: pagination)
 
 		return envelopes.compactMap { envelope in
 			do {
-            return try decode(envelope: envelope)
+				return try decode(envelope: envelope)
 			} catch {
 				print("Error decoding envelope \(error)")
 				return nil
 			}
 		}
+	}
+
+	func decryptedMessages(limit: Int? = nil, before: Date? = nil, after: Date? = nil, direction: PagingInfoSortDirection? = .descending) async throws -> [DecryptedMessage] {
+		let pagination = Pagination(limit: limit, before: before, after: after, direction: direction)
+		let envelopes = try await client.apiClient.envelopes(topic: topic.description, pagination: pagination)
+
+		return try envelopes.map { envelope in
+			try decrypt(envelope: envelope)
+		}
+	}
+
+	func decrypt(envelope: Envelope) throws -> DecryptedMessage {
+		let message = try Message(serializedData: envelope.message)
+		return try MessageV2.decrypt(generateID(from: envelope), topic, message.v2, keyMaterial: keyMaterial, client: client)
 	}
 
 	var ephemeralTopic: String {
@@ -162,21 +176,26 @@ public struct ConversationV2 {
 		}
 	}
 
+	public func streamDecryptedMessages() -> AsyncThrowingStream<DecryptedMessage, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				for try await envelope in client.subscribe(topics: [topic.description]) {
+					let decoded = try decrypt(envelope: envelope)
+
+					continuation.yield(decoded)
+				}
+			}
+		}
+	}
+
 	public var createdAt: Date {
 		Date(timeIntervalSince1970: Double(header.createdNs / 1_000_000) / 1000)
 	}
 
 	public func decode(envelope: Envelope) throws -> DecodedMessage {
 		let message = try Message(serializedData: envelope.message)
-		var decoded = try decode(message.v2)
 
-		decoded.id = generateID(from: envelope)
-
-		return decoded
-	}
-
-	private func decode(_ message: MessageV2) throws -> DecodedMessage {
-		try MessageV2.decode(message, keyMaterial: keyMaterial, client: client)
+		return try MessageV2.decode(generateID(from: envelope), topic, message.v2, keyMaterial: keyMaterial, client: client)
 	}
 
 	@discardableResult func send<T>(content: T, options: SendOptions? = nil) async throws -> String {
@@ -196,6 +215,9 @@ public struct ConversationV2 {
 
     @discardableResult func send(prepared: PreparedMessage) async throws -> String {
         try await client.publish(envelopes: prepared.envelopes)
+        if((await client.contacts.consentList.state(address: peerAddress)) == .unknown) {
+            try await client.contacts.allow(addresses: [peerAddress])
+        }
         return prepared.messageID
     }
 

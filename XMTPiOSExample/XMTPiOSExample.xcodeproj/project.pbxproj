@@ -40,6 +40,7 @@
 		A6C0F3842AC1E4B5008C6AA7 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C0F3832AC1E4B5008C6AA7 /* LoginView.swift */; };
 		A6C0F3862AC1E549008C6AA7 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C0F3852AC1E549008C6AA7 /* Data.swift */; };
 		A6D192D0293A7B97006B49F2 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D192CF293A7B97006B49F2 /* ConversationListView.swift */; };
+		A6E774162B154CF000F01DFF /* XMTP in Frameworks */ = {isa = PBXBuildFile; productRef = A6E774152B154CF000F01DFF /* XMTP */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,7 +85,6 @@
 		A687810629679BC700042FAB /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		A687810B29679BFC00042FAB /* WalletConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletConnection.swift; sourceTree = "<group>"; };
 		A687810D29679C0D00042FAB /* WalletConnectionMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletConnectionMethod.swift; sourceTree = "<group>"; };
-		A69F33C7292DD3A9005A5556 /* xmtp-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "xmtp-ios"; path = ..; sourceTree = "<group>"; };
 		A69F33C9292DD557005A5556 /* LoggedInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedInView.swift; sourceTree = "<group>"; };
 		A69F33CB292DD568005A5556 /* QRCodeSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeSheetView.swift; sourceTree = "<group>"; };
 		A6AE5180297B61AE006FDD0F /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -93,6 +93,7 @@
 		A6C0F3832AC1E4B5008C6AA7 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		A6C0F3852AC1E549008C6AA7 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		A6D192CF293A7B97006B49F2 /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
+		A6E774192B154D1E00F01DFF /* xmtp-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "xmtp-ios"; path = ..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6E774162B154CF000F01DFF /* XMTP in Frameworks */,
 				A65F0707297B5E7600C3C76E /* WalletConnectSwift in Frameworks */,
 				A6C0F3802AC1E34F008C6AA7 /* WalletConnectModal in Frameworks */,
 				6AEE396E29F330CD0027B657 /* secp256k1 in Frameworks */,
@@ -126,7 +128,7 @@
 		A6281986292DC825004B9117 = {
 			isa = PBXGroup;
 			children = (
-				A69F33C7292DD3A9005A5556 /* xmtp-ios */,
+				A6E774192B154D1E00F01DFF /* xmtp-ios */,
 				A6281991292DC825004B9117 /* XMTPiOSExample */,
 				A6AE5181297B61AE006FDD0F /* NotificationService */,
 				A6281990292DC825004B9117 /* Products */,
@@ -246,6 +248,7 @@
 				A6C0F37D2AC1E34F008C6AA7 /* WalletConnect */,
 				A6C0F37F2AC1E34F008C6AA7 /* WalletConnectModal */,
 				A6C0F3812AC1E34F008C6AA7 /* Web3Wallet */,
+				A6E774152B154CF000F01DFF /* XMTP */,
 			);
 			productName = XMTPiOSExample;
 			productReference = A628198F292DC825004B9117 /* XMTPiOSExample.app */;
@@ -751,6 +754,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A6C0F37C2AC1E34F008C6AA7 /* XCRemoteSwiftPackageReference "WalletConnectSwiftV2" */;
 			productName = Web3Wallet;
+		};
+		A6E774152B154CF000F01DFF /* XMTP */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = XMTP;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
