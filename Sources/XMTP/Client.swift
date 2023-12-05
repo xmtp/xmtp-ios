@@ -25,13 +25,13 @@ public struct ClientOptions {
 		/// Optional: Specify self-reported version e.g. XMTPInbox/v1.0.0.
 		public var isSecure: Bool = true
         
-		/// Specify whether the API client should use TLS security. In general this should only be false when using the `.local` environment.
-		public var appVersion: String? = nil
+	/// Specify whether the API client should use TLS security. In general this should only be false when using the `.local` environment.
+	public var appVersion: String? = nil
 
-		public init(env: XMTPEnvironment = .dev, isSecure: Bool = true, appVersion: String? = nil) {
+	public init(env: XMTPEnvironment = .dev, isSecure: Bool = true, appVersion: String? = nil) {
 			self.env = env
 			self.isSecure = isSecure
-			self.appVersion = appVersion
+		self.appVersion = appVersion
 		}
 	}
 
@@ -137,7 +137,7 @@ public final class Client: Sendable {
 		}
 	}
 
-  static func loadPrivateKeys(for account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> PrivateKeyBundleV1? {
+	static func loadPrivateKeys(for account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> PrivateKeyBundleV1? {
 		let res = try await apiClient.query(
 			topic: .userPrivateStoreKeyBundle(account.address),
 			pagination: nil
