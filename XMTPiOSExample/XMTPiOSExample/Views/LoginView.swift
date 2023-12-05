@@ -132,8 +132,10 @@ struct LoginView: View {
 		let optionalNamespaces: [String: ProposalNamespace] = [
 			"eip155": ProposalNamespace(
 				chains: [
+					// swiftlint:disable force_unwrapping
 					Blockchain("eip155:80001")!,        //Polygon Testnet
 					Blockchain("eip155:421613")!        //Arbitrum Testnet
+					// swiftlint:enable force_unwrapping
 				],
 				methods: [
 					"personal_sign"
