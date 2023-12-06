@@ -126,7 +126,7 @@ struct ContentView: View {
 	func generateWalletWithPrivateKeys() {
     Task {
         do {
-			let privateKeyString = "67633be8c32db5414951db4a9ea9734b1214f8f5ca15d6b16818c0b4ee864653" // Your PrivateKey instance here
+			let privateKeyString = "private_key" // Your PrivateKey instance here
             // Function to convert hex string to Data
             
             
@@ -158,8 +158,7 @@ struct ContentView: View {
 		Task {
 			do {
 				let wallet = try PrivateKey.generate()
-				let client = try await Client.create(account: wallet, options: .init(api: .init(env: .production, isSecure: true, appVersion: "XMTPTest/v1.0.0")))
-                print (client.address);
+				let client = try await Client.create(account: wallet, options: .init(api: .init(env: .dev, isSecure: true, appVersion: "XMTPTest/v1.0.0")))
 				let keysData = try client.privateKeyBundle.serializedData()
 				Persistence().saveKeys(keysData)
 
