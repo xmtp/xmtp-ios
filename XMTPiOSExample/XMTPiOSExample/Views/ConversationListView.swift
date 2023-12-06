@@ -37,7 +37,7 @@ struct ConversationListView: View {
 			do {
 				for try await conversation in await client.conversations.stream() {
 					conversations.insert(conversation, at: 0)
-
+					print("Received conversation: \(conversation.peerAddress)")
 					await add(conversations: [conversation])
 				}
 

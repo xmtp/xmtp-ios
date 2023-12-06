@@ -11,8 +11,25 @@ import XMTP
 struct ConversationDetailView: View {
 	var client: XMTP.Client
 	var conversation: XMTP.Conversation
+	@State private var streamTask: Task<(), Error>? = nil
 
 	@State private var messages: [DecodedMessage] = []
+	
+	func startStream() {
+		streamTask = Task {
+			do {
+				for try await message in conversation.streamMessages() {
+					let content: String = try message.content()
+					print("Received message: \(content)")
+					await MainActor.run {
+						messages.append(message)
+					}
+				}
+			} catch {
+				print("Error in message stream: \(error)")
+			}
+   	 }	
+	}
 
 	var body: some View {
 		VStack {
@@ -22,16 +39,15 @@ struct ConversationDetailView: View {
 				}
 				.task {
 					await loadMessages()
+					startStream()
 				}
-				.task {
-					do {
-						for try await message in conversation.streamMessages() {
-							await MainActor.run {
-								messages.append(message)
-							}
-						}
-					} catch {
-						print("Error in message stream: \(error)")
+				.onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+					streamTask?.cancel()
+				}
+				.onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+					Task{
+						await loadMessages()
+						startStream()
 					}
 				}
 
