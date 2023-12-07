@@ -27,12 +27,6 @@ jobs:
         with:
           ruby-version: 3.0
 
-      - name: Install dependencies
-        run: gem install jazzy
-
-      - name: Generate documentation
-        run: jazzy --output ./docs --theme=fullwidth
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
