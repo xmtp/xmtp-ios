@@ -2,9 +2,9 @@ name: Generate docs content to Pages (jazzy)
 
 on:
   push:
-    branches: ["main", "docs", "docs_build_v1"]
+    branches: ["docs_build_v1"]
   pull_request:
-    branches: ["main", "docs", "docs_build_v1"]
+    branches: ["docs_build_v1"]
   workflow_dispatch:
 
 permissions:
@@ -31,7 +31,7 @@ jobs:
         run: gem install jazzy
 
       - name: Generate documentation
-        run: jazzy --output ./docs
+        run: jazzy --output ./docs --theme=fullwidth
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
