@@ -1,7 +1,9 @@
-name: Deploy docs content to Pages
+name: Generate docs content to Pages (jazzy)
 
 on:
   push:
+    branches: ["main", "docs", "docs_build_v1"]
+  pull_request:
     branches: ["main", "docs", "docs_build_v1"]
   workflow_dispatch:
 
