@@ -42,7 +42,7 @@ public struct ClientOptions {
 	}
 }
 
-/// Client is the entrypoint into the XMTP SDK.
+/// Client is the entrypoint into the XMTP SDK. test
 ///
 /// A client is created by calling ``create(account:options:)`` with a ``SigningKey`` that can create signatures on your behalf. The client will request a signature in two cases:
 ///
