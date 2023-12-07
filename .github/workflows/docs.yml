@@ -1,4 +1,4 @@
-name: Deploy docs content to Pages
+name: Deploy docs content to Pages 2
 
 on:
   push:
@@ -42,7 +42,7 @@ jobs:
           bundle add jazzy
 
       - name: Generate documentation
-        run: bundle exec jazzy --output ./docs
+        run: bundle exec jazzy --output ./docs --theme=fullwidth
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
