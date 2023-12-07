@@ -157,8 +157,9 @@ public actor Contacts {
         self.consentList = ConsentList(client: client)
 	}
 
-	public func refreshConsentList() async throws {
-		self.consentList = try await ConsentList(client: client).load()
+	public func refreshConsentList() async throws -> ConsentList {
+		consentList = try await ConsentList(client: client).load()
+        return consentList
 	}
 
 	public func isAllowed(_ address: String) -> Bool {
