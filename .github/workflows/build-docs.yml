@@ -4,7 +4,7 @@ name: Deploy docs content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main", "docs","docs_build_v1"]
+    branches: ["main", "docs", "docs_build_v1"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -34,7 +34,7 @@ jobs:
         with:
           xcode-version: latest-stable
       - name: "Build docs"
-        run: xcodebuild docbuild -scheme XMTP -destination 'generic/platform=ios'
+        run: xcodebuild docbuild -scheme XMTP -destination 'generic/platform=ios' -quiet
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
