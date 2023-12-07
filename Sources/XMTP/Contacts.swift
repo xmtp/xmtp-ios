@@ -135,8 +135,10 @@ public class ConsentList {
 
 	func state(address: String) -> ConsentState {
 		let entry = entries[ConsentListEntry.address(address).key]
-
+        
+        // swiftlint:disable no_optional_try
         return entry?.consentType ?? .unknown
+        // swiftlint:enable no_optional_try
 	}
 }
 
