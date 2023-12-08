@@ -1,8 +1,8 @@
-name: Deploy docs content to Pages 2
+name: Deploy docs content to GitHub Pages
 
 on:
   push:
-    branches: ["docs_build_v1"]
+    branches: ["main", "docs", "docs_build_v1"]
   workflow_dispatch:
 
 permissions:
