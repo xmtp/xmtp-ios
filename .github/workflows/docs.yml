@@ -2,7 +2,7 @@ name: Deploy docs content to GitHub Pages
 
 on:
   push:
-    branches: ["main", "docs", "docs_build_v1"]
+    branches: ["main", "docs", "update_swift_rust"]
   workflow_dispatch:
 
 permissions:
