@@ -15,6 +15,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  update-package:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Update specific Swift package
+        run: |
+          swift package update
+          swift package reset
+          swift package resolve
   deploy:
     environment:
       name: github-pages
