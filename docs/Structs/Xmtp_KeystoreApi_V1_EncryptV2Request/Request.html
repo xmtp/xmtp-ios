@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Request Structure Reference</title>
+    <link rel="stylesheet" type="text/css" href="../../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../../js/jquery.min.js" defer></script>
+    <script src="../../js/jazzy.js" defer></script>
+    
+    <script src="../../js/lunr.min.js" defer></script>
+    <script src="../../js/typeahead.jquery.js" defer></script>
+    <script src="../../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Struct/Request" class="dashAnchor"></a>
+
+    <a title="Request Structure Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../../index.html">
+          XMTP 0.7.3-alpha0 Docs
+        </a>
+         (69% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="../../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../../index.html">XMTP Reference</a>
+      <img class="carat" src="../../img/carat.png" alt=""/>
+      Request Structure Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../../Actors.html">Actors</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Actors/Contacts.html">Contacts</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Actors/Conversations.html">Conversations</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Classes/Client.html">Client</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Classes/ConsentList.html">ConsentList</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Classes/Notifications_V1_NotificationsClient.html">Notifications_V1_NotificationsClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Classes/Notifications_V1_NotificationsClient/Metadata.html">– Metadata</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../../Global%20Variables.html">Global Variables</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Global%20Variables.html#/s:4XMTP21ContentTypeAttachmentAA021Xmtp_MessageContents_bC2IdVvp">ContentTypeAttachment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Global%20Variables.html#/s:4XMTP19ContentTypeReactionAA021Xmtp_MessageContents_bC2IdVvp">ContentTypeReaction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Global%20Variables.html#/s:4XMTP22ContentTypeReadReceiptAA021Xmtp_MessageContents_bC2IdVvp">ContentTypeReadReceipt</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Global%20Variables.html#/s:4XMTP27ContentTypeRemoteAttachmentAA021Xmtp_MessageContents_bC2IdVvp">ContentTypeRemoteAttachment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Global%20Variables.html#/s:4XMTP16ContentTypeReplyAA021Xmtp_MessageContents_bC2IdVvp">ContentTypeReply</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Global%20Variables.html#/s:4XMTP15ContentTypeTextAA021Xmtp_MessageContents_bC2IdVvp">ContentTypeText</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/ApiClientError.html">ApiClientError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/AttachmentCodecError.html">AttachmentCodecError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/ClientError.html">ClientError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/ConsentState.html">ConsentState</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/ContactError.html">ContactError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/Conversation.html">Conversation</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/Conversation/Version.html">– Version</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/ConversationContainer.html">ConversationContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/ConversationError.html">ConversationError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/EncodedContentCompression.html">EncodedContentCompression</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/MessageVersion.html">MessageVersion</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/ReactionAction.html">ReactionAction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/ReactionSchema.html">ReactionSchema</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/RemoteAttachmentError.html">RemoteAttachmentError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/Topic.html">Topic</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/XMTPEnvironment.html">XMTPEnvironment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/Xmtp_KeystoreApi_V1_ErrorCode.html">Xmtp_KeystoreApi_V1_ErrorCode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/Xmtp_KeystoreApi_V1_JobType.html">Xmtp_KeystoreApi_V1_JobType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/Xmtp_MessageApi_V1_SortDirection.html">Xmtp_MessageApi_V1_SortDirection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Enums/Xmtp_MessageContents_Compression.html">Xmtp_MessageContents_Compression</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../../Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Extensions/ContentTypeID.html">ContentTypeID</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Extensions/EncodedContent.html">EncodedContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Extensions.html#/s:4XMTP12InvitationV1a">InvitationV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Extensions/PrivateKey.html">PrivateKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Extensions/SealedInvitationHeaderV1.html">SealedInvitationHeaderV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Extensions/Signature.html">Signature</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Extensions/SignedPrivateKey.html">SignedPrivateKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Extensions/SignedPublicKeyBundle.html">SignedPublicKeyBundle</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Protocols/ContentCodec.html">ContentCodec</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Protocols/Notifications_V1_NotificationsClientInterface.html">Notifications_V1_NotificationsClientInterface</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Protocols/SigningKey.html">SigningKey</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Attachment.html">Attachment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/AttachmentCodec.html">AttachmentCodec</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ClientOptions.html">ClientOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ClientOptions/Api.html">– Api</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ConsentListEntry.html">ConsentListEntry</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ConsentListEntry/EntryType.html">– EntryType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ConversationV1.html">ConversationV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs.html#/s:4XMTP23ConversationV1ContainerV">ConversationV1Container</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ConversationV2.html">ConversationV2</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ConversationV2Container.html">ConversationV2Container</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs.html#/s:4XMTP16DecodedCompositeV">DecodedComposite</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/DecodedMessage.html">DecodedMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/DecryptedMessage.html">DecryptedMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/EncryptedEncodedContent.html">EncryptedEncodedContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Notifications_V1_DeleteInstallationRequest.html">Notifications_V1_DeleteInstallationRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Notifications_V1_DeliveryMechanism.html">Notifications_V1_DeliveryMechanism</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Notifications_V1_DeliveryMechanism/OneOf_DeliveryMechanismType.html">– OneOf_DeliveryMechanismType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Notifications_V1_RegisterInstallationRequest.html">Notifications_V1_RegisterInstallationRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Notifications_V1_RegisterInstallationResponse.html">Notifications_V1_RegisterInstallationResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Notifications_V1_SubscribeRequest.html">Notifications_V1_SubscribeRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Notifications_V1_UnsubscribeRequest.html">Notifications_V1_UnsubscribeRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Pagination.html">Pagination</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/PreparedMessage.html">PreparedMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Reaction.html">Reaction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ReactionCodec.html">ReactionCodec</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ReadReceipt.html">ReadReceipt</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ReadReceiptCodec.html">ReadReceiptCodec</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/RemoteAttachment.html">RemoteAttachment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/RemoteAttachment/Scheme.html">– Scheme</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/RemoteAttachmentCodec.html">RemoteAttachmentCodec</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Reply.html">Reply</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/ReplyCodec.html">ReplyCodec</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/SendOptions.html">SendOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/TextCodec.html">TextCodec</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/XMTPPush.html">XMTPPush</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/XMTPPush.html">XMTPPush</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_CreateAuthTokenRequest.html">Xmtp_KeystoreApi_V1_CreateAuthTokenRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_CreateInviteRequest.html">Xmtp_KeystoreApi_V1_CreateInviteRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_CreateInviteResponse.html">Xmtp_KeystoreApi_V1_CreateInviteResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_DecryptResponse.html">Xmtp_KeystoreApi_V1_DecryptResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_DecryptResponse/Response.html">– Response</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_DecryptV1Request.html">Xmtp_KeystoreApi_V1_DecryptV1Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_DecryptV1Request/Request.html">– Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_DecryptV2Request.html">Xmtp_KeystoreApi_V1_DecryptV2Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_DecryptV2Request/Request.html">– Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_EncryptResponse.html">Xmtp_KeystoreApi_V1_EncryptResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_EncryptResponse/Response.html">– Response</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_EncryptV1Request.html">Xmtp_KeystoreApi_V1_EncryptV1Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_EncryptV1Request/Request.html">– Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_EncryptV2Request.html">Xmtp_KeystoreApi_V1_EncryptV2Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_EncryptV2Request/Request.html">– Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_GetConversationsResponse.html">Xmtp_KeystoreApi_V1_GetConversationsResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_GetKeystoreStatusRequest.html">Xmtp_KeystoreApi_V1_GetKeystoreStatusRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_GetKeystoreStatusResponse.html">Xmtp_KeystoreApi_V1_GetKeystoreStatusResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_GetKeystoreStatusResponse/KeystoreStatus.html">– KeystoreStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_GetRefreshJobRequest.html">Xmtp_KeystoreApi_V1_GetRefreshJobRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_GetRefreshJobResponse.html">Xmtp_KeystoreApi_V1_GetRefreshJobResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_InitKeystoreRequest.html">Xmtp_KeystoreApi_V1_InitKeystoreRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_InitKeystoreRequest/OneOf_Bundle.html">– OneOf_Bundle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_InitKeystoreResponse.html">Xmtp_KeystoreApi_V1_InitKeystoreResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_KeystoreError.html">Xmtp_KeystoreApi_V1_KeystoreError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SaveInvitesRequest.html">Xmtp_KeystoreApi_V1_SaveInvitesRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SaveInvitesRequest/Request.html">– Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SaveInvitesResponse.html">Xmtp_KeystoreApi_V1_SaveInvitesResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SaveInvitesResponse/Response.html">– Response</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SaveV1ConversationsRequest.html">Xmtp_KeystoreApi_V1_SaveV1ConversationsRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SaveV1ConversationsResponse.html">Xmtp_KeystoreApi_V1_SaveV1ConversationsResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SetRefeshJobRequest.html">Xmtp_KeystoreApi_V1_SetRefeshJobRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SetRefreshJobResponse.html">Xmtp_KeystoreApi_V1_SetRefreshJobResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SignDigestRequest.html">Xmtp_KeystoreApi_V1_SignDigestRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_SignDigestRequest/OneOf_Signer.html">– OneOf_Signer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_TopicMap.html">Xmtp_KeystoreApi_V1_TopicMap</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_KeystoreApi_V1_TopicMap/TopicData.html">– TopicData</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_AuthData.html">Xmtp_MessageApi_V1_AuthData</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_BatchQueryRequest.html">Xmtp_MessageApi_V1_BatchQueryRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_BatchQueryResponse.html">Xmtp_MessageApi_V1_BatchQueryResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_Cursor.html">Xmtp_MessageApi_V1_Cursor</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_Cursor/OneOf_Cursor.html">– OneOf_Cursor</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_Envelope.html">Xmtp_MessageApi_V1_Envelope</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_IndexCursor.html">Xmtp_MessageApi_V1_IndexCursor</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_PagingInfo.html">Xmtp_MessageApi_V1_PagingInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_PublishRequest.html">Xmtp_MessageApi_V1_PublishRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_PublishResponse.html">Xmtp_MessageApi_V1_PublishResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_QueryRequest.html">Xmtp_MessageApi_V1_QueryRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_QueryResponse.html">Xmtp_MessageApi_V1_QueryResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_SubscribeAllRequest.html">Xmtp_MessageApi_V1_SubscribeAllRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_SubscribeRequest.html">Xmtp_MessageApi_V1_SubscribeRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageApi_V1_Token.html">Xmtp_MessageApi_V1_Token</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Ciphertext.html">Xmtp_MessageContents_Ciphertext</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Ciphertext/OneOf_Union.html">– OneOf_Union</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Ciphertext/Aes256gcmHkdfsha256.html">– Aes256gcmHkdfsha256</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Composite.html">Xmtp_MessageContents_Composite</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Composite/Part.html">– Part</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_ContactBundle.html">Xmtp_MessageContents_ContactBundle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_ContactBundle/OneOf_Version.html">– OneOf_Version</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_ContactBundleV1.html">Xmtp_MessageContents_ContactBundleV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_ContactBundleV2.html">Xmtp_MessageContents_ContactBundleV2</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_ContentTypeId.html">Xmtp_MessageContents_ContentTypeId</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_ConversationReference.html">Xmtp_MessageContents_ConversationReference</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_DecodedMessage.html">Xmtp_MessageContents_DecodedMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_EciesMessage.html">Xmtp_MessageContents_EciesMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_EciesMessage/OneOf_Version.html">– OneOf_Version</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_EncodedContent.html">Xmtp_MessageContents_EncodedContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_EncryptedPrivateKeyBundle.html">Xmtp_MessageContents_EncryptedPrivateKeyBundle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_EncryptedPrivateKeyBundle/OneOf_Version.html">– OneOf_Version</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_EncryptedPrivateKeyBundleV1.html">Xmtp_MessageContents_EncryptedPrivateKeyBundleV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_InvitationV1.html">Xmtp_MessageContents_InvitationV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_InvitationV1/OneOf_Encryption.html">– OneOf_Encryption</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_InvitationV1/Aes256gcmHkdfsha256.html">– Aes256gcmHkdfsha256</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_InvitationV1/Context.html">– Context</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Message.html">Xmtp_MessageContents_Message</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Message/OneOf_Version.html">– OneOf_Version</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_MessageHeaderV1.html">Xmtp_MessageContents_MessageHeaderV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_MessageHeaderV2.html">Xmtp_MessageContents_MessageHeaderV2</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_MessageV1.html">Xmtp_MessageContents_MessageV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_MessageV2.html">Xmtp_MessageContents_MessageV2</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivateKey.html">Xmtp_MessageContents_PrivateKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivateKey/OneOf_Union.html">– OneOf_Union</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivateKey/Secp256k1.html">– Secp256k1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivateKeyBundle.html">Xmtp_MessageContents_PrivateKeyBundle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivateKeyBundle/OneOf_Version.html">– OneOf_Version</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivateKeyBundleV1.html">Xmtp_MessageContents_PrivateKeyBundleV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivateKeyBundleV2.html">Xmtp_MessageContents_PrivateKeyBundleV2</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivatePreferencesAction.html">Xmtp_MessageContents_PrivatePreferencesAction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivatePreferencesAction/OneOf_MessageType.html">– OneOf_MessageType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivatePreferencesAction/Allow.html">– Allow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PrivatePreferencesAction/Block.html">– Block</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PublicKey.html">Xmtp_MessageContents_PublicKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PublicKey/OneOf_Union.html">– OneOf_Union</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PublicKey/Secp256k1Uncompressed.html">– Secp256k1Uncompressed</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_PublicKeyBundle.html">Xmtp_MessageContents_PublicKeyBundle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SealedInvitation.html">Xmtp_MessageContents_SealedInvitation</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SealedInvitation/OneOf_Version.html">– OneOf_Version</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SealedInvitationHeaderV1.html">Xmtp_MessageContents_SealedInvitationHeaderV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SealedInvitationV1.html">Xmtp_MessageContents_SealedInvitationV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Signature.html">Xmtp_MessageContents_Signature</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Signature/OneOf_Union.html">– OneOf_Union</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Signature/ECDSACompact.html">– ECDSACompact</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_Signature/WalletECDSACompact.html">– WalletECDSACompact</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SignedContent.html">Xmtp_MessageContents_SignedContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SignedEciesCiphertext.html">Xmtp_MessageContents_SignedEciesCiphertext</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SignedEciesCiphertext/Ecies.html">– Ecies</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SignedPayload.html">Xmtp_MessageContents_SignedPayload</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SignedPrivateKey.html">Xmtp_MessageContents_SignedPrivateKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SignedPrivateKey/OneOf_Union.html">– OneOf_Union</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SignedPrivateKey/Secp256k1.html">– Secp256k1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SignedPublicKey.html">Xmtp_MessageContents_SignedPublicKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_SignedPublicKeyBundle.html">Xmtp_MessageContents_SignedPublicKeyBundle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_UnsignedPublicKey.html">Xmtp_MessageContents_UnsignedPublicKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_UnsignedPublicKey/OneOf_Union.html">– OneOf_Union</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Structs/Xmtp_MessageContents_UnsignedPublicKey/Secp256k1Uncompressed.html">– Secp256k1Uncompressed</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP17BatchQueryRequesta">BatchQueryRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP18BatchQueryResponsea">BatchQueryResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP10CipherTexta">CipherText</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP13ContentTypeIDa">ContentTypeID</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP6Cursora">Cursor</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP14EncodedContenta">EncodedContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP8Envelopea">Envelope</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP12InvitationV1a">InvitationV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP7Messagea">Message</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP23PagingInfoSortDirectiona">PagingInfoSortDirection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP16PreEventCallbacka">PreEventCallback</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP10PrivateKeya">PrivateKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP16PrivateKeyBundlea">PrivateKeyBundle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP18PrivateKeyBundleV1a">PrivateKeyBundleV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP18PrivateKeyBundleV2a">PrivateKeyBundleV2</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP24PrivatePreferencesActiona">PrivatePreferencesAction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP14PublishRequesta">PublishRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP15PublishResponsea">PublishResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP12QueryRequesta">QueryRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP13QueryResponsea">QueryResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP24SealedInvitationHeaderV1a">SealedInvitationHeaderV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP9Signaturea">Signature</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP16SignedPrivateKeya">SignedPrivateKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP21SignedPublicKeyBundlea">SignedPublicKeyBundle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../../Typealiases.html#/s:4XMTP16SubscribeRequesta">SubscribeRequest</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>Request</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Request</span></code></pre>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt"><a href="../../Structs/Xmtp_KeystoreApi_V1_EncryptV2Request.html">Xmtp_KeystoreApi_V1_EncryptV2Request</a></span><span class="o">.</span><span class="kt">Request</span><span class="p">:</span> <span class="kd">@unchecked</span> <span class="kt">Sendable</span></code></pre>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt"><a href="../../Structs/Xmtp_KeystoreApi_V1_EncryptV2Request.html">Xmtp_KeystoreApi_V1_EncryptV2Request</a></span><span class="o">.</span><span class="kt">Request</span><span class="p">:</span> <span class="kt">SwiftProtobuf</span><span class="o">.</span><span class="kt"><a href="../../Typealiases.html#/s:4XMTP7Messagea">Message</a></span><span class="p">,</span> <span class="kt">SwiftProtobuf</span><span class="o">.</span><span class="n">_MessageImplementationBase</span><span class="p">,</span> <span class="kt">SwiftProtobuf</span><span class="o">.</span><span class="n">_ProtoNameProviding</span></code></pre>
+
+                </div>
+              </div>
+            <p>A single encryption request</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:4XMTP36Xmtp_KeystoreApi_V1_EncryptV2RequestV0H0V7payload10Foundation4DataVvp"></a>
+                    <a name="//apple_ref/swift/Property/payload" class="dashAnchor"></a>
+                    <a class="token" href="#/s:4XMTP36Xmtp_KeystoreApi_V1_EncryptV2RequestV0H0V7payload10Foundation4DataVvp">payload</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">payload</span><span class="p">:</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:4XMTP36Xmtp_KeystoreApi_V1_EncryptV2RequestV0H0V11headerBytes10Foundation4DataVvp"></a>
+                    <a name="//apple_ref/swift/Property/headerBytes" class="dashAnchor"></a>
+                    <a class="token" href="#/s:4XMTP36Xmtp_KeystoreApi_V1_EncryptV2RequestV0H0V11headerBytes10Foundation4DataVvp">headerBytes</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">headerBytes</span><span class="p">:</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:4XMTP36Xmtp_KeystoreApi_V1_EncryptV2RequestV0H0V12contentTopicSSvp"></a>
+                    <a name="//apple_ref/swift/Property/contentTopic" class="dashAnchor"></a>
+                    <a class="token" href="#/s:4XMTP36Xmtp_KeystoreApi_V1_EncryptV2RequestV0H0V12contentTopicSSvp">contentTopic</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">contentTopic</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftProtobuf7MessageP13unknownFieldsAA14UnknownStorageVvp"></a>
+                    <a name="//apple_ref/swift/Property/unknownFields" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftProtobuf7MessageP13unknownFieldsAA14UnknownStorageVvp">unknownFields</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">unknownFields</span><span class="p">:</span> <span class="kt">UnknownStorage</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftProtobuf7MessagePxycfc"></a>
+                    <a name="//apple_ref/swift/Method/init()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftProtobuf7MessagePxycfc">init()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Code%20below%20here%20is%20support%20for%20the%20SwiftProtobuf%20runtime."></a>
+                <a name="//apple_ref/swift/Section/Code below here is support for the SwiftProtobuf runtime." class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Code%20below%20here%20is%20support%20for%20the%20SwiftProtobuf%20runtime."></a>
+                  <h3 class="section-name"><span>Code below here is support for the SwiftProtobuf runtime.</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftProtobuf7MessageP05protoC4NameSSvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/protoMessageName" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftProtobuf7MessageP05protoC4NameSSvpZ">protoMessageName</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">protoMessageName</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftProtobuf19_ProtoNameProvidingP17_protobuf_nameMapAA01_dH0VvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/_protobuf_nameMap" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftProtobuf19_ProtoNameProvidingP17_protobuf_nameMapAA01_dH0VvpZ">_protobuf_nameMap</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">_protobuf_nameMap</span><span class="p">:</span> <span class="kt">SwiftProtobuf</span><span class="o">.</span><span class="n">_NameMap</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftProtobuf7MessageP06decodeC07decoderyqd__z_tKAA7DecoderRd__lF"></a>
+                    <a name="//apple_ref/swift/Method/decodeMessage(decoder:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftProtobuf7MessageP06decodeC07decoderyqd__z_tKAA7DecoderRd__lF">decodeMessage(decoder:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="n">decodeMessage</span><span class="o">&lt;</span><span class="kt">D</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">decoder</span><span class="p">:</span> <span class="k">inout</span> <span class="kt">D</span><span class="p">)</span> <span class="k">throws</span> <span class="k">where</span> <span class="kt">D</span> <span class="p">:</span> <span class="kt">Decoder</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:13SwiftProtobuf7MessageP8traverse7visitoryqd__z_tKAA7VisitorRd__lF"></a>
+                    <a name="//apple_ref/swift/Method/traverse(visitor:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:13SwiftProtobuf7MessageP8traverse7visitoryqd__z_tKAA7VisitorRd__lF">traverse(visitor:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">traverse</span><span class="o">&lt;</span><span class="kt">V</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">visitor</span><span class="p">:</span> <span class="k">inout</span> <span class="kt">V</span><span class="p">)</span> <span class="k">throws</span> <span class="k">where</span> <span class="kt">V</span> <span class="p">:</span> <span class="kt">Visitor</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:SQ2eeoiySbx_xtFZ"></a>
+                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:SQ2eeoiySbx_xtFZ">==(_:<wbr>_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span> <span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="kt"><a href="../../Structs/Xmtp_KeystoreApi_V1_EncryptV2Request.html">Xmtp_KeystoreApi_V1_EncryptV2Request</a></span><span class="o">.</span><span class="kt">Request</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="kt"><a href="../../Structs/Xmtp_KeystoreApi_V1_EncryptV2Request.html">Xmtp_KeystoreApi_V1_EncryptV2Request</a></span><span class="o">.</span><span class="kt">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2023 <a class="link" href="https://github.com/xmtp/xmtp-ios" target="_blank" rel="external noopener">Pat Nakajima</a>. All rights reserved. (Last updated: 2023-12-20)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>
