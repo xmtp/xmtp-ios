@@ -28,6 +28,7 @@ jobs:
           swift package reset
           swift package resolve
   deploy:
+    needs: update-package
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
