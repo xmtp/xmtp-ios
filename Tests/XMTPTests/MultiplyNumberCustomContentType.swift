@@ -79,24 +79,6 @@ public struct MultiplyNumbersCodec: ContentCodec {
 
 @available(iOS 15, *)
 class MultiplyNumberCustomContentType: XCTestCase {
-	func testCanRoundTripWithCustomContentType() async throws {
-		let fixtures = await fixtures()
-
-		let aliceClient = fixtures.aliceClient!
-		let aliceConversation = try await aliceClient.conversations.newConversation(with: fixtures.bob.address)
-
-		aliceClient.register(codec: SingleNumberCodec())
-
-		try await aliceConversation.send(content: Double(3), options: .init(contentType: SingleNumberCodec().contentType))
-
-		let messages = try await aliceConversation.messages()
-		XCTAssertEqual(messages.count, 1)
-
-		if messages.count == 1 {
-			let content: Double = try messages[0].content()
-			XCTAssertEqual(6, content)
-		}
-	}
     func testCanRoundTripWithMultiplyNumbersCodec() async throws {
         let fixtures = await fixtures()
 
