@@ -9,34 +9,6 @@ import XCTest
 @testable import XMTP
 
 
-public struct SingleNumberCodec: ContentCodec {
-	
-    
-	public typealias T = Double
-
-	public var contentType: ContentTypeID {
-		ContentTypeID(authorityID: "example.com", typeID: "number", versionMajor: 1, versionMinor: 1)
-	}
-
-	public func encode(content: Double, client _: Client) throws -> EncodedContent {
-		var encodedContent = EncodedContent()
-
-		encodedContent.type = ContentTypeID(authorityID: "example.com", typeID: "number", versionMajor: 1, versionMinor: 1)
-		encodedContent.content = try JSONEncoder().encode(content)
-
-		return encodedContent
-	}
-
-	public func decode(content: EncodedContent, client _: Client) throws -> Double {
-		let decoded = try JSONDecoder().decode(Double.self, from: content.content)
-		return decoded * 2
-	}
-    public func fallback(content: Double) throws -> String? {
-		return "SingleNumberCodec is not supported"
-	}
-}
-
-
 public struct MultiplyNumbers {
     public var num1: Double
     public var num2: Double
@@ -49,7 +21,7 @@ public struct MultiplyNumbers {
     }
 }
 
-public struct MultiplyNumbersCodec: ContentCodec {
+public struct ContentTypeMultiplyNumberCodec: ContentCodec {
 	public typealias T = MultiplyNumbers
 
 	public var contentType: ContentTypeID {
@@ -73,22 +45,22 @@ public struct MultiplyNumbersCodec: ContentCodec {
     }
     
     public func fallback(content: MultiplyNumbers) throws -> String? {
-		return "MultiplyNumbersCodec is not supported"
+		return "ContentTypeMultiplyNumberCodec is not supported"
 	}
 }
 
 @available(iOS 15, *)
 class MultiplyNumberCustomContentType: XCTestCase {
-    func testCanRoundTripWithMultiplyNumbersCodec() async throws {
+    func testCanRoundTripWithContentTypeMultiplyNumberCodec() async throws {
         let fixtures = await fixtures()
 
         let aliceClient = fixtures.aliceClient!
         let aliceConversation = try await aliceClient.conversations.newConversation(with: fixtures.bob.address)
 
-        aliceClient.register(codec: MultiplyNumbersCodec())
+        aliceClient.register(codec: ContentTypeMultiplyNumberCodec())
 
         let multiplyNumbers = MultiplyNumbers(num1: 3, num2: 2)
-        try await aliceConversation.send(content: multiplyNumbers, options: .init(contentType: MultiplyNumbersCodec().contentType))
+        try await aliceConversation.send(content: multiplyNumbers, options: .init(contentType: ContentTypeMultiplyNumberCodec().contentType))
 
         let messages = try await aliceConversation.messages()
         XCTAssertEqual(messages.count, 1)
