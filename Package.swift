@@ -9,8 +9,8 @@ let package = Package(
 	products: [
 		// Products define the executables and libraries a package produces, and make them visible to other packages.
 		.library(
-			name: "XMTP",
-			targets: ["XMTP"]
+			name: "XMTPiOS",
+			targets: ["XMTPiOS"]
 		),
 		.library(
 			name: "XMTPTestHelpers",
@@ -32,7 +32,7 @@ let package = Package(
 		// Targets are the basic building blocks of a package. A target can define a module or a test suite.
 		// Targets can depend on other targets in this package, and on products in packages this package depends on.
 		.target(
-			name: "XMTP",
+			name: "XMTPiOS",
 			dependencies: [
 				.product(name: "secp256k1", package: "secp256k1.swift"),
 				"web3.swift",
@@ -43,11 +43,11 @@ let package = Package(
 		),
 		.target(
 			name: "XMTPTestHelpers",
-			dependencies: ["XMTP"]
+			dependencies: ["XMTPiOS"]
 		),
 		.testTarget(
 			name: "XMTPTests",
-			dependencies: ["XMTP", "XMTPTestHelpers"]
+			dependencies: ["XMTPiOS", "XMTPTestHelpers"]
 		),
 	]
 )
