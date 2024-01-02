@@ -8,7 +8,7 @@
 import Foundation
 
 import XCTest
-@testable import XMTP
+@testable import XMTPiOS
 import XMTPRust
 import XMTPTestHelpers
 

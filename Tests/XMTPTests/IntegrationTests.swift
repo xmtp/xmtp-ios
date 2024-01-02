@@ -10,7 +10,7 @@ import secp256k1
 import web3
 import XCTest
 import XMTPRust
-@testable import XMTP
+@testable import XMTPiOS
 import XMTPRust
 import XMTPTestHelpers
 

@@ -8,7 +8,7 @@
 #if canImport(XCTest)
 import Combine
 import XCTest
-@testable import XMTP
+@testable import XMTPiOS
 import XMTPRust
 
 public struct TestConfig {
