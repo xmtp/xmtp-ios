@@ -9,7 +9,7 @@
 import Combine
 import XCTest
 @testable import XMTPiOS
-import XMTPRust
+import LibXMTP
 
 public struct TestConfig {
     static let TEST_SERVER_ENABLED = _env("TEST_SERVER_ENABLED") == "true"
@@ -137,7 +137,7 @@ public class FakeApiClient: ApiClient {
 
 	// MARK: ApiClient conformance
 
-	public required init(environment: XMTP.XMTPEnvironment, secure _: Bool, rustClient _: XMTPRust.RustClient, appVersion: String?) throws {
+	public required init(environment: XMTP.XMTPEnvironment, secure _: Bool, rustClient _: LibXMTP.RustClient, appVersion: String?) throws {
 		self.environment = environment
         self.appVersion = appVersion ?? "0.0.0"
 	}

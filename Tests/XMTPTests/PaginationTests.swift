@@ -9,7 +9,7 @@ import Foundation
 
 import XCTest
 @testable import XMTPiOS
-import XMTPRust
+import LibXMTP
 import XMTPTestHelpers
 
 @available(iOS 15, *)

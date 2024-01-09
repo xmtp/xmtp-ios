@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import XMTPRust
+import LibXMTP
 
 
 public typealias PrivatePreferencesAction = Xmtp_MessageContents_PrivatePreferencesAction
@@ -50,7 +50,7 @@ public class ConsentList {
         self.privateKey = client.privateKeyBundleV1.identityKey.secp256K1.bytes
         self.publicKey = client.privateKeyBundleV1.identityKey.publicKey.secp256K1Uncompressed.bytes
         // swiftlint:disable no_optional_try
-        self.identifier = try? XMTPRust.generate_private_preferences_topic_identifier(RustVec(privateKey)).toString()
+        self.identifier = try? LibXMTP.generate_private_preferences_topic_identifier(privateKey).toString()
         // swiftlint:enable no_optional_try
     }
 
@@ -68,10 +68,10 @@ public class ConsentList {
 		for envelope in envelopes.envelopes {
 
 
-			let payload = try XMTPRust.user_preferences_decrypt(
-				RustVec(publicKey),
-				RustVec(privateKey),
-				RustVec(envelope.message)
+			let payload = try LibXMTP.user_preferences_decrypt(
+				publicKey,
+				privateKey,
+				envelope.message
 			)
 
             preferences.append(try PrivatePreferencesAction(serializedData: Data(payload)))
@@ -104,10 +104,10 @@ public class ConsentList {
             payload.messageType = nil
         }
 
-		let message = try XMTPRust.user_preferences_encrypt(
-			RustVec(publicKey),
-			RustVec(privateKey),
-            RustVec(payload.serializedData())
+		let message = try LibXMTP.user_preferences_encrypt(
+			publicKey,
+			privateKey,
+			payload.serializedData()
 		)
 
 		let envelope = Envelope(

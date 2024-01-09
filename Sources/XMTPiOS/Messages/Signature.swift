@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import XMTPRust
+import LibXMTP
 
 /// Represents a secp256k1 compact recoverable signature.
 public typealias Signature = Xmtp_MessageContents_Signature
@@ -103,7 +103,7 @@ extension Signature {
 
 	func verify(signedBy: PublicKey, digest: Data) throws -> Bool {
 		do {
-			let _ = try XMTPRust.verify_k256_sha256(RustVec<UInt8>(signedBy.secp256K1Uncompressed.bytes), RustVec<UInt8>(digest), RustVec<UInt8>(ecdsaCompact.bytes), UInt8(ecdsaCompact.recovery))
+			let _ = try LibXMTP.verify_k256_sha256(signedBy.secp256K1Uncompressed.bytes, digest, ecdsaCompact.bytes, UInt8(ecdsaCompact.recovery))
 		} catch {
 			return false
 		}

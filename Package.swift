@@ -26,7 +26,7 @@ let package = Package(
 		.package(url: "https://github.com/1024jp/GzipSwift", from: "5.2.0"),
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "0.3.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.0.0"),
-		.package(url: "https://github.com/xmtp/xmtp-rust-swift", branch: "main"),
+		.package(url: "https://github.com/xmtp/libxmtp-swift", branch: "main"),
 	],
 	targets: [
 		// Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -38,7 +38,7 @@ let package = Package(
 				"web3.swift",
 				.product(name: "Gzip", package: "GzipSwift"),
 				.product(name: "Connect", package: "connect-swift"),
-				.product(name: "XMTPRust", package: "xmtp-rust-swift"),
+				.product(name: "LibXMTP", package: "libxmtp-swift"),
 			]
 		),
 		.target(
