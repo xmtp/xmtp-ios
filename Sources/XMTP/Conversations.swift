@@ -263,12 +263,6 @@ public actor Conversations {
 		return .v1(conversationV1)
 	}
 
-//	private func findExistingConversation(with peerAddress: String, conversationID: String?) -> Conversation? {
-//		return conversationsByTopic.first(where: { $0.value.peerAddress == peerAddress &&
-//				(($0.value.conversationID ?? "") == (conversationID ?? ""))
-//		})?.value
-//	}
-
 	public func newConversation(with peerAddress: String, context: InvitationV1.Context? = nil) async throws -> Conversation {
 		if peerAddress.lowercased() == client.address.lowercased() {
 			throw ConversationError.recipientIsSender
