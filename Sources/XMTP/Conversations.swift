@@ -4,10 +4,70 @@ public enum ConversationError: Error {
 	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String)
 }
 
+public extension Sequence {
+	func asyncCompactMap<T>(
+		_ transform: (Element) async throws -> T?
+	) async rethrows -> [T] {
+		var values = [T]()
+
+		for element in self {
+			guard let value = try await transform(element) else {
+				continue
+			}
+
+			values.append(value)
+		}
+
+		return values
+	}
+	func asyncFlatMap<T: Sequence>(
+		_ transform: (Element) async throws -> T
+	) async rethrows -> [T.Element] {
+		var values = [T.Element]()
+
+		for element in self {
+			try await values.append(contentsOf: transform(element))
+		}
+
+		return values
+	}
+}
+
+actor ConversationActor {
+	static let shared = ConversationActor()
+	private init() {}
+	var conversationsByTopic: [String: Conversation] = [:]
+	
+	func set(_ key: String, _ object: Conversation) {
+		conversationsByTopic[key] = object
+	}
+	
+	func get(_ key: String) -> Conversation? {
+		conversationsByTopic[key]
+	}
+	
+	func findExistingConversation(with peerAddress: String, conversationID: String?) -> Conversation? {
+		return conversationsByTopic.first(where: { $0.value.peerAddress == peerAddress &&
+				(($0.value.conversationID ?? "") == (conversationID ?? ""))
+		})?.value
+	}
+	
+	func getConversationsSorted() -> [Conversation] {
+		conversationsByTopic.values.sorted { a, b in
+			a.createdAt < b.createdAt
+		}
+	}
+	
+	func getMostRecent() -> Conversation? {
+		conversationsByTopic.values.max { a, b in
+			a.createdAt < b.createdAt
+		}
+	}
+}
+
 /// Handles listing and creating Conversations.
 public actor Conversations {
 	var client: Client
-	var conversationsByTopic: [String: Conversation] = [:]
 
 	init(client: Client) {
 		self.client = client
@@ -29,7 +89,9 @@ public actor Conversations {
 				client: client
 			))
 		}
-		conversationsByTopic[conversation.topic] = conversation
+		Task {
+			await ConversationActor.shared.set(conversation.topic, conversation)
+		}
 		return conversation
 	}
 
@@ -45,9 +107,9 @@ public actor Conversations {
 		// TODO: consider using a task group here for parallel batch calls
 		for batch in batches {
 			messages += try await client.apiClient.batchQuery(request: batch)
-				.responses.flatMap { res in
-					res.envelopes.compactMap { envelope in
-						let conversation = conversationsByTopic[envelope.contentTopic]
+				.responses.asyncFlatMap { res in
+					await res.envelopes.asyncCompactMap { envelope in
+						let conversation = await ConversationActor.shared.get(envelope.contentTopic)
 						if conversation == nil {
 							print("discarding message, unknown conversation \(envelope)")
 							return nil
@@ -76,9 +138,9 @@ public actor Conversations {
 		// TODO: consider using a task group here for parallel batch calls
 		for batch in batches {
 			messages += try await client.apiClient.batchQuery(request: batch)
-				.responses.flatMap { res in
-					res.envelopes.compactMap { envelope in
-						let conversation = conversationsByTopic[envelope.contentTopic]
+				.responses.asyncFlatMap { res in
+					await res.envelopes.asyncCompactMap { envelope in
+						let conversation = await ConversationActor.shared.get(envelope.contentTopic)
 						if conversation == nil {
 							print("discarding message, unknown conversation \(envelope)")
 							return nil
@@ -110,16 +172,20 @@ public actor Conversations {
 
 					do {
 						for try await envelope in client.subscribe(topics: topics) {
-							if let conversation = conversationsByTopic[envelope.contentTopic] {
+							if let conversation = await ConversationActor.shared.get(envelope.contentTopic) {
 								let decoded = try conversation.decode(envelope)
 								continuation.yield(decoded)
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
 								let conversation = try fromInvite(envelope: envelope)
-								conversationsByTopic[conversation.topic] = conversation
+								Task {
+									await ConversationActor.shared.set(conversation.topic, conversation)
+								}
 								break // Break so we can resubscribe with the new conversation
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
 								let conversation = try fromIntro(envelope: envelope)
-								conversationsByTopic[conversation.topic] = conversation
+								Task {
+									await ConversationActor.shared.set(conversation.topic, conversation)
+								}
 								let decoded = try conversation.decode(envelope)
 								continuation.yield(decoded)
 								break // Break so we can resubscribe with the new conversation
@@ -150,16 +216,20 @@ public actor Conversations {
 
 					do {
 						for try await envelope in client.subscribe(topics: topics) {
-							if let conversation = conversationsByTopic[envelope.contentTopic] {
+							if let conversation = await ConversationActor.shared.get(envelope.contentTopic) {
 								let decoded = try conversation.decrypt(envelope)
 								continuation.yield(decoded)
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
 								let conversation = try fromInvite(envelope: envelope)
-								conversationsByTopic[conversation.topic] = conversation
+								Task {
+									await ConversationActor.shared.set(conversation.topic, conversation)
+								}
 								break // Break so we can resubscribe with the new conversation
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
 								let conversation = try fromIntro(envelope: envelope)
-								conversationsByTopic[conversation.topic] = conversation
+								Task {
+									await ConversationActor.shared.set(conversation.topic, conversation)
+								}
 								let decoded = try conversation.decrypt(envelope)
 								continuation.yield(decoded)
 								break // Break so we can resubscribe with the new conversation
@@ -193,18 +263,18 @@ public actor Conversations {
 		return .v1(conversationV1)
 	}
 
-	private func findExistingConversation(with peerAddress: String, conversationID: String?) -> Conversation? {
-		return conversationsByTopic.first(where: { $0.value.peerAddress == peerAddress &&
-				(($0.value.conversationID ?? "") == (conversationID ?? ""))
-		})?.value
-	}
+//	private func findExistingConversation(with peerAddress: String, conversationID: String?) -> Conversation? {
+//		return conversationsByTopic.first(where: { $0.value.peerAddress == peerAddress &&
+//				(($0.value.conversationID ?? "") == (conversationID ?? ""))
+//		})?.value
+//	}
 
 	public func newConversation(with peerAddress: String, context: InvitationV1.Context? = nil) async throws -> Conversation {
 		if peerAddress.lowercased() == client.address.lowercased() {
 			throw ConversationError.recipientIsSender
 		}
 		print("\(client.address) starting conversation with \(peerAddress)")
-		if let existing = findExistingConversation(with: peerAddress, conversationID: context?.conversationID) {
+		if let existing = await ConversationActor.shared.findExistingConversation(with: peerAddress, conversationID: context?.conversationID) {
 			return existing
 		}
 
@@ -213,7 +283,7 @@ public actor Conversations {
 		}
 
 		_ = try await list() // cache old conversations and check again
-		if let existing = findExistingConversation(with: peerAddress, conversationID: context?.conversationID) {
+		if let existing = await ConversationActor.shared.findExistingConversation(with: peerAddress, conversationID: context?.conversationID) {
 			return existing
 		}
 
@@ -230,7 +300,9 @@ public actor Conversations {
 		try await client.contacts.allow(addresses: [peerAddress])
 
 		let conversation: Conversation = .v2(conversationV2)
-		conversationsByTopic[conversation.topic] = conversation
+		Task {
+			await ConversationActor.shared.set(conversation.topic, conversation)
+		}
 		return conversation
 	}
 
@@ -274,46 +346,48 @@ public actor Conversations {
 	}
 
 	public func list() async throws -> [Conversation] {
-		var newConversations: [Conversation] = []
-		let mostRecent = conversationsByTopic.values.max { a, b in
-			a.createdAt < b.createdAt
-		}
-		let pagination = Pagination(after: mostRecent?.createdAt)
-		do {
-			let seenPeers = try await listIntroductionPeers(pagination: pagination)
-			for (peerAddress, sentAt) in seenPeers {
-				newConversations.append(
-					Conversation.v1(
-						ConversationV1(
-							client: client,
-							peerAddress: peerAddress,
-							sentAt: sentAt
+		Task {
+			var newConversations: [Conversation] = []
+			let mostRecent = await ConversationActor.shared.getMostRecent()
+			let pagination = Pagination(after: mostRecent?.createdAt)
+			do {
+				let seenPeers = try await listIntroductionPeers(pagination: pagination)
+				for (peerAddress, sentAt) in seenPeers {
+					newConversations.append(
+						Conversation.v1(
+							ConversationV1(
+								client: client,
+								peerAddress: peerAddress,
+								sentAt: sentAt
+							)
 						)
 					)
-				)
-			}
-		} catch {
-			print("Error loading introduction peers: \(error)")
-		}
-
-		for sealedInvitation in try await listInvitations(pagination: pagination) {
-			do {
-				try newConversations.append(
-					Conversation.v2(makeConversation(from: sealedInvitation))
-				)
+				}
+				
 			} catch {
-				print("Error loading invitations: \(error)")
+				print("Error loading introduction peers: \(error)")
 			}
+			for sealedInvitation in try await listInvitations(pagination: pagination) {
+				do {
+					try newConversations.append(
+							Conversation.v2(makeConversation(from:sealedInvitation))
+					)
+				} catch {
+					print("Error loading invitations: \(error)")
+				}
+			}
+			
+			newConversations
+				.filter { $0.peerAddress != client.address && Topic.isValidTopic(topic: $0.topic) }
+				.forEach { conversation in
+					Task {
+						await ConversationActor.shared.set(conversation.topic, conversation)
+					}
+				}
+			// TODO(perf): use DB to persist + sort
 		}
-
-		newConversations
-			.filter { $0.peerAddress != client.address && Topic.isValidTopic(topic: $0.topic) }
-			.forEach { conversationsByTopic[$0.topic] = $0 }
-
-		// TODO(perf): use DB to persist + sort
-		return conversationsByTopic.values.sorted { a, b in
-			a.createdAt < b.createdAt
-		}
+		return await ConversationActor.shared.getConversationsSorted()
+		
 	}
 
 	private func listIntroductionPeers(pagination: Pagination?) async throws -> [String: Date] {
