@@ -340,7 +340,6 @@ public actor Conversations {
 	}
 
 	public func list() async throws -> [Conversation] {
-		Task {
 			var newConversations: [Conversation] = []
 			let mostRecent = await ConversationActor.shared.getMostRecent()
 			let pagination = Pagination(after: mostRecent?.createdAt)
@@ -379,7 +378,6 @@ public actor Conversations {
 					}
 				}
 			// TODO(perf): use DB to persist + sort
-		}
 		return await ConversationActor.shared.getConversationsSorted()
 		
 	}
