@@ -340,46 +340,45 @@ public actor Conversations {
 	}
 
 	public func list() async throws -> [Conversation] {
-			var newConversations: [Conversation] = []
-			let mostRecent = await ConversationActor.shared.getMostRecent()
-			let pagination = Pagination(after: mostRecent?.createdAt)
-			do {
-				let seenPeers = try await listIntroductionPeers(pagination: pagination)
-				for (peerAddress, sentAt) in seenPeers {
-					newConversations.append(
-						Conversation.v1(
-							ConversationV1(
-								client: client,
-								peerAddress: peerAddress,
-								sentAt: sentAt
-							)
+		var newConversations: [Conversation] = []
+		let mostRecent = await ConversationActor.shared.getMostRecent()
+		let pagination = Pagination(after: mostRecent?.createdAt)
+		do {
+			let seenPeers = try await listIntroductionPeers(pagination: pagination)
+			for (peerAddress, sentAt) in seenPeers {
+				newConversations.append(
+					Conversation.v1(
+						ConversationV1(
+							client: client,
+							peerAddress: peerAddress,
+							sentAt: sentAt
 						)
 					)
-				}
-				
-			} catch {
-				print("Error loading introduction peers: \(error)")
-			}
-			for sealedInvitation in try await listInvitations(pagination: pagination) {
-				do {
-					try newConversations.append(
-							Conversation.v2(makeConversation(from:sealedInvitation))
-					)
-				} catch {
-					print("Error loading invitations: \(error)")
-				}
+				)
 			}
 			
-			newConversations
-				.filter { $0.peerAddress != client.address && Topic.isValidTopic(topic: $0.topic) }
-				.forEach { conversation in
-					Task {
-						await ConversationActor.shared.set(conversation.topic, conversation)
-					}
-				}
-			// TODO(perf): use DB to persist + sort
-		return await ConversationActor.shared.getConversationsSorted()
+		} catch {
+			print("Error loading introduction peers: \(error)")
+		}
+		for sealedInvitation in try await listInvitations(pagination: pagination) {
+			do {
+				try newConversations.append(
+						Conversation.v2(makeConversation(from:sealedInvitation))
+				)
+			} catch {
+				print("Error loading invitations: \(error)")
+			}
+		}
 		
+		newConversations
+			.filter { $0.peerAddress != client.address && Topic.isValidTopic(topic: $0.topic) }
+			.forEach { conversation in
+				Task {
+					await ConversationActor.shared.set(conversation.topic, conversation)
+				}
+			}
+		// TODO(perf): use DB to persist + sort
+		return await ConversationActor.shared.getConversationsSorted()
 	}
 
 	private func listIntroductionPeers(pagination: Pagination?) async throws -> [String: Date] {
