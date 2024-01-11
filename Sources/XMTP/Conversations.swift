@@ -356,20 +356,20 @@ public actor Conversations {
 					)
 				)
 			}
-			
 		} catch {
 			print("Error loading introduction peers: \(error)")
 		}
+
 		for sealedInvitation in try await listInvitations(pagination: pagination) {
 			do {
 				try newConversations.append(
-						Conversation.v2(makeConversation(from:sealedInvitation))
+					Conversation.v2(makeConversation(from: sealedInvitation))
 				)
 			} catch {
 				print("Error loading invitations: \(error)")
 			}
 		}
-		
+
 		newConversations
 			.filter { $0.peerAddress != client.address && Topic.isValidTopic(topic: $0.topic) }
 			.forEach { conversation in
