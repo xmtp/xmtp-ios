@@ -20,7 +20,7 @@ public struct ConversationV2Container: Codable {
 
 	public func decode(with client: Client) -> ConversationV2 {
 		let context = InvitationV1.Context(conversationID: conversationID ?? "", metadata: metadata)
-		return ConversationV2(topic: topic, keyMaterial: keyMaterial, context: context, peerAddress: peerAddress, client: client, header: header, createdAt: createdAt ?? 0)
+		return ConversationV2(topic: topic, keyMaterial: keyMaterial, context: context, peerAddress: peerAddress, client: client, createdAt: createdAt ?? 0, header: header)
 	}
 }
 
@@ -48,8 +48,8 @@ public struct ConversationV2 {
 			context: invitation.context,
 			peerAddress: peerAddress,
 			client: client,
-			header: header,
-			createdAt: header.createdNs
+			createdAt: header.createdNs,
+			header: header
 		)
 	}
 
@@ -63,14 +63,14 @@ public struct ConversationV2 {
 		header = SealedInvitationHeaderV1()
 	}
 
-	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, header: SealedInvitationHeaderV1, createdAt: UInt64? = nil) {
+	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, createdAt: UInt64? = nil, header: SealedInvitationHeaderV1) {
 		self.topic = topic
 		self.keyMaterial = keyMaterial
 		self.context = context
 		self.peerAddress = peerAddress
 		self.client = client
-		self.header = header
 		self.createdAt = createdAt
+		self.header = header
 	}
 
 	public var encodedContainer: ConversationV2Container {
