@@ -15,11 +15,12 @@ public struct ConversationV2Container: Codable {
 	var conversationID: String?
 	var metadata: [String: String] = [:]
 	var peerAddress: String
+	var createdAt: UInt64?
 	var header: SealedInvitationHeaderV1
 
 	public func decode(with client: Client) -> ConversationV2 {
 		let context = InvitationV1.Context(conversationID: conversationID ?? "", metadata: metadata)
-		return ConversationV2(topic: topic, keyMaterial: keyMaterial, context: context, peerAddress: peerAddress, client: client, header: header)
+		return ConversationV2(topic: topic, keyMaterial: keyMaterial, context: context, peerAddress: peerAddress, client: client, header: header, createdAt: createdAt ?? 0)
 	}
 }
 
@@ -30,6 +31,7 @@ public struct ConversationV2 {
 	public var context: InvitationV1.Context
 	public var peerAddress: String
 	public var client: Client
+	public var createdAt: UInt64?
 	private var header: SealedInvitationHeaderV1
 
 	static func create(client: Client, invitation: InvitationV1, header: SealedInvitationHeaderV1) throws -> ConversationV2 {
@@ -46,30 +48,33 @@ public struct ConversationV2 {
 			context: invitation.context,
 			peerAddress: peerAddress,
 			client: client,
-			header: header
+			header: header,
+			createdAt: header.createdNs
 		)
 	}
 
-	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client) {
+	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, createdAt: UInt64? = nil) {
 		self.topic = topic
 		self.keyMaterial = keyMaterial
 		self.context = context
 		self.peerAddress = peerAddress
 		self.client = client
+		self.createdAt = createdAt
 		header = SealedInvitationHeaderV1()
 	}
 
-	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, header: SealedInvitationHeaderV1) {
+	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, header: SealedInvitationHeaderV1, createdAt: UInt64? = nil) {
 		self.topic = topic
 		self.keyMaterial = keyMaterial
 		self.context = context
 		self.peerAddress = peerAddress
 		self.client = client
 		self.header = header
+		self.createdAt = createdAt
 	}
 
 	public var encodedContainer: ConversationV2Container {
-		ConversationV2Container(topic: topic, keyMaterial: keyMaterial, conversationID: context.conversationID, metadata: context.metadata, peerAddress: peerAddress, header: header)
+		ConversationV2Container(topic: topic, keyMaterial: keyMaterial, conversationID: context.conversationID, metadata: context.metadata, peerAddress: peerAddress, createdAt: createdAt, header: header)
 	}
 
 	func prepareMessage(encodedContent: EncodedContent, options: SendOptions?) async throws -> PreparedMessage {
@@ -188,8 +193,8 @@ public struct ConversationV2 {
 		}
 	}
 
-	public var createdAt: Date {
-		Date(timeIntervalSince1970: Double(header.createdNs / 1_000_000) / 1000)
+	public var conversationCreatedAt: Date {
+		Date(timeIntervalSince1970: Double((createdAt ?? 0) / 1_000_000) / 1000)
 	}
 
 	public func decode(envelope: Envelope) throws -> DecodedMessage {

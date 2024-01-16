@@ -122,4 +122,39 @@ class ConversationsTests: XCTestCase {
         XCTAssertFalse(Topic.isValidTopic(topic: directMessageV2))
         XCTAssertFalse(Topic.isValidTopic(topic: preferenceList))
     }
+	
+	func testLoadConvos() async throws {
+		// Data from hex: 0836200ffafa17a3cb8b54f22d6afa60b13da48726543241adc5c250dbb0e0cd
+		// aka 2k many convo test wallet
+		let privateKeyData = Data([8,54,32,15,250,250,23,163,203,139,84,242,45,106,250,96,177,61,164,135,38,84,50,65,173,197,194,80,219,176,224,205])
+		let privateKey = try PrivateKey(privateKeyData)
+		// Use hardcoded privateKey for testing
+		let options = XMTP.ClientOptions(api: ClientOptions.Api(env: .dev, isSecure: true))
+		let client = try await Client.create(account: privateKey, options: options)
+		
+		let start = Date()
+		let conversations = try await client.conversations.list()
+		let end = Date()
+		print("Loaded \(conversations.count) conversations in \(end.timeIntervalSince(start))s")
+		
+		let start2 = Date()
+		let conversations2 = try await client.conversations.list()
+		let end2 = Date()
+		print("Second time loaded \(conversations2.count) conversations in \(end2.timeIntervalSince(start2))s")
+
+		let first500Topics = try conversations.prefix(500).map { try $0.toTopicData().serializedData() }
+		let client2 = try await Client.create(account: privateKey, options: options)
+		for topic in first500Topics {
+			await client2.conversations.importTopicData(data: try Xmtp_KeystoreApi_V1_TopicMap.TopicData(serializedData: topic))
+		}	
+		let start3 = Date()
+		let conversations3 = try await client2.conversations.list()
+		let end3 = Date()
+		print("Loaded \(conversations3.count) conversations in \(end3.timeIntervalSince(start3))s")
+		
+		let start4 = Date()
+		let conversations4 = try await client2.conversations.list()
+		let end4 = Date()
+		print("Second time loaded \(conversations4.count) conversations in \(end4.timeIntervalSince(start4))s")
+	}
 }
