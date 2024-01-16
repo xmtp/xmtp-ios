@@ -26,7 +26,7 @@ public enum ApiClientError: Error {
 
 protocol ApiClient: Sendable {
 	var environment: XMTPEnvironment { get }
-    init(environment: XMTPEnvironment, secure: Bool, rustClient: LibXMTP.RustClient, appVersion: String?) throws
+    init(environment: XMTPEnvironment, secure: Bool, rustClient: LibXMTP.FfiV2Client, appVersion: String?) throws
 	func setAuthToken(_ token: String)
     func batchQuery(request: BatchQueryRequest) async throws -> BatchQueryResponse
 	func query(topic: String, pagination: Pagination?, cursor: Xmtp_MessageApi_V1_Cursor?) async throws -> QueryResponse
@@ -65,13 +65,13 @@ class GRPCApiClient: ApiClient {
 	var environment: XMTPEnvironment
 	var authToken = ""
 
-	var rustClient: LibXMTP.RustClient
+	var rustClient: LibXMTP.FfiV2Client
 
-    required init(environment: XMTPEnvironment, secure _: Bool = true, rustClient: LibXMTP.RustClient, appVersion: String? = nil) throws {
+    required init(environment: XMTPEnvironment, secure _: Bool = true, rustClient: LibXMTP.FfiV2Client, appVersion: String? = nil) throws {
 		self.environment = environment
 		self.rustClient = rustClient
         if let appVersion = appVersion {
-            rustClient.set_app_version(appVersion.intoRustString())
+					rustClient.setAppVersion(version: appVersion)
         }
 	}
 
@@ -89,21 +89,17 @@ class GRPCApiClient: ApiClient {
 
     func batchQuery(request: BatchQueryRequest) async throws -> BatchQueryResponse {
         do {
-            let req = try request.serializedData()
-            let res = try await rustClient.batch_query(req)
-            return try BatchQueryResponse(serializedData: Data(res))
-        } catch let error as RustString {
-            throw ApiClientError.batchQueryError(error.toString())
+					return try await rustClient.batchQuery(req: request.toFFI).fromFFI
+        } catch {
+					throw ApiClientError.batchQueryError(error.localizedDescription)
         }
     }
 
     func query(request: QueryRequest) async throws -> QueryResponse {
         do {
-            let req = try request.serializedData()
-            let res = try await rustClient.query(req)
-            return try QueryResponse(serializedData: Data(res))
-        } catch let error as RustString {
-            throw ApiClientError.queryError(error.toString())
+					return try await rustClient.query(request: request.toFFI).fromFFI
+        } catch {
+					throw ApiClientError.queryError(error.localizedDescription)
         }
     }
 
@@ -143,19 +139,20 @@ class GRPCApiClient: ApiClient {
                 let request = SubscribeRequest.with { $0.contentTopics = topics }
                 let req = try request.serializedData()
                 do {
-                    let subscription = try await self.rustClient.subscribe(req)
-                    // Run a continuous for loop polling and sleeping for a bit each loop.
-                    while true {
-                        let buf = try subscription.get_envelopes_as_query_response()
-                        // Note: it uses QueryResponse as a convenient envelopes wrapper.
-                        let res = try QueryResponse(serializedData: Data(buf))
-                        for envelope in res.envelopes {
-                            continuation.yield(envelope)
-                        }
-                        try await Task.sleep(nanoseconds: 50_000_000) // 50ms
-                    }
-                } catch let error as RustString {
-                    throw ApiClientError.subscribeError(error.toString())
+									// TODO: FIXME
+//                    let subscription = try await self.rustClient.subscribe(req)
+//                    // Run a continuous for loop polling and sleeping for a bit each loop.
+//                    while true {
+//                        let buf = try subscription.get_envelopes_as_query_response()
+//                        // Note: it uses QueryResponse as a convenient envelopes wrapper.
+//                        let res = try QueryResponse(serializedData: Data(buf))
+//                        for envelope in res.envelopes {
+//                            continuation.yield(envelope)
+//                        }
+//                        try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+//                    }
+                } catch {
+                    throw ApiClientError.subscribeError(error.localizedDescription)
                 }
 			}
 		}
@@ -163,11 +160,9 @@ class GRPCApiClient: ApiClient {
 
     func publish(request: PublishRequest) async throws -> PublishResponse {
         do {
-            let req = try request.serializedData()
-            let res = try await rustClient.publish(authToken.intoRustString(), req)
-            return try PublishResponse(serializedData: Data(res))
-        } catch let error as RustString {
-            throw ApiClientError.publishError(error.toString())
+					return try await rustClient.publish(request: request.toFFI).fromFFI
+        } catch {
+            throw ApiClientError.publishError(error.localizedDescription)
         }
     }
 
