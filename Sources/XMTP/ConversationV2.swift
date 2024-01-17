@@ -20,7 +20,7 @@ public struct ConversationV2Container: Codable {
 
 	public func decode(with client: Client) -> ConversationV2 {
 		let context = InvitationV1.Context(conversationID: conversationID ?? "", metadata: metadata)
-		return ConversationV2(topic: topic, keyMaterial: keyMaterial, context: context, peerAddress: peerAddress, client: client, createdAt: createdAt ?? 0, header: header)
+		return ConversationV2(topic: topic, keyMaterial: keyMaterial, context: context, peerAddress: peerAddress, client: client, createdAt: createdAt, header: header)
 	}
 }
 
@@ -31,7 +31,7 @@ public struct ConversationV2 {
 	public var context: InvitationV1.Context
 	public var peerAddress: String
 	public var client: Client
-	public var createdAt: UInt64?
+	var createdAtNs: UInt64?
 	private var header: SealedInvitationHeaderV1
 
 	static func create(client: Client, invitation: InvitationV1, header: SealedInvitationHeaderV1) throws -> ConversationV2 {
@@ -59,7 +59,7 @@ public struct ConversationV2 {
 		self.context = context
 		self.peerAddress = peerAddress
 		self.client = client
-		self.createdAt = createdAt
+		self.createdAtNs = createdAt
 		header = SealedInvitationHeaderV1()
 	}
 
@@ -69,12 +69,12 @@ public struct ConversationV2 {
 		self.context = context
 		self.peerAddress = peerAddress
 		self.client = client
-		self.createdAt = createdAt
+		self.createdAtNs = createdAt
 		self.header = header
 	}
 
 	public var encodedContainer: ConversationV2Container {
-		ConversationV2Container(topic: topic, keyMaterial: keyMaterial, conversationID: context.conversationID, metadata: context.metadata, peerAddress: peerAddress, createdAt: createdAt, header: header)
+		ConversationV2Container(topic: topic, keyMaterial: keyMaterial, conversationID: context.conversationID, metadata: context.metadata, peerAddress: peerAddress, createdAt: createdAtNs, header: header)
 	}
 
 	func prepareMessage(encodedContent: EncodedContent, options: SendOptions?) async throws -> PreparedMessage {
@@ -193,8 +193,8 @@ public struct ConversationV2 {
 		}
 	}
 
-	public var conversationCreatedAt: Date {
-		Date(timeIntervalSince1970: Double((createdAt ?? 0) / 1_000_000) / 1000)
+	public var createdAt: Date {
+		Date(timeIntervalSince1970: Double((createdAtNs ?? header.createdNs) / 1_000_000) / 1000)
 	}
 
 	public func decode(envelope: Envelope) throws -> DecodedMessage {

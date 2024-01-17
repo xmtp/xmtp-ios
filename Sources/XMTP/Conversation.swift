@@ -56,7 +56,7 @@ public enum Conversation: Sendable {
 		case let .v1(conversationV1):
 			return conversationV1.sentAt
 		case let .v2(conversationV2):
-			return conversationV2.conversationCreatedAt
+			return conversationV2.createdAt
 		}
 	}
 
