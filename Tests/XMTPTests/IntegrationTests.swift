@@ -27,7 +27,7 @@ final class IntegrationTests: XCTestCase {
 
 		let authToken = try await authorized.createAuthToken()
 
-		let rustClient = try await LibXMTP.create_client(XMTP.GRPCApiClient.envToUrl(env: .local), false)
+		let rustClient = try await LibXMTP.createV2Client(host: GRPCApiClient.envToUrl(env: .local), isSecure: false)
 		let api = try GRPCApiClient(environment: .local, secure: false, rustClient: rustClient)
 		api.setAuthToken(authToken)
 
@@ -494,7 +494,7 @@ final class IntegrationTests: XCTestCase {
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = Data(try LibXMTP.public_key_from_private_key_k256(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try LibXMTP.publicKeyFromPrivateKeyK256(privateKeyBytes: keyBytes.bytes))
 
 		let client = try await XMTPiOS.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -564,7 +564,7 @@ final class IntegrationTests: XCTestCase {
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = Data(try LibXMTP.public_key_from_private_key_k256(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try LibXMTP.publicKeyFromPrivateKeyK256(privateKeyBytes: keyBytes.bytes))
 
 		let client = try await XMTPiOS.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -587,7 +587,7 @@ final class IntegrationTests: XCTestCase {
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = Data(try LibXMTP.public_key_from_private_key_k256(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try LibXMTP.publicKeyFromPrivateKeyK256(privateKeyBytes: keyBytes.bytes))
 
 		let client = try await XMTPiOS.Client.create(account: key)
 		XCTAssertEqual(client.apiClient.environment, .dev)
@@ -616,7 +616,7 @@ final class IntegrationTests: XCTestCase {
 
 		var key = PrivateKey()
 		key.secp256K1.bytes = Data(keyBytes)
-		key.publicKey.secp256K1Uncompressed.bytes = Data(try LibXMTP.public_key_from_private_key_k256(keyBytes))
+		key.publicKey.secp256K1Uncompressed.bytes = Data(try LibXMTP.publicKeyFromPrivateKeyK256(privateKeyBytes: keyBytes.bytes))
 
 
 		let client = try await XMTPiOS.Client.create(account: key)

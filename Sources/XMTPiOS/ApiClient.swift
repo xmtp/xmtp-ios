@@ -58,11 +58,11 @@ func makeQueryRequest(topic: String, pagination: Pagination? = nil, cursor: Curs
     }
 }
 
-class GRPCApiClient: ApiClient {
+final class GRPCApiClient: ApiClient {
 	let ClientVersionHeaderKey = "X-Client-Version"
 	let AppVersionHeaderKey = "X-App-Version"
 
-	var environment: XMTPEnvironment
+	let environment: XMTPEnvironment
 	var authToken = ""
 
 	var rustClient: LibXMTP.FfiV2Client
@@ -160,7 +160,7 @@ class GRPCApiClient: ApiClient {
 
     func publish(request: PublishRequest) async throws -> PublishResponse {
         do {
-					return try await rustClient.publish(request: request.toFFI).fromFFI
+					return try await rustClient.publish(request: request.toFFI, authToken: self.authToken).fromFFI
         } catch {
             throw ApiClientError.publishError(error.localizedDescription)
         }

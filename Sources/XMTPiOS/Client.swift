@@ -77,15 +77,15 @@ public final class Client: Sendable {
 	public static func create(account: SigningKey, options: ClientOptions? = nil) async throws -> Client {
 		let options = options ?? ClientOptions()
         do {
-		let client = try await LibXMTP.create_client(GRPCApiClient.envToUrl(env: options.api.env), options.api.env != .local)
+					let client = try await LibXMTP.createV2Client(host: GRPCApiClient.envToUrl(env: options.api.env), isSecure: options.api.env != .local)
 		let apiClient = try GRPCApiClient(
 			environment: options.api.env,
 			secure: options.api.isSecure,
 			rustClient: client
 		)
 		return try await create(account: account, apiClient: apiClient)
-        } catch let error as RustString {
-            throw ClientError.creationError(error.toString())
+        } catch {
+            throw ClientError.creationError(error.localizedDescription)
         }
 	}
 
@@ -157,7 +157,7 @@ public final class Client: Sendable {
 
 		let options = options ?? ClientOptions()
 
-		let client = try await LibXMTP.create_client(GRPCApiClient.envToUrl(env: options.api.env), options.api.env != .local)
+		let client = try await LibXMTP.createV2Client(host: GRPCApiClient.envToUrl(env: options.api.env), isSecure: options.api.env != .local)
 		let apiClient = try GRPCApiClient(
 			environment: options.api.env,
 			secure: options.api.isSecure,
@@ -196,7 +196,7 @@ public final class Client: Sendable {
     public static func canMessage(_ peerAddress: String, options: ClientOptions? = nil) async throws -> Bool {
         let options = options ?? ClientOptions()
 
-        let client = try await LibXMTP.create_client(GRPCApiClient.envToUrl(env: options.api.env), options.api.env != .local)
+        let client = try await LibXMTP.createV2Client(host: GRPCApiClient.envToUrl(env: options.api.env), isSecure: options.api.env != .local)
         let apiClient = try GRPCApiClient(
           environment: options.api.env,
           secure: options.api.isSecure,
