@@ -27,7 +27,7 @@ public actor Conversations {
 				context: data.invitation.context,
 				peerAddress: data.peerAddress,
 				client: client,
-				createdAt: data.createdNs
+				createdAtNs: data.createdNs
 			))
 		}
 		conversationsByTopic[conversation.topic] = conversation

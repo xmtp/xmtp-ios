@@ -141,7 +141,7 @@ class MessageTests: XCTestCase {
 			return
 		}
 
-		let conversation = ConversationV2(topic: decodedConversation.topic, keyMaterial: decodedConversation.keyMaterial, context: InvitationV1.Context(), peerAddress: decodedConversation.peerAddress, client: client, createdAt: decodedConversation.createdAt, header: SealedInvitationHeaderV1())
+		let conversation = ConversationV2(topic: decodedConversation.topic, keyMaterial: decodedConversation.keyMaterial, context: InvitationV1.Context(), peerAddress: decodedConversation.peerAddress, client: client, header: SealedInvitationHeaderV1())
 
 		let decodedMessage = try conversation.decode(envelope: envelope)
 		XCTAssertEqual(decodedMessage.id, "e42a7dd44d0e1214824eab093cb89cfe6f666298d0af2d54fe0c914c8b72eff3")
