@@ -37,6 +37,15 @@
       }
     },
     {
+      "identity" : "libxmtp-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/xmtp/libxmtp-swift",
+      "state" : {
+        "branch" : "671e9c2",
+        "revision" : "671e9c250d326de46c314983095f4102b8f679a1"
+      }
+    },
+    {
       "identity" : "secp256k1.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/GigaBitcoin/secp256k1.swift.git",
