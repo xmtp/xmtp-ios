@@ -18,44 +18,44 @@ public typealias QueryResponse = Xmtp_MessageApi_V1_QueryResponse
 public typealias SubscribeRequest = Xmtp_MessageApi_V1_SubscribeRequest
 
 public enum ApiClientError: Error {
-    case batchQueryError(String)
-    case queryError(String)
-    case publishError(String)
-    case subscribeError(String)
+	case batchQueryError(String)
+	case queryError(String)
+	case publishError(String)
+	case subscribeError(String)
 }
 
 protocol ApiClient: Sendable {
 	var environment: XMTPEnvironment { get }
-    init(environment: XMTPEnvironment, secure: Bool, rustClient: LibXMTP.FfiV2Client, appVersion: String?) throws
+	init(environment: XMTPEnvironment, secure: Bool, rustClient: LibXMTP.FfiV2ApiClient, appVersion: String?) throws
 	func setAuthToken(_ token: String)
-    func batchQuery(request: BatchQueryRequest) async throws -> BatchQueryResponse
+	func batchQuery(request: BatchQueryRequest) async throws -> BatchQueryResponse
 	func query(topic: String, pagination: Pagination?, cursor: Xmtp_MessageApi_V1_Cursor?) async throws -> QueryResponse
 	func query(topic: Topic, pagination: Pagination?) async throws -> QueryResponse
-    func query(request: QueryRequest) async throws -> QueryResponse
+	func query(request: QueryRequest) async throws -> QueryResponse
 	func envelopes(topic: String, pagination: Pagination?) async throws -> [Envelope]
-	func publish(envelopes: [Envelope]) async throws -> PublishResponse
-    func publish(request: PublishRequest) async throws -> PublishResponse
+	func publish(envelopes: [Envelope]) async throws
+	func publish(request: PublishRequest) async throws
 	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error>
 }
 
 func makeQueryRequest(topic: String, pagination: Pagination? = nil, cursor: Cursor? = nil) -> QueryRequest {
-    return QueryRequest.with {
-        $0.contentTopics = [topic]
-        if let pagination {
-            $0.pagingInfo = pagination.pagingInfo
-        }
-        if let endAt = pagination?.before {
-            $0.endTimeNs = UInt64(endAt.millisecondsSinceEpoch) * 1_000_000
-            $0.pagingInfo.direction = pagination?.direction ?? .descending
-        }
-        if let startAt = pagination?.after {
-            $0.startTimeNs = UInt64(startAt.millisecondsSinceEpoch) * 1_000_000
-            $0.pagingInfo.direction = pagination?.direction ?? .descending
-        }
-        if let cursor {
-            $0.pagingInfo.cursor = cursor
-        }
-    }
+	return QueryRequest.with {
+		$0.contentTopics = [topic]
+		if let pagination {
+			$0.pagingInfo = pagination.pagingInfo
+		}
+		if let endAt = pagination?.before {
+			$0.endTimeNs = UInt64(endAt.millisecondsSinceEpoch) * 1_000_000
+			$0.pagingInfo.direction = pagination?.direction ?? .descending
+		}
+		if let startAt = pagination?.after {
+			$0.startTimeNs = UInt64(startAt.millisecondsSinceEpoch) * 1_000_000
+			$0.pagingInfo.direction = pagination?.direction ?? .descending
+		}
+		if let cursor {
+			$0.pagingInfo.cursor = cursor
+		}
+	}
 }
 
 final class GRPCApiClient: ApiClient {
@@ -65,14 +65,14 @@ final class GRPCApiClient: ApiClient {
 	let environment: XMTPEnvironment
 	var authToken = ""
 
-	var rustClient: LibXMTP.FfiV2Client
+	var rustClient: LibXMTP.FfiV2ApiClient
 
-    required init(environment: XMTPEnvironment, secure _: Bool = true, rustClient: LibXMTP.FfiV2Client, appVersion: String? = nil) throws {
+	required init(environment: XMTPEnvironment, secure _: Bool = true, rustClient: LibXMTP.FfiV2ApiClient, appVersion: String? = nil) throws {
 		self.environment = environment
 		self.rustClient = rustClient
-        if let appVersion = appVersion {
-					rustClient.setAppVersion(version: appVersion)
-        }
+		if let appVersion = appVersion {
+			rustClient.setAppVersion(version: appVersion)
+		}
 	}
 
 	static func envToUrl(env: XMTPEnvironment) -> String {
@@ -87,29 +87,29 @@ final class GRPCApiClient: ApiClient {
 		authToken = token
 	}
 
-    func batchQuery(request: BatchQueryRequest) async throws -> BatchQueryResponse {
-        do {
-					return try await rustClient.batchQuery(req: request.toFFI).fromFFI
-        } catch {
-					throw ApiClientError.batchQueryError(error.localizedDescription)
-        }
-    }
+	func batchQuery(request: BatchQueryRequest) async throws -> BatchQueryResponse {
+		do {
+			return try await rustClient.batchQuery(req: request.toFFI).fromFFI
+		} catch {
+			throw ApiClientError.batchQueryError(error.localizedDescription)
+		}
+	}
 
-    func query(request: QueryRequest) async throws -> QueryResponse {
-        do {
-					return try await rustClient.query(request: request.toFFI).fromFFI
-        } catch {
-					throw ApiClientError.queryError(error.localizedDescription)
-        }
-    }
+	func query(request: QueryRequest) async throws -> QueryResponse {
+		do {
+			return try await rustClient.query(request: request.toFFI).fromFFI
+		} catch {
+			throw ApiClientError.queryError(error.localizedDescription)
+		}
+	}
 
-    func query(topic: String, pagination: Pagination? = nil, cursor: Cursor? = nil) async throws -> QueryResponse {
-        return try await query(request: makeQueryRequest(topic: topic, pagination: pagination, cursor: cursor))
-    }
+	func query(topic: String, pagination: Pagination? = nil, cursor: Cursor? = nil) async throws -> QueryResponse {
+		return try await query(request: makeQueryRequest(topic: topic, pagination: pagination, cursor: cursor))
+	}
 
-    func query(topic: Topic, pagination: Pagination? = nil) async throws -> QueryResponse {
-        return try await query(request: makeQueryRequest(topic: topic.description, pagination: pagination))
-    }
+	func query(topic: Topic, pagination: Pagination? = nil) async throws -> QueryResponse {
+		return try await query(request: makeQueryRequest(topic: topic.description, pagination: pagination))
+	}
 
 	func envelopes(topic: String, pagination: Pagination? = nil) async throws -> [Envelope] {
 		var envelopes: [Envelope] = []
@@ -123,52 +123,52 @@ final class GRPCApiClient: ApiClient {
 
 			cursor = response.pagingInfo.cursor
 			hasNextPage = !response.envelopes.isEmpty && response.pagingInfo.hasCursor
-            
-            if let limit = pagination?.limit, envelopes.count >= limit {
-                envelopes = Array(envelopes.prefix(limit))
-                break
-            }
+
+			if let limit = pagination?.limit, envelopes.count >= limit {
+				envelopes = Array(envelopes.prefix(limit))
+				break
+			}
 		}
 
 		return envelopes
 	}
 
 	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
-		return AsyncThrowingStream { continuation in
+		return AsyncThrowingStream { _ in
 			Task {
-                let request = SubscribeRequest.with { $0.contentTopics = topics }
-                let req = try request.serializedData()
-                do {
-									// TODO: FIXME
-//                    let subscription = try await self.rustClient.subscribe(req)
-//                    // Run a continuous for loop polling and sleeping for a bit each loop.
-//                    while true {
-//                        let buf = try subscription.get_envelopes_as_query_response()
-//                        // Note: it uses QueryResponse as a convenient envelopes wrapper.
-//                        let res = try QueryResponse(serializedData: Data(buf))
-//                        for envelope in res.envelopes {
-//                            continuation.yield(envelope)
-//                        }
-//                        try await Task.sleep(nanoseconds: 50_000_000) // 50ms
-//                    }
-                } catch {
-                    throw ApiClientError.subscribeError(error.localizedDescription)
-                }
+				let request = SubscribeRequest.with { $0.contentTopics = topics }
+				let req = try request.serializedData()
+				do {
+					// TODO: FIXME
+					//                    let subscription = try await self.rustClient.subscribe(req)
+					//                    // Run a continuous for loop polling and sleeping for a bit each loop.
+					//                    while true {
+					//                        let buf = try subscription.get_envelopes_as_query_response()
+					//                        // Note: it uses QueryResponse as a convenient envelopes wrapper.
+					//                        let res = try QueryResponse(serializedData: Data(buf))
+					//                        for envelope in res.envelopes {
+					//                            continuation.yield(envelope)
+					//                        }
+					//                        try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+					//                    }
+				} catch {
+					throw ApiClientError.subscribeError(error.localizedDescription)
+				}
 			}
 		}
 	}
 
-    func publish(request: PublishRequest) async throws -> PublishResponse {
-        do {
-					return try await rustClient.publish(request: request.toFFI, authToken: self.authToken).fromFFI
-        } catch {
-            throw ApiClientError.publishError(error.localizedDescription)
-        }
-    }
+	func publish(request: PublishRequest) async throws {
+		do {
+			try await rustClient.publish(request: request.toFFI, authToken: authToken)
+		} catch {
+			throw ApiClientError.publishError(error.localizedDescription)
+		}
+	}
 
-	@discardableResult func publish(envelopes: [Envelope]) async throws -> PublishResponse {
-        return try await publish(request: PublishRequest.with {
-            $0.envelopes = envelopes
-        })
+	func publish(envelopes: [Envelope]) async throws {
+		return try await publish(request: PublishRequest.with {
+			$0.envelopes = envelopes
+		})
 	}
 }

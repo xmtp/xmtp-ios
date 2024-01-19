@@ -210,7 +210,7 @@ public final class Client: Sendable {
 			secure: options.api.isSecure,
 			rustClient: client
 		)
-		return try await apiClient.query(topic: .contact(peerAddress)).envelopes.count > 0
+		return try await apiClient.query(topic: Topic.contact(peerAddress)).envelopes.count > 0
 	}
 
 	public func importConversation(from conversationData: Data) throws -> Conversation? {
@@ -312,13 +312,13 @@ public final class Client: Sendable {
 		return try await apiClient.batchQuery(request: request)
 	}
 
-	@discardableResult public func publish(envelopes: [Envelope]) async throws -> PublishResponse {
+	public func publish(envelopes: [Envelope]) async throws {
 		let authorized = AuthorizedIdentity(address: address, authorized: privateKeyBundleV1.identityKey.publicKey, identity: privateKeyBundleV1.identityKey)
 		let authToken = try await authorized.createAuthToken()
 
 		apiClient.setAuthToken(authToken)
 
-		return try await apiClient.publish(envelopes: envelopes)
+		try await apiClient.publish(envelopes: envelopes)
 	}
 
 	public func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {

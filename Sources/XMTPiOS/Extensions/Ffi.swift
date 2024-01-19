@@ -114,17 +114,3 @@ extension FfiPublishRequest {
 		}
 	}
 }
-
-// MARK: PublishResponse
-
-extension PublishResponse {
-	var toFFI: FfiV2PublishResponse {
-		FfiV2PublishResponse()
-	}
-}
-
-extension FfiV2PublishResponse {
-	var fromFFI: PublishResponse {
-		PublishResponse()
-	}
-}

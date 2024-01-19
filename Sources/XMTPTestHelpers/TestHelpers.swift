@@ -137,7 +137,7 @@ public class FakeApiClient: ApiClient {
 
 	// MARK: ApiClient conformance
 
-	public required init(environment: XMTPiOS.XMTPEnvironment, secure _: Bool, rustClient _: LibXMTP.FfiV2Client, appVersion: String?) throws {
+	public required init(environment: XMTPiOS.XMTPEnvironment, secure _: Bool, rustClient _: LibXMTP.FfiV2ApiClient, appVersion: String?) throws {
 		self.environment = environment
         self.appVersion = appVersion ?? "0.0.0"
 	}
@@ -217,14 +217,12 @@ public class FakeApiClient: ApiClient {
 		return try await query(topic: topic.description, pagination: pagination, cursor: nil)
 	}
 
-	public func publish(envelopes: [XMTPiOS.Envelope]) async throws -> XMTPiOS.PublishResponse {
+	public func publish(envelopes: [XMTPiOS.Envelope]) async throws {
 		for envelope in envelopes {
 			send(envelope: envelope)
 		}
 
 		published.append(contentsOf: envelopes)
-
-		return PublishResponse()
 	}
 
 	public func batchQuery(request: XMTPiOS.BatchQueryRequest) async throws -> XMTPiOS.BatchQueryResponse {
@@ -253,7 +251,7 @@ public class FakeApiClient: ApiClient {
         abort() // Not supported on Fake
     }
 
-	public func publish(request: XMTPiOS.PublishRequest) async throws -> XMTPiOS.PublishResponse {
+	public func publish(request: XMTPiOS.PublishRequest) async throws {
         abort() // Not supported on Fake
     }
 
