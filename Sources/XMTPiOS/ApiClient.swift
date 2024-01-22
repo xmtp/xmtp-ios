@@ -134,23 +134,22 @@ final class GRPCApiClient: ApiClient {
 	}
 
 	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
-		return AsyncThrowingStream { _ in
+		return AsyncThrowingStream { continuation in
 			Task {
 				let request = SubscribeRequest.with { $0.contentTopics = topics }
-				let req = try request.serializedData()
 				do {
-					// TODO: FIXME
-					//                    let subscription = try await self.rustClient.subscribe(req)
-					//                    // Run a continuous for loop polling and sleeping for a bit each loop.
-					//                    while true {
-					//                        let buf = try subscription.get_envelopes_as_query_response()
-					//                        // Note: it uses QueryResponse as a convenient envelopes wrapper.
-					//                        let res = try QueryResponse(serializedData: Data(buf))
-					//                        for envelope in res.envelopes {
-					//                            continuation.yield(envelope)
-					//                        }
-					//                        try await Task.sleep(nanoseconds: 50_000_000) // 50ms
-					//                    }
+					let subscription = try await rustClient.subscribe(request: request.toFFI)
+
+					defer {
+						Task {
+							await subscription.end()
+						}
+					}
+
+					while true {
+						let nextEnvelope = try await subscription.next()
+						continuation.yield(nextEnvelope.fromFFI)
+					}
 				} catch {
 					throw ApiClientError.subscribeError(error.localizedDescription)
 				}

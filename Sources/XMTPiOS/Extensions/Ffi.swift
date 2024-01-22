@@ -8,6 +8,69 @@
 import Foundation
 import LibXMTP
 
+// MARK: PagingInfo
+
+extension PagingInfo {
+	var toFFI: FfiPagingInfo {
+		FfiPagingInfo(limit: limit, cursor: cursor.toFFI, direction: direction.toFFI)
+	}
+}
+
+extension FfiPagingInfo {
+	var fromFFI: PagingInfo {
+		PagingInfo.with {
+			$0.limit = limit
+
+			if let cursor {
+				$0.cursor = cursor.fromFFI
+			}
+
+			$0.direction = direction.fromFFI
+		}
+	}
+}
+
+extension Cursor {
+	var toFFI: FfiCursor {
+		FfiCursor(digest: [UInt8](self.index.digest), senderTimeNs: self.index.senderTimeNs)
+	}
+}
+
+extension FfiCursor {
+	var fromFFI: Cursor {
+		Cursor.with {
+			$0.index.digest = Data(digest)
+			$0.index.senderTimeNs = senderTimeNs
+		}
+	}
+}
+
+extension PagingInfoSortDirection {
+	var toFFI: FfiSortDirection {
+		switch self {
+		case .ascending:
+			return .ascending
+		case .descending:
+			return .descending
+		default:
+			return .unspecified
+		}
+	}
+}
+
+extension FfiSortDirection {
+	var fromFFI: PagingInfoSortDirection {
+		switch self {
+		case .ascending:
+			return .ascending
+		case .descending:
+			return .descending
+		default:
+			return .unspecified
+		}
+	}
+}
+
 // MARK: QueryRequest
 
 extension QueryRequest {
@@ -16,7 +79,7 @@ extension QueryRequest {
 			contentTopics: contentTopics,
 			startTimeNs: startTimeNs,
 			endTimeNs: endTimeNs,
-			pagingInfo: nil // TODO: fixme
+			pagingInfo: pagingInfo.toFFI
 		)
 	}
 }
@@ -27,7 +90,7 @@ extension FfiV2QueryRequest {
 			$0.contentTopics = contentTopics
 			$0.startTimeNs = startTimeNs
 			$0.endTimeNs = endTimeNs
-			$0.pagingInfo = PagingInfo() // TODO: fixme
+			$0.pagingInfo = pagingInfo?.fromFFI ?? PagingInfo()
 		}
 	}
 }
@@ -60,7 +123,7 @@ extension FfiV2QueryResponse {
 	var fromFFI: QueryResponse {
 		QueryResponse.with {
 			$0.envelopes = envelopes.map(\.fromFFI)
-			$0.pagingInfo = PagingInfo() // TODO: fixme
+			$0.pagingInfo = pagingInfo?.fromFFI ?? PagingInfo()
 		}
 	}
 }
@@ -111,6 +174,21 @@ extension FfiPublishRequest {
 	var fromFFI: PublishRequest {
 		PublishRequest.with {
 			$0.envelopes = envelopes.map(\.fromFFI)
+		}
+	}
+}
+
+// MARK: SubscribeRequest
+extension SubscribeRequest {
+	var toFFI: FfiV2SubscribeRequest {
+		FfiV2SubscribeRequest(contentTopics: contentTopics)
+	}
+}
+
+extension FfiV2SubscribeRequest {
+	var fromFFI: SubscribeRequest {
+		SubscribeRequest.with {
+			$0.contentTopics = contentTopics
 		}
 	}
 }
