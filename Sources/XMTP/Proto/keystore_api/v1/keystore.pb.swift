@@ -1118,6 +1118,19 @@ public struct Xmtp_KeystoreApi_V1_TopicMap {
   public init() {}
 }
 
+/// Used to get a mapping of conversation topics to their HMAC keys
+public struct Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var topics: [String] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 /// A mapping of topics to their HMAC keys
 public struct Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
@@ -1214,6 +1227,7 @@ extension Xmtp_KeystoreApi_V1_SetRefeshJobRequest: @unchecked Sendable {}
 extension Xmtp_KeystoreApi_V1_SetRefreshJobResponse: @unchecked Sendable {}
 extension Xmtp_KeystoreApi_V1_TopicMap: @unchecked Sendable {}
 extension Xmtp_KeystoreApi_V1_TopicMap.TopicData: @unchecked Sendable {}
+extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest: @unchecked Sendable {}
 extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse: @unchecked Sendable {}
 extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeyData: @unchecked Sendable {}
 extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeys: @unchecked Sendable {}
@@ -3013,6 +3027,38 @@ extension Xmtp_KeystoreApi_V1_TopicMap.TopicData: SwiftProtobuf.Message, SwiftPr
 	if lhs.createdNs != rhs.createdNs {return false}
 	if lhs.peerAddress != rhs.peerAddress {return false}
 	if lhs._invitation != rhs._invitation {return false}
+	if lhs.unknownFields != rhs.unknownFields {return false}
+	return true
+  }
+}
+
+extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetConversationHmacKeysRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+	1: .same(proto: "topics"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+	while let fieldNumber = try decoder.nextFieldNumber() {
+	  // The use of inline closures is to circumvent an issue where the compiler
+	  // allocates stack space for every case branch when no optimizations are
+	  // enabled. https://github.com/apple/swift-protobuf/issues/1034
+	  switch fieldNumber {
+	  case 1: try { try decoder.decodeRepeatedStringField(value: &self.topics) }()
+	  default: break
+	  }
+	}
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+	if !self.topics.isEmpty {
+	  try visitor.visitRepeatedStringField(value: self.topics, fieldNumber: 1)
+	}
+	try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest, rhs: Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest) -> Bool {
+	if lhs.topics != rhs.topics {return false}
 	if lhs.unknownFields != rhs.unknownFields {return false}
 	return true
   }
