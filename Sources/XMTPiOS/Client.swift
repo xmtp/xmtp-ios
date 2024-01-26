@@ -61,7 +61,7 @@ public struct ClientOptions {
 /// 2. To sign a random salt used to encrypt the key bundle in storage. This happens every time the client is started, including the very first time).
 ///
 /// > Important: The client connects to the XMTP `dev` environment by default. Use ``ClientOptions`` to change this and other parameters of the network connection.
-public final class Client: Sendable {
+public final class Client {
 	/// The wallet address of the ``SigningKey`` used to create this Client.
 	public let address: String
 	let privateKeyBundleV1: PrivateKeyBundleV1
@@ -130,9 +130,7 @@ public final class Client: Sendable {
 	}
 
 	static func loadOrCreateKeys(for account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> (PrivateKeyBundleV1, LegacyIdentitySource) {
-		// swiftlint:disable no_optional_try
 		if let keys = try await loadPrivateKeys(for: account, apiClient: apiClient, options: options) {
-			// swiftlint:enable no_optional_try
 			print("loading existing private keys.")
 			#if DEBUG
 				print("Loaded existing private keys.")
