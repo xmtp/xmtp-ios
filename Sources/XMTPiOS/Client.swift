@@ -8,6 +8,7 @@
 import Foundation
 import LibXMTP
 import web3
+import URLCompatibilityKit
 
 public typealias PreEventCallback = () async throws -> Void
 
@@ -65,6 +66,7 @@ public final class Client: Sendable {
 	public let address: String
 	let privateKeyBundleV1: PrivateKeyBundleV1
 	let apiClient: ApiClient
+	let v3Client: LibXMTP.FfiXmtpClient
 
 	/// Access ``Conversations`` for this Client.
 	public lazy var conversations: Conversations = .init(client: self)
@@ -100,15 +102,34 @@ public final class Client: Sendable {
 	}
 
 	static func create(account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> Client {
-		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient, options: options)
+		let (privateKeyBundleV1, source) = try await loadOrCreateKeys(for: account, apiClient: apiClient, options: options)
 
-		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient)
+		let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(account.address).db3")
+		let v3Client = try await LibXMTP.createClient(
+			logger: XMTPLogger(),
+			host: apiClient.environment.rawValue,
+			isSecure: apiClient.environment != .local,
+			db: dbURL.path,
+			encryptionKey: nil,
+			accountAddress: account.address,
+			legacyIdentitySource: source,
+			legacySignedPrivateKeyProto: nil
+		)
+
+		guard let textToSign = v3Client.textToSign() else {
+			throw ClientError.creationError("no text to sign")
+		}
+
+		let signature = try await account.sign(message: textToSign).rawData
+		try await v3Client.registerIdentity(recoverableWalletSignature: signature)
+
+		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client)
 		try await client.ensureUserContactPublished()
 
 		return client
 	}
 
-	static func loadOrCreateKeys(for account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> PrivateKeyBundleV1 {
+	static func loadOrCreateKeys(for account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> (PrivateKeyBundleV1, LegacyIdentitySource) {
 		// swiftlint:disable no_optional_try
 		if let keys = try await loadPrivateKeys(for: account, apiClient: apiClient, options: options) {
 			// swiftlint:enable no_optional_try
@@ -116,7 +137,7 @@ public final class Client: Sendable {
 			#if DEBUG
 				print("Loaded existing private keys.")
 			#endif
-			return keys
+			return (keys, .network)
 		} else {
 			#if DEBUG
 				print("No existing keys found, creating new bundle.")
@@ -133,7 +154,7 @@ public final class Client: Sendable {
 				Envelope(topic: .userPrivateStoreKeyBundle(account.address), timestamp: Date(), message: encryptedKeys.serializedData()),
 			])
 
-			return keys
+			return (keys, .keyGenerator)
 		}
 	}
 
@@ -172,13 +193,28 @@ public final class Client: Sendable {
 			rustClient: client
 		)
 
-		return try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient)
+		let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(address).db3")
+		let v3Client = try await LibXMTP.createClient(
+			logger: XMTPLogger(),
+			host: apiClient.environment.rawValue,
+			isSecure: apiClient.environment != .local,
+			db: dbURL.path,
+			encryptionKey: nil,
+			accountAddress: address,
+			legacyIdentitySource: .static,
+			legacySignedPrivateKeyProto: try v1Bundle.identityKey.serializedData()
+		)
+
+		try await v3Client.registerIdentity(recoverableWalletSignature: nil)
+
+		return try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client)
 	}
 
-	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient) throws {
+	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient) throws {
 		self.address = address
 		self.privateKeyBundleV1 = privateKeyBundleV1
 		self.apiClient = apiClient
+		self.v3Client = v3Client
 	}
 
 	public var privateKeyBundle: PrivateKeyBundle {
