@@ -67,7 +67,6 @@ class MessageTests: XCTestCase {
 
 		let decoded = try MessageV2.decode("", "", message1, keyMaterial: invitationv1.aes256GcmHkdfSha256.keyMaterial, client: client)
 		let result: String = try decoded.content()
-		print(decoded)
 		XCTAssertEqual(result, "Yo!")
 	}
 
