@@ -97,4 +97,8 @@ public struct ReactionCodec: ContentCodec {
             return nil
         }
     }
+	
+	public func shouldPush(content: Reaction) throws -> Bool {
+		return false
+	}
 }
