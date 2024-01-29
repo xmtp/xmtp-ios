@@ -16,11 +16,12 @@ enum MessageV2Error: Error {
 }
 
 extension MessageV2 {
-	init(headerBytes: Data, ciphertext: CipherText, senderHmac: Data) {
+	init(headerBytes: Data, ciphertext: CipherText, senderHmac: Data, shouldPush: Bool) {
 		self.init()
 		self.headerBytes = headerBytes
 		self.ciphertext = ciphertext
 		self.senderHmac = senderHmac
+		self.shouldPush = shouldPush
 	}
 
 	static func decrypt(_ id: String, _ topic: String, _ message: MessageV2, keyMaterial: Data, client: Client) throws -> DecryptedMessage {
@@ -79,7 +80,7 @@ extension MessageV2 {
 		}
 	}
 
-	static func encode(client: Client, content encodedContent: EncodedContent, topic: String, keyMaterial: Data, senderHmac: Data) async throws -> MessageV2 {
+	static func encode(client: Client, content encodedContent: EncodedContent, topic: String, keyMaterial: Data, shouldPush: Bool) async throws -> MessageV2 {
 		let payload = try encodedContent.serializedData()
 
 		let date = Date()
@@ -96,11 +97,19 @@ extension MessageV2 {
 		let signedBytes = try signedContent.serializedData()
 
 		let ciphertext = try Crypto.encrypt(keyMaterial, signedBytes, additionalData: headerBytes)
+		
+		let thirtyDayPeriodsSinceEpoch = Int(date.timeIntervalSince1970 / 60 / 60 / 24 / 30)
+		let info = "\(thirtyDayPeriodsSinceEpoch)-\(client.address)"
+		let infoEncoded = info.data(using: .utf8)
+
+		let senderHmac = try Crypto.generateHmacSignature(secret: keyMaterial, info: infoEncoded!, message: headerBytes)
+		
 
 		return MessageV2(
 			headerBytes: headerBytes,
 			ciphertext: ciphertext,
-			senderHmac: senderHmac
+			senderHmac: senderHmac,
+			shouldPush: shouldPush
 		)
 	}
 }
