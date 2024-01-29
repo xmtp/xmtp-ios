@@ -230,7 +230,8 @@ class ConversationTests: XCTestCase {
 						client: bobClient,
 						content: encodedContent,
 						topic: conversation.topic,
-						keyMaterial: conversation.keyMaterial
+						keyMaterial: conversation.keyMaterial,
+						shouldPush: false
 					)
 				).serializedData()
 			)
@@ -285,10 +286,18 @@ class ConversationTests: XCTestCase {
 		let signedBytes = try signedContent.serializedData()
 
 		let ciphertext = try Crypto.encrypt(aliceConversation.keyMaterial, signedBytes, additionalData: headerBytes)
+		
+		let thirtyDayPeriodsSinceEpoch = Int(date.timeIntervalSince1970 / 60 / 60 / 24 / 30)
+		let info = "\(thirtyDayPeriodsSinceEpoch)-\(aliceClient.address)"
+		let infoEncoded = info.data(using: .utf8)
+		
+		let senderHmac = try Crypto.generateHmacSignature(secret: aliceConversation.keyMaterial, info: infoEncoded!, message: headerBytes)
 
 		let tamperedMessage = MessageV2(
 			headerBytes: headerBytes,
-			ciphertext: ciphertext
+			ciphertext: ciphertext,
+			senderHmac: senderHmac,
+			shouldPush: false
 		)
 
 		try await aliceClient.publish(envelopes: [

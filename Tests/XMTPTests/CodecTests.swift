@@ -9,6 +9,10 @@ import XCTest
 @testable import XMTP
 
 struct NumberCodec: ContentCodec {
+	func shouldPush(content: Double) throws -> Bool {
+		return false
+	}
+	
 	func fallback(content: Double) throws -> String? {
 		return "pi"
 	}
