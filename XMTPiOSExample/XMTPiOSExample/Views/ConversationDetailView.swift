@@ -6,11 +6,11 @@
 //
 
 import SwiftUI
-import XMTP
+import XMTPiOS
 
 struct ConversationDetailView: View {
-	var client: XMTP.Client
-	var conversation: XMTP.Conversation
+	var client: Client
+	var conversation: Conversation
 
 	@State private var messages: [DecodedMessage] = []
 
