@@ -26,7 +26,7 @@ let package = Package(
 		.package(url: "https://github.com/1024jp/GzipSwift", from: "5.2.0"),
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "0.3.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.0.0"),
-		.package(url: "https://github.com/xmtp/libxmtp-swift", revision: "e0cac80"),
+		.package(url: "https://github.com/xmtp/libxmtp-swift", revision: "58e80a6"),
 //		.package(path: "../libxmtp-swift")
 	],
 	targets: [
