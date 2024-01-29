@@ -117,13 +117,11 @@ public actor Conversations {
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
 								let conversation = try fromInvite(envelope: envelope)
 								conversationsByTopic[conversation.topic] = conversation
-								break // Break so we can resubscribe with the new conversation
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
 								let conversation = try fromIntro(envelope: envelope)
 								conversationsByTopic[conversation.topic] = conversation
 								let decoded = try conversation.decode(envelope)
 								continuation.yield(decoded)
-								break // Break so we can resubscribe with the new conversation
 							} else {
 								print("huh \(envelope)")
 							}
