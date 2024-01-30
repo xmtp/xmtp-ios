@@ -44,7 +44,7 @@ class MessageTests: XCTestCase {
 	}
 
 	func testFullyEncodesDecodesMessagesV2() async throws {
-//	    try TestConfig.skipIfNotRunningLocalNodeTests()
+		try TestConfig.skipIfNotRunningLocalNodeTests()
 		let aliceWallet = try PrivateKey.generate()
 		let bobWallet = try PrivateKey.generate()
 
