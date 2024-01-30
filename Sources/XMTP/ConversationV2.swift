@@ -79,9 +79,10 @@ public struct ConversationV2 {
 
 	func prepareMessage(encodedContent: EncodedContent, options: SendOptions?) async throws -> PreparedMessage {
 		let codec = client.codecRegistry.find(for: options?.contentType)
+		let decoded = try codec.decode(content: encodedContent, client: client)
 		
 		func shouldPush<Codec: ContentCodec>(codec: Codec, content: Any) throws -> Bool {
-			if let content = content as? Codec.T {
+			if let content = decoded as? Codec.T {
 				return try codec.shouldPush(content: content)
 			} else {
 				throw CodecError.invalidContent
