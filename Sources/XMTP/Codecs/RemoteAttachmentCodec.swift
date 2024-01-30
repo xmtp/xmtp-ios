@@ -208,6 +208,6 @@ public struct RemoteAttachmentCodec: ContentCodec {
 	}
 	
 	public func shouldPush(content: RemoteAttachment) throws -> Bool {
-		return false
+		return true
 	}
 }

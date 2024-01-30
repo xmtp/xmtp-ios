@@ -68,6 +68,6 @@ public struct ReplyCodec: ContentCodec {
     }
 	
 	public func shouldPush(content: Reply) throws -> Bool {
-		return false
+		return true
 	}
 }

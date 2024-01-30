@@ -61,6 +61,6 @@ public struct AttachmentCodec: ContentCodec {
     }
 	
 	public func shouldPush(content: Attachment) throws -> Bool {
-		return false
+		return true
 	}
 }
