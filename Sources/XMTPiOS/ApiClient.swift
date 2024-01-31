@@ -35,8 +35,7 @@ protocol ApiClient: Sendable {
 	func envelopes(topic: String, pagination: Pagination?) async throws -> [Envelope]
 	func publish(envelopes: [Envelope]) async throws
 	func publish(request: PublishRequest) async throws
-	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error>
-	func subscribe2(request: SubscribeRequest) async throws -> FfiV2Subscription
+	func subscribe(topics: [String]) -> AsyncThrowingStream<(envelope: Envelope, subscription: LibXMTP.FfiV2Subscription), Error>
 	func makeSubscribeRequest(topics: [String]) -> SubscribeRequest
 }
 
@@ -138,12 +137,8 @@ final class GRPCApiClient: ApiClient {
 	func makeSubscribeRequest(topics: [String]) -> SubscribeRequest {
 		return SubscribeRequest.with { $0.contentTopics = topics }
 	}
-	
-	func subscribe2(request: SubscribeRequest) async throws -> LibXMTP.FfiV2Subscription {
-		return try await rustClient.subscribe(request: request.toFFI)
-	}
-	
-	func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
+
+	func subscribe(topics: [String]) -> AsyncThrowingStream<(envelope: Envelope, subscription: LibXMTP.FfiV2Subscription), Error> {
 		return AsyncThrowingStream { continuation in
 			Task {
 				let request = SubscribeRequest.with { $0.contentTopics = topics }
@@ -158,7 +153,7 @@ final class GRPCApiClient: ApiClient {
 
 					while true {
 						let nextEnvelope = try await subscription.next()
-						continuation.yield(nextEnvelope.fromFFI)
+						continuation.yield((envelope: nextEnvelope.fromFFI, subscription: subscription))
 					}
 				} catch {
 					throw ApiClientError.subscribeError(error.localizedDescription)

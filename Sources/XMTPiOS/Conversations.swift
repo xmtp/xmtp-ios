@@ -108,34 +108,29 @@ public actor Conversations {
 					topics.append(conversation.topic)
 				}
 
-				var subscribeRequest = client.makeSubscribeRequest(topics: topics)
-				var subscription = try await client.subscribe2(request: subscribeRequest)
-
 				do {
-					while true {
-						let nextEnvelope = try await subscription.next()
-						let envelope = nextEnvelope.fromFFI
-						if let conversation = conversationsByTopic[envelope.contentTopic] {
-							let decoded = try conversation.decode(envelope)
-							continuation.yield(decoded)
-						} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
-							let conversation = try fromInvite(envelope: envelope)
-							conversationsByTopic[conversation.topic] = conversation
-							topics.append(conversation.topic)
-							subscribeRequest = client.makeSubscribeRequest(topics: topics)
-							try await subscription.update(req: subscribeRequest.toFFI)
-						} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
-							let conversation = try fromIntro(envelope: envelope)
-							conversationsByTopic[conversation.topic] = conversation
-							let decoded = try conversation.decode(envelope)
-							continuation.yield(decoded)
-							topics.append(conversation.topic)
-							subscribeRequest = client.makeSubscribeRequest(topics: topics)
-							try await subscription.update(req: subscribeRequest.toFFI)
+					for try await (envelope, subscription) in client.subscribe(topics: topics) {
+						while true {
+							if let conversation = conversationsByTopic[envelope.contentTopic] {
+								let decoded = try conversation.decode(envelope)
+								continuation.yield(decoded)
+							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
+								let conversation = try fromInvite(envelope: envelope)
+								conversationsByTopic[conversation.topic] = conversation
+								topics.append(conversation.topic)
+								try await subscription.update(req: client.makeSubscribeRequest(topics: topics).toFFI)
+							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
+								let conversation = try fromIntro(envelope: envelope)
+								conversationsByTopic[conversation.topic] = conversation
+								let decoded = try conversation.decode(envelope)
+								continuation.yield(decoded)
+								topics.append(conversation.topic)
+								try await subscription.update(req: client.makeSubscribeRequest(topics: topics).toFFI)
+
+							}
 						}
 					}
 				} catch {
-					await subscription.end()
 					continuation.finish(throwing: error)
 				}
 			}
@@ -154,40 +149,35 @@ public actor Conversations {
 						topics.append(conversation.topic)
 					}
 
-					var subscribeRequest = client.makeSubscribeRequest(topics: topics)
-					var subscription = try await client.subscribe2(request: subscribeRequest)
-
 					do {
-						while true {
-							let nextEnvelope = try await subscription.next()
-							let envelope = nextEnvelope.fromFFI
-							if let conversation = conversationsByTopic[envelope.contentTopic] {
-								let decoded = try conversation.decrypt(envelope)
-								continuation.yield(decoded)
-							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
-								let conversation = try fromInvite(envelope: envelope)
-								conversationsByTopic[conversation.topic] = conversation
-								topics.append(conversation.topic)
-								subscribeRequest = client.makeSubscribeRequest(topics: topics)
-								try await subscription.update(req: subscribeRequest.toFFI)
-							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
-								let conversation = try fromIntro(envelope: envelope)
-								conversationsByTopic[conversation.topic] = conversation
-								let decoded = try conversation.decrypt(envelope)
-								continuation.yield(decoded)
-								topics.append(conversation.topic)
-								subscribeRequest = client.makeSubscribeRequest(topics: topics)
-								try await subscription.update(req: subscribeRequest.toFFI)
+						for try await (envelope, subscription) in client.subscribe(topics: topics) {
+							while true {
+								let nextEnvelope = try await subscription.next()
+								let envelope = nextEnvelope.fromFFI
+								if let conversation = conversationsByTopic[envelope.contentTopic] {
+									let decoded = try conversation.decrypt(envelope)
+									continuation.yield(decoded)
+								} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
+									let conversation = try fromInvite(envelope: envelope)
+									conversationsByTopic[conversation.topic] = conversation
+									topics.append(conversation.topic)
+									try await subscription.update(req: client.makeSubscribeRequest(topics: topics).toFFI)
+								} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
+									let conversation = try fromIntro(envelope: envelope)
+									conversationsByTopic[conversation.topic] = conversation
+									let decoded = try conversation.decrypt(envelope)
+									continuation.yield(decoded)
+									topics.append(conversation.topic)
+									try await subscription.update(req: client.makeSubscribeRequest(topics: topics).toFFI)
+								}
 							}
 						}
 					} catch {
-						await subscription.end()
 						continuation.finish(throwing: error)
 					}
 				}
 			}
 		}
-	}
 
 	public func fromInvite(envelope: Envelope) throws -> Conversation {
 		let sealedInvitation = try SealedInvitation(serializedData: envelope.message)
@@ -253,7 +243,7 @@ public actor Conversations {
 			Task {
 				var streamedConversationTopics: Set<String> = []
 
-				for try await envelope in client.subscribe(topics: [.userIntro(client.address), .userInvite(client.address)]) {
+				for try await (envelope, subscription) in client.subscribe(topics: [.userIntro(client.address), .userInvite(client.address)]) {
 					if envelope.contentTopic == Topic.userIntro(client.address).description {
 						let conversationV1 = try fromIntro(envelope: envelope)
 

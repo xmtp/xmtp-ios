@@ -321,18 +321,14 @@ public final class Client: Sendable {
 		try await apiClient.publish(envelopes: envelopes)
 	}
 
-	public func subscribe(topics: [String]) -> AsyncThrowingStream<Envelope, Error> {
+	public func subscribe(topics: [String]) -> AsyncThrowingStream<(envelope: Envelope, subscription: LibXMTP.FfiV2Subscription), Error> {
 		return apiClient.subscribe(topics: topics)
 	}
 
-	public func subscribe(topics: [Topic]) -> AsyncThrowingStream<Envelope, Error> {
+	public func subscribe(topics: [Topic]) -> AsyncThrowingStream<(envelope: Envelope, subscription: LibXMTP.FfiV2Subscription), Error> {
 		return subscribe(topics: topics.map(\.description))
 	}
-	
-	public func subscribe2(request: SubscribeRequest) async throws -> FfiV2Subscription {
-		return try await apiClient.subscribe2(request: request)
-	}
-	
+
 	public func makeSubscribeRequest(topics: [String]) -> SubscribeRequest {
 		return apiClient.makeSubscribeRequest(topics: topics)
 	}

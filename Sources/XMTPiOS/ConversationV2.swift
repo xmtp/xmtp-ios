@@ -159,7 +159,7 @@ public struct ConversationV2 {
 		AsyncThrowingStream { continuation in
 			Task {
 				do {
-					for try await envelope in client.subscribe(topics: [ephemeralTopic]) {
+					for try await (envelope, subscription) in client.subscribe(topics: [ephemeralTopic]) {
 						continuation.yield(envelope)
 					}
 				} catch {
@@ -172,7 +172,7 @@ public struct ConversationV2 {
 	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
 		AsyncThrowingStream { continuation in
 			Task {
-				for try await envelope in client.subscribe(topics: [topic.description]) {
+				for try await (envelope, subscription) in client.subscribe(topics: [topic.description]) {
 					let decoded = try decode(envelope: envelope)
 
 					continuation.yield(decoded)
@@ -184,7 +184,7 @@ public struct ConversationV2 {
 	public func streamDecryptedMessages() -> AsyncThrowingStream<DecryptedMessage, Error> {
 		AsyncThrowingStream { continuation in
 			Task {
-				for try await envelope in client.subscribe(topics: [topic.description]) {
+				for try await (envelope, subscription) in client.subscribe(topics: [topic.description]) {
 					let decoded = try decrypt(envelope: envelope)
 
 					continuation.yield(decoded)

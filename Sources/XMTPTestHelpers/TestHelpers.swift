@@ -81,6 +81,27 @@ class FakeStreamHolder: ObservableObject {
 
 @available(iOS 15, *)
 public class FakeApiClient: ApiClient {
+	public func subscribe(topics: [String]) -> AsyncThrowingStream<(envelope: XMTPiOS.Envelope, subscription: LibXMTP.FfiV2Subscription), Error> {
+		AsyncThrowingStream { continuation in
+			self.cancellable = stream.$envelope.sink(receiveValue: { env in
+				if let env, topics.contains(env.contentTopic) {
+					Task {
+						let request = SubscribeRequest.with { $0.contentTopics = topics }
+						try continuation.yield((env, await self.subscribe2(request: request)))
+					}
+				}
+			})
+		}
+	}
+
+	public func subscribe2(request: XMTPiOS.SubscribeRequest) async throws -> LibXMTP.FfiV2Subscription {
+		return try await rustClient.subscribe(request: request.toFFI)
+	}
+	
+	public func makeSubscribeRequest(topics: [String]) -> XMTPiOS.SubscribeRequest {
+		return SubscribeRequest.with { $0.contentTopics = topics }
+	}
+	
 	public func envelopes(topic: String, pagination: XMTPiOS.Pagination?) async throws -> [XMTPiOS.Envelope] {
 		try await query(topic: topic, pagination: pagination).envelopes
 	}
@@ -88,6 +109,7 @@ public class FakeApiClient: ApiClient {
 	public var environment: XMTPEnvironment
 	public var authToken: String = ""
     public var appVersion: String
+	public var rustClient: LibXMTP.FfiV2ApiClient
 	private var responses: [String: [XMTPiOS.Envelope]] = [:]
 	private var stream = FakeStreamHolder()
 	public var published: [XMTPiOS.Envelope] = []
@@ -118,9 +140,10 @@ public class FakeApiClient: ApiClient {
 		responses[topic.description] = responsesForTopic
 	}
 
-	public init() {
+	public init() async throws {
 		environment = .local
         appVersion = "test/0.0.0"
+		rustClient = try await LibXMTP.createV2Client(host: GRPCApiClient.envToUrl(env: .local), isSecure: false)
 	}
 
 	public func send(envelope: XMTPiOS.Envelope) {
@@ -137,9 +160,10 @@ public class FakeApiClient: ApiClient {
 
 	// MARK: ApiClient conformance
 
-	public required init(environment: XMTPiOS.XMTPEnvironment, secure _: Bool, rustClient _: LibXMTP.FfiV2ApiClient, appVersion: String?) throws {
+	public required init(environment: XMTPiOS.XMTPEnvironment, secure _: Bool, rustClient: LibXMTP.FfiV2ApiClient, appVersion: String?) throws {
 		self.environment = environment
         self.appVersion = appVersion ?? "0.0.0"
+		self.rustClient = rustClient
 	}
 
 	public func subscribe(topics: [String]) -> AsyncThrowingStream<XMTPiOS.Envelope, Error> {
@@ -271,7 +295,7 @@ public struct Fixtures {
 		alice = try PrivateKey.generate()
 		bob = try PrivateKey.generate()
 
-		fakeApiClient = FakeApiClient()
+		fakeApiClient = try await FakeApiClient()
 
 		aliceClient = try await Client.create(account: alice, apiClient: fakeApiClient)
 		bobClient = try await Client.create(account: bob, apiClient: fakeApiClient)
