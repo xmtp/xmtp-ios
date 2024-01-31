@@ -108,9 +108,9 @@ public actor Conversations {
 					topics.append(conversation.topic)
 				}
 
-				do {
-					for try await (envelope, subscription) in client.subscribe(topics: topics) {
-						while true {
+				while(true) {
+					do {
+						for try await (envelope, subscription) in client.subscribe(topics: topics) {
 							if let conversation = conversationsByTopic[envelope.contentTopic] {
 								let decoded = try conversation.decode(envelope)
 								continuation.yield(decoded)
@@ -126,50 +126,6 @@ public actor Conversations {
 								continuation.yield(decoded)
 								topics.append(conversation.topic)
 								try await subscription.update(req: client.makeSubscribeRequest(topics: topics).toFFI)
-
-							}
-						}
-					}
-				} catch {
-					continuation.finish(throwing: error)
-				}
-			}
-		}
-	}
-
-	public func streamAllDecryptedMessages() async throws -> AsyncThrowingStream<DecryptedMessage, Error> {
-		return AsyncThrowingStream { continuation in
-			Task {
-					var topics: [String] = [
-						Topic.userInvite(client.address).description,
-						Topic.userIntro(client.address).description,
-					]
-
-					for conversation in try await list() {
-						topics.append(conversation.topic)
-					}
-
-					do {
-						for try await (envelope, subscription) in client.subscribe(topics: topics) {
-							while true {
-								let nextEnvelope = try await subscription.next()
-								let envelope = nextEnvelope.fromFFI
-								if let conversation = conversationsByTopic[envelope.contentTopic] {
-									let decoded = try conversation.decrypt(envelope)
-									continuation.yield(decoded)
-								} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
-									let conversation = try fromInvite(envelope: envelope)
-									conversationsByTopic[conversation.topic] = conversation
-									topics.append(conversation.topic)
-									try await subscription.update(req: client.makeSubscribeRequest(topics: topics).toFFI)
-								} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
-									let conversation = try fromIntro(envelope: envelope)
-									conversationsByTopic[conversation.topic] = conversation
-									let decoded = try conversation.decrypt(envelope)
-									continuation.yield(decoded)
-									topics.append(conversation.topic)
-									try await subscription.update(req: client.makeSubscribeRequest(topics: topics).toFFI)
-								}
 							}
 						}
 					} catch {
@@ -178,6 +134,47 @@ public actor Conversations {
 				}
 			}
 		}
+	}
+
+	public func streamAllDecryptedMessages() async throws -> AsyncThrowingStream<DecryptedMessage, Error> {
+		return AsyncThrowingStream { continuation in
+			Task {
+				var topics: [String] = [
+					Topic.userInvite(client.address).description,
+					Topic.userIntro(client.address).description,
+				]
+				
+				for conversation in try await list() {
+					topics.append(conversation.topic)
+				}
+				
+				while true {
+					do {
+						for try await (envelope, subscription) in client.subscribe(topics: topics) {
+							if let conversation = conversationsByTopic[envelope.contentTopic] {
+								let decoded = try conversation.decrypt(envelope)
+								continuation.yield(decoded)
+							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
+								let conversation = try fromInvite(envelope: envelope)
+								conversationsByTopic[conversation.topic] = conversation
+								topics.append(conversation.topic)
+								try await subscription.update(req: client.makeSubscribeRequest(topics: topics).toFFI)
+							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
+								let conversation = try fromIntro(envelope: envelope)
+								conversationsByTopic[conversation.topic] = conversation
+								let decoded = try conversation.decrypt(envelope)
+								continuation.yield(decoded)
+								topics.append(conversation.topic)
+								try await subscription.update(req: client.makeSubscribeRequest(topics: topics).toFFI)
+							}
+						}
+					} catch {
+						continuation.finish(throwing: error)
+					}
+				}
+			}
+		}
+	}
 
 	public func fromInvite(envelope: Envelope) throws -> Conversation {
 		let sealedInvitation = try SealedInvitation(serializedData: envelope.message)
