@@ -111,7 +111,6 @@ public actor Conversations {
 				var subscribeRequest = client.makeSubscribeRequest(topics: topics)
 				var subscription = try await client.subscribe2(request: subscribeRequest)
 
-				let request = SubscribeRequest.with { $0.contentTopics = topics }
 				do {
 					while true {
 						let nextEnvelope = try await subscription.next()
@@ -146,7 +145,6 @@ public actor Conversations {
 	public func streamAllDecryptedMessages() async throws -> AsyncThrowingStream<DecryptedMessage, Error> {
 		return AsyncThrowingStream { continuation in
 			Task {
-				while true {
 					var topics: [String] = [
 						Topic.userInvite(client.address).description,
 						Topic.userIntro(client.address).description,
@@ -156,26 +154,34 @@ public actor Conversations {
 						topics.append(conversation.topic)
 					}
 
+					var subscribeRequest = client.makeSubscribeRequest(topics: topics)
+					var subscription = try await client.subscribe2(request: subscribeRequest)
+
 					do {
-						for try await envelope in client.subscribe(topics: topics) {
+						while true {
+							let nextEnvelope = try await subscription.next()
+							let envelope = nextEnvelope.fromFFI
 							if let conversation = conversationsByTopic[envelope.contentTopic] {
 								let decoded = try conversation.decrypt(envelope)
 								continuation.yield(decoded)
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
 								let conversation = try fromInvite(envelope: envelope)
 								conversationsByTopic[conversation.topic] = conversation
-								break // Break so we can resubscribe with the new conversation
+								topics.append(conversation.topic)
+								subscribeRequest = client.makeSubscribeRequest(topics: topics)
+								try await subscription.update(req: subscribeRequest.toFFI)
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
 								let conversation = try fromIntro(envelope: envelope)
 								conversationsByTopic[conversation.topic] = conversation
 								let decoded = try conversation.decrypt(envelope)
 								continuation.yield(decoded)
-								break // Break so we can resubscribe with the new conversation
-							} else {
-								print("huh \(envelope)")
+								topics.append(conversation.topic)
+								subscribeRequest = client.makeSubscribeRequest(topics: topics)
+								try await subscription.update(req: subscribeRequest.toFFI)
 							}
 						}
 					} catch {
+						await subscription.end()
 						continuation.finish(throwing: error)
 					}
 				}
