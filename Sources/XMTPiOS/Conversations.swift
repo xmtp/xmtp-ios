@@ -1,7 +1,7 @@
 import Foundation
 
 public enum ConversationError: Error {
-	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String)
+	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String), streamingIssue(String)
 }
 
 /// Handles listing and creating Conversations.
@@ -98,41 +98,55 @@ public actor Conversations {
 
 	public func streamAllMessages() async throws -> AsyncThrowingStream<DecodedMessage, Error> {
 		return AsyncThrowingStream { continuation in
+			var topics: [String] = [
+				Topic.userInvite(client.address).description,
+				Topic.userIntro(client.address).description,
+			]
+
+			for conversation in try await list() {
+				topics.append(conversation.topic)
+			}
+
+			var subscribeRequest = client.makeSubscribeRequest(topics: topics)
+			var subscription = client.subscribe2(request: subscribeRequest)
+
 			Task {
-				while true {
-					var topics: [String] = [
-						Topic.userInvite(client.address).description,
-						Topic.userIntro(client.address).description,
-					]
-
-					for conversation in try await list() {
-						topics.append(conversation.topic)
-					}
-
-					do {
-						for try await envelope in client.subscribe(topics: topics) {
-							if let conversation = conversationsByTopic[envelope.contentTopic] {
-								let decoded = try conversation.decode(envelope)
-								continuation.yield(decoded)
-							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
-								let conversation = try fromInvite(envelope: envelope)
-								conversationsByTopic[conversation.topic] = conversation
-							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
-								let conversation = try fromIntro(envelope: envelope)
-								conversationsByTopic[conversation.topic] = conversation
-								let decoded = try conversation.decode(envelope)
-								continuation.yield(decoded)
-							} else {
-								print("huh \(envelope)")
-							}
+				let request = SubscribeRequest.with { $0.contentTopics = topics }
+				do {
+					defer {
+						Task {
+							await subscription.end()
 						}
-					} catch {
-						continuation.finish(throwing: error)
 					}
+
+					while true {
+						let nextEnvelope = try await subscription.next()
+						let envelope = nextEnvelope.fromFFI
+						if let conversation = conversationsByTopic[envelope.contentTopic] {
+							let decoded = try conversation.decode(envelope)
+							continuation.yield(decoded)
+						} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
+							let conversation = try fromInvite(envelope: envelope)
+							conversationsByTopic[conversation.topic] = conversation
+							subscribeRequest = client.makeSubscribeRequest(topics: topics)
+							subscription.update(req: subscribeRequest.toFFI)
+						} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
+							let conversation = try fromIntro(envelope: envelope)
+							conversationsByTopic[conversation.topic] = conversation
+							let decoded = try conversation.decode(envelope)
+							subscription.update(req: subscribeRequest.toFFI)
+							continuation.yield(decoded)
+						} else {
+							print("huh \(envelope)")
+						}
+					}
+				} catch {
+					throw ConversationError.streamingIssue(error.localizedDescription)
 				}
 			}
 		}
 	}
+
 
 	public func streamAllDecryptedMessages() async throws -> AsyncThrowingStream<DecryptedMessage, Error> {
 		return AsyncThrowingStream { continuation in

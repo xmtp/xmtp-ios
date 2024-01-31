@@ -328,6 +328,14 @@ public final class Client: Sendable {
 	public func subscribe(topics: [Topic]) -> AsyncThrowingStream<Envelope, Error> {
 		return subscribe(topics: topics.map(\.description))
 	}
+	
+	public func subscribe2(request: SubscribeRequest) async throws -> FfiV2Subscription {
+		return try await apiClient.subscribe2(request: request)
+	}
+	
+	public func makeSubscribeRequest(topics: [String]) -> SubscribeRequest {
+		return apiClient.makeSubscribeRequest(topics: topics)
+	}
 
 	func getUserContact(peerAddress: String) async throws -> ContactBundle? {
 		let peerAddress = EthereumAddress(peerAddress).toChecksumAddress()
