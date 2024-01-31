@@ -149,13 +149,13 @@ final class GRPCApiClient: ApiClient {
 				let request = SubscribeRequest.with { $0.contentTopics = topics }
 				do {
 					let subscription = try await rustClient.subscribe(request: request.toFFI)
-					
+
 					defer {
 						Task {
 							await subscription.end()
 						}
 					}
-					
+
 					while true {
 						let nextEnvelope = try await subscription.next()
 						continuation.yield(nextEnvelope.fromFFI)
