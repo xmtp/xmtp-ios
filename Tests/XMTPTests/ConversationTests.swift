@@ -266,7 +266,8 @@ class ConversationTests: XCTestCase {
 		}
 
 		let codec = TextCodec()
-		let originalContent = try codec.encode(content: "hello", client: aliceClient)
+		let originalContentText = "hello"
+		let originalContent = try codec.encode(content: originalContentText, client: aliceClient)
 		let tamperedContent = try codec.encode(content: "this is a fake", client: aliceClient)
 
 		let originalPayload = try originalContent.serializedData()
@@ -292,12 +293,14 @@ class ConversationTests: XCTestCase {
 		let infoEncoded = info.data(using: .utf8)
 		
 		let senderHmac = try Crypto.generateHmacSignature(secret: aliceConversation.keyMaterial, info: infoEncoded!, message: headerBytes)
+		
+		let shouldPush = try codec.shouldPush(content: originalContentText)
 
 		let tamperedMessage = MessageV2(
 			headerBytes: headerBytes,
 			ciphertext: ciphertext,
 			senderHmac: senderHmac,
-			shouldPush: false
+			shouldPush: shouldPush
 		)
 
 		try await aliceClient.publish(envelopes: [
