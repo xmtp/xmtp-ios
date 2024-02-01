@@ -7,10 +7,12 @@
 
 import SwiftUI
 import XMTPiOS
+import web3
 
 struct MessageCellView: View {
 	var myAddress: String
 	var message: DecodedMessage
+	var isGroup: Bool = false
 	@State private var isDebugging = false
 
 	var body: some View {
@@ -20,6 +22,12 @@ struct MessageCellView: View {
 					Spacer()
 				}
 				VStack(alignment: .leading) {
+					if isGroup && message.senderAddress.lowercased() != myAddress.lowercased() {
+						Text(message.senderAddress)
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
+
 					Text(bodyText)
 
 					if isDebugging {

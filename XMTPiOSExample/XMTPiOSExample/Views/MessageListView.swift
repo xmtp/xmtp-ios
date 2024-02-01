@@ -11,13 +11,14 @@ import XMTPiOS
 struct MessageListView: View {
 	var myAddress: String
 	var messages: [DecodedMessage]
+	var isGroup: Bool = false
 
 	var body: some View {
 		ScrollViewReader { proxy in
 			ScrollView {
 				VStack {
 					ForEach(Array(messages.sorted(by: { $0.sent < $1.sent }).enumerated()), id: \.0) { i, message in
-						MessageCellView(myAddress: myAddress, message: message)
+						MessageCellView(myAddress: myAddress, message: message, isGroup: isGroup)
 							.transition(.scale)
 							.id(i)
 					}
