@@ -1,4 +1,5 @@
 import Foundation
+import LibXMTP
 
 public enum ConversationError: Error {
 	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String)
@@ -17,10 +18,24 @@ public actor Conversations {
 		self.client = client
 	}
 
-	public func groups() async throws -> [Group] {
+	public func groups(createdAfter: Date? = nil, createdBefore: Date? = nil, limit: Int? = nil) async throws -> [Group] {
 		try await client.v3Client.conversations().sync()
 
-		return try await client.v3Client.conversations().list(opts: .init(createdAfterNs: nil, createdBeforeNs: nil, limit: nil)).map { $0.fromFFI(client: client) }
+		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil)
+
+		if let createdAfter {
+			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
+		}
+
+		if let createdBefore {
+			options.createdBeforeNs = Int64(createdBefore.millisecondsSinceEpoch)
+		}
+
+		if let limit {
+			options.limit = Int64(limit)
+		}
+
+		return try await client.v3Client.conversations().list(opts: options).map { $0.fromFFI(client: client) }
 	}
 
 	public func newGroup(with addresses: [String]) async throws -> Group {

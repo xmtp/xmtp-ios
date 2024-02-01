@@ -86,10 +86,24 @@ public struct Group: Identifiable, Equatable, Hashable {
 		try await ffiGroup.send(contentBytes: encoded.serializedData())
 	}
 
-	public func messages() async throws -> [DecodedMessage] {
-		// TODO: paginate
+	public func messages(before: Date? = nil, after: Date? = nil, limit: Int? = nil) async throws -> [DecodedMessage] {
 		try await ffiGroup.sync()
-		let messages = try ffiGroup.findMessages(opts: .init(sentBeforeNs: nil, sentAfterNs: nil, limit: nil))
+
+		var options = FfiListMessagesOptions(sentBeforeNs: nil, sentAfterNs: nil, limit: nil)
+
+		if let before {
+			options.sentBeforeNs = Int64(before.millisecondsSinceEpoch)
+		}
+
+		if let after {
+			options.sentAfterNs = Int64(after.millisecondsSinceEpoch)
+		}
+
+		if let limit {
+			options.limit = Int64(limit)
+		}
+
+		let messages = try ffiGroup.findMessages(opts: options)
 
 		return try messages.map { ffiMessage in
 			let encodedContent = try EncodedContent(serializedData: ffiMessage.content)
