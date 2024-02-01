@@ -24,6 +24,10 @@ public struct Group: Identifiable, Equatable, Hashable {
 		ffiGroup.id()
 	}
 
+	public func sync() async throws {
+		try await ffiGroup.sync()
+	}
+
 	public static func == (lhs: Group, rhs: Group) -> Bool {
 		lhs.id == rhs.id
 	}
@@ -32,12 +36,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 		id.hash(into: &hasher)
 	}
 
-	public func members() async throws -> [Member] {
-		_ = try await ffiGroup.sync()
-		return try ffiGroup.listMembers().map(\.fromFFI)
-	}
-
-	public var cachedMembers: [Member] {
+	public var members: [Member] {
 		do {
 			return try ffiGroup.listMembers().map(\.fromFFI)
 		} catch {
@@ -45,14 +44,13 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}
 	}
 
+
 	public func addMembers(addresses: [String]) async throws {
 		try await ffiGroup.addMembers(accountAddresses: addresses)
-		try await ffiGroup.sync()
 	}
 
 	public func removeMembers(addresses: [String]) async throws {
 		try await ffiGroup.removeMembers(accountAddresses: addresses)
-		try await ffiGroup.sync()
 	}
 
 	public func send<T>(content: T, options: SendOptions? = nil) async throws {
@@ -87,8 +85,6 @@ public struct Group: Identifiable, Equatable, Hashable {
 	}
 
 	public func messages(before: Date? = nil, after: Date? = nil, limit: Int? = nil) async throws -> [DecodedMessage] {
-		try await ffiGroup.sync()
-
 		var options = FfiListMessagesOptions(sentBeforeNs: nil, sentAfterNs: nil, limit: nil)
 
 		if let before {

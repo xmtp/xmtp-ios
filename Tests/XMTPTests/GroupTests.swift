@@ -74,7 +74,10 @@ class GroupTests: XCTestCase {
 		_ = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
 
 		let aliceGroupCount = try await fixtures.aliceClient.conversations.groups().count
+
+		try await fixtures.bobClient.conversations.sync()
 		let bobGroupCount = try await fixtures.bobClient.conversations.groups().count
+
 		XCTAssertEqual(1, aliceGroupCount)
 		XCTAssertEqual(1, bobGroupCount)
 	}
@@ -83,7 +86,8 @@ class GroupTests: XCTestCase {
 		let fixtures = try await localFixtures()
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
 
-		let members = try await group.members().map(\.accountAddress.localizedLowercase).sorted()
+		try await group.sync()
+		let members = group.members.map(\.accountAddress.localizedLowercase).sorted()
 
 		XCTAssertEqual([fixtures.bob.address.localizedLowercase, fixtures.alice.address.localizedLowercase].sorted(), members)
 	}
@@ -94,7 +98,8 @@ class GroupTests: XCTestCase {
 
 		try await group.addMembers(addresses: [fixtures.fred.address])
 
-		let members = try await group.members().map(\.accountAddress.localizedLowercase).sorted()
+		try await group.sync()
+		let members = group.members.map(\.accountAddress.localizedLowercase).sorted()
 
 		XCTAssertEqual([
 			fixtures.bob.address.localizedLowercase,
@@ -110,7 +115,8 @@ class GroupTests: XCTestCase {
 		let fixtures = try await localFixtures()
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
 
-		let members = try await group.members().map(\.accountAddress.localizedLowercase).sorted()
+		try await group.sync()
+		let members = group.members.map(\.accountAddress.localizedLowercase).sorted()
 
 		XCTAssertEqual([
 			fixtures.bob.address.localizedLowercase,
@@ -120,7 +126,9 @@ class GroupTests: XCTestCase {
 
 		try await group.removeMembers(addresses: [fixtures.fred.address])
 
-		let newMembers = try await group.members().map(\.accountAddress.localizedLowercase).sorted()
+		try await group.sync()
+
+		let newMembers = group.members.map(\.accountAddress.localizedLowercase).sorted()
 		XCTAssertEqual([
 			fixtures.bob.address.localizedLowercase,
 			fixtures.alice.address.localizedLowercase,
@@ -149,11 +157,16 @@ class GroupTests: XCTestCase {
 	func testCanSendMessagesToGroup() async throws {
 		let fixtures = try await localFixtures()
 		let aliceGroup = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+
+		try await fixtures.bobClient.conversations.sync()
 		let bobGroup = try await fixtures.bobClient.conversations.groups()[0]
 
 		try await aliceGroup.send(content: "sup gang")
 
+		try await aliceGroup.sync()
 		let aliceMessage = try await aliceGroup.messages().last!
+
+		try await bobGroup.sync()
 		let bobMessage = try await bobGroup.messages().last!
 
 		XCTAssertEqual("sup gang", try aliceMessage.content())

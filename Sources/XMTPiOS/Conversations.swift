@@ -18,9 +18,11 @@ public actor Conversations {
 		self.client = client
 	}
 
-	public func groups(createdAfter: Date? = nil, createdBefore: Date? = nil, limit: Int? = nil) async throws -> [Group] {
+	public func sync() async throws {
 		try await client.v3Client.conversations().sync()
+	}
 
+	public func groups(createdAfter: Date? = nil, createdBefore: Date? = nil, limit: Int? = nil) async throws -> [Group] {
 		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil)
 
 		if let createdAfter {
