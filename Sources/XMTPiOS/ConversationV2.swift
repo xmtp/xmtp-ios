@@ -79,22 +79,13 @@ public struct ConversationV2 {
 
 	func prepareMessage(encodedContent: EncodedContent, options: SendOptions?) async throws -> PreparedMessage {
 		let codec = client.codecRegistry.find(for: options?.contentType)
-		let decoded = try codec.decode(content: encodedContent, client: client)
-		
-		func shouldPush<Codec: ContentCodec>(codec: Codec, content: Any) throws -> Bool {
-			if let content = decoded as? Codec.T {
-				return try codec.shouldPush(content: content)
-			} else {
-				throw CodecError.invalidContent
-			}
-		}
 
 		let message = try await MessageV2.encode(
 			client: client,
 			content: encodedContent,
 			topic: topic,
 			keyMaterial: keyMaterial,
-			shouldPush: shouldPush(codec: codec, content: encodedContent)
+			codec: codec
 		)
 
 		let topic = options?.ephemeral == true ? ephemeralTopic : topic
@@ -246,7 +237,7 @@ public struct ConversationV2 {
 			content: content,
 			topic: topic,
 			keyMaterial: keyMaterial,
-			shouldPush: codec.shouldPush(content: content as! T)
+			codec: codec
 		)
 
 		let envelope = Envelope(

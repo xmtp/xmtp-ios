@@ -12,7 +12,7 @@ import LibXMTP
 typealias MessageV2 = Xmtp_MessageContents_MessageV2
 
 enum MessageV2Error: Error {
-	case invalidSignature, decodeError(String)
+	case invalidSignature, decodeError(String), invalidData
 }
 
 extension MessageV2 {
@@ -80,7 +80,7 @@ extension MessageV2 {
 		}
 	}
 
-	static func encode(client: Client, content encodedContent: EncodedContent, topic: String, keyMaterial: Data, shouldPush: Bool) async throws -> MessageV2 {
+	static func encode<Codec: ContentCodec>(client: Client, content encodedContent: EncodedContent, topic: String, keyMaterial: Data, codec: Codec) async throws -> MessageV2 {
 		let payload = try encodedContent.serializedData()
 
 		let date = Date()
@@ -100,9 +100,14 @@ extension MessageV2 {
 		
 		let thirtyDayPeriodsSinceEpoch = Int(date.timeIntervalSince1970 / 60 / 60 / 24 / 30)
 		let info = "\(thirtyDayPeriodsSinceEpoch)-\(client.address)"
-		let infoEncoded = info.data(using: .utf8)
+		guard let infoEncoded = info.data(using: .utf8) else {
+			throw MessageV2Error.invalidData
+		}
 
-		let senderHmac = try Crypto.generateHmacSignature(secret: keyMaterial, info: infoEncoded!, message: headerBytes)
+		let senderHmac = try Crypto.generateHmacSignature(secret: keyMaterial, info: infoEncoded, message: headerBytes)
+		
+		let decoded = try codec.decode(content: encodedContent, client: client)
+		let shouldPush = try codec.shouldPush(content: decoded)
 		
 
 		return MessageV2(

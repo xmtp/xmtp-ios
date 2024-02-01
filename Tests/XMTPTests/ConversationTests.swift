@@ -231,7 +231,7 @@ class ConversationTests: XCTestCase {
 						content: encodedContent,
 						topic: conversation.topic,
 						keyMaterial: conversation.keyMaterial,
-						shouldPush: false
+						codec: encoder
 					)
 				).serializedData()
 			)
