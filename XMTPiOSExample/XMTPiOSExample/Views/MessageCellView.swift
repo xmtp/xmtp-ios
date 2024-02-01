@@ -9,7 +9,7 @@ import SwiftUI
 import XMTPiOS
 import web3
 
-struct MessageCellView: View {
+struct MessageTextView: View {
 	var myAddress: String
 	var message: DecodedMessage
 	var isGroup: Bool = false
@@ -76,6 +76,53 @@ struct MessageCellView: View {
 			return .white
 		} else {
 			return .primary
+		}
+	}
+}
+
+struct MessageGroupMembershipChangedView: View {
+	var message: DecodedMessage
+
+	var body: some View {
+		Text(label)
+			.font(.caption)
+			.foregroundStyle(.secondary)
+	}
+
+	var label: String {
+		do {
+			let changes: GroupMembershipChanges = try message.content()
+
+			if !changes.membersAdded.isEmpty {
+				return "Added \(changes.membersAdded.map(\.accountAddress).joined(separator: ", "))"
+			}
+
+			if !changes.membersRemoved.isEmpty {
+				return "Removed \(changes.membersRemoved.map(\.accountAddress).joined(separator: ", "))"
+			}
+
+			return changes.debugDescription
+		} catch {
+			return "Membership changed"
+		}
+
+	}
+}
+
+struct MessageCellView: View {
+	var myAddress: String
+	var message: DecodedMessage
+	var isGroup: Bool = false
+	@State private var isDebugging = false
+
+	var body: some View {
+		switch message.encodedContent.type {
+		case ContentTypeText:
+			MessageTextView(myAddress: myAddress, message: message)
+		case ContentTypeGroupMembershipChanged:
+			MessageGroupMembershipChangedView(message: message)
+		default:
+			Text(message.fallbackContent)
 		}
 	}
 }
