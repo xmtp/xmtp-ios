@@ -88,6 +88,7 @@ public struct ConversationV2 {
 				throw CodecError.invalidContent
 			}
 		}
+
 		let message = try await MessageV2.encode(
 			client: client,
 			content: encodedContent,
