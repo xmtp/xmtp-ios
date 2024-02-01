@@ -55,15 +55,6 @@
       }
     },
     {
-      "identity" : "libxmtp-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/xmtp/libxmtp-swift",
-      "state" : {
-        "branch" : "92274fe",
-        "revision" : "92274fe0dde1fc7f8f716ebcffa3d252813be56d"
-      }
-    },
-    {
       "identity" : "qrcode",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/WalletConnect/QRCode",

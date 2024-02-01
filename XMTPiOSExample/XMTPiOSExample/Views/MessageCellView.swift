@@ -16,7 +16,7 @@ struct MessageCellView: View {
 	var body: some View {
 		VStack {
 			HStack {
-				if message.senderAddress == myAddress {
+				if message.senderAddress.lowercased() == myAddress.lowercased() {
 					Spacer()
 				}
 				VStack(alignment: .leading) {
@@ -39,7 +39,7 @@ struct MessageCellView: View {
 						isDebugging.toggle()
 					}
 				}
-				if message.senderAddress != myAddress {
+				if message.senderAddress.lowercased() != myAddress.lowercased() {
 					Spacer()
 				}
 			}
@@ -47,13 +47,16 @@ struct MessageCellView: View {
 	}
 
 	var bodyText: String {
-		// swiftlint:disable force_try
-		return try! message.content()
+		do {
+			return try message.content()
+		} catch {
+			return message.fallbackContent
+		}
 		// swiftlint:enable force_try
 	}
 
 	var background: Color {
-		if message.senderAddress == myAddress {
+		if message.senderAddress.lowercased() == myAddress.lowercased() {
 			return .purple
 		} else {
 			return .secondary.opacity(0.2)
@@ -61,7 +64,7 @@ struct MessageCellView: View {
 	}
 
 	var color: Color {
-		if message.senderAddress == myAddress {
+		if message.senderAddress.lowercased() == myAddress.lowercased() {
 			return .white
 		} else {
 			return .primary

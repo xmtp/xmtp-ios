@@ -4,6 +4,10 @@ public enum ConversationError: Error {
 	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String)
 }
 
+public enum GroupError: Error {
+	case emptyCreation
+}
+
 /// Handles listing and creating Conversations.
 public actor Conversations {
 	var client: Client
@@ -11,6 +15,20 @@ public actor Conversations {
 
 	init(client: Client) {
 		self.client = client
+	}
+
+	public func groups() async throws -> [Group] {
+		try await client.v3Client.conversations().sync()
+
+		return try await client.v3Client.conversations().list(opts: .init(createdAfterNs: nil, createdBeforeNs: nil, limit: nil)).map { $0.fromFFI(client: client) }
+	}
+
+	public func newGroup(with addresses: [String]) async throws -> Group {
+		if addresses.isEmpty {
+			throw GroupError.emptyCreation
+		}
+
+		return try await client.v3Client.conversations().createGroup(accountAddresses: addresses).fromFFI(client: client)
 	}
 
 	/// Import a previously seen conversation.

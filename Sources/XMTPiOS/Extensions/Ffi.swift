@@ -192,3 +192,17 @@ extension FfiV2SubscribeRequest {
 		}
 	}
 }
+
+// MARK: Group
+
+extension FfiGroup {
+	func fromFFI(client: Client) -> Group {
+		Group(ffiGroup: self, client: client)
+	}
+}
+
+extension FfiGroupMember {
+	var fromFFI: Group.Member {
+		Group.Member(ffiGroupMember: self)
+	}
+}

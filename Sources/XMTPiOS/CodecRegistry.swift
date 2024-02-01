@@ -8,7 +8,10 @@
 import Foundation
 
 struct CodecRegistry {
-	var codecs: [String: any ContentCodec] = [TextCodec().id: TextCodec()]
+	var codecs: [String: any ContentCodec] = [
+		TextCodec().id: TextCodec(),
+		GroupMembershipChangedCodec().id: GroupMembershipChangedCodec()
+	]
 
 	mutating func register(codec: any ContentCodec) {
 		codecs[codec.id] = codec

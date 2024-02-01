@@ -12,19 +12,24 @@ struct ConversationListView: View {
 	var client: XMTPiOS.Client
 
 	@EnvironmentObject var coordinator: EnvironmentCoordinator
-	@State private var conversations: [XMTPiOS.Conversation] = []
+	@State private var conversations: [ConversationOrGroup] = []
 	@State private var isShowingNewConversation = false
 
 	var body: some View {
 		List {
-			ForEach(conversations, id: \.peerAddress) { conversation in
-				NavigationLink(value: conversation) {
-					Text(conversation.peerAddress)
+			ForEach(conversations, id: \.id) { item in
+				NavigationLink(value: item) {
+					Text(item.id)
 				}
 			}
 		}
-		.navigationDestination(for: Conversation.self) { conversation in
-			ConversationDetailView(client: client, conversation: conversation)
+		.navigationDestination(for: ConversationOrGroup.self) { item in
+			switch item {
+			case .conversation(let conversation):
+				ConversationDetailView(client: client, conversation: conversation)
+			case .group(let group):
+				GroupDetailView(client: client, group: group)
+			}
 		}
 		.navigationTitle("Conversations")
 		.refreshable {
@@ -36,9 +41,9 @@ struct ConversationListView: View {
 		.task {
 			do {
 				for try await conversation in await client.conversations.stream() {
-					conversations.insert(conversation, at: 0)
+					conversations.insert(.conversation(conversation), at: 0)
 
-					await add(conversations: [conversation])
+					await add(conversations: [.conversation(conversation)])
 				}
 
 			} catch {
@@ -55,19 +60,31 @@ struct ConversationListView: View {
 			}
 		}
 		.sheet(isPresented: $isShowingNewConversation) {
-			NewConversationView(client: client) { conversation in
-				conversations.insert(conversation, at: 0)
-				coordinator.path.append(conversation)
+			NewConversationView(client: client) { conversationOrGroup in
+				switch conversationOrGroup {
+				case .conversation(let conversation):
+					conversations.insert(.conversation(conversation), at: 0)
+					coordinator.path.append(conversation)
+				case .group(let group):
+					conversations.insert(.group(group), at: 0)
+					coordinator.path.append(group)
+				}
 			}
 		}
 	}
 
 	func loadConversations() async {
 		do {
-			let conversations = try await client.conversations.list()
+			let conversations = try await client.conversations.list().map {
+				ConversationOrGroup.conversation($0)
+			}
+
+			let groups = try await client.conversations.groups().map {
+				ConversationOrGroup.group($0)
+			}
 
 			await MainActor.run {
-				self.conversations = conversations
+				self.conversations = conversations + groups
 			}
 
 			await add(conversations: conversations)
@@ -76,21 +93,29 @@ struct ConversationListView: View {
 		}
 	}
 
-	func add(conversations: [Conversation]) async {
-		// Ensure we're subscribed to push notifications on these conversations
-		do {
-			try await XMTPPush.shared.subscribe(topics: conversations.map(\.topic))
-		} catch {
-			print("Error subscribing: \(error)")
-		}
+	func add(conversations: [ConversationOrGroup]) async {
+		for conversationOrGroup in conversations {
+			switch conversationOrGroup {
+			case .conversation(let conversation):
+				// Ensure we're subscribed to push notifications on these conversations
+				do {
+					try await XMTPPush.shared.subscribe(topics: [conversation.topic])
+				} catch {
+					print("Error subscribing: \(error)")
+				}
 
-		for conversation in conversations {
-			do {
-				try Persistence().save(conversation: conversation)
-			} catch {
-				print("Error saving \(conversation.topic): \(error)")
+				do {
+					try Persistence().save(conversation: conversation)
+				} catch {
+					print("Error saving \(conversation.topic): \(error)")
+				}
+			case .group:
+				// TODO: handle
+				return
 			}
 		}
+
+
 	}
 }
 
