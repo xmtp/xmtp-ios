@@ -6,14 +6,14 @@
 //
 
 import SwiftUI
-import XMTP
+import XMTPiOS
 
 class EnvironmentCoordinator: ObservableObject {
 	@Published var path = NavigationPath()
 }
 
 struct LoggedInView: View {
-	var client: XMTP.Client
+	var client: XMTPiOS.Client
 
 	@StateObject var environmentCoordinator = EnvironmentCoordinator()
 

@@ -6,20 +6,24 @@
 //
 
 import XCTest
-@testable import XMTP
+@testable import XMTPiOS
 
 struct NumberCodec: ContentCodec {
+	func shouldPush(content: Double) throws -> Bool {
+		return false
+	}
+	
 	func fallback(content: Double) throws -> String? {
 		return "pi"
 	}
     
 	typealias T = Double
 
-	var contentType: XMTP.ContentTypeID {
+	var contentType: XMTPiOS.ContentTypeID {
 		ContentTypeID(authorityID: "example.com", typeID: "number", versionMajor: 1, versionMinor: 1)
 	}
 
-	func encode(content: Double, client _: Client) throws -> XMTP.EncodedContent {
+	func encode(content: Double, client _: Client) throws -> XMTPiOS.EncodedContent {
 		var encodedContent = EncodedContent()
 
 		encodedContent.type = ContentTypeID(authorityID: "example.com", typeID: "number", versionMajor: 1, versionMinor: 1)
@@ -28,7 +32,7 @@ struct NumberCodec: ContentCodec {
 		return encodedContent
 	}
 
-	func decode(content: XMTP.EncodedContent, client _: Client) throws -> Double {
+	func decode(content: XMTPiOS.EncodedContent, client _: Client) throws -> Double {
 		return try JSONDecoder().decode(Double.self, from: content.content)
 	}
 }

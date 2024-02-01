@@ -6,10 +6,10 @@
 //
 
 import SwiftUI
-import XMTP
+import XMTPiOS
 
 struct NewConversationView: View {
-	var client: XMTP.Client
+	var client: XMTPiOS.Client
 	var onCreate: (Conversation) -> Void
 
 	@Environment(\.dismiss) var dismiss
