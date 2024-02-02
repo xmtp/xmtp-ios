@@ -6,7 +6,7 @@ public enum ConversationError: Error {
 }
 
 public enum GroupError: Error {
-	case emptyCreation, memberCannotBeSelf, memberNotRegistered([String])
+	case alphaMLSNotEnabled, emptyCreation, memberCannotBeSelf, memberNotRegistered([String])
 }
 
 /// Handles listing and creating Conversations.
@@ -19,10 +19,18 @@ public actor Conversations {
 	}
 
 	public func sync() async throws {
-		try await client.v3Client.conversations().sync()
+		guard let v3Client = client.v3Client else {
+			return
+		}
+
+		try await v3Client.conversations().sync()
 	}
 
 	public func groups(createdAfter: Date? = nil, createdBefore: Date? = nil, limit: Int? = nil) async throws -> [Group] {
+		guard let v3Client = client.v3Client else {
+			return []
+		}
+
 		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil)
 
 		if let createdAfter {
@@ -37,10 +45,14 @@ public actor Conversations {
 			options.limit = Int64(limit)
 		}
 
-		return try await client.v3Client.conversations().list(opts: options).map { $0.fromFFI(client: client) }
+		return try await v3Client.conversations().list(opts: options).map { $0.fromFFI(client: client) }
 	}
 
 	public func newGroup(with addresses: [String]) async throws -> Group {
+		guard let v3Client = client.v3Client else {
+			throw GroupError.alphaMLSNotEnabled
+		}
+
 		if addresses.isEmpty {
 			throw GroupError.emptyCreation
 		}
@@ -74,7 +86,7 @@ public actor Conversations {
 			throw GroupError.memberNotRegistered(erroredAddresses)
 		}
 
-		return try await client.v3Client.conversations().createGroup(accountAddresses: addresses).fromFFI(client: client)
+		return try await v3Client.conversations().createGroup(accountAddresses: addresses).fromFFI(client: client)
 	}
 
 	/// Import a previously seen conversation.

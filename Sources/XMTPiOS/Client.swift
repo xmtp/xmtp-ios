@@ -44,11 +44,20 @@ public struct ClientOptions {
 	/// `preCreateIdentityCallback` will be called immediately before a Create Identity wallet signature is requested from the user.
 	public var preCreateIdentityCallback: PreEventCallback?
 
-	public init(api: Api = Api(), codecs: [any ContentCodec] = [], preEnableIdentityCallback: PreEventCallback? = nil, preCreateIdentityCallback: PreEventCallback? = nil) {
+	public var enableAlphaMLS: Bool = false
+
+	public init(
+		api: Api = Api(),
+		codecs: [any ContentCodec] = [],
+		preEnableIdentityCallback: PreEventCallback? = nil,
+		preCreateIdentityCallback: PreEventCallback? = nil,
+		enableAlphaMLS: Bool = false
+	) {
 		self.api = api
 		self.codecs = codecs
 		self.preEnableIdentityCallback = preEnableIdentityCallback
 		self.preCreateIdentityCallback = preCreateIdentityCallback
+		self.enableAlphaMLS = enableAlphaMLS
 	}
 }
 
@@ -65,7 +74,7 @@ public final class Client {
 	public let address: String
 	let privateKeyBundleV1: PrivateKeyBundleV1
 	let apiClient: ApiClient
-	let v3Client: LibXMTP.FfiXmtpClient
+	let v3Client: LibXMTP.FfiXmtpClient?
 
 	/// Access ``Conversations`` for this Client.
 	public lazy var conversations: Conversations = .init(client: self)
@@ -103,21 +112,27 @@ public final class Client {
 	static func create(account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> Client {
 		let (privateKeyBundleV1, source) = try await loadOrCreateKeys(for: account, apiClient: apiClient, options: options)
 
-		let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(account.address).db3")
-		let v3Client = try await LibXMTP.createClient(
-			logger: XMTPLogger(),
-			host: GRPCApiClient.envToUrl(env: apiClient.environment),
-			isSecure: apiClient.environment != .local,
-			db: dbURL.path,
-			encryptionKey: nil,
-			accountAddress: account.address,
-			legacyIdentitySource: source,
-			legacySignedPrivateKeyProto: try privateKeyBundleV1.toV2().identityKey.serializedData()
-		)
+		let v3Client: FfiXmtpClient?
 
-		if let textToSign = v3Client.textToSign() {
-			let signature = try await account.sign(message: textToSign).rawData
-			try await v3Client.registerIdentity(recoverableWalletSignature: signature)
+		if options?.enableAlphaMLS == true {
+			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(account.address).db3")
+			v3Client = try await LibXMTP.createClient(
+				logger: XMTPLogger(),
+				host: GRPCApiClient.envToUrl(env: apiClient.environment),
+				isSecure: apiClient.environment != .local,
+				db: dbURL.path,
+				encryptionKey: nil,
+				accountAddress: account.address,
+				legacyIdentitySource: source,
+				legacySignedPrivateKeyProto: try privateKeyBundleV1.toV2().identityKey.serializedData()
+			)
+
+			if let textToSign = v3Client?.textToSign() {
+				let signature = try await account.sign(message: textToSign).rawData
+				try await v3Client?.registerIdentity(recoverableWalletSignature: signature)
+			}
+		} else {
+			v3Client = nil
 		}
 
 		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client)
@@ -172,7 +187,11 @@ public final class Client {
 	}
 
 	public func canMessageV3(address: String) async throws -> Bool {
-		try await v3Client.canMessage(accountAddresses: [address]) == [true]
+		guard let v3Client else {
+			return false
+		}
+
+		return try await v3Client.canMessage(accountAddresses: [address]) == [true]
 	}
 
 	public static func from(bundle: PrivateKeyBundle, options: ClientOptions? = nil) async throws -> Client {
@@ -192,24 +211,30 @@ public final class Client {
 			rustClient: client
 		)
 
-		let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(address).db3")
-		let v3Client = try await LibXMTP.createClient(
-			logger: XMTPLogger(),
-			host: GRPCApiClient.envToUrl(env: apiClient.environment),
-			isSecure: apiClient.environment != .local,
-			db: dbURL.path,
-			encryptionKey: nil,
-			accountAddress: address,
-			legacyIdentitySource: .static,
-			legacySignedPrivateKeyProto: try v1Bundle.toV2().identityKey.serializedData()
-		)
+		let v3Client: FfiXmtpClient?
 
-		try await v3Client.registerIdentity(recoverableWalletSignature: nil)
+		if options.enableAlphaMLS == true {
+			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(address).db3")
+			v3Client = try await LibXMTP.createClient(
+				logger: XMTPLogger(),
+				host: GRPCApiClient.envToUrl(env: apiClient.environment),
+				isSecure: apiClient.environment != .local,
+				db: dbURL.path,
+				encryptionKey: nil,
+				accountAddress: address,
+				legacyIdentitySource: .static,
+				legacySignedPrivateKeyProto: try v1Bundle.toV2().identityKey.serializedData()
+			)
+
+			try await v3Client?.registerIdentity(recoverableWalletSignature: nil)
+		} else {
+			v3Client = nil
+		}
 
 		return try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client)
 	}
 
-	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient) throws {
+	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient?) throws {
 		self.address = address
 		self.privateKeyBundleV1 = privateKeyBundleV1
 		self.apiClient = apiClient
