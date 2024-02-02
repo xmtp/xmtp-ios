@@ -115,7 +115,7 @@ public final class Client {
 		let v3Client: FfiXmtpClient?
 
 		if options?.enableAlphaMLS == true && options?.api.env == .local {
-			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(account.address).db3")
+			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(options?.api.env.rawValue ?? "")-\(account.address).db3")
 			v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
 				host: GRPCApiClient.envToUrl(env: apiClient.environment),
@@ -218,7 +218,7 @@ public final class Client {
 		let v3Client: FfiXmtpClient?
 
 		if options.enableAlphaMLS == true && options.api.env == .local {
-			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(address).db3")
+			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(options.api.env.rawValue)-\(address).db3")
 			v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
 				host: GRPCApiClient.envToUrl(env: apiClient.environment),
