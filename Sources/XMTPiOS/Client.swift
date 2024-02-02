@@ -114,7 +114,7 @@ public final class Client {
 
 		let v3Client: FfiXmtpClient?
 
-		if options?.enableAlphaMLS == true {
+		if options?.enableAlphaMLS == true && options?.api.env == .local {
 			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(account.address).db3")
 			v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
@@ -137,6 +137,10 @@ public final class Client {
 
 		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client)
 		try await client.ensureUserContactPublished()
+
+		for codec in (options?.codecs ?? []) {
+			client.register(codec: codec)
+		}
 
 		return client
 	}
@@ -213,7 +217,7 @@ public final class Client {
 
 		let v3Client: FfiXmtpClient?
 
-		if options.enableAlphaMLS == true {
+		if options.enableAlphaMLS == true && options.api.env == .local {
 			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(address).db3")
 			v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
@@ -231,7 +235,13 @@ public final class Client {
 			v3Client = nil
 		}
 
-		return try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client)
+		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client)
+
+		for codec in options.codecs {
+			result.register(codec: codec)
+		}
+
+		return result
 	}
 
 	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient?) throws {

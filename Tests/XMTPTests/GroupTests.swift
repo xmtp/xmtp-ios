@@ -46,11 +46,20 @@ class GroupTests: XCTestCase {
 
 	func localFixtures() async throws -> LocalFixtures {
 		let alice = try PrivateKey.generate()
-		let aliceClient = try await Client.create(account: alice, options: .init(api: .init(env: .local, isSecure: false), enableAlphaMLS: true))
+		let aliceClient = try await Client.create(
+			account: alice,
+			options: .init(api: .init(env: .local, isSecure: false), codecs: [GroupMembershipChangedCodec()], enableAlphaMLS: true)
+		)
 		let bob = try PrivateKey.generate()
-		let bobClient = try await Client.create(account: bob, options: .init(api: .init(env: .local, isSecure: false), enableAlphaMLS: true))
+		let bobClient = try await Client.create(
+			account: bob,
+			options: .init(api: .init(env: .local, isSecure: false), codecs: [GroupMembershipChangedCodec()], enableAlphaMLS: true)
+		)
 		let fred = try PrivateKey.generate()
-		let fredClient = try await Client.create(account: fred, options: .init(api: .init(env: .local, isSecure: false), enableAlphaMLS: true))
+		let fredClient = try await Client.create(
+			account: fred,
+			options: .init(api: .init(env: .local, isSecure: false), codecs: [GroupMembershipChangedCodec()], enableAlphaMLS: true)
+		)
 
 		return .init(
 			alice: alice,
