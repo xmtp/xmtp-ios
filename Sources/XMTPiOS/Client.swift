@@ -112,15 +112,13 @@ public final class Client {
 			encryptionKey: nil,
 			accountAddress: account.address,
 			legacyIdentitySource: source,
-			legacySignedPrivateKeyProto: nil
+			legacySignedPrivateKeyProto: try privateKeyBundleV1.toV2().identityKey.serializedData()
 		)
 
-		guard let textToSign = v3Client.textToSign() else {
-			throw ClientError.creationError("no text to sign")
+		if let textToSign = v3Client.textToSign() {
+			let signature = try await account.sign(message: textToSign).rawData
+			try await v3Client.registerIdentity(recoverableWalletSignature: signature)
 		}
-
-		let signature = try await account.sign(message: textToSign).rawData
-		try await v3Client.registerIdentity(recoverableWalletSignature: signature)
 
 		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client)
 		try await client.ensureUserContactPublished()
@@ -203,7 +201,7 @@ public final class Client {
 			encryptionKey: nil,
 			accountAddress: address,
 			legacyIdentitySource: .static,
-			legacySignedPrivateKeyProto: try v1Bundle.identityKey.serializedData()
+			legacySignedPrivateKeyProto: try v1Bundle.toV2().identityKey.serializedData()
 		)
 
 		try await v3Client.registerIdentity(recoverableWalletSignature: nil)
