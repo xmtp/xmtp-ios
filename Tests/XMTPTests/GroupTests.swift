@@ -154,6 +154,24 @@ class GroupTests: XCTestCase {
 		)
 	}
 
+	func testCannotStartGroupWithNonRegisteredIdentity() async throws {
+		let fixtures = try await localFixtures()
+
+		let nonRegistered = try PrivateKey.generate()
+
+		do {
+			_ = try await fixtures.aliceClient.conversations.newGroup(with: [nonRegistered.address])
+
+			XCTFail("did not throw error")
+		} catch {
+			if case let GroupError.memberNotRegistered(addresses) = error {
+				XCTAssertEqual([nonRegistered.address.lowercased()], addresses.map { $0.lowercased() })
+			} else {
+				XCTFail("did not throw correct error")
+			}
+		}
+	}
+
 	func testCanSendMessagesToGroup() async throws {
 		let fixtures = try await localFixtures()
 		let aliceGroup = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])

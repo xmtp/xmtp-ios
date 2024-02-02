@@ -6,7 +6,7 @@ public enum ConversationError: Error {
 }
 
 public enum GroupError: Error {
-	case emptyCreation
+	case emptyCreation, memberCannotBeSelf, memberNotRegistered([String])
 }
 
 /// Handles listing and creating Conversations.
@@ -43,6 +43,35 @@ public actor Conversations {
 	public func newGroup(with addresses: [String]) async throws -> Group {
 		if addresses.isEmpty {
 			throw GroupError.emptyCreation
+		}
+
+		if addresses.first(where: { $0.lowercased() == client.address.lowercased() }) != nil {
+			throw GroupError.memberCannotBeSelf
+		}
+
+		let erroredAddresses = try await withThrowingTaskGroup(of: (String?).self) { group in
+			for address in addresses {
+				group.addTask {
+					if try await self.client.canMessageV3(address: address) {
+						return nil
+					} else {
+						return address
+					}
+				}
+			}
+
+			var results: [String] = []
+			for try await result in group {
+				if let result {
+					results.append(result)
+				}
+			}
+
+			return results
+		}
+
+		if !erroredAddresses.isEmpty {
+			throw GroupError.memberNotRegistered(erroredAddresses)
 		}
 
 		return try await client.v3Client.conversations().createGroup(accountAddresses: addresses).fromFFI(client: client)
