@@ -109,30 +109,41 @@ public final class Client {
 		}
 	}
 
-	static func create(account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> Client {
-		let (privateKeyBundleV1, source) = try await loadOrCreateKeys(for: account, apiClient: apiClient, options: options)
-
+	static func initV3Client(address: String, options: ClientOptions?, source: LegacyIdentitySource, privateKeyBundleV1: PrivateKeyBundleV1) async throws -> FfiXmtpClient? {
 		let v3Client: FfiXmtpClient?
 
 		if options?.enableAlphaMLS == true && options?.api.env == .local {
-			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(options?.api.env.rawValue ?? "")-\(account.address).db3")
+			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(options?.api.env.rawValue ?? "")-\(address).db3")
 			v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
-				host: GRPCApiClient.envToUrl(env: apiClient.environment),
-				isSecure: apiClient.environment != .local,
+				host: GRPCApiClient.envToUrl(env: options?.api.env ?? .local),
+				isSecure: (options?.api.env ?? .local) != .local,
 				db: dbURL.path,
 				encryptionKey: nil,
-				accountAddress: account.address,
+				accountAddress: address,
 				legacyIdentitySource: source,
 				legacySignedPrivateKeyProto: try privateKeyBundleV1.toV2().identityKey.serializedData()
 			)
-
-			if let textToSign = v3Client?.textToSign() {
-				let signature = try await account.sign(message: textToSign).rawData
-				try await v3Client?.registerIdentity(recoverableWalletSignature: signature)
-			}
 		} else {
 			v3Client = nil
+		}
+
+		return v3Client
+	}
+
+	static func create(account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> Client {
+		let (privateKeyBundleV1, source) = try await loadOrCreateKeys(for: account, apiClient: apiClient, options: options)
+
+		let v3Client = try await initV3Client(
+			address: account.address,
+			options: options,
+			source: source,
+			privateKeyBundleV1: privateKeyBundleV1
+		)
+
+		if let textToSign = v3Client?.textToSign() {
+			let signature = try await account.sign(message: textToSign).rawData
+			try await v3Client?.registerIdentity(recoverableWalletSignature: signature)
 		}
 
 		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client)
@@ -215,25 +226,12 @@ public final class Client {
 			rustClient: client
 		)
 
-		let v3Client: FfiXmtpClient?
-
-		if options.enableAlphaMLS == true && options.api.env == .local {
-			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(options.api.env.rawValue)-\(address).db3")
-			v3Client = try await LibXMTP.createClient(
-				logger: XMTPLogger(),
-				host: GRPCApiClient.envToUrl(env: apiClient.environment),
-				isSecure: apiClient.environment != .local,
-				db: dbURL.path,
-				encryptionKey: nil,
-				accountAddress: address,
-				legacyIdentitySource: .static,
-				legacySignedPrivateKeyProto: try v1Bundle.toV2().identityKey.serializedData()
-			)
-
-			try await v3Client?.registerIdentity(recoverableWalletSignature: nil)
-		} else {
-			v3Client = nil
-		}
+		let v3Client = try await initV3Client(
+			address: address,
+			options: options,
+			source: .static,
+			privateKeyBundleV1: v1Bundle
+		)
 
 		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client)
 
