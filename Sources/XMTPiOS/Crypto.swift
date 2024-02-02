@@ -105,10 +105,9 @@ enum Crypto {
 	}
 	
 	static func hkdfHmacKey(secret: Data, info: Data) throws -> SymmetricKey {
-		let salt = Data()
 		let key = HKDF<SHA256>.deriveKey(
 			inputKeyMaterial: SymmetricKey(data: secret),
-			salt: salt,
+			salt: Data(),
 			info: info,
 			outputByteCount: 32)
 		return key
