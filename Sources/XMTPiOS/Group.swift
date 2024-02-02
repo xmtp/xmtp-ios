@@ -24,6 +24,10 @@ public struct Group: Identifiable, Equatable, Hashable {
 		ffiGroup.id()
 	}
 
+	public var createdAt: Date {
+		Date(millisecondsSinceEpoch: ffiGroup.createdAtNs())
+	}
+
 	public func sync() async throws {
 		try await ffiGroup.sync()
 	}

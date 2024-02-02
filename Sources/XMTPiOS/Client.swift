@@ -93,6 +93,8 @@ public final class Client {
 		codecRegistry.register(codec: codec)
 	}
 
+	var enableAlphaMLS: Bool
+
 	/// Creates a client.
 	public static func create(account: SigningKey, options: ClientOptions? = nil) async throws -> Client {
 		let options = options ?? ClientOptions()
@@ -135,7 +137,13 @@ public final class Client {
 			v3Client = nil
 		}
 
-		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client)
+		let client = try Client(
+			address: account.address,
+			privateKeyBundleV1: privateKeyBundleV1,
+			apiClient: apiClient,
+			v3Client: v3Client,
+			enableAlphaMLS: options?.enableAlphaMLS == true
+		)
 		try await client.ensureUserContactPublished()
 
 		for codec in (options?.codecs ?? []) {
@@ -235,7 +243,13 @@ public final class Client {
 			v3Client = nil
 		}
 
-		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client)
+		let result = try Client(
+			address: address,
+			privateKeyBundleV1: v1Bundle,
+			apiClient: apiClient,
+			v3Client: v3Client,
+			enableAlphaMLS: options.enableAlphaMLS == true
+		)
 
 		for codec in options.codecs {
 			result.register(codec: codec)
@@ -244,11 +258,12 @@ public final class Client {
 		return result
 	}
 
-	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient?) throws {
+	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient?, enableAlphaMLS: Bool) throws {
 		self.address = address
 		self.privateKeyBundleV1 = privateKeyBundleV1
 		self.apiClient = apiClient
 		self.v3Client = v3Client
+		self.enableAlphaMLS = enableAlphaMLS
 	}
 
 	public var privateKeyBundle: PrivateKeyBundle {
@@ -283,7 +298,7 @@ public final class Client {
 		return try await apiClient.query(topic: Topic.contact(peerAddress)).envelopes.count > 0
 	}
 
-	public func importConversation(from conversationData: Data) throws -> Conversation? {
+	public func importConversation(from conversationData: Data) throws -> DirectMessage? {
 		let jsonDecoder = JSONDecoder()
 
 		do {
@@ -299,7 +314,7 @@ public final class Client {
 		}
 	}
 
-	func importV2Conversation(export: ConversationV2Export) throws -> Conversation {
+	func importV2Conversation(export: ConversationV2Export) throws -> DirectMessage {
 		guard let keyMaterial = Data(base64Encoded: Data(export.keyMaterial.utf8)) else {
 			throw ConversationImportError.invalidData
 		}
@@ -317,7 +332,7 @@ public final class Client {
 		))
 	}
 
-	func importV1Conversation(export: ConversationV1Export) throws -> Conversation {
+	func importV1Conversation(export: ConversationV1Export) throws -> DirectMessage {
 		let formatter = ISO8601DateFormatter()
 		formatter.formatOptions.insert(.withFractionalSeconds)
 

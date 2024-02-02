@@ -9,7 +9,7 @@ import SwiftUI
 import XMTPiOS
 
 enum ConversationOrGroup: Identifiable, Hashable {
-	case conversation(Conversation), group(XMTPiOS.Group)
+	case conversation(DirectMessage), group(XMTPiOS.Group)
 
 	static func == (lhs: ConversationOrGroup, rhs: ConversationOrGroup) -> Bool {
 		lhs.id == rhs.id

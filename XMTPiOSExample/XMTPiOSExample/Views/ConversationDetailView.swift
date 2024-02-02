@@ -10,7 +10,7 @@ import XMTPiOS
 
 struct ConversationDetailView: View {
 	var client: Client
-	var conversation: Conversation
+	var conversation: DirectMessage
 
 	@State private var messages: [DecodedMessage] = []
 

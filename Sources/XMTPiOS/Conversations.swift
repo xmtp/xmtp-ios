@@ -12,7 +12,7 @@ public enum GroupError: Error {
 /// Handles listing and creating Conversations.
 public actor Conversations {
 	var client: Client
-	var conversationsByTopic: [String: Conversation] = [:]
+	var conversationsByTopic: [String: DirectMessage] = [:]
 
 	init(client: Client) {
 		self.client = client
@@ -91,8 +91,8 @@ public actor Conversations {
 
 	/// Import a previously seen conversation.
 	/// See Conversation.toTopicData()
-	public func importTopicData(data: Xmtp_KeystoreApi_V1_TopicMap.TopicData) -> Conversation {
-		let conversation: Conversation
+	public func importTopicData(data: Xmtp_KeystoreApi_V1_TopicMap.TopicData) -> DirectMessage {
+		let conversation: DirectMessage
 		if !data.hasInvitation {
 			let sentAt = Date(timeIntervalSince1970: TimeInterval(data.createdNs / 1_000_000_000))
 			conversation = .v1(ConversationV1(client: client, peerAddress: data.peerAddress, sentAt: sentAt))
@@ -182,7 +182,13 @@ public actor Conversations {
 					]
 
 					for conversation in try await list() {
-						topics.append(conversation.topic)
+						switch conversation {
+						case .directMessage(let dm):
+							topics.append(dm.topic)
+						default:
+							// TODO: stream group messages
+							continue
+						}
 					}
 
 					do {
@@ -222,7 +228,13 @@ public actor Conversations {
 					]
 
 					for conversation in try await list() {
-						topics.append(conversation.topic)
+						switch conversation {
+						case .directMessage(let dm):
+							topics.append(dm.topic)
+						default:
+							// TODO: stream group messages
+							continue
+						}
 					}
 
 					do {
@@ -252,14 +264,14 @@ public actor Conversations {
 		}
 	}
 
-	public func fromInvite(envelope: Envelope) throws -> Conversation {
+	public func fromInvite(envelope: Envelope) throws -> DirectMessage {
 		let sealedInvitation = try SealedInvitation(serializedData: envelope.message)
 		let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)
 
 		return try .v2(ConversationV2.create(client: client, invitation: unsealed, header: sealedInvitation.v1.header))
 	}
 
-	public func fromIntro(envelope: Envelope) throws -> Conversation {
+	public func fromIntro(envelope: Envelope) throws -> DirectMessage {
 		let messageV1 = try MessageV1.fromBytes(envelope.message)
 		let senderAddress = try messageV1.header.sender.walletAddress
 		let recipientAddress = try messageV1.header.recipient.walletAddress
@@ -270,13 +282,13 @@ public actor Conversations {
 		return .v1(conversationV1)
 	}
 
-	private func findExistingConversation(with peerAddress: String, conversationID: String?) -> Conversation? {
+	private func findExistingConversation(with peerAddress: String, conversationID: String?) -> DirectMessage? {
 		return conversationsByTopic.first(where: { $0.value.peerAddress == peerAddress &&
 				(($0.value.conversationID ?? "") == (conversationID ?? ""))
 		})?.value
 	}
 
-	public func newConversation(with peerAddress: String, context: InvitationV1.Context? = nil) async throws -> Conversation {
+	public func newConversation(with peerAddress: String, context: InvitationV1.Context? = nil) async throws -> DirectMessage {
 		if peerAddress.lowercased() == client.address.lowercased() {
 			throw ConversationError.recipientIsSender
 		}
@@ -306,12 +318,12 @@ public actor Conversations {
 
 		try await client.contacts.allow(addresses: [peerAddress])
 
-		let conversation: Conversation = .v2(conversationV2)
+		let conversation: DirectMessage = .v2(conversationV2)
 		conversationsByTopic[conversation.topic] = conversation
 		return conversation
 	}
 
-	public func stream() -> AsyncThrowingStream<Conversation, Error> {
+	public func stream() -> AsyncThrowingStream<DirectMessage, Error> {
 		AsyncThrowingStream { continuation in
 			Task {
 				var streamedConversationTopics: Set<String> = []
@@ -351,7 +363,17 @@ public actor Conversations {
 	}
 
 	public func list() async throws -> [Conversation] {
-		var newConversations: [Conversation] = []
+		async let directMessages = try await listDirectMessageConversations().map { Conversation.directMessage($0) }
+
+		async let groups = try await groups().map { Conversation.group($0) }
+
+		return ((try await directMessages) + (try await groups)).sorted { a, b in
+			a.createdAt < b.createdAt
+		}
+	}
+
+	private func listDirectMessageConversations() async throws -> [DirectMessage] {
+		var newConversations: [DirectMessage] = []
 		let mostRecent = conversationsByTopic.values.max { a, b in
 			a.createdAt < b.createdAt
 		}
@@ -360,7 +382,7 @@ public actor Conversations {
 			let seenPeers = try await listIntroductionPeers(pagination: pagination)
 			for (peerAddress, sentAt) in seenPeers {
 				newConversations.append(
-					Conversation.v1(
+					DirectMessage.v1(
 						ConversationV1(
 							client: client,
 							peerAddress: peerAddress,
@@ -376,7 +398,7 @@ public actor Conversations {
 		for sealedInvitation in try await listInvitations(pagination: pagination) {
 			do {
 				try newConversations.append(
-					Conversation.v2(makeConversation(from: sealedInvitation))
+					DirectMessage.v2(makeConversation(from: sealedInvitation))
 				)
 			} catch {
 				print("Error loading invitations: \(error)")

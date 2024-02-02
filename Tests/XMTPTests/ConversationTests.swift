@@ -521,7 +521,7 @@ class ConversationTests: XCTestCase {
 		try await conversation.send(content: "hi")
 		let envelope = fakeApiClient.published.first(where: { $0.contentTopic.hasPrefix("/xmtp/0/m-") })!
 
-		let container = Conversation.v2(conversation).encodedContainer
+		let container = DirectMessage.v2(conversation).encodedContainer
 
 		try await fakeApiClient.assertNoQuery {
 			let decodedConversation = container.decode(with: aliceClient)
@@ -543,7 +543,7 @@ class ConversationTests: XCTestCase {
 		let decodedMessage = try conversation.decode(envelope: message)
 		XCTAssertEqual("hi", decodedMessage.body)
 
-		let decodedMessage2 = try Conversation.v2(conversation).decode(message)
+		let decodedMessage2 = try DirectMessage.v2(conversation).decode(message)
 		XCTAssertEqual("hi", decodedMessage2.body)
 	}
 
