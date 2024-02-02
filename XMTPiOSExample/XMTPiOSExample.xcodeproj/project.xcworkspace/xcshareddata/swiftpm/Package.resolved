@@ -59,7 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/xmtp/libxmtp-swift",
       "state" : {
-        "revision" : "1d7068f181a402b2cd8b9520ccb768e65a55ec32"
+        "branch" : "503086d",
+        "revision" : "503086d91ba6c3420aca118e4812d62a004d17ee"
       }
     },
     {
