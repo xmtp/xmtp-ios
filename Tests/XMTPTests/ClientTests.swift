@@ -20,6 +20,38 @@ class ClientTests: XCTestCase {
 		_ = try await Client.create(account: fakeWallet)
 	}
 
+	func testPassingMLSEncryptionKey() async throws {
+		try TestConfig.skipIfNotRunningLocalNodeTests()
+
+		let bo = try PrivateKey.generate()
+		let key = try Crypto.secureRandomBytes(count: 32)
+
+		_ = try await Client.create(
+			account: bo,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				enableAlphaMLS: true,
+				mlsEncryptionKey: key
+			)
+		)
+
+		do {
+			_ = try await Client.create(
+				account: bo,
+				options: .init(
+					api: .init(env: .local, isSecure: false),
+					enableAlphaMLS: true,
+					mlsEncryptionKey: nil // No key should error
+				)
+			)
+
+			XCTFail("did not throw")
+		} catch {
+			XCTAssert(true)
+		}
+	}
+
+
 	func testCanMessage() async throws {
 		let fixtures = await fixtures()
 		let notOnNetwork = try PrivateKey.generate()
