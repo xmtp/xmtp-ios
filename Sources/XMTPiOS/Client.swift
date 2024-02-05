@@ -214,7 +214,11 @@ public final class Client {
 	}
 
 	/// Create a Client from saved v1 key bundle.
-	public static func from(v1Bundle: PrivateKeyBundleV1, options: ClientOptions? = nil) async throws -> Client {
+	public static func from(
+		v1Bundle: PrivateKeyBundleV1,
+		options: ClientOptions? = nil,
+		signingKey: SigningKey? = nil
+	) async throws -> Client {
 		let address = try v1Bundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress
 
 		let options = options ?? ClientOptions()
@@ -232,6 +236,15 @@ public final class Client {
 			source: .static,
 			privateKeyBundleV1: v1Bundle
 		)
+
+		if let v3Client, let textToSign = v3Client.textToSign() {
+			guard let signingKey else {
+				throw ClientError.creationError("No v3 keys found, you must pass a SigningKey in order to enable alpha MLS features")
+			}
+
+			let signature = try await signingKey.sign(message: textToSign)
+			try await v3Client.registerIdentity(recoverableWalletSignature: signature.rawData)
+		}
 
 		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client)
 
