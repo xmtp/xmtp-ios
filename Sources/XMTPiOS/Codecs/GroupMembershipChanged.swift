@@ -37,7 +37,7 @@ public struct GroupMembershipChangedCodec: ContentCodec {
 	}
 
 	public func shouldPush(content: GroupMembershipChanges) throws -> Bool {
-		true
+		false
 	}
 }
 
