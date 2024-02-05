@@ -20,6 +20,49 @@ class ClientTests: XCTestCase {
 		_ = try await Client.create(account: fakeWallet)
 	}
 
+	func testPassingSavedKeysWithNoSignerWithMLSErrors() async throws {
+		try TestConfig.skipIfNotRunningLocalNodeTests()
+
+		let bo = try PrivateKey.generate()
+
+		do {
+			let client = try await Client.create(
+				account: bo,
+				options: .init(
+					api: .init(env: .local, isSecure: false),
+					enableAlphaMLS: .enabled(bo)
+				)
+			)
+		} catch {
+			XCTAssert(error.localizedDescription.contains("no keys"))
+		}
+	}
+
+	func testPassingSavedKeysWithMLS() async throws {
+		try TestConfig.skipIfNotRunningLocalNodeTests()
+
+		let bo = try PrivateKey.generate()
+		let client = try await Client.create(
+			account: bo,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				enableAlphaMLS: .enabled(bo)
+			)
+		)
+
+		let keys = client.privateKeyBundle
+		let otherClient = try await Client.from(
+			bundle: keys,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				// Should not need to pass the signer again
+				enableAlphaMLS: .enabled(nil)
+			)
+		)
+
+		XCTAssertEqual(client.address, otherClient.address)
+	}
+
 	func testPassingMLSEncryptionKey() async throws {
 		try TestConfig.skipIfNotRunningLocalNodeTests()
 
@@ -30,7 +73,7 @@ class ClientTests: XCTestCase {
 			account: bo,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
-				enableAlphaMLS: true,
+				enableAlphaMLS: .enabled(bo),
 				mlsEncryptionKey: key
 			)
 		)
@@ -40,7 +83,7 @@ class ClientTests: XCTestCase {
 				account: bo,
 				options: .init(
 					api: .init(env: .local, isSecure: false),
-					enableAlphaMLS: true,
+					enableAlphaMLS: .enabled(bo),
 					mlsEncryptionKey: nil // No key should error
 				)
 			)
@@ -50,7 +93,6 @@ class ClientTests: XCTestCase {
 			XCTAssert(true)
 		}
 	}
-
 
 	func testCanMessage() async throws {
 		let fixtures = await fixtures()
