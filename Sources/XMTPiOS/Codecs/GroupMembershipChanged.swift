@@ -13,7 +13,6 @@ public typealias GroupMembershipChanges = Xmtp_Mls_MessageContents_GroupMembersh
 public let ContentTypeGroupMembershipChanged = ContentTypeID(authorityID: "xmtp.org", typeID: "group_membership_change", versionMajor: 1, versionMinor: 0)
 
 public struct GroupMembershipChangedCodec: ContentCodec {
-
 	public typealias T = GroupMembershipChanges
 
 	public init() {	}
@@ -35,6 +34,10 @@ public struct GroupMembershipChangedCodec: ContentCodec {
 
 	public func fallback(content: GroupMembershipChanges) throws -> String? {
 		return nil
+	}
+
+	public func shouldPush(content: GroupMembershipChanges) throws -> Bool {
+		true
 	}
 }
 
