@@ -45,19 +45,22 @@ public struct ClientOptions {
 	public var preCreateIdentityCallback: PreEventCallback?
 
 	public var enableAlphaMLS: Bool = false
+	public var mlsEncryptionKey: Data?
 
 	public init(
 		api: Api = Api(),
 		codecs: [any ContentCodec] = [],
 		preEnableIdentityCallback: PreEventCallback? = nil,
 		preCreateIdentityCallback: PreEventCallback? = nil,
-		enableAlphaMLS: Bool = false
+		enableAlphaMLS: Bool = false,
+		mlsEncryptionKey: Data? = nil
 	) {
 		self.api = api
 		self.codecs = codecs
 		self.preEnableIdentityCallback = preEnableIdentityCallback
 		self.preCreateIdentityCallback = preCreateIdentityCallback
 		self.enableAlphaMLS = enableAlphaMLS
+		self.mlsEncryptionKey = mlsEncryptionKey
 	}
 }
 
@@ -105,7 +108,7 @@ public final class Client {
 			)
 			return try await create(account: account, apiClient: apiClient, options: options)
 		} catch {
-			throw ClientError.creationError(error.localizedDescription)
+			throw ClientError.creationError("\(error)")
 		}
 	}
 
@@ -119,7 +122,7 @@ public final class Client {
 				host: GRPCApiClient.envToUrl(env: options?.api.env ?? .local),
 				isSecure: (options?.api.env ?? .local) != .local,
 				db: dbURL.path,
-				encryptionKey: nil,
+				encryptionKey: options?.mlsEncryptionKey,
 				accountAddress: address,
 				legacyIdentitySource: source,
 				legacySignedPrivateKeyProto: try privateKeyBundleV1.toV2().identityKey.serializedData()
