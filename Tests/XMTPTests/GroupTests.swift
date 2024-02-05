@@ -48,17 +48,29 @@ class GroupTests: XCTestCase {
 		let alice = try PrivateKey.generate()
 		let aliceClient = try await Client.create(
 			account: alice,
-			options: .init(api: .init(env: .local, isSecure: false), codecs: [GroupMembershipChangedCodec()], enableAlphaMLS: true)
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				codecs: [GroupMembershipChangedCodec()],
+				mlsAlpha: true
+			)
 		)
 		let bob = try PrivateKey.generate()
 		let bobClient = try await Client.create(
 			account: bob,
-			options: .init(api: .init(env: .local, isSecure: false), codecs: [GroupMembershipChangedCodec()], enableAlphaMLS: true)
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				codecs: [GroupMembershipChangedCodec()],
+				mlsAlpha: true
+			)
 		)
 		let fred = try PrivateKey.generate()
 		let fredClient = try await Client.create(
 			account: fred,
-			options: .init(api: .init(env: .local, isSecure: false), codecs: [GroupMembershipChangedCodec()], enableAlphaMLS: true)
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				codecs: [GroupMembershipChangedCodec()],
+				mlsAlpha: true
+			)
 		)
 
 		return .init(

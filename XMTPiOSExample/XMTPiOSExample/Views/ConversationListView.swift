@@ -79,6 +79,8 @@ struct ConversationListView: View {
 				ConversationOrGroup.conversation($0)
 			}
 
+			try await client.conversations.sync()
+
 			let groups = try await client.conversations.groups().map {
 				ConversationOrGroup.group($0)
 			}

@@ -38,6 +38,7 @@ struct GroupDetailView: View {
 
 	func loadMessages() async {
 		do {
+			try await group.sync()
 			let messages = try await group.messages()
 			await MainActor.run {
 				self.messages = messages

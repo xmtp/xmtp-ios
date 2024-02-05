@@ -24,7 +24,7 @@ enum ConversationOrGroup: Identifiable, Hashable {
 		case .conversation(let conversation):
 			return conversation.peerAddress
 		case .group(let group):
-			return group.members.map(\.accountAddress).joined(separator: ",")
+			return group.members.joined(separator: ",")
 		}
 	}
 }
@@ -111,6 +111,7 @@ struct NewConversationView: View {
 					Task {
 						do {
 							let group = try await client.conversations.newGroup(with: groupMembers)
+							try await client.conversations.sync()
 							await MainActor.run {
 								onCreate(.group(group))
 							}
