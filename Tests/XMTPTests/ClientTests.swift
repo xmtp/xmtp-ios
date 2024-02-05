@@ -30,7 +30,7 @@ class ClientTests: XCTestCase {
 				account: bo,
 				options: .init(
 					api: .init(env: .local, isSecure: false),
-					mlsAlpha: .enabled(bo)
+					mlsAlpha: true
 				)
 			)
 		} catch {
@@ -46,7 +46,7 @@ class ClientTests: XCTestCase {
 			account: bo,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
-				mlsAlpha: .enabled(bo)
+				mlsAlpha: true
 			)
 		)
 
@@ -56,7 +56,7 @@ class ClientTests: XCTestCase {
 			options: .init(
 				api: .init(env: .local, isSecure: false),
 				// Should not need to pass the signer again
-				mlsAlpha: .enabled(nil)
+				mlsAlpha: true
 			)
 		)
 
@@ -73,7 +73,7 @@ class ClientTests: XCTestCase {
 			account: bo,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
-				mlsAlpha: .enabled(bo),
+				mlsAlpha: true,
 				mlsEncryptionKey: key
 			)
 		)
@@ -83,7 +83,7 @@ class ClientTests: XCTestCase {
 				account: bo,
 				options: .init(
 					api: .init(env: .local, isSecure: false),
-					mlsAlpha: .enabled(bo),
+					mlsAlpha: true,
 					mlsEncryptionKey: nil // No key should error
 				)
 			)
