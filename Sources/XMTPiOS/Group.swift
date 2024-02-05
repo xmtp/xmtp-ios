@@ -12,7 +12,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 	var ffiGroup: FfiGroup
 	var client: Client
 
-	public struct Member {
+	struct Member {
 		var ffiGroupMember: FfiGroupMember
 
 		public var accountAddress: String {
@@ -36,9 +36,9 @@ public struct Group: Identifiable, Equatable, Hashable {
 		id.hash(into: &hasher)
 	}
 
-	public var members: [Member] {
+	public var members: [String] {
 		do {
-			return try ffiGroup.listMembers().map(\.fromFFI)
+			return try ffiGroup.listMembers().map(\.fromFFI.accountAddress)
 		} catch {
 			return []
 		}

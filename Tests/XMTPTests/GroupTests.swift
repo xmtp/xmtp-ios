@@ -96,7 +96,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
 
 		try await group.sync()
-		let members = group.members.map(\.accountAddress.localizedLowercase).sorted()
+		let members = group.members.map(\.localizedLowercase).sorted()
 
 		XCTAssertEqual([fixtures.bob.address.localizedLowercase, fixtures.alice.address.localizedLowercase].sorted(), members)
 	}
@@ -108,7 +108,7 @@ class GroupTests: XCTestCase {
 		try await group.addMembers(addresses: [fixtures.fred.address])
 
 		try await group.sync()
-		let members = group.members.map(\.accountAddress.localizedLowercase).sorted()
+		let members = group.members.map(\.localizedLowercase).sorted()
 
 		XCTAssertEqual([
 			fixtures.bob.address.localizedLowercase,
@@ -125,7 +125,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
 
 		try await group.sync()
-		let members = group.members.map(\.accountAddress.localizedLowercase).sorted()
+		let members = group.members.map(\.localizedLowercase).sorted()
 
 		XCTAssertEqual([
 			fixtures.bob.address.localizedLowercase,
@@ -137,7 +137,7 @@ class GroupTests: XCTestCase {
 
 		try await group.sync()
 
-		let newMembers = group.members.map(\.accountAddress.localizedLowercase).sorted()
+		let newMembers = group.members.map(\.localizedLowercase).sorted()
 		XCTAssertEqual([
 			fixtures.bob.address.localizedLowercase,
 			fixtures.alice.address.localizedLowercase,
