@@ -20,6 +20,34 @@ class ClientTests: XCTestCase {
 		_ = try await Client.create(account: fakeWallet)
 	}
 
+	func testPassingMLSEncryptionKey() async throws {
+		let bo = try PrivateKey.generate()
+		let key = try Crypto.secureRandomBytes(count: 32)
+
+		_ = try await Client.create(
+			account: bo,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				codecs: [GroupMembershipChangedCodec()],
+				enableAlphaMLS: true,
+				mlsEncryptionKey: key
+			)
+		)
+
+		await assertThrowsAsyncError(
+			_ = try await Client.create(
+					account: bo,
+					options: .init(
+						api: .init(env: .local, isSecure: false),
+						codecs: [GroupMembershipChangedCodec()],
+						enableAlphaMLS: true,
+						mlsEncryptionKey: nil // No key should error
+				)
+			)
+		)
+	}
+
+
 	func testCanMessage() async throws {
 		let fixtures = await fixtures()
 		let notOnNetwork = try PrivateKey.generate()

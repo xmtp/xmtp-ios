@@ -71,33 +71,6 @@ class GroupTests: XCTestCase {
 		)
 	}
 
-	func testPassingEncryptionKey() async throws {
-		let bo = try PrivateKey.generate()
-		let key = try Crypto.secureRandomBytes(count: 32)
-
-		_ = try await Client.create(
-			account: bo,
-			options: .init(
-				api: .init(env: .local, isSecure: false),
-				codecs: [GroupMembershipChangedCodec()],
-				enableAlphaMLS: true,
-				mlsEncryptionKey: key
-			)
-		)
-
-		await assertThrowsAsyncError(
-			_ = try await Client.create(
-					account: bo,
-					options: .init(
-						api: .init(env: .local, isSecure: false),
-						codecs: [GroupMembershipChangedCodec()],
-						enableAlphaMLS: true,
-						mlsEncryptionKey: nil // No key should error
-				)
-			)
-		)
-	}
-
 	func testCanCreateGroups() async throws {
 		let fixtures = try await localFixtures()
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
