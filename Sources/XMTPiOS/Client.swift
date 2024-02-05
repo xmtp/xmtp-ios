@@ -48,7 +48,7 @@ public struct ClientOptions {
 	/// `preCreateIdentityCallback` will be called immediately before a Create Identity wallet signature is requested from the user.
 	public var preCreateIdentityCallback: PreEventCallback?
 
-	public var enableAlphaMLS: MLSAlphaOption = .disabled
+	public var mlsAlpha: MLSAlphaOption = .disabled
 	public var mlsEncryptionKey: Data?
 
 	public init(
@@ -56,14 +56,14 @@ public struct ClientOptions {
 		codecs: [any ContentCodec] = [],
 		preEnableIdentityCallback: PreEventCallback? = nil,
 		preCreateIdentityCallback: PreEventCallback? = nil,
-		enableAlphaMLS: MLSAlphaOption = .disabled,
+		mlsAlpha: MLSAlphaOption = .disabled,
 		mlsEncryptionKey: Data? = nil
 	) {
 		self.api = api
 		self.codecs = codecs
 		self.preEnableIdentityCallback = preEnableIdentityCallback
 		self.preCreateIdentityCallback = preCreateIdentityCallback
-		self.enableAlphaMLS = enableAlphaMLS
+		self.mlsAlpha = mlsAlpha
 		self.mlsEncryptionKey = mlsEncryptionKey
 	}
 }
@@ -122,7 +122,7 @@ public final class Client {
 		source: LegacyIdentitySource,
 		privateKeyBundleV1: PrivateKeyBundleV1
 	) async throws -> FfiXmtpClient? {
-		if case let .enabled(signingKey) = options?.enableAlphaMLS, options?.api.env == .local {
+		if case let .enabled(signingKey) = options?.mlsAlpha, options?.api.env == .local {
 			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(options?.api.env.rawValue ?? "")-\(address).db3")
 			let v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
