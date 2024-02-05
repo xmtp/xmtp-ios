@@ -8,7 +8,7 @@ import Foundation
 public typealias CipherText = Xmtp_MessageContents_Ciphertext
 
 enum CryptoError: Error {
-	case randomBytes, combinedPayload
+	case randomBytes, combinedPayload, hmacSignatureError
 }
 
 enum Crypto {
@@ -102,5 +102,38 @@ enum Crypto {
 		} else {
 			throw CryptoError.randomBytes
 		}
+	}
+	
+	static func hkdfHmacKey(secret: Data, info: Data) throws -> SymmetricKey {
+		let key = HKDF<SHA256>.deriveKey(
+			inputKeyMaterial: SymmetricKey(data: secret),
+			salt: Data(),
+			info: info,
+			outputByteCount: 32)
+		return key
+	}
+	
+	static func generateHmacSignature(secret: Data, info: Data, message: Data) throws -> Data {
+		do {
+		  let key = try hkdfHmacKey(secret: secret, info: info)
+		  let signature = HMAC<SHA256>.authenticationCode(for: message, using: key)
+		  return Data(signature)
+	  } catch {
+		  throw CryptoError.hmacSignatureError
+	  }
+	}
+	
+	static func exportHmacKey(key: SymmetricKey) -> Data {
+		var exportedData = Data(count: key.bitCount / 8)
+		exportedData.withUnsafeMutableBytes { buffer in
+			key.withUnsafeBytes { keyBuffer in
+				buffer.copyMemory(from: keyBuffer)
+			}
+		}
+		return exportedData
+	}
+
+	static func importHmacKey(keyData: Data) -> SymmetricKey {
+		return SymmetricKey(data: keyData)
 	}
 }

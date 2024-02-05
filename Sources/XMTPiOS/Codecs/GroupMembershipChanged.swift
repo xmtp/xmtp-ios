@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  GroupMembershipChanged.swift
 //  
 //
 //  Created by Pat Nakajima on 2/1/24.
