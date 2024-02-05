@@ -15,10 +15,6 @@ public enum ClientError: Error {
 	case creationError(String)
 }
 
-public enum MLSAlphaOption {
-	case disabled, enabled(SigningKey?)
-}
-
 /// Specify configuration options for creating a ``Client``.
 public struct ClientOptions {
 	// Specify network options
@@ -48,7 +44,7 @@ public struct ClientOptions {
 	/// `preCreateIdentityCallback` will be called immediately before a Create Identity wallet signature is requested from the user.
 	public var preCreateIdentityCallback: PreEventCallback?
 
-	public var mlsAlpha: MLSAlphaOption = .disabled
+	public var mlsAlpha = false
 	public var mlsEncryptionKey: Data?
 
 	public init(
@@ -56,7 +52,7 @@ public struct ClientOptions {
 		codecs: [any ContentCodec] = [],
 		preEnableIdentityCallback: PreEventCallback? = nil,
 		preCreateIdentityCallback: PreEventCallback? = nil,
-		mlsAlpha: MLSAlphaOption = .disabled,
+		mlsAlpha: Bool = false,
 		mlsEncryptionKey: Data? = nil
 	) {
 		self.api = api
@@ -120,9 +116,10 @@ public final class Client {
 		address: String,
 		options: ClientOptions?,
 		source: LegacyIdentitySource,
-		privateKeyBundleV1: PrivateKeyBundleV1
+		privateKeyBundleV1: PrivateKeyBundleV1,
+		signingKey: SigningKey?
 	) async throws -> FfiXmtpClient? {
-		if case let .enabled(signingKey) = options?.mlsAlpha, options?.api.env == .local {
+		if options?.mlsAlpha == true, options?.api.env == .local {
 			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(options?.api.env.rawValue ?? "")-\(address).db3")
 			let v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
@@ -159,7 +156,8 @@ public final class Client {
 			address: account.address,
 			options: options,
 			source: source,
-			privateKeyBundleV1: privateKeyBundleV1
+			privateKeyBundleV1: privateKeyBundleV1,
+			signingKey: account
 		)
 
 		if let textToSign = v3Client?.textToSign() {
@@ -255,7 +253,8 @@ public final class Client {
 			address: address,
 			options: options,
 			source: .static,
-			privateKeyBundleV1: v1Bundle
+			privateKeyBundleV1: v1Bundle,
+			signingKey: nil
 		)
 
 		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client)
