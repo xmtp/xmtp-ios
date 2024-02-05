@@ -15,6 +15,10 @@ public enum ClientError: Error {
 	case creationError(String)
 }
 
+public enum MLSAlphaOption {
+	case disabled, enabled(SigningKey?)
+}
+
 /// Specify configuration options for creating a ``Client``.
 public struct ClientOptions {
 	// Specify network options
@@ -44,7 +48,7 @@ public struct ClientOptions {
 	/// `preCreateIdentityCallback` will be called immediately before a Create Identity wallet signature is requested from the user.
 	public var preCreateIdentityCallback: PreEventCallback?
 
-	public var enableAlphaMLS: Bool = false
+	public var mlsAlpha: MLSAlphaOption = .disabled
 	public var mlsEncryptionKey: Data?
 
 	public init(
@@ -52,14 +56,14 @@ public struct ClientOptions {
 		codecs: [any ContentCodec] = [],
 		preEnableIdentityCallback: PreEventCallback? = nil,
 		preCreateIdentityCallback: PreEventCallback? = nil,
-		enableAlphaMLS: Bool = false,
+		mlsAlpha: MLSAlphaOption = .disabled,
 		mlsEncryptionKey: Data? = nil
 	) {
 		self.api = api
 		self.codecs = codecs
 		self.preEnableIdentityCallback = preEnableIdentityCallback
 		self.preCreateIdentityCallback = preCreateIdentityCallback
-		self.enableAlphaMLS = enableAlphaMLS
+		self.mlsAlpha = mlsAlpha
 		self.mlsEncryptionKey = mlsEncryptionKey
 	}
 }
@@ -112,12 +116,15 @@ public final class Client {
 		}
 	}
 
-	static func initV3Client(address: String, options: ClientOptions?, source: LegacyIdentitySource, privateKeyBundleV1: PrivateKeyBundleV1) async throws -> FfiXmtpClient? {
-		let v3Client: FfiXmtpClient?
-
-		if options?.enableAlphaMLS == true && options?.api.env == .local {
+	static func initV3Client(
+		address: String,
+		options: ClientOptions?,
+		source: LegacyIdentitySource,
+		privateKeyBundleV1: PrivateKeyBundleV1
+	) async throws -> FfiXmtpClient? {
+		if case let .enabled(signingKey) = options?.mlsAlpha, options?.api.env == .local {
 			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(options?.api.env.rawValue ?? "")-\(address).db3")
-			v3Client = try await LibXMTP.createClient(
+			let v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
 				host: GRPCApiClient.envToUrl(env: options?.api.env ?? .local),
 				isSecure: (options?.api.env ?? .local) != .local,
@@ -127,11 +134,22 @@ public final class Client {
 				legacyIdentitySource: source,
 				legacySignedPrivateKeyProto: try privateKeyBundleV1.toV2().identityKey.serializedData()
 			)
-		} else {
-			v3Client = nil
-		}
 
-		return v3Client
+			if let textToSign = v3Client.textToSign() {
+				guard let signingKey else {
+					throw ClientError.creationError("No v3 keys found, you must pass a SigningKey in order to enable alpha MLS features")
+				}
+
+				let signature = try await signingKey.sign(message: textToSign)
+				try await v3Client.registerIdentity(recoverableWalletSignature: signature.rawData)
+			} else {
+				try await v3Client.registerIdentity(recoverableWalletSignature: nil)
+			}
+
+			return v3Client
+		} else {
+			return nil
+		}
 	}
 
 	static func create(account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> Client {
@@ -239,15 +257,6 @@ public final class Client {
 			source: .static,
 			privateKeyBundleV1: v1Bundle
 		)
-
-		if let v3Client, let textToSign = v3Client.textToSign() {
-			guard let signingKey else {
-				throw ClientError.creationError("No v3 keys found, you must pass a SigningKey in order to enable alpha MLS features")
-			}
-
-			let signature = try await signingKey.sign(message: textToSign)
-			try await v3Client.registerIdentity(recoverableWalletSignature: signature.rawData)
-		}
 
 		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client)
 
