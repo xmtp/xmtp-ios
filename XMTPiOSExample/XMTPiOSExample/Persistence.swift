@@ -40,7 +40,7 @@ struct Persistence {
 		return decoded
 	}
 
-	func save(conversation: Conversation) throws {
+	func save(conversation: DirectMessage) throws {
 		keychain[data: key(topic: conversation.topic)] = try JSONEncoder().encode(conversation.encodedContainer)
 	}
 
