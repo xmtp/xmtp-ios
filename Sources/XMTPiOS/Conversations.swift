@@ -9,10 +9,25 @@ public enum GroupError: Error {
 	case alphaMLSNotEnabled, emptyCreation, memberCannotBeSelf, memberNotRegistered([String])
 }
 
+final class GroupStreamCallback: FfiConversationCallback {
+	let client: Client
+	let callback: (Group) -> Void
+
+	init(client: Client, callback: @escaping (Group) -> Void) {
+		self.client = client
+		self.callback = callback
+	}
+
+	func onConversation(conversation: FfiGroup) {
+		self.callback(conversation.fromFFI(client: client))
+	}
+}
+
 /// Handles listing and creating Conversations.
 public actor Conversations {
 	var client: Client
 	var conversationsByTopic: [String: Conversation] = [:]
+	let streamHolder = StreamHolder()
 
 	init(client: Client) {
 		self.client = client
@@ -46,6 +61,18 @@ public actor Conversations {
 		}
 
 		return try await v3Client.conversations().list(opts: options).map { $0.fromFFI(client: client) }
+	}
+
+	public func streamGroups() async throws -> AsyncThrowingStream<Group, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				self.streamHolder.stream = try await self.client.v3Client?.conversations().stream(
+					callback: GroupStreamCallback(client: self.client) { group in
+						continuation.yield(group)
+					}
+				)
+			}
+		}
 	}
 
 	public func newGroup(with addresses: [String]) async throws -> Group {

@@ -26,9 +26,14 @@ final class MessageCallback: FfiMessageCallback {
 	}
 }
 
+final class StreamHolder {
+	var stream: FfiStreamCloser?
+}
+
 public struct Group: Identifiable, Equatable, Hashable {
 	var ffiGroup: FfiGroup
 	var client: Client
+	let streamHolder = StreamHolder()
 
 	struct Member {
 		var ffiGroupMember: FfiGroupMember
@@ -105,12 +110,22 @@ public struct Group: Identifiable, Equatable, Hashable {
 		try await ffiGroup.send(contentBytes: encoded.serializedData())
 	}
 
+	public func endStream() {
+		self.streamHolder.stream?.end()
+	}
+
 	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
 		AsyncThrowingStream { continuation in
-			Task {
-				try await ffiGroup.stream(messageCallback: MessageCallback(client: client) { message in
-					continuation.yield(message)
-				})
+			Task.detached {
+				do {
+					self.streamHolder.stream = try await ffiGroup.stream(
+						messageCallback: MessageCallback(client: self.client) { message in
+							continuation.yield(message)
+						}
+					)
+				} catch {
+					print("STREAM ERR: \(error)")
+				}
 			}
 		}
 	}
