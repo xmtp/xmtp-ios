@@ -78,8 +78,8 @@ final class GRPCApiClient: ApiClient {
 	static func envToUrl(env: XMTPEnvironment) -> String {
 		switch env {
 		case XMTPEnvironment.local: return "http://localhost:5556"
-		case XMTPEnvironment.dev: return "https://dev.xmtp.network:5556"
-		case XMTPEnvironment.production: return "https://production.xmtp.network:5556"
+		case XMTPEnvironment.dev: return "https://grpc.dev.xmtp.network:443:5556"
+		case XMTPEnvironment.production: return "https://grpc.production.xmtp.network:443:5556"
 		}
 	}
 
