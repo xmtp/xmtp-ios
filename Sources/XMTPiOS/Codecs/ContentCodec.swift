@@ -8,7 +8,7 @@
 import Foundation
 
 enum CodecError: String, Error {
-	case invalidContent, codecNotFound
+	case invalidContent, codecNotFound, unableToDetermine
 }
 
 public typealias EncodedContent = Xmtp_MessageContents_EncodedContent

@@ -78,15 +78,13 @@ public struct ConversationV2 {
 	}
 
 	func prepareMessage(encodedContent: EncodedContent, options: SendOptions?) async throws -> PreparedMessage {
-		let codec = client.codecRegistry.find(for: options?.contentType)
 
 		let message = try await MessageV2.encode(
 			client: client,
 			content: encodedContent,
 			topic: topic,
 			keyMaterial: keyMaterial,
-			codec: codec,
-			shouldPush: options?.shouldPush
+			shouldPush: options?.shouldPush ?? false
 		)
 
 		let topic = options?.ephemeral == true ? ephemeralTopic : topic
@@ -123,8 +121,21 @@ public struct ConversationV2 {
         if let compression = options?.compression {
 			encoded = try encoded.compress(compression)
 		}
+		
+		func shouldPush<Codec: ContentCodec>(codec: Codec, content: Any) throws -> Bool? {
+			if let content = content as? Codec.T {
+				return try codec.shouldPush(content: content)
+			} else {
+				throw CodecError.unableToDetermine
+			}
+		}
+		
+		var opts = options
+		if opts?.shouldPush == nil {
+			opts?.shouldPush = try shouldPush(codec: codec, content: content)
+		}
 
-		return try await prepareMessage(encodedContent: encoded, options: options)
+		return try await prepareMessage(encodedContent: encoded, options: opts)
 	}
 
 	func messages(limit: Int? = nil, before: Date? = nil, after: Date? = nil, direction: PagingInfoSortDirection? = .descending) async throws -> [DecodedMessage] {
@@ -232,13 +243,14 @@ public struct ConversationV2 {
 
 	public func encode<Codec: ContentCodec, T>(codec: Codec, content: T) async throws -> Data where Codec.T == T {
 		let content = try codec.encode(content: content, client: client)
+		let shouldPush = try codec.shouldPush(content: content as! T)
 
 		let message = try await MessageV2.encode(
 			client: client,
 			content: content,
 			topic: topic,
 			keyMaterial: keyMaterial,
-			codec: codec
+			shouldPush: shouldPush
 		)
 
 		let envelope = Envelope(

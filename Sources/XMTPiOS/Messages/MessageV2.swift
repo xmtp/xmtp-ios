@@ -81,7 +81,7 @@ extension MessageV2 {
 		}
 	}
 
-	static func encode<Codec: ContentCodec>(client: Client, content encodedContent: EncodedContent, topic: String, keyMaterial: Data, codec: Codec, shouldPush: Bool? = nil) async throws -> MessageV2 {
+	static func encode(client: Client, content encodedContent: EncodedContent, topic: String, keyMaterial: Data, shouldPush: Bool) async throws -> MessageV2 {
 		let payload = try encodedContent.serializedData()
 
 		let date = Date()
@@ -106,15 +106,12 @@ extension MessageV2 {
 		}
 
 		let senderHmac = try Crypto.generateHmacSignature(secret: keyMaterial, info: infoEncoded, message: headerBytes)
-		
-		let decoded = try codec.decode(content: encodedContent, client: client)
-		let calculatedShouldPush = try codec.shouldPush(content: decoded)
 
 		return MessageV2(
 			headerBytes: headerBytes,
 			ciphertext: ciphertext,
 			senderHmac: senderHmac,
-			shouldPush: shouldPush ?? calculatedShouldPush
+			shouldPush: shouldPush
 		)
 	}
 }
