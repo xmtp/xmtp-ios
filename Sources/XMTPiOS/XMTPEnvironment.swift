@@ -11,5 +11,16 @@ import Foundation
 public enum XMTPEnvironment: String, Sendable {
 	case dev = "grpc.dev.xmtp.network:443",
 	     production = "grpc.production.xmtp.network:443",
-	     local = "localhost"
+	     local = "localhost:5556"
+
+	var url: String {
+		switch self {
+		case .dev:
+			return "https://\(rawValue)"
+		case .production:
+			return "https://\(rawValue)"
+		case .local:
+			return "http://\(rawValue)"
+		}
+	}
 }
