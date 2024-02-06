@@ -44,6 +44,9 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}
 	}
 
+	public var createdAt: Date {
+		Date(millisecondsSinceEpoch: ffiGroup.createdAtNs())
+	}
 
 	public func addMembers(addresses: [String]) async throws {
 		try await ffiGroup.addMembers(accountAddresses: addresses)

@@ -27,6 +27,15 @@ enum ConversationOrGroup: Identifiable, Hashable {
 			return group.members.joined(separator: ",")
 		}
 	}
+
+	var createdAt: Date {
+		switch self {
+		case .conversation(let conversation):
+			return conversation.createdAt
+		case .group(let group):
+			return group.createdAt
+		}
+	}
 }
 
 struct NewConversationView: View {

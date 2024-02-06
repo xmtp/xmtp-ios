@@ -17,9 +17,37 @@ struct ConversationListView: View {
 
 	var body: some View {
 		List {
-			ForEach(conversations, id: \.id) { item in
+			ForEach(conversations.sorted(by: { $0.createdAt > $1.createdAt }), id: \.id) { item in
 				NavigationLink(value: item) {
-					Text(item.id)
+					HStack {
+						switch item {
+						case .conversation:
+							Image(systemName: "person.fill")
+								.resizable()
+								.scaledToFit()
+								.frame(width: 16, height: 16)
+								.foregroundStyle(.secondary)
+						case .group:
+							Image(systemName: "person.3.fill")
+								.resizable()
+								.scaledToFit()
+								.frame(width: 16, height: 16)
+								.foregroundStyle(.secondary)
+						}
+
+						VStack(alignment: .leading) {
+							switch item {
+							case .conversation(let conversation):
+								Text(abbreviate(address: conversation.peerAddress))
+							case .group(let group):
+								Text(group.members.map { abbreviate(address: $0) }.joined(separator: ", "))
+							}
+
+							Text(item.createdAt.formatted())
+								.font(.caption)
+								.foregroundStyle(.secondary)
+						}
+					}
 				}
 			}
 		}
@@ -70,6 +98,16 @@ struct ConversationListView: View {
 					coordinator.path.append(conversationOrGroup)
 				}
 			}
+		}
+	}
+
+	func abbreviate(address: String) -> String {
+		if address.count > 6 {
+			let start = address.index(address.startIndex, offsetBy: 6)
+			let end = address.index(address.endIndex, offsetBy: -5)
+			return address.replacingCharacters(in: start ... end, with: "...")
+		} else {
+			return address
 		}
 	}
 
