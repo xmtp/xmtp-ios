@@ -193,6 +193,22 @@ extension FfiV2SubscribeRequest {
 	}
 }
 
+// MARK: Messages
+
+extension FfiMessage {
+	func fromFFI(client: Client) throws -> DecodedMessage {
+		let encodedContent = try EncodedContent(serializedData: content)
+
+		return DecodedMessage(
+			client: client,
+			topic: "",
+			encodedContent: encodedContent,
+			senderAddress: addrFrom,
+			sent: Date(timeIntervalSince1970: TimeInterval(sentAtNs / 1_000_000_000))
+		)
+	}
+}
+
 // MARK: Group
 
 extension FfiGroup {

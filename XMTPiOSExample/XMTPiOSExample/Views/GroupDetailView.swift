@@ -24,6 +24,15 @@ struct GroupDetailView: View {
 				.task {
 					await loadMessages()
 				}
+				.task {
+					do {
+						for try await _ in group.streamMessages() {
+							await loadMessages()
+						}
+					} catch {
+						print("Erorr streaming group messages \(error)")
+					}
+				}
 
 			MessageComposerView { text in
 				do {
