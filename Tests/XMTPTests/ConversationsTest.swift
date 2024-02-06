@@ -34,6 +34,15 @@ class ConversationsTests: XCTestCase {
 		XCTAssertEqual(conversation.createdAt.description, created.description)
 	}
 
+	func testError() async throws {
+		let fixtures = await fixtures()
+		do {
+			try await fixtures.aliceClient.conversations.newConversation(with: fixtures.alice.address)
+		} catch {
+			print("ERRORohno: \(error)")
+		}
+	}
+
 	func testCanGetConversationFromInviteEnvelope() async throws {
 		let fixtures = await fixtures()
 		let client: Client = fixtures.aliceClient!
