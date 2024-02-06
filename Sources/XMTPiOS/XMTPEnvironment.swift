@@ -9,7 +9,7 @@ import Foundation
 
 /// Contains hosts an `ApiClient` can connect to
 public enum XMTPEnvironment: String, Sendable {
-	case dev = "dev.xmtp.network",
-	     production = "production.xmtp.network",
+	case dev = "grpc.dev.xmtp.network:443",
+	     production = "grpc.production.xmtp.network:443",
 	     local = "localhost"
 }
