@@ -64,10 +64,10 @@ struct ConversationListView: View {
 				switch conversationOrGroup {
 				case .conversation(let conversation):
 					conversations.insert(.conversation(conversation), at: 0)
-					coordinator.path.append(conversation)
+					coordinator.path.append(conversationOrGroup)
 				case .group(let group):
 					conversations.insert(.group(group), at: 0)
-					coordinator.path.append(group)
+					coordinator.path.append(conversationOrGroup)
 				}
 			}
 		}

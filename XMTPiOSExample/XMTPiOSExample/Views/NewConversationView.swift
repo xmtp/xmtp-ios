@@ -113,6 +113,7 @@ struct NewConversationView: View {
 							let group = try await client.conversations.newGroup(with: groupMembers)
 							try await client.conversations.sync()
 							await MainActor.run {
+								dismiss()
 								onCreate(.group(group))
 							}
 						} catch {
