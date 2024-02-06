@@ -13,6 +13,7 @@ struct GroupDetailView: View {
 	var group: XMTPiOS.Group
 
 	@State private var messages: [DecodedMessage] = []
+	@State private var isShowingSettings = false
 
 	var body: some View {
 		VStack {
@@ -34,6 +35,14 @@ struct GroupDetailView: View {
 		}
 		.navigationTitle("Group Chat")
 		.navigationBarTitleDisplayMode(.inline)
+		.toolbar {
+			Button(action: { isShowingSettings.toggle() }) {
+				Label("Settings", systemImage: "gearshape")
+			}
+			.sheet(isPresented: $isShowingSettings) {
+				GroupSettingsView(client: client, group: group)
+			}
+		}
 	}
 
 	func loadMessages() async {

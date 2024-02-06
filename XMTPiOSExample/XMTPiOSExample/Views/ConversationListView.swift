@@ -38,9 +38,9 @@ struct ConversationListView: View {
 						VStack(alignment: .leading) {
 							switch item {
 							case .conversation(let conversation):
-								Text(abbreviate(address: conversation.peerAddress))
+								Text(Util.abbreviate(address: conversation.peerAddress))
 							case .group(let group):
-								Text(group.members.map { abbreviate(address: $0) }.joined(separator: ", "))
+								Text(group.members.sorted().map { Util.abbreviate(address: $0) }.joined(separator: ", "))
 							}
 
 							Text(item.createdAt.formatted())
@@ -98,16 +98,6 @@ struct ConversationListView: View {
 					coordinator.path.append(conversationOrGroup)
 				}
 			}
-		}
-	}
-
-	func abbreviate(address: String) -> String {
-		if address.count > 6 {
-			let start = address.index(address.startIndex, offsetBy: 6)
-			let end = address.index(address.endIndex, offsetBy: -5)
-			return address.replacingCharacters(in: start ... end, with: "...")
-		} else {
-			return address
 		}
 	}
 

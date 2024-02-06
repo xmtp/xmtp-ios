@@ -87,6 +87,7 @@ struct MessageGroupMembershipChangedView: View {
 		Text(label)
 			.font(.caption)
 			.foregroundStyle(.secondary)
+			.padding(.vertical)
 	}
 
 	var label: String {
@@ -94,11 +95,11 @@ struct MessageGroupMembershipChangedView: View {
 			let changes: GroupMembershipChanges = try message.content()
 
 			if !changes.membersAdded.isEmpty {
-				return "Added \(changes.membersAdded.map(\.accountAddress).joined(separator: ", "))"
+				return "Added \(changes.membersAdded.map(\.accountAddress).map { Util.abbreviate(address: $0) }.joined(separator: ", "))"
 			}
 
 			if !changes.membersRemoved.isEmpty {
-				return "Removed \(changes.membersRemoved.map(\.accountAddress).joined(separator: ", "))"
+				return "Removed \(changes.membersRemoved.map(\.accountAddress).map { Util.abbreviate(address: $0) }.joined(separator: ", "))"
 			}
 
 			return changes.debugDescription
