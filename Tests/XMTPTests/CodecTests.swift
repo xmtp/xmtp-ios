@@ -96,8 +96,7 @@ class CodecTests: XCTestCase {
 			client: aliceClient,
 			content: messages[0].encodedContent,
 			topic: aliceConversation.topic,
-			keyMaterial: Data(aliceConversation.keyMaterial!),
-			codec: NumberCodec()
+			keyMaterial: Data(aliceConversation.keyMaterial!)
 		)
 		
 		XCTAssertEqual(false, message.shouldPush)

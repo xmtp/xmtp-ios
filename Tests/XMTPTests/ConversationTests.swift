@@ -230,8 +230,7 @@ class ConversationTests: XCTestCase {
 						client: bobClient,
 						content: encodedContent,
 						topic: conversation.topic,
-						keyMaterial: conversation.keyMaterial,
-						codec: encoder
+						keyMaterial: conversation.keyMaterial
 					)
 				).serializedData()
 			)
