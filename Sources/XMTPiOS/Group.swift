@@ -109,7 +109,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 
 			return DecodedMessage(
 				client: client,
-				topic: "",
+				topic: id.toHex,
 				encodedContent: encodedContent,
 				senderAddress: ffiMessage.addrFrom,
 				sent: Date(timeIntervalSince1970: TimeInterval(ffiMessage.sentAtNs / 1_000_000_000))
