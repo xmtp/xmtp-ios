@@ -16,8 +16,21 @@ public enum ConversationError: Error, CustomStringConvertible {
 	}
 }
 
-public enum GroupError: Error {
+public enum GroupError: Error, CustomStringConvertible {
 	case alphaMLSNotEnabled, emptyCreation, memberCannotBeSelf, memberNotRegistered([String])
+
+	public var description: String {
+		switch self {
+		case .alphaMLSNotEnabled:
+			return "GroupError.alphaMLSNotEnabled"
+		case .emptyCreation:
+			return "GroupError.emptyCreation you cannot create an empty group"
+		case .memberCannotBeSelf:
+			return "GroupError.memberCannotBeSelf you cannot add yourself to a group"
+		case .memberNotRegistered(let array):
+			return "GroupError.memberNotRegistered members not registered: \(array.joined(separator: ", "))"
+		}
+	}
 }
 
 /// Handles listing and creating Conversations.
