@@ -23,7 +23,7 @@ public struct TestConfig {
     }
 
     static public func skipIfNotRunningLocalNodeTests() throws {
-//        try XCTSkipIf(!TEST_SERVER_ENABLED, "requires local node")
+        try XCTSkipIf(!TEST_SERVER_ENABLED, "requires local node")
     }
 
     static public func skip(because: String) throws {
