@@ -40,7 +40,7 @@ struct ConversationListView: View {
 							case .conversation(let conversation):
 								Text(Util.abbreviate(address: conversation.peerAddress))
 							case .group(let group):
-								Text(group.members.sorted().map { Util.abbreviate(address: $0) }.joined(separator: ", "))
+								Text(group.memberAddresses.sorted().map { Util.abbreviate(address: $0) }.joined(separator: ", "))
 							}
 
 							Text(item.createdAt.formatted())

@@ -36,7 +36,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 		id.hash(into: &hasher)
 	}
 
-	public var members: [String] {
+	public var memberAddresses: [String] {
 		do {
 			return try ffiGroup.listMembers().map(\.fromFFI.accountAddress)
 		} catch {

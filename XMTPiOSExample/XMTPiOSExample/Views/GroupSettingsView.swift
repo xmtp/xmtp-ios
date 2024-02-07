@@ -116,7 +116,7 @@ struct GroupSettingsView: View {
 	private func syncGroupMembers() async {
 		try? await group.sync()
 		await MainActor.run {
-			self.groupMembers = group.members
+			self.groupMembers = group.memberAddresses
 		}
 	}
 }
