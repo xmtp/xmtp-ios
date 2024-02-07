@@ -17,11 +17,24 @@ public typealias QueryRequest = Xmtp_MessageApi_V1_QueryRequest
 public typealias QueryResponse = Xmtp_MessageApi_V1_QueryResponse
 public typealias SubscribeRequest = Xmtp_MessageApi_V1_SubscribeRequest
 
-public enum ApiClientError: Error {
+public enum ApiClientError: Error, CustomStringConvertible {
 	case batchQueryError(String)
 	case queryError(String)
 	case publishError(String)
 	case subscribeError(String)
+
+	public var description: String {
+		switch self {
+		case .batchQueryError(let err):
+			return "ApiClientError.batchQueryError: \(err)"
+		case .queryError(let err):
+			return "ApiClientError.queryError: \(err)"
+		case .publishError(let err):
+			return "ApiClientError.publishError: \(err)"
+		case .subscribeError(let err):
+			return "ApiClientError.subscribeError: \(err)"
+		}
+	}
 }
 
 protocol ApiClient: Sendable {
@@ -72,14 +85,6 @@ final class GRPCApiClient: ApiClient {
 		self.rustClient = rustClient
 		if let appVersion = appVersion {
 			rustClient.setAppVersion(version: appVersion)
-		}
-	}
-
-	static func envToUrl(env: XMTPEnvironment) -> String {
-		switch env {
-		case XMTPEnvironment.local: return "http://localhost:5556"
-		case XMTPEnvironment.dev: return "https://dev.xmtp.network:5556"
-		case XMTPEnvironment.production: return "https://production.xmtp.network:5556"
 		}
 	}
 

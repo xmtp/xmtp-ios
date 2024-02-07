@@ -1,8 +1,19 @@
 import Foundation
 import LibXMTP
 
-public enum ConversationError: Error {
+public enum ConversationError: Error, CustomStringConvertible {
 	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String)
+
+	public var description: String {
+		switch self {
+		case .recipientIsSender:
+			return "ConversationError.recipientIsSender: Recipient cannot be sender"
+		case .recipientNotOnNetwork:
+			return "ConversationError.recipientNotOnNetwork: Recipient is not on network"
+		case .v1NotSupported(let str):
+			return "ConversationError.v1NotSupported: V1 does not support: \(str)"
+		}
+	}
 }
 
 public enum GroupError: Error {
