@@ -38,6 +38,7 @@ extension PrivateKeyBundleV2 {
 	}
 
 	func findPreKey(_ myPreKey: SignedPublicKey) throws -> SignedPrivateKey {
+		print("Number of prekeys: \(preKeys.count)")
 		for preKey in preKeys {
 			if preKey.matches(myPreKey) {
 				return preKey

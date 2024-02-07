@@ -34,9 +34,12 @@ extension SealedInvitationV1 {
 			throw SealedInvitationError.noSignature
 		}
 
+		print("Checking identity key matches")
 		if viewer.identityKey.matches(header.sender.identityKey) {
+			print("Sender is self")
 			secret = try viewer.sharedSecret(peer: header.recipient, myPreKey: header.sender.preKey, isRecipient: false)
 		} else {
+			print("Sender is other")
 			secret = try viewer.sharedSecret(peer: header.sender, myPreKey: header.recipient.preKey, isRecipient: true)
 		}
 
