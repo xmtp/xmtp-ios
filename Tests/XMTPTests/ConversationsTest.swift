@@ -61,10 +61,18 @@ class ConversationsTests: XCTestCase {
 	}
 
 	func testStreamAllMessagesGetsMessageFromKnownConversation() async throws {
-		let fixtures = await fixtures()
-		let client = fixtures.aliceClient!
-
-		let bobConversation = try await fixtures.bobClient.conversations.newConversation(with: client.address)
+		// Data from hex: 0836200ffafa17a3cb8b54f22d6afa60b13da48726543241adc5c250dbb0e0cd
+		// aka 2k many convo test wallet
+		let privateKeyData = Data([8,54,32,15,250,250,23,163,203,139,84,242,45,106,250,96,177,61,164,135,38,84,50,65,173,197,194,80,219,176,224,205])
+		let privateKey = try PrivateKey(privateKeyData)
+		// Use hardcoded privateKey for testing
+		let options = ClientOptions(api: ClientOptions.Api(env: .dev, isSecure: true))
+		let client = try await Client.create(account: privateKey, options: options)
+		
+		let bobKey = try PrivateKey.generate()
+		let bobClient = try await Client.create(account: bobKey, options: options)
+		
+		let bobConversation = try await bobClient.conversations.newConversation(with: client.address)
 
 		let expectation1 = expectation(description: "got a message")
 
