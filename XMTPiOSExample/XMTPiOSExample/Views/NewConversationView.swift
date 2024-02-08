@@ -24,7 +24,7 @@ enum ConversationOrGroup: Identifiable, Hashable {
 		case .conversation(let conversation):
 			return conversation.peerAddress
 		case .group(let group):
-			return group.members.joined(separator: ",")
+			return group.memberAddresses.joined(separator: ",")
 		}
 	}
 

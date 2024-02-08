@@ -1,12 +1,36 @@
 import Foundation
 import LibXMTP
 
-public enum ConversationError: Error {
+public enum ConversationError: Error, CustomStringConvertible {
 	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String)
+
+	public var description: String {
+		switch self {
+		case .recipientIsSender:
+			return "ConversationError.recipientIsSender: Recipient cannot be sender"
+		case .recipientNotOnNetwork:
+			return "ConversationError.recipientNotOnNetwork: Recipient is not on network"
+		case .v1NotSupported(let str):
+			return "ConversationError.v1NotSupported: V1 does not support: \(str)"
+		}
+	}
 }
 
-public enum GroupError: Error {
+public enum GroupError: Error, CustomStringConvertible {
 	case alphaMLSNotEnabled, emptyCreation, memberCannotBeSelf, memberNotRegistered([String])
+
+	public var description: String {
+		switch self {
+		case .alphaMLSNotEnabled:
+			return "GroupError.alphaMLSNotEnabled"
+		case .emptyCreation:
+			return "GroupError.emptyCreation you cannot create an empty group"
+		case .memberCannotBeSelf:
+			return "GroupError.memberCannotBeSelf you cannot add yourself to a group"
+		case .memberNotRegistered(let array):
+			return "GroupError.memberNotRegistered members not registered: \(array.joined(separator: ", "))"
+		}
+	}
 }
 
 final class GroupStreamCallback: FfiConversationCallback {
