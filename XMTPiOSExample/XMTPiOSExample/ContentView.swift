@@ -30,10 +30,12 @@ struct ContentView: View {
 				Button("Connect Wallet") { isConnectingWallet = true }
 					.sheet(isPresented: $isConnectingWallet) {
 						LoginView(onConnected: { client in
+							print("GOT A CLIENT \(client.address)")
 							do {
 								let keysData = try client.privateKeyBundle.serializedData()
 								Persistence().saveKeys(keysData)
 								self.status = .connected(client)
+								isConnectingWallet = false
 							} catch {
 								print("Error setting up client: \(error)")
 							}

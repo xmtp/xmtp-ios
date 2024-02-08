@@ -113,6 +113,7 @@ public final class Client {
 				secure: options.api.isSecure,
 				rustClient: client
 			)
+
 			return try await create(account: account, apiClient: apiClient, options: options)
 		} catch {
 			throw ClientError.creationError("\(error)")
@@ -144,8 +145,11 @@ public final class Client {
 					throw ClientError.creationError("No v3 keys found, you must pass a SigningKey in order to enable alpha MLS features")
 				}
 
+				print("requesting signature")
 				let signature = try await signingKey.sign(message: textToSign)
+				print("done requesting signature, registering identity \(options?.api.env.url) \(options?.api.env.isSecure == true)")
 				try await v3Client.registerIdentity(recoverableWalletSignature: signature.rawData)
+				print("done registering identity")
 			} else {
 				try await v3Client.registerIdentity(recoverableWalletSignature: nil)
 			}
@@ -159,6 +163,7 @@ public final class Client {
 	static func create(account: SigningKey, apiClient: ApiClient, options: ClientOptions? = nil) async throws -> Client {
 		let (privateKeyBundleV1, source) = try await loadOrCreateKeys(for: account, apiClient: apiClient, options: options)
 
+		print("INIT V3 CLIENT ---------------------------------------------------")
 		let v3Client = try await initV3Client(
 			address: account.address,
 			options: options,
@@ -166,11 +171,7 @@ public final class Client {
 			privateKeyBundleV1: privateKeyBundleV1,
 			signingKey: account
 		)
-
-		if let textToSign = v3Client?.textToSign() {
-			let signature = try await account.sign(message: textToSign).rawData
-			try await v3Client?.registerIdentity(recoverableWalletSignature: signature)
-		}
+		print("DONE INIT V3 CLIENT ----------------------------------------------")
 
 		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client)
 		try await client.ensureUserContactPublished()

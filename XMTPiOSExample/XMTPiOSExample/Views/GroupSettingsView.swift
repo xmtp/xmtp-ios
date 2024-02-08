@@ -72,7 +72,7 @@ struct GroupSettingsView: View {
 								do {
 									if try await self.client.canMessageV3(address: newGroupMember) {
 										try await group.addMembers(addresses: [newGroupMember])
-										try await syncGroupMembers()
+										await syncGroupMembers()
 
 										await MainActor.run {
 											self.groupError = ""
