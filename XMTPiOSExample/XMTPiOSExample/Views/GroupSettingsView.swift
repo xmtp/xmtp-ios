@@ -118,7 +118,7 @@ struct GroupSettingsView: View {
 		try? await group.sync()
 		// swiftlint:enable no_optional_try
 		await MainActor.run {
-			self.groupMembers = group.members
+			self.groupMembers = group.memberAddresses
 		}
 	}
 }
