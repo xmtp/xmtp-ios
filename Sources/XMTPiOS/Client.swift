@@ -248,7 +248,6 @@ public final class Client {
 		let address = try v1Bundle.identityKey.publicKey.recoverWalletSignerPublicKey().walletAddress
 
 		let options = options ?? ClientOptions()
-
 		let client = try await LibXMTP.createV2Client(host: options.api.env.url, isSecure: options.api.env.isSecure)
 		let apiClient = try GRPCApiClient(
 			environment: options.api.env,
@@ -302,7 +301,6 @@ public final class Client {
 
 	public static func canMessage(_ peerAddress: String, options: ClientOptions? = nil) async throws -> Bool {
 		let options = options ?? ClientOptions()
-
 		let client = try await LibXMTP.createV2Client(host: options.api.env.url, isSecure: options.api.env.isSecure)
 		let apiClient = try GRPCApiClient(
 			environment: options.api.env,

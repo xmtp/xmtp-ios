@@ -8,9 +8,32 @@
 import Foundation
 import LibXMTP
 
+final class MessageCallback: FfiMessageCallback {
+	let client: XMTPiOS.Client
+	let callback: (DecodedMessage) -> Void
+
+	init(client: XMTPiOS.Client, _ callback: @escaping (DecodedMessage) -> Void) {
+		self.client = client
+		self.callback = callback
+	}
+
+	func onMessage(message: LibXMTP.FfiMessage) {
+		do {
+			try callback(message.fromFFI(client: client))
+		} catch {
+			print("Error onMessage \(error)")
+		}
+	}
+}
+
+final class StreamHolder {
+	var stream: FfiStreamCloser?
+}
+
 public struct Group: Identifiable, Equatable, Hashable {
 	var ffiGroup: FfiGroup
 	var client: Client
+	let streamHolder = StreamHolder()
 
 	struct Member {
 		var ffiGroupMember: FfiGroupMember
@@ -87,6 +110,26 @@ public struct Group: Identifiable, Equatable, Hashable {
 		try await ffiGroup.send(contentBytes: encoded.serializedData())
 	}
 
+	public func endStream() {
+		self.streamHolder.stream?.end()
+	}
+
+	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
+		AsyncThrowingStream { continuation in
+			Task.detached {
+				do {
+					self.streamHolder.stream = try await ffiGroup.stream(
+						messageCallback: MessageCallback(client: self.client) { message in
+							continuation.yield(message)
+						}
+					)
+				} catch {
+					print("STREAM ERR: \(error)")
+				}
+			}
+		}
+	}
+
 	public func messages(before: Date? = nil, after: Date? = nil, limit: Int? = nil) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(sentBeforeNs: nil, sentAfterNs: nil, limit: nil)
 
@@ -105,15 +148,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 		let messages = try ffiGroup.findMessages(opts: options)
 
 		return try messages.map { ffiMessage in
-			let encodedContent = try EncodedContent(serializedData: ffiMessage.content)
-
-			return DecodedMessage(
-				client: client,
-				topic: id.toHex,
-				encodedContent: encodedContent,
-				senderAddress: ffiMessage.addrFrom,
-				sent: Date(timeIntervalSince1970: TimeInterval(ffiMessage.sentAtNs / 1_000_000_000))
-			)
+			try ffiMessage.fromFFI(client: client)
 		}
 	}
 }

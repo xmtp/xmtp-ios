@@ -68,6 +68,18 @@ struct ConversationListView: View {
 		}
 		.task {
 			do {
+				for try await group in try await client.conversations.streamGroups() {
+					conversations.insert(.group(group), at: 0)
+
+					await add(conversations: [.group(group)])
+				}
+
+			} catch {
+				print("Error streaming groups: \(error)")
+			}
+		}
+		.task {
+			do {
 				for try await conversation in await client.conversations.stream() {
 					conversations.insert(.conversation(conversation), at: 0)
 
