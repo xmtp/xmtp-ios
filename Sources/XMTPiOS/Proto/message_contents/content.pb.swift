@@ -132,6 +132,9 @@ public struct Xmtp_MessageContents_EncodedContent {
 
   /// encoded content itself
   public var content: Data = Data()
+	
+  /// Indicates whether the content should be pushed.
+  public var shouldPush: Bool = false
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -256,6 +259,7 @@ extension Xmtp_MessageContents_EncodedContent: SwiftProtobuf.Message, SwiftProto
     3: .same(proto: "fallback"),
     5: .same(proto: "compression"),
     4: .same(proto: "content"),
+	6: .same(proto: "shouldPush"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -269,6 +273,7 @@ extension Xmtp_MessageContents_EncodedContent: SwiftProtobuf.Message, SwiftProto
       case 3: try { try decoder.decodeSingularStringField(value: &self._fallback) }()
       case 4: try { try decoder.decodeSingularBytesField(value: &self.content) }()
       case 5: try { try decoder.decodeSingularEnumField(value: &self._compression) }()
+	  case 6: try { try decoder.decodeSingularBoolField(value: &self.shouldPush) }()
       default: break
       }
     }
@@ -294,7 +299,10 @@ extension Xmtp_MessageContents_EncodedContent: SwiftProtobuf.Message, SwiftProto
     try { if let v = self._compression {
       try visitor.visitSingularEnumField(value: v, fieldNumber: 5)
     } }()
-    try unknownFields.traverse(visitor: &visitor)
+	if self.shouldPush != false {
+	  try visitor.visitSingularBoolField(value: self.shouldPush, fieldNumber: 6)
+	}
+	try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Xmtp_MessageContents_EncodedContent, rhs: Xmtp_MessageContents_EncodedContent) -> Bool {
@@ -303,6 +311,7 @@ extension Xmtp_MessageContents_EncodedContent: SwiftProtobuf.Message, SwiftProto
     if lhs._fallback != rhs._fallback {return false}
     if lhs._compression != rhs._compression {return false}
     if lhs.content != rhs.content {return false}
+	if lhs.shouldPush != rhs.shouldPush {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
