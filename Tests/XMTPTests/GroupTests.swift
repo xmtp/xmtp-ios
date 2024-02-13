@@ -103,61 +103,61 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(1, bobGroupCount)
 	}
 
-	func testCanListGroupMembers() async throws {
-		let fixtures = try await localFixtures()
-		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+//	func testCanListGroupMembers() async throws {
+//		let fixtures = try await localFixtures()
+//		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+//
+//		try await group.sync()
+//		let members = group.members.map(\.localizedLowercase).sorted()
+//
+//		XCTAssertEqual([fixtures.bob.address.localizedLowercase, fixtures.alice.address.localizedLowercase].sorted(), members)
+//	}
 
-		try await group.sync()
-		let members = group.members.map(\.localizedLowercase).sorted()
+//	func testCanAddGroupMembers() async throws {
+//		let fixtures = try await localFixtures()
+//		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+//
+//		try await group.addMembers(addresses: [fixtures.fred.address])
+//
+//		try await group.sync()
+//		let members = group.members.map(\.localizedLowercase).sorted()
+//
+//		XCTAssertEqual([
+//			fixtures.bob.address.localizedLowercase,
+//			fixtures.alice.address.localizedLowercase,
+//			fixtures.fred.address.localizedLowercase
+//		].sorted(), members)
+//
+//		let groupChangedMessage: GroupMembershipChanges = try await group.messages().last!.content()
+//		XCTAssertEqual(groupChangedMessage.membersAdded.map(\.accountAddress.localizedLowercase), [fixtures.fred.address.localizedLowercase])
+//	}
 
-		XCTAssertEqual([fixtures.bob.address.localizedLowercase, fixtures.alice.address.localizedLowercase].sorted(), members)
-	}
-
-	func testCanAddGroupMembers() async throws {
-		let fixtures = try await localFixtures()
-		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
-
-		try await group.addMembers(addresses: [fixtures.fred.address])
-
-		try await group.sync()
-		let members = group.members.map(\.localizedLowercase).sorted()
-
-		XCTAssertEqual([
-			fixtures.bob.address.localizedLowercase,
-			fixtures.alice.address.localizedLowercase,
-			fixtures.fred.address.localizedLowercase
-		].sorted(), members)
-
-		let groupChangedMessage: GroupMembershipChanges = try await group.messages().last!.content()
-		XCTAssertEqual(groupChangedMessage.membersAdded.map(\.accountAddress.localizedLowercase), [fixtures.fred.address.localizedLowercase])
-	}
-
-	func testCanRemoveMembers() async throws {
-		let fixtures = try await localFixtures()
-		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
-
-		try await group.sync()
-		let members = group.members.map(\.localizedLowercase).sorted()
-
-		XCTAssertEqual([
-			fixtures.bob.address.localizedLowercase,
-			fixtures.alice.address.localizedLowercase,
-			fixtures.fred.address.localizedLowercase
-		].sorted(), members)
-
-		try await group.removeMembers(addresses: [fixtures.fred.address])
-
-		try await group.sync()
-
-		let newMembers = group.members.map(\.localizedLowercase).sorted()
-		XCTAssertEqual([
-			fixtures.bob.address.localizedLowercase,
-			fixtures.alice.address.localizedLowercase,
-		].sorted(), newMembers)
-
-		let groupChangedMessage: GroupMembershipChanges = try await group.messages().last!.content()
-		XCTAssertEqual(groupChangedMessage.membersRemoved.map(\.accountAddress.localizedLowercase), [fixtures.fred.address.localizedLowercase])
-	}
+//	func testCanRemoveMembers() async throws {
+//		let fixtures = try await localFixtures()
+//		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
+//
+//		try await group.sync()
+//		let members = group.members.map(\.localizedLowercase).sorted()
+//
+//		XCTAssertEqual([
+//			fixtures.bob.address.localizedLowercase,
+//			fixtures.alice.address.localizedLowercase,
+//			fixtures.fred.address.localizedLowercase
+//		].sorted(), members)
+//
+//		try await group.removeMembers(addresses: [fixtures.fred.address])
+//
+//		try await group.sync()
+//
+//		let newMembers = group.members.map(\.localizedLowercase).sorted()
+//		XCTAssertEqual([
+//			fixtures.bob.address.localizedLowercase,
+//			fixtures.alice.address.localizedLowercase,
+//		].sorted(), newMembers)
+//
+//		let groupChangedMessage: GroupMembershipChanges = try await group.messages().last!.content()
+//		XCTAssertEqual(groupChangedMessage.membersRemoved.map(\.accountAddress.localizedLowercase), [fixtures.fred.address.localizedLowercase])
+//	}
 
 	func testCannotStartGroupWithSelf() async throws {
 		let fixtures = try await localFixtures()

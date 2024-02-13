@@ -39,8 +39,6 @@ class ClientTests: XCTestCase {
 	}
 
 	func testPassingSavedKeysWithMLS() async throws {
-		try TestConfig.skipIfNotRunningLocalNodeTests()
-
 		let bo = try PrivateKey.generate()
 		let client = try await Client.create(
 			account: bo,
@@ -49,6 +47,9 @@ class ClientTests: XCTestCase {
 				mlsAlpha: true
 			)
 		)
+
+		try await client.conversations.groups()
+		print("Are you here?")
 
 		let keys = client.privateKeyBundle
 		let otherClient = try await Client.from(
@@ -61,11 +62,11 @@ class ClientTests: XCTestCase {
 		)
 
 		XCTAssertEqual(client.address, otherClient.address)
+		
+		try await otherClient.conversations.groups()
 	}
 
 	func testPassingMLSEncryptionKey() async throws {
-		try TestConfig.skipIfNotRunningLocalNodeTests()
-
 		let bo = try PrivateKey.generate()
 		let key = try Crypto.secureRandomBytes(count: 32)
 
