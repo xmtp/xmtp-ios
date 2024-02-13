@@ -172,10 +172,12 @@ class GroupTests: XCTestCase {
 			fixtures.fred.address.localizedLowercase
 		].sorted(), members)
 		
+		try await fixtures.fredClient.conversations.sync()
 		let fredGroup = try await fixtures.fredClient.conversations.groups().first
-		
-		var isAliceActive = try await group.isActive()
-		var isFredActive = try await fredGroup!.isActive()
+		try await fredGroup?.sync()
+
+		var isAliceActive = try group.isActive()
+		var isFredActive = try fredGroup!.isActive()
 		
 		XCTAssert(isAliceActive)
 		XCTAssert(isFredActive)
@@ -190,8 +192,10 @@ class GroupTests: XCTestCase {
 			fixtures.alice.address.localizedLowercase,
 		].sorted(), newMembers)
 		
-		isAliceActive = try await group.isActive()
-		isFredActive = try await fredGroup!.isActive()
+		try await fredGroup?.sync()
+		
+		isAliceActive = try group.isActive()
+		isFredActive = try fredGroup!.isActive()
 		
 		XCTAssert(isAliceActive)
 		XCTAssert(!isFredActive)
