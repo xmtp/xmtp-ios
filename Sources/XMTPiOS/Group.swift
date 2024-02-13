@@ -59,8 +59,9 @@ public struct Group: Identifiable, Equatable, Hashable {
 		id.hash(into: &hasher)
 	}
 	
-	public var isActive: Bool {
-		ffiGroup.isActive()
+	public func isActive() async throws -> Bool {
+		try await ffiGroup.sync()
+		return ffiGroup.isActive()
 	}
 
 	public var memberAddresses: [String] {
