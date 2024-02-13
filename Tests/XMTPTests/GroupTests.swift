@@ -243,12 +243,17 @@ class GroupTests: XCTestCase {
 		try await fixtures.bobClient.conversations.sync()
 		let bobGroup = try await fixtures.bobClient.conversations.groups()[0]
 
+		try await aliceGroup.send(content: "sup gang original")
 		try await aliceGroup.send(content: "sup gang")
 
 		try await aliceGroup.sync()
+		let aliceGroupsCount = try await aliceGroup.messages().count
+		XCTAssertEqual(3, aliceGroupsCount)
 		let aliceMessage = try await aliceGroup.messages().last!
 
 		try await bobGroup.sync()
+		let bobGroupsCount = try await bobGroup.messages().count
+		XCTAssertEqual(2, bobGroupsCount)
 		let bobMessage = try await bobGroup.messages().last!
 
 		XCTAssertEqual("sup gang", try aliceMessage.content())
