@@ -83,7 +83,20 @@ public struct Group: Identifiable, Equatable, Hashable {
 		try await ffiGroup.removeMembers(accountAddresses: addresses)
 	}
 
-	public func send<T>(content: T, options: SendOptions? = nil) async throws {
+
+	public func send<T>(content: T, options: SendOptions? = nil) async throws -> String {
+		let preparedMessage = try await prepareMessage(content: content, options: options)
+		return try await send(encodedContent: preparedMessage)
+	}
+	
+	public func send(encodedContent: EncodedContent) async throws -> String {
+		try await ffiGroup.send(contentBytes: encodedContent.serializedData())
+		return id.toHex
+	}
+	
+	public func prepareMessage<T>(content: T, options: SendOptions?) async throws -> EncodedContent {
+		let codec = client.codecRegistry.find(for: options?.contentType)
+
 		func encode<Codec: ContentCodec>(codec: Codec, content: Any) throws -> EncodedContent {
 			if let content = content as? Codec.T {
 				return try codec.encode(content: content, client: client)
@@ -92,9 +105,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 			}
 		}
 
-		let codec = client.codecRegistry.find(for: options?.contentType)
 		var encoded = try encode(codec: codec, content: content)
-
+		
 		func fallback<Codec: ContentCodec>(codec: Codec, content: Any) throws -> String? {
 			if let content = content as? Codec.T {
 				return try codec.fallback(content: content)
@@ -102,16 +114,16 @@ public struct Group: Identifiable, Equatable, Hashable {
 				throw CodecError.invalidContent
 			}
 		}
-
+		
 		if let fallback = try fallback(codec: codec, content: content) {
 			encoded.fallback = fallback
 		}
-
+		
 		if let compression = options?.compression {
 			encoded = try encoded.compress(compression)
 		}
 
-		try await ffiGroup.send(contentBytes: encoded.serializedData())
+		return encoded
 	}
 
 	public func endStream() {
