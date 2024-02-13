@@ -146,7 +146,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func messages(before: Date? = nil, after: Date? = nil, limit: Int? = nil) async throws -> [DecodedMessage] {
+	public func messages(before: Date? = nil, after: Date? = nil, limit: Int? = nil, direction: PagingInfoSortDirection? = .descending) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(sentBeforeNs: nil, sentAfterNs: nil, limit: nil)
 
 		if let before {
@@ -161,14 +161,19 @@ public struct Group: Identifiable, Equatable, Hashable {
 			options.limit = Int64(limit)
 		}
 
-		let messages = try ffiGroup.findMessages(opts: options)
-
-		return try messages.map { ffiMessage in
+		let messages = try ffiGroup.findMessages(opts: options).map { ffiMessage in
 			try ffiMessage.fromFFI(client: client)
+		}
+
+		return switch direction {
+		case .ascending:
+			messages
+		default:
+			messages.reversed()
 		}
 	}
 	
-	public func decryptedMessages(before: Date? = nil, after: Date? = nil, limit: Int? = nil) async throws -> [DecryptedMessage] {
+	public func decryptedMessages(before: Date? = nil, after: Date? = nil, limit: Int? = nil, direction: PagingInfoSortDirection? = .descending) async throws -> [DecryptedMessage] {
 		var options = FfiListMessagesOptions(sentBeforeNs: nil, sentAfterNs: nil, limit: nil)
 
 		if let before {
@@ -183,10 +188,16 @@ public struct Group: Identifiable, Equatable, Hashable {
 			options.limit = Int64(limit)
 		}
 
-		let messages = try ffiGroup.findMessages(opts: options)
-
-		return try messages.map { ffiMessage in
+		let messages = try ffiGroup.findMessages(opts: options).map { ffiMessage in
 			try ffiMessage.fromFFIDecrypted(client: client)
 		}
+		
+		return switch direction {
+		case .ascending:
+			messages
+		default:
+			messages.reversed()
+		}
+
 	}
 }
