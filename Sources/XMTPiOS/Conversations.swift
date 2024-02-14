@@ -1,6 +1,5 @@
 import Foundation
 import LibXMTP
-import Combine
 
 public enum ConversationError: Error, CustomStringConvertible {
 	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String)
@@ -415,12 +414,9 @@ public actor Conversations {
 		AsyncThrowingStream<Conversation, Error> { continuation in
 			Task {
 				do {
-					// First stream
-					for try await conversation in try await streamGroupConversations() {
+					for try await conversation in streamGroupConversations() {
 						continuation.yield(conversation)
 					}
-					
-					// Second stream
 					for try await conversation in stream() {
 						continuation.yield(conversation)
 					}
