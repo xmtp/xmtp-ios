@@ -1,5 +1,6 @@
 import Foundation
 import LibXMTP
+import Combine
 
 public enum ConversationError: Error, CustomStringConvertible {
 	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String)
@@ -103,7 +104,7 @@ public actor Conversations {
 		}
 	}
 	
-	private func streamGroupConversations() async throws -> AsyncThrowingStream<Conversation, Error> {
+	private func streamGroupConversations() -> AsyncThrowingStream<Conversation, Error> {
 		AsyncThrowingStream { continuation in
 			Task {
 				self.streamHolder.stream = try await self.client.v3Client?.conversations().stream(
@@ -409,7 +410,26 @@ public actor Conversations {
 			}
 		}
 	}
-
+	
+	public func streamAll() -> AsyncThrowingStream<Conversation, Error> {
+		AsyncThrowingStream<Conversation, Error> { continuation in
+			Task {
+				do {
+					// First stream
+					for try await conversation in try await streamGroupConversations() {
+						continuation.yield(conversation)
+					}
+					
+					// Second stream
+					for try await conversation in stream() {
+						continuation.yield(conversation)
+					}
+				} catch {
+					continuation.finish(throwing: error)
+				}
+			}
+		}
+	}
 	private func makeConversation(from sealedInvitation: SealedInvitation) throws -> ConversationV2 {
 		let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)
 		let conversation = try ConversationV2.create(client: client, invitation: unsealed, header: sealedInvitation.v1.header)
