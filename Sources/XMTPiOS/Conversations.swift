@@ -102,6 +102,18 @@ public actor Conversations {
 			}
 		}
 	}
+	
+	private func streamGroupConversations() async throws -> AsyncThrowingStream<Conversation, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				self.streamHolder.stream = try await self.client.v3Client?.conversations().stream(
+					callback: GroupStreamCallback(client: self.client) { group in
+						continuation.yield(Conversation.group(group))
+					}
+				)
+			}
+		}
+	}
 
 	public func newGroup(with addresses: [String]) async throws -> Group {
 		guard let v3Client = client.v3Client else {
@@ -405,7 +417,15 @@ public actor Conversations {
 		return conversation
 	}
 
-	public func list() async throws -> [Conversation] {
+	public func list(includeGroups: Bool = false) async throws -> [Conversation] {
+		if (includeGroups) {
+			try await sync()
+			let groups = try await groups()
+
+			groups.forEach { group in
+				conversationsByTopic[group.id.toHex] = Conversation.group(group)
+			}
+		}
 		var newConversations: [Conversation] = []
 		let mostRecent = conversationsByTopic.values.max { a, b in
 			a.createdAt < b.createdAt
