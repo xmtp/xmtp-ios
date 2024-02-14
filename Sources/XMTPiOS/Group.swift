@@ -185,11 +185,11 @@ public struct Group: Identifiable, Equatable, Hashable {
 			try ffiMessage.fromFFI(client: client)
 		}
 
-		return switch direction {
+		switch direction {
 		case .ascending:
-			messages
+			return messages
 		default:
-			messages.reversed()
+			return messages.reversed()
 		}
 	}
 	
@@ -212,11 +212,11 @@ public struct Group: Identifiable, Equatable, Hashable {
 			try ffiMessage.fromFFIDecrypted(client: client)
 		}
 		
-		return switch direction {
+		switch direction {
 		case .ascending:
-			messages
+			return messages
 		default:
-			messages.reversed()
+			return messages.reversed()
 		}
 
 	}
