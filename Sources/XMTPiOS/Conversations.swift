@@ -17,7 +17,7 @@ public enum ConversationError: Error, CustomStringConvertible {
 }
 
 public enum GroupError: Error, CustomStringConvertible {
-	case alphaMLSNotEnabled, emptyCreation, memberCannotBeSelf, memberNotRegistered([String])
+	case alphaMLSNotEnabled, emptyCreation, memberCannotBeSelf, memberNotRegistered([String]), groupsRequireMessagePassed, notSupportedByGroups
 
 	public var description: String {
 		switch self {
@@ -29,6 +29,10 @@ public enum GroupError: Error, CustomStringConvertible {
 			return "GroupError.memberCannotBeSelf you cannot add yourself to a group"
 		case .memberNotRegistered(let array):
 			return "GroupError.memberNotRegistered members not registered: \(array.joined(separator: ", "))"
+		case .groupsRequireMessagePassed:
+			return "GroupError.groupsRequireMessagePassed you cannot call this method without passing a message instead of an envelope"
+		case .notSupportedByGroups:
+			return "GroupError.notSupportedByGroups this method is not supported by groups"
 		}
 	}
 }
