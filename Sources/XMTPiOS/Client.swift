@@ -238,7 +238,7 @@ public final class Client {
 		return try await v3Client.canMessage(accountAddresses: [address]) == [true]
 	}
 	
-	public func canMessage(addresses: [String]) async throws -> Bool {
+	public func canMessageV3(addresses: [String]) async throws -> Bool {
 		guard let v3Client else {
 			return false
 		}
