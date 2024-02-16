@@ -43,8 +43,8 @@ struct PreviewClientProvider<Content: View>: View {
 				.task {
 					do {
 						var options = ClientOptions()
-						options.api.env = .dev
-						options.api.isSecure = true
+						options.api.env = .local
+						options.api.isSecure = false
 						let client = try await Client.create(account: wallet, options: options)
 						await MainActor.run {
 							self.client = client
