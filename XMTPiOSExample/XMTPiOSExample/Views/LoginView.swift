@@ -163,7 +163,7 @@ struct LoginView: View {
 					let client = try await Client.create(
 						account: signer,
 						options: .init(
-							api: .init(env: .local, isSecure: false),
+							api: .init(env: .dev, isSecure: true),
 							codecs: [GroupMembershipChangedCodec()],
 							mlsAlpha: true
 						)
