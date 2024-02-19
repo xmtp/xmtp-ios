@@ -130,12 +130,27 @@ public final class Client {
 	) async throws -> FfiXmtpClient? {
 		if options?.mlsAlpha == true, options?.api.env.supportsMLS == true {
 			let dbURL = options?.mlsDbPath ?? URL.documentsDirectory.appendingPathComponent("xmtp-\(options?.api.env.rawValue ?? "")-\(address).db3").path
+			
+			var encryptionKey = options?.mlsEncryptionKey
+			if (encryptionKey == nil) {
+				let preferences = UserDefaults.standard
+				let key = "xmtp-key"
+				if preferences.data(forKey: key) == nil {
+					let data = Data(try Crypto.secureRandomBytes(count: 32))
+					preferences.set(data, forKey: key)
+					preferences.synchronize()
+					encryptionKey = data
+				} else {
+					encryptionKey = preferences.data(forKey: key)
+				}
+			}
+			
 			let v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
 				host: (options?.api.env ?? .local).url,
 				isSecure: options?.api.env.isSecure == true,
 				db: dbURL,
-				encryptionKey: options?.mlsEncryptionKey,
+				encryptionKey: encryptionKey,
 				accountAddress: address,
 				legacyIdentitySource: source,
 				legacySignedPrivateKeyProto: try privateKeyBundleV1.toV2().identityKey.serializedData()
