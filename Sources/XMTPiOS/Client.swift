@@ -238,7 +238,7 @@ public final class Client {
 			return false
 		}
 		
-		return try await v3Client.canMessage(accountAddresses: addresses).contains(false)
+		return try await !v3Client.canMessage(accountAddresses: addresses).contains(false)
 	}
 
 

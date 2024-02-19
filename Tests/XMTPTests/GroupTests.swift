@@ -142,7 +142,7 @@ class GroupTests: XCTestCase {
 			fixtures.fred.address.localizedLowercase
 		].sorted(), members)
 
-		let groupChangedMessage: GroupMembershipChanges = try await group.messages().last!.content()
+		let groupChangedMessage: GroupMembershipChanges = try await group.messages().first!.content()
 		XCTAssertEqual(groupChangedMessage.membersAdded.map(\.accountAddress.localizedLowercase), [fixtures.fred.address.localizedLowercase])
 	}
 
@@ -169,7 +169,7 @@ class GroupTests: XCTestCase {
 			fixtures.alice.address.localizedLowercase,
 		].sorted(), newMembers)
 
-		let groupChangedMessage: GroupMembershipChanges = try await group.messages().last!.content()
+		let groupChangedMessage: GroupMembershipChanges = try await group.messages().first!.content()
 		XCTAssertEqual(groupChangedMessage.membersRemoved.map(\.accountAddress.localizedLowercase), [fixtures.fred.address.localizedLowercase])
 	}
 	
@@ -177,7 +177,7 @@ class GroupTests: XCTestCase {
 		let fixtures = try await localFixtures()
 		let notOnNetwork = try PrivateKey.generate()
 		let canMessage = try await fixtures.aliceClient.canMessageV3(addresses: [fixtures.bobClient.address])
-		let cannotMessage = try await fixtures.aliceClient.canMessageV3(addresses: [notOnNetwork.address])
+		let cannotMessage = try await fixtures.aliceClient.canMessageV3(addresses: [notOnNetwork.address, fixtures.bobClient.address])
 		XCTAssert(canMessage)
 		XCTAssert(!cannotMessage)
 	}
