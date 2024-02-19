@@ -13,10 +13,10 @@ public struct SendOptions {
 	public var ephemeral: Bool = false
 	public var shouldPush: Bool?
 
-	public init(compression: EncodedContentCompression? = nil, contentType: ContentTypeID? = nil, ephemeral: Bool = false, shouldPush: Bool? = nil) {
+	public init(compression: EncodedContentCompression? = nil, contentType: ContentTypeID? = nil, ephemeral: Bool = false, __shouldPush: Bool? = nil) {
 		self.compression = compression
 		self.contentType = contentType
 		self.ephemeral = ephemeral
-		self.shouldPush = shouldPush
+		self.shouldPush = __shouldPush
 	}
 }
