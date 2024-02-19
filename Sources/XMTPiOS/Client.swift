@@ -53,6 +53,7 @@ public struct ClientOptions {
 
 	public var mlsAlpha = false
 	public var mlsEncryptionKey: Data?
+	public var mlsDbPath: String?
 
 	public init(
 		api: Api = Api(),
@@ -128,12 +129,12 @@ public final class Client {
 		signingKey: SigningKey?
 	) async throws -> FfiXmtpClient? {
 		if options?.mlsAlpha == true, options?.api.env.supportsMLS == true {
-			let dbURL = URL.documentsDirectory.appendingPathComponent("xmtp-\(options?.api.env.rawValue ?? "")-\(address).db3")
+			let dbURL = options?.mlsDbPath ?? URL.documentsDirectory.appendingPathComponent("xmtp-\(options?.api.env.rawValue ?? "")-\(address).db3").path
 			let v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
 				host: (options?.api.env ?? .local).url,
 				isSecure: options?.api.env.isSecure == true,
-				db: dbURL.path,
+				db: dbURL,
 				encryptionKey: options?.mlsEncryptionKey,
 				accountAddress: address,
 				legacyIdentitySource: source,
