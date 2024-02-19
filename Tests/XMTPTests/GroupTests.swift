@@ -8,6 +8,7 @@
 import CryptoKit
 import XCTest
 @testable import XMTPiOS
+import LibXMTP
 import XMTPTestHelpers
 
 func assertThrowsAsyncError<T>(
@@ -83,11 +84,63 @@ class GroupTests: XCTestCase {
 		)
 	}
 
-	func testCanCreateGroups() async throws {
+	func testCanCreateAGroupWithDefaultPermissions() async throws {
 		let fixtures = try await localFixtures()
-		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+		let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
+		try await fixtures.aliceClient.conversations.sync()
+		let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+		XCTAssert(!bobGroup.id.isEmpty)
+		XCTAssert(!aliceGroup.id.isEmpty)
+		
+		
+		try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
+		try await bobGroup.sync()
+		XCTAssertEqual(aliceGroup.memberAddresses.count, 3)
+		XCTAssertEqual(bobGroup.memberAddresses.count, 3)
 
-		XCTAssert(!group.id.isEmpty)
+		try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
+		try await bobGroup.sync()
+		XCTAssertEqual(aliceGroup.memberAddresses.count, 2)
+		XCTAssertEqual(bobGroup.memberAddresses.count, 2)
+
+		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
+		try await aliceGroup.sync()
+		XCTAssertEqual(aliceGroup.memberAddresses.count, 3)
+		XCTAssertEqual(bobGroup.memberAddresses.count, 3)
+	}
+	
+	func testCanCreateAGroupWithAdminPermissions() async throws {
+		let fixtures = try await localFixtures()
+		let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address], permissions: GroupPermissions.groupCreatorIsAdmin)
+		try await fixtures.aliceClient.conversations.sync()
+		let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+		XCTAssert(!bobGroup.id.isEmpty)
+		XCTAssert(!aliceGroup.id.isEmpty)
+		
+		
+		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
+		try await aliceGroup.sync()
+		XCTAssertEqual(aliceGroup.memberAddresses.count, 3)
+		XCTAssertEqual(bobGroup.memberAddresses.count, 3)
+
+		await assertThrowsAsyncError(
+			try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
+		)
+		try await bobGroup.sync()
+		XCTAssertEqual(aliceGroup.memberAddresses.count, 3)
+		XCTAssertEqual(bobGroup.memberAddresses.count, 3)
+		
+		try await bobGroup.removeMembers(addresses: [fixtures.fred.address])
+		try await aliceGroup.sync()
+		XCTAssertEqual(aliceGroup.memberAddresses.count, 2)
+		XCTAssertEqual(bobGroup.memberAddresses.count, 2)
+
+		await assertThrowsAsyncError(
+			try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
+		)
+		try await bobGroup.sync()
+		XCTAssertEqual(aliceGroup.memberAddresses.count, 2)
+		XCTAssertEqual(bobGroup.memberAddresses.count, 2)
 	}
 
 	func testCanListGroups() async throws {
