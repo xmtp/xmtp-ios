@@ -107,6 +107,13 @@ class GroupTests: XCTestCase {
 		try await aliceGroup.sync()
 		XCTAssertEqual(aliceGroup.memberAddresses.count, 3)
 		XCTAssertEqual(bobGroup.memberAddresses.count, 3)
+		
+		XCTAssertEqual(bobGroup.permissionLevel(), .everyoneIsAdmin)
+		XCTAssertEqual(aliceGroup.permissionLevel(), .everyoneIsAdmin)
+		XCTAssertEqual(bobGroup.adminAddress(), fixtures.bobClient.address)
+		XCTAssertEqual(aliceGroup.adminAddress(), fixtures.bobClient.address)
+		XCTAssert(bobGroup.isAdmin())
+		XCTAssert(!aliceGroup.isAdmin())
 	}
 	
 	func testCanCreateAGroupWithAdminPermissions() async throws {
@@ -141,6 +148,13 @@ class GroupTests: XCTestCase {
 		try await bobGroup.sync()
 		XCTAssertEqual(aliceGroup.memberAddresses.count, 2)
 		XCTAssertEqual(bobGroup.memberAddresses.count, 2)
+		
+		XCTAssertEqual(bobGroup.permissionLevel(), .groupCreatorIsAdmin)
+		XCTAssertEqual(aliceGroup.permissionLevel(), .groupCreatorIsAdmin)
+		XCTAssertEqual(bobGroup.adminAddress(), fixtures.bobClient.address)
+		XCTAssertEqual(aliceGroup.adminAddress(), fixtures.bobClient.address)
+		XCTAssert(bobGroup.isAdmin())
+		XCTAssert(!aliceGroup.isAdmin())
 	}
 
 	func testCanListGroups() async throws {
