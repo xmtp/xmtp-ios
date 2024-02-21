@@ -281,7 +281,7 @@ public actor Conversations {
 	
 	public func streamAllGroupMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
 		AsyncThrowingStream { continuation in
-			Task.detached {
+			Task {
 				do {
 					self.streamHolder.stream = try await self.client.v3Client?.conversations().streamAllMessages(
 						messageCallback: MessageCallback(client: self.client) { message in
@@ -326,7 +326,7 @@ public actor Conversations {
 	
 	public func streamAllGroupDecryptedMessages() -> AsyncThrowingStream<DecryptedMessage, Error> {
 		AsyncThrowingStream { continuation in
-			Task.detached {
+			Task {
 				do {
 					self.streamHolder.stream = try await self.client.v3Client?.conversations().streamAllMessages(
 						messageCallback: MessageCallback(client: self.client) { message in
