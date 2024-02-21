@@ -136,4 +136,14 @@ enum Crypto {
 	static func importHmacKey(keyData: Data) -> SymmetricKey {
 		return SymmetricKey(data: keyData)
 	}
+	
+	static func verifyHmacSignature(key: Data, signature: Data, message: Data) -> Bool {
+		do {
+			let hmac = try calculateMac(message, key)
+			return hmac == signature
+		} catch {
+			return false
+		}
+
+	}
 }
