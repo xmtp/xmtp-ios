@@ -121,6 +121,30 @@ class ClientTests: XCTestCase {
 		)
 
 		XCTAssertEqual(client.address, bundleClient.address)
+		
+		await assertThrowsAsyncError(
+			_ = try await Client.from(
+				bundle: keys,
+				options: .init(
+					api: .init(env: .local, isSecure: false),
+					mlsAlpha: true,
+					mlsEncryptionKey: nil,
+					mlsDbPath: dbPath
+				)
+			)
+		)
+		
+		await assertThrowsAsyncError(
+			_ = try await Client.from(
+				bundle: keys,
+				options: .init(
+					api: .init(env: .local, isSecure: false),
+					mlsAlpha: true,
+					mlsEncryptionKey: key,
+					mlsDbPath: nil
+				)
+			)
+		)
 	}
 
 	func testCanMessage() async throws {
