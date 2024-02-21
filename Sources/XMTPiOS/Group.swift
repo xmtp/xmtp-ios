@@ -43,8 +43,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 		ffiGroup.id()
 	}
 	
-	var metadata: FfiGroupMetadata {
-		return ffiGroup.groupMetadata()
+	func metadata() throws -> FfiGroupMetadata {
+		return try ffiGroup.groupMetadata()
 	}
 
 	public func sync() async throws {
@@ -63,16 +63,16 @@ public struct Group: Identifiable, Equatable, Hashable {
 		return try ffiGroup.isActive()
 	}
 	
-	public func isAdmin(): Bool {
-		return metadata.creatorAccountAddress() == client.address
+	public func isAdmin() throws -> Bool {
+		return try metadata().creatorAccountAddress() == client.address
 	}
 
-	public func permissionLevel(): GroupPermissions {
-		return metadata.policyType()
+	public func permissionLevel() throws -> GroupPermissions {
+		return try metadata().policyType()
 	}
 
-	public func adminAddress(): String {
-		return metadata.creatorAccountAddress()
+	public func adminAddress() throws -> String {
+		return try metadata().creatorAccountAddress()
 	}
 	
 	public var memberAddresses: [String] {
