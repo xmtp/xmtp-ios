@@ -9,6 +9,7 @@ import Foundation
 import XCTest
 @testable import XMTPiOS
 import XMTPTestHelpers
+import CryptoKit
 
 @available(macOS 13.0, *)
 @available(iOS 15, *)
@@ -158,7 +159,7 @@ class ConversationsTests: XCTestCase {
 		}
 		
 		var topicHmacs: [String: Data] = [:]
-		let headerBytes = Data(count: 10)
+		let headerBytes = try Crypto.secureRandomBytes(count: 10)
 		
 		for conversation in conversations {
 			let topic = conversation.topic
@@ -183,7 +184,7 @@ class ConversationsTests: XCTestCase {
 		for (topic, hmacData) in hmacKeys.hmacKeys {
 			for (idx, hmacKeyThirtyDayPeriod) in hmacData.values.enumerated() {
 				let valid = Crypto.verifyHmacSignature(
-					key: hmacKeyThirtyDayPeriod.hmacKey,
+					key: SymmetricKey(data: hmacKeyThirtyDayPeriod.hmacKey),
 					signature: topicHmacs[topic]!,
 					message: headerBytes
 				)
