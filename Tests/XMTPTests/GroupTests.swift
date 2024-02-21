@@ -110,8 +110,8 @@ class GroupTests: XCTestCase {
 		
 		XCTAssertEqual(try bobGroup.permissionLevel(), .everyoneIsAdmin)
 		XCTAssertEqual(try aliceGroup.permissionLevel(), .everyoneIsAdmin)
-		XCTAssertEqual(try bobGroup.adminAddress(), fixtures.bobClient.address)
-		XCTAssertEqual(try aliceGroup.adminAddress(), fixtures.bobClient.address)
+		XCTAssertEqual(try bobGroup.adminAddress().lowercased(), fixtures.bobClient.address.lowercased())
+		XCTAssertEqual(try aliceGroup.adminAddress().lowercased(), fixtures.bobClient.address.lowercased())
 		XCTAssert(try bobGroup.isAdmin())
 		XCTAssert(try !aliceGroup.isAdmin())
 	}
@@ -151,8 +151,8 @@ class GroupTests: XCTestCase {
 		
 		XCTAssertEqual(try bobGroup.permissionLevel(), .groupCreatorIsAdmin)
 		XCTAssertEqual(try aliceGroup.permissionLevel(), .groupCreatorIsAdmin)
-		XCTAssertEqual(try bobGroup.adminAddress(), fixtures.bobClient.address)
-		XCTAssertEqual(try aliceGroup.adminAddress(), fixtures.bobClient.address)
+		XCTAssertEqual(try bobGroup.adminAddress().lowercased(), fixtures.bobClient.address.lowercased())
+		XCTAssertEqual(try aliceGroup.adminAddress().lowercased(), fixtures.bobClient.address.lowercased())
 		XCTAssert(try bobGroup.isAdmin())
 		XCTAssert(try !aliceGroup.isAdmin())
 	}

@@ -64,7 +64,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 	}
 	
 	public func isAdmin() throws -> Bool {
-		return try metadata().creatorAccountAddress() == client.address
+		return try metadata().creatorAccountAddress().lowercased() == client.address.lowercased()
 	}
 
 	public func permissionLevel() throws -> GroupPermissions {
