@@ -144,6 +144,5 @@ enum Crypto {
 		} catch {
 			return false
 		}
-
 	}
 }
