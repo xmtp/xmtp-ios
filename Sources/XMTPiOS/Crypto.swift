@@ -137,11 +137,11 @@ enum Crypto {
 	}
 	
 	static func verifyHmacSignature(key: SymmetricKey, signature: Data, message: Data) -> Bool {
-		do {
-			let hmac = HMAC<SHA256>.authenticationCode(for: message, using: key)
-			return Data(hmac) == signature
-		} catch {
-			return false
-		}
+		let isValid = HMAC<SHA256>.isValidAuthenticationCode(
+			signature,
+			authenticating: message,
+			using: key
+		)
+		return isValid
 	}
 }

@@ -176,7 +176,8 @@ class ConversationsTests: XCTestCase {
 			let keyMaterial = conversation.keyMaterial
 			let info = "\(thirtyDayPeriodsSinceEpoch)-\(alixClient.address)"
 			let key = try Crypto.deriveKey(secret: keyMaterial!, nonce: Data(), info: Data(info.utf8))
-			let hmac = try Crypto.calculateMac(key, headerBytes)
+			let hmac = try Crypto.calculateMac(headerBytes, key)
+//			let hmac = try Crypto.generateHmacSignature(secret: keyMaterial!, info: Data(info.utf8), message: headerBytes)
 			
 			topicHmacs[topic] = hmac
 		}
