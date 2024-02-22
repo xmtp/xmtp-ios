@@ -598,9 +598,9 @@ public actor Conversations {
 			var hmacKeys = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeys()
 
 			for period in (thirtyDayPeriodsSinceEpoch - 1)...(thirtyDayPeriodsSinceEpoch + 1) {
-				let info = "\(period)-\(self.client.address)"
+				let info = "\(period)-\(client.address)"
 				do {
-					let hmacKey = try Crypto.calculateMac(Data(info.utf8), keyMaterial)
+					let hmacKey = try Crypto.calculateMac(keyMaterial, Data(info.utf8))
 					var hmacKeyData = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeyData()
 					hmacKeyData.hmacKey = hmacKey
 					hmacKeyData.thirtyDayPeriodsSinceEpoch = Int32(period)

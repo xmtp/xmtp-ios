@@ -76,11 +76,10 @@ enum Crypto {
 
 	static func deriveKey(secret: Data, nonce: Data, info: Data) throws -> Data {
 		let key = HKDF<SHA256>.deriveKey(
-				inputKeyMaterial: SymmetricKey(data: secret),
-				salt: nonce,
-				info: info,
-				outputByteCount: 32
-		)
+			inputKeyMaterial: SymmetricKey(data: secret),
+			salt: nonce,
+			info: info,
+			outputByteCount: 32)
         return key.withUnsafeBytes { body in
             Data(body)
         }
