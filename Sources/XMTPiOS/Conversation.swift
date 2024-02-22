@@ -86,11 +86,7 @@ public enum Conversation: Sendable {
 		case let .v2(conversationV2):
 			return conversationV2.peerAddress
 		case let .group(group):
-			var addresses = group.memberAddresses.map(\.localizedLowercase)
-			if let index = addresses.firstIndex(of: clientAddress.localizedLowercase) {
-				addresses.remove(at: index)
-			}
-			return addresses.joined(separator: ",")
+			return group.peerAddresses.joined(separator: ",")
 		}
 	}
 	
@@ -101,11 +97,7 @@ public enum Conversation: Sendable {
 		case let .v2(conversationV2):
 			return [conversationV2.peerAddress]
 		case let .group(group):
-			var addresses = group.memberAddresses.map(\.localizedLowercase)
-			if let index = addresses.firstIndex(of: clientAddress.localizedLowercase) {
-				addresses.remove(at: index)
-			}
-			return addresses
+			return group.peerAddresses
 		}
 	}
 	
