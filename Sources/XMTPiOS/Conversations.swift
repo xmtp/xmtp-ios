@@ -600,7 +600,7 @@ public actor Conversations {
 			for period in (thirtyDayPeriodsSinceEpoch - 1)...(thirtyDayPeriodsSinceEpoch + 1) {
 				let info = "\(period)-\(client.address)"
 				do {
-					let hmacKey = try Crypto.calculateMac(Data(info.utf8), keyMaterial)
+					let hmacKey = try Crypto.deriveKey(secret: keyMaterial, nonce: Data(), info: Data(info.utf8))
 					var hmacKeyData = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeyData()
 					hmacKeyData.hmacKey = hmacKey
 					hmacKeyData.thirtyDayPeriodsSinceEpoch = Int32(period)
@@ -609,7 +609,6 @@ public actor Conversations {
 					print("Error calculating HMAC key for topic \(topic): \(error)")
 				}
 			}
-			
 			hmacKeysResponse.hmacKeys[topic] = hmacKeys
 		}
 		

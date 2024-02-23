@@ -126,7 +126,7 @@ class ConversationsTests: XCTestCase {
     }
 	
 	func testReturnsAllHMACKeys() async throws {
-//		try TestConfig.skipIfNotRunningLocalNodeTests()
+		try TestConfig.skipIfNotRunningLocalNodeTests()
 
 		let alix = try PrivateKey.generate()
 		let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
@@ -177,7 +177,6 @@ class ConversationsTests: XCTestCase {
 			let info = "\(thirtyDayPeriodsSinceEpoch)-\(alixClient.address)"
 			let key = try Crypto.deriveKey(secret: keyMaterial!, nonce: Data(), info: Data(info.utf8))
 			let hmac = try Crypto.calculateMac(headerBytes, key)
-//			let hmac = try Crypto.generateHmacSignature(secret: keyMaterial!, info: Data(info.utf8), message: headerBytes)
 			
 			topicHmacs[topic] = hmac
 		}
@@ -189,9 +188,9 @@ class ConversationsTests: XCTestCase {
 					signature: topicHmacs[topic]!,
 					message: headerBytes
 				)
+
 				XCTAssertTrue(valid == (idx == 1))
 			}
 		}
-
 	}
 }
