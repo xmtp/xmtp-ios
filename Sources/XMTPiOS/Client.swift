@@ -89,6 +89,7 @@ public final class Client {
 	let apiClient: ApiClient
 	let v3Client: LibXMTP.FfiXmtpClient?
 	public let libXMTPVersion: String = getVersionInfo()
+	let dbPath: String = ""
 
 	/// Access ``Conversations`` for this Client.
 	public lazy var conversations: Conversations = .init(client: self)
@@ -449,6 +450,18 @@ public final class Client {
 
 	public func subscribe(topics: [Topic]) -> AsyncThrowingStream<Envelope, Error> {
 		return subscribe(topics: topics.map(\.description))
+	}
+	
+	public func deleteLocalDatabase() {
+		let fm = FileManager.default
+		let url = URL(string: dbPath)
+		if (url != nil) {
+			do {
+				try fm.removeItem(at: url!)
+			} catch {
+				print("Error deleting file: \(dbPath)")
+			}
+		}
 	}
 
 	func getUserContact(peerAddress: String) async throws -> ContactBundle? {
