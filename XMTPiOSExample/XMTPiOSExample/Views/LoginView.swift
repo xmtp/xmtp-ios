@@ -181,6 +181,7 @@ struct LoginView: View {
 			}
 			.store(in: &publishers)
 	}
+    // swiftlint:enable function_body_length
 
 	var body: some View {
 		ModalWrapper()
