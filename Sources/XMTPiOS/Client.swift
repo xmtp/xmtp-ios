@@ -452,18 +452,9 @@ public final class Client {
 		return subscribe(topics: topics.map(\.description))
 	}
 
-	public func deleteLocalDatabase() {
+	public func deleteLocalDatabase() throws {
 		let fm = FileManager.default
-		let url = URL(string: dbPath)
-		if (url != nil) {
-			do {
-				// swiftlint: disable force_unwrapping
-				try fm.removeItem(at: url!)
-				// swiftlint: enable force_unwrapping
-			} catch {
-				print("Error deleting file: \(dbPath)")
-			}
-		}
+		try fm.removeItem(atPath: dbPath)
 	}
 
 	func getUserContact(peerAddress: String) async throws -> ContactBundle? {

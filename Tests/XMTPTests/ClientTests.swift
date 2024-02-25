@@ -172,7 +172,7 @@ class ClientTests: XCTestCase {
 		var groupCount = try await boClient.conversations.groups().count
 		XCTAssertEqual(groupCount, 1)
 
-		boClient.deleteLocalDatabase()
+		try boClient.deleteLocalDatabase()
 
 		boClient = try await Client.create(
 			account: bo,
