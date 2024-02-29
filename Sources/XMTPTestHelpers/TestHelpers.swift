@@ -221,7 +221,7 @@ public class FakeApiClient: ApiClient {
 				}
 			}
 		}
- 
+
         if let direction = pagination?.direction {
             switch direction {
             case .ascending:
@@ -268,7 +268,6 @@ public class FakeApiClient: ApiClient {
 		var queryResponse = XMTPiOS.BatchQueryResponse()
         queryResponse.responses = responses
         return queryResponse
-     
     }
 
 	public func query(request: XMTPiOS.QueryRequest) async throws -> XMTPiOS.QueryResponse {
@@ -278,7 +277,6 @@ public class FakeApiClient: ApiClient {
 	public func publish(request: XMTPiOS.PublishRequest) async throws {
         abort() // Not supported on Fake
     }
-
 }
 
 @available(iOS 15, *)

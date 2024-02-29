@@ -1,16 +1,162 @@
 import Foundation
+import LibXMTP
 
-public enum ConversationError: Error {
+public enum ConversationError: Error, CustomStringConvertible {
 	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String), streamingIssue(String)
+
+	public var description: String {
+		switch self {
+		case .recipientIsSender:
+			return "ConversationError.recipientIsSender: Recipient cannot be sender"
+		case .recipientNotOnNetwork:
+			return "ConversationError.recipientNotOnNetwork: Recipient is not on network"
+		case .v1NotSupported(let str):
+			return "ConversationError.v1NotSupported: V1 does not support: \(str)"
+		}
+		case .streamingIssue(let str):
+			return "ConversationError.streamingIssue: \(str)"
+		}
+	}
+}
+
+public enum GroupError: Error, CustomStringConvertible {
+	case alphaMLSNotEnabled, emptyCreation, memberCannotBeSelf, memberNotRegistered([String]), groupsRequireMessagePassed, notSupportedByGroups
+
+	public var description: String {
+		switch self {
+		case .alphaMLSNotEnabled:
+			return "GroupError.alphaMLSNotEnabled"
+		case .emptyCreation:
+			return "GroupError.emptyCreation you cannot create an empty group"
+		case .memberCannotBeSelf:
+			return "GroupError.memberCannotBeSelf you cannot add yourself to a group"
+		case .memberNotRegistered(let array):
+			return "GroupError.memberNotRegistered members not registered: \(array.joined(separator: ", "))"
+		case .groupsRequireMessagePassed:
+			return "GroupError.groupsRequireMessagePassed you cannot call this method without passing a message instead of an envelope"
+		case .notSupportedByGroups:
+			return "GroupError.notSupportedByGroups this method is not supported by groups"
+		}
+	}
+}
+
+final class GroupStreamCallback: FfiConversationCallback {
+	let client: Client
+	let callback: (Group) -> Void
+
+	init(client: Client, callback: @escaping (Group) -> Void) {
+		self.client = client
+		self.callback = callback
+	}
+
+	func onConversation(conversation: FfiGroup) {
+		self.callback(conversation.fromFFI(client: client))
+	}
 }
 
 /// Handles listing and creating Conversations.
 public actor Conversations {
 	var client: Client
 	var conversationsByTopic: [String: Conversation] = [:]
+	let streamHolder = StreamHolder()
 
 	init(client: Client) {
 		self.client = client
+	}
+
+	public func sync() async throws {
+		guard let v3Client = client.v3Client else {
+			return
+		}
+
+		try await v3Client.conversations().sync()
+	}
+
+	public func groups(createdAfter: Date? = nil, createdBefore: Date? = nil, limit: Int? = nil) async throws -> [Group] {
+		guard let v3Client = client.v3Client else {
+			return []
+		}
+
+		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil)
+
+		if let createdAfter {
+			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
+		}
+
+		if let createdBefore {
+			options.createdBeforeNs = Int64(createdBefore.millisecondsSinceEpoch)
+		}
+
+		if let limit {
+			options.limit = Int64(limit)
+		}
+
+		return try await v3Client.conversations().list(opts: options).map { $0.fromFFI(client: client) }
+	}
+
+	public func streamGroups() async throws -> AsyncThrowingStream<Group, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				self.streamHolder.stream = try await self.client.v3Client?.conversations().stream(
+					callback: GroupStreamCallback(client: self.client) { group in
+						continuation.yield(group)
+					}
+				)
+			}
+		}
+	}
+	
+	private func streamGroupConversations() -> AsyncThrowingStream<Conversation, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				self.streamHolder.stream = try await self.client.v3Client?.conversations().stream(
+					callback: GroupStreamCallback(client: self.client) { group in
+						continuation.yield(Conversation.group(group))
+					}
+				)
+			}
+		}
+	}
+
+	public func newGroup(with addresses: [String], permissions: GroupPermissions = .everyoneIsAdmin) async throws -> Group {
+		guard let v3Client = client.v3Client else {
+			throw GroupError.alphaMLSNotEnabled
+		}
+
+		if addresses.isEmpty {
+			throw GroupError.emptyCreation
+		}
+
+		if addresses.first(where: { $0.lowercased() == client.address.lowercased() }) != nil {
+			throw GroupError.memberCannotBeSelf
+		}
+
+		let erroredAddresses = try await withThrowingTaskGroup(of: (String?).self) { group in
+			for address in addresses {
+				group.addTask {
+					if try await self.client.canMessageV3(address: address) {
+						return nil
+					} else {
+						return address
+					}
+				}
+			}
+
+			var results: [String] = []
+			for try await result in group {
+				if let result {
+					results.append(result)
+				}
+			}
+
+			return results
+		}
+
+		if !erroredAddresses.isEmpty {
+			throw GroupError.memberNotRegistered(erroredAddresses)
+		}
+
+		return try await v3Client.conversations().createGroup(accountAddresses: addresses, permissions: permissions).fromFFI(client: client)
 	}
 
 	/// Import a previously seen conversation.
@@ -96,7 +242,7 @@ public actor Conversations {
 		return messages
 	}
 
-	public func streamAllMessages() async throws -> AsyncThrowingStream<DecodedMessage, Error> {
+	func streamAllV2Messages() async throws -> AsyncThrowingStream<DecodedMessage, Error> {
 		return AsyncThrowingStream { continuation in
 			Task {
 				var topics: [String] = [
@@ -135,8 +281,99 @@ public actor Conversations {
 			}
 		}
 	}
+	
+	public func streamAllGroupMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				do {
+					self.streamHolder.stream = try await self.client.v3Client?.conversations().streamAllMessages(
+						messageCallback: MessageCallback(client: self.client) { message in
+							do {
+								continuation.yield(try message.fromFFI(client: self.client))
+							} catch {
+								print("Error onMessage \(error)")
+							}
+						}
+					)
+				} catch {
+					print("STREAM ERR: \(error)")
+				}
+			}
+		}
+	}
+	
+	public func streamAllMessages(includeGroups: Bool = false) async throws -> AsyncThrowingStream<DecodedMessage, Error> {
+		AsyncThrowingStream<DecodedMessage, Error> { continuation in
+			@Sendable func forwardStreamToMerged(stream: AsyncThrowingStream<DecodedMessage, Error>) async {
+				do {
+					var iterator = stream.makeAsyncIterator()
+					while let element = try await  iterator.next() {
+						continuation.yield(element)
+					}
+					continuation.finish()
+				} catch {
+					continuation.finish(throwing: error)
+				}
+			}
+			
+			Task {
+				await forwardStreamToMerged(stream: try streamAllV2Messages())
+			}
+			if (includeGroups) {
+				Task {
+					await forwardStreamToMerged(stream: streamAllGroupMessages())
+				}
+			}
+		}
+	}
+	
+	public func streamAllGroupDecryptedMessages() -> AsyncThrowingStream<DecryptedMessage, Error> {
+		AsyncThrowingStream { continuation in
+			Task {
+				do {
+					self.streamHolder.stream = try await self.client.v3Client?.conversations().streamAllMessages(
+						messageCallback: MessageCallback(client: self.client) { message in
+							do {
+								continuation.yield(try message.fromFFIDecrypted(client: self.client))
+							} catch {
+								print("Error onMessage \(error)")
+							}
+						}
+					)
+				} catch {
+					print("STREAM ERR: \(error)")
+				}
+			}
+		}
+	}
+	
+	public func streamAllDecryptedMessages(includeGroups: Bool = false) -> AsyncThrowingStream<DecryptedMessage, Error> {
+		AsyncThrowingStream<DecryptedMessage, Error> { continuation in
+			@Sendable func forwardStreamToMerged(stream: AsyncThrowingStream<DecryptedMessage, Error>) async {
+				do {
+					var iterator = stream.makeAsyncIterator()
+					while let element = try await  iterator.next() {
+						continuation.yield(element)
+					}
+					continuation.finish()
+				} catch {
+					continuation.finish(throwing: error)
+				}
+			}
+			
+			Task {
+				await forwardStreamToMerged(stream: try streamAllV2DecryptedMessages())
+			}
+			if (includeGroups) {
+				Task {
+					await forwardStreamToMerged(stream: streamAllGroupDecryptedMessages())
+				}
+			}
+		}
+	}
 
-	public func streamAllDecryptedMessages() async throws -> AsyncThrowingStream<DecryptedMessage, Error> {
+
+	func streamAllV2DecryptedMessages() async throws -> AsyncThrowingStream<DecryptedMessage, Error> {
 		return AsyncThrowingStream { continuation in
 			Task {
 				var topics: [String] = [
@@ -267,6 +504,29 @@ public actor Conversations {
 		}
 	}
 
+   public func streamAll() -> AsyncThrowingStream<Conversation, Error> {
+	   AsyncThrowingStream<Conversation, Error> { continuation in
+		   @Sendable func forwardStreamToMerged(stream: AsyncThrowingStream<Conversation, Error>) async {
+			   do {
+				   var iterator = stream.makeAsyncIterator()
+				   while let element = try await  iterator.next() {
+					   continuation.yield(element)
+				   }
+				   continuation.finish()
+			   } catch {
+				   continuation.finish(throwing: error)
+			   }
+		   }
+		   
+		   Task {
+			   await forwardStreamToMerged(stream: stream())
+		   }
+		   Task {
+			   await forwardStreamToMerged(stream: streamGroupConversations())
+		   }
+	   }
+   }
+
 	private func makeConversation(from sealedInvitation: SealedInvitation) throws -> ConversationV2 {
 		let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)
 		let conversation = try ConversationV2.create(client: client, invitation: unsealed, header: sealedInvitation.v1.header)
@@ -274,7 +534,15 @@ public actor Conversations {
 		return conversation
 	}
 
-	public func list() async throws -> [Conversation] {
+	public func list(includeGroups: Bool = false) async throws -> [Conversation] {
+		if (includeGroups) {
+			try await sync()
+			let groups = try await groups()
+
+			groups.forEach { group in
+				conversationsByTopic[group.id.toHex] = Conversation.group(group)
+			}
+		}
 		var newConversations: [Conversation] = []
 		let mostRecent = conversationsByTopic.values.max { a, b in
 			a.createdAt < b.createdAt
@@ -315,6 +583,39 @@ public actor Conversations {
 		return conversationsByTopic.values.sorted { a, b in
 			a.createdAt < b.createdAt
 		}
+	}
+	
+	public func getHmacKeys(request: Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest? = nil) -> Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse {
+		let thirtyDayPeriodsSinceEpoch = Int(Date().timeIntervalSince1970) / (60 * 60 * 24 * 30)
+		var hmacKeysResponse = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse()
+		
+		var topics = conversationsByTopic
+
+		if let requestTopics = request?.topics, !requestTopics.isEmpty {
+			topics = topics.filter { requestTopics.contains($0.key) }
+		}
+		
+		for (topic, conversation) in topics {
+			guard let keyMaterial = conversation.keyMaterial else { continue }
+			
+			var hmacKeys = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeys()
+
+			for period in (thirtyDayPeriodsSinceEpoch - 1)...(thirtyDayPeriodsSinceEpoch + 1) {
+				let info = "\(period)-\(client.address)"
+				do {
+					let hmacKey = try Crypto.deriveKey(secret: keyMaterial, nonce: Data(), info: Data(info.utf8))
+					var hmacKeyData = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeyData()
+					hmacKeyData.hmacKey = hmacKey
+					hmacKeyData.thirtyDayPeriodsSinceEpoch = Int32(period)
+					hmacKeys.values.append(hmacKeyData)
+				} catch {
+					print("Error calculating HMAC key for topic \(topic): \(error)")
+				}
+			}
+			hmacKeysResponse.hmacKeys[topic] = hmacKeys
+		}
+		
+		return hmacKeysResponse
 	}
 
 	private func listIntroductionPeers(pagination: Pagination?) async throws -> [String: Date] {

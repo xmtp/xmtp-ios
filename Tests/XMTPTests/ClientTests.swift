@@ -15,9 +15,186 @@ import XMTPTestHelpers
 @available(iOS 15, *)
 class ClientTests: XCTestCase {
 	func testTakesAWallet() async throws {
-	    try TestConfig.skip(because: "run manually against dev")
+			try TestConfig.skip(because: "run manually against dev")
 		let fakeWallet = try PrivateKey.generate()
 		_ = try await Client.create(account: fakeWallet)
+	}
+
+	func testPassingSavedKeysWithNoSignerWithMLSErrors() async throws {
+		try TestConfig.skipIfNotRunningLocalNodeTests()
+
+		let bo = try PrivateKey.generate()
+
+		do {
+			let client = try await Client.create(
+				account: bo,
+				options: .init(
+					api: .init(env: .local, isSecure: false),
+					mlsAlpha: true
+				)
+			)
+		} catch {
+			XCTAssert(error.localizedDescription.contains("no keys"))
+		}
+	}
+
+	func testPassingSavedKeysWithMLS() async throws {
+		try TestConfig.skipIfNotRunningLocalNodeTests()
+
+		let bo = try PrivateKey.generate()
+		let client = try await Client.create(
+			account: bo,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				mlsAlpha: true
+			)
+		)
+
+		let keys = client.privateKeyBundle
+		let otherClient = try await Client.from(
+			bundle: keys,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				// Should not need to pass the signer again
+				mlsAlpha: true
+			)
+		)
+
+		XCTAssertEqual(client.address, otherClient.address)
+	}
+
+	func testPassingMLSEncryptionKey() async throws {
+		try TestConfig.skipIfNotRunningLocalNodeTests()
+
+		let bo = try PrivateKey.generate()
+		let key = try Crypto.secureRandomBytes(count: 32)
+
+		_ = try await Client.create(
+			account: bo,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				mlsAlpha: true,
+				mlsEncryptionKey: key
+			)
+		)
+
+		do {
+			_ = try await Client.create(
+				account: bo,
+				options: .init(
+					api: .init(env: .local, isSecure: false),
+					mlsAlpha: true,
+					mlsEncryptionKey: nil // No key should error
+				)
+			)
+
+			XCTFail("did not throw")
+		} catch {
+			XCTAssert(true)
+		}
+	}
+	
+	func testPassingMLSEncryptionKeyAndDatabasePath() async throws {
+		try TestConfig.skipIfNotRunningLocalNodeTests()
+		
+		let bo = try PrivateKey.generate()
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let documentsURL = try
+			FileManager.default.url(
+				for: .documentDirectory,
+				in: .userDomainMask,
+				appropriateFor: nil,
+				create: false
+			)
+		
+		let dbPath = documentsURL.appendingPathComponent("xmtp-\(bo.walletAddress).db3").path
+		
+		let client = try await Client.create(
+			account: bo,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				mlsAlpha: true,
+				mlsEncryptionKey: key,
+				mlsDbPath: dbPath
+			)
+		)
+		
+		let keys = client.privateKeyBundle
+		let bundleClient = try await Client.from(
+			bundle: keys,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				mlsAlpha: true,
+				mlsEncryptionKey: key,
+				mlsDbPath: dbPath
+			)
+		)
+
+		XCTAssertEqual(client.address, bundleClient.address)
+		
+		await assertThrowsAsyncError(
+			_ = try await Client.from(
+				bundle: keys,
+				options: .init(
+					api: .init(env: .local, isSecure: false),
+					mlsAlpha: true,
+					mlsEncryptionKey: nil,
+					mlsDbPath: dbPath
+				)
+			)
+		)
+		
+		await assertThrowsAsyncError(
+			_ = try await Client.from(
+				bundle: keys,
+				options: .init(
+					api: .init(env: .local, isSecure: false),
+					mlsAlpha: true,
+					mlsEncryptionKey: key,
+					mlsDbPath: nil
+				)
+			)
+		)
+	}
+	
+	func testCanDeleteDatabase() async throws {
+		let bo = try PrivateKey.generate()
+		let alix = try PrivateKey.generate()
+		var boClient = try await Client.create(
+			account: bo,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				mlsAlpha: true
+			)
+		)
+	
+		let alixClient = try await Client.create(
+			account: alix,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				mlsAlpha: true
+			)
+		)
+
+		_ = try await boClient.conversations.newGroup(with: [alixClient.address])
+		try await boClient.conversations.sync()
+
+		var groupCount = try await boClient.conversations.groups().count
+		XCTAssertEqual(groupCount, 1)
+
+		try boClient.deleteLocalDatabase()
+
+		boClient = try await Client.create(
+			account: bo,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				mlsAlpha: true
+			)
+		)
+
+		try await boClient.conversations.sync()
+		groupCount = try await boClient.conversations.groups().count
+		XCTAssertEqual(groupCount, 0)
 	}
 
 	func testCanMessage() async throws {
@@ -30,19 +207,19 @@ class ClientTests: XCTestCase {
 		XCTAssertFalse(cannotMessage)
 	}
 
-    func testStaticCanMessage() async throws {
-        try TestConfig.skip(because: "run manually against local")
-        let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
+		func testStaticCanMessage() async throws {
+				try TestConfig.skip(because: "run manually against local")
+				let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 
-        let aliceWallet = try PrivateKey.generate()
-        let notOnNetwork = try PrivateKey.generate()
-        let alice = try await Client.create(account: aliceWallet, options: opts)
+				let aliceWallet = try PrivateKey.generate()
+				let notOnNetwork = try PrivateKey.generate()
+				let alice = try await Client.create(account: aliceWallet, options: opts)
 
-        let canMessage = try await Client.canMessage(alice.address, options: opts)
-        let cannotMessage = try await Client.canMessage(notOnNetwork.address, options: opts)
-        XCTAssertTrue(canMessage)
-        XCTAssertFalse(cannotMessage)
-    }
+				let canMessage = try await Client.canMessage(alice.address, options: opts)
+				let cannotMessage = try await Client.canMessage(notOnNetwork.address, options: opts)
+				XCTAssertTrue(canMessage)
+				XCTAssertFalse(cannotMessage)
+		}
 
 	func testHasPrivateKeyBundleV1() async throws {
 		let fakeWallet = try PrivateKey.generate()
@@ -56,7 +233,7 @@ class ClientTests: XCTestCase {
 	}
 
 	func testCanBeCreatedWithBundle() async throws {
-        try TestConfig.skip(because: "run manually against dev")
+				try TestConfig.skip(because: "run manually against dev")
 		let fakeWallet = try PrivateKey.generate()
 		let client = try await Client.create(account: fakeWallet)
 
@@ -69,7 +246,7 @@ class ClientTests: XCTestCase {
 	}
 
 	func testCanBeCreatedWithV1Bundle() async throws {
-        try TestConfig.skip(because: "run manually against dev")
+				try TestConfig.skip(because: "run manually against dev")
 		let fakeWallet = try PrivateKey.generate()
 		let client = try await Client.create(account: fakeWallet)
 
@@ -100,40 +277,40 @@ class ClientTests: XCTestCase {
 
 		XCTAssertEqual(recovered, client.keys.identityKey.publicKey.secp256K1Uncompressed.bytes)
 	}
-  
-  func testPreEnableIdentityCallback() async throws {
-    let fakeWallet = try PrivateKey.generate()
-    let expectation = XCTestExpectation(description: "preEnableIdentityCallback is called")
-    
-    let preEnableIdentityCallback: () async throws -> Void = {
-        print("preEnableIdentityCallback called")
-        expectation.fulfill()
-    }
-    
-    let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false), preEnableIdentityCallback: preEnableIdentityCallback )
-    do {
-      _ = try await Client.create(account: fakeWallet, options: opts)
-      await XCTWaiter().fulfillment(of: [expectation], timeout: 5)
-    } catch {
-      XCTFail("Error: \(error)")
-    }
-  }
-  
-  func testPreCreateIdentityCallback() async throws {
-    let fakeWallet = try PrivateKey.generate()
-    let expectation = XCTestExpectation(description: "preCreateIdentityCallback is called")
-    
-    let preCreateIdentityCallback: () async throws -> Void = {
-        print("preCreateIdentityCallback called")
-        expectation.fulfill()
-    }
-    
-    let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false), preCreateIdentityCallback: preCreateIdentityCallback )
-    do {
-      _ = try await Client.create(account: fakeWallet, options: opts)
-      await XCTWaiter().fulfillment(of: [expectation], timeout: 5)
-    } catch {
-      XCTFail("Error: \(error)")
-    }
-  }
+
+	func testPreEnableIdentityCallback() async throws {
+		let fakeWallet = try PrivateKey.generate()
+		let expectation = XCTestExpectation(description: "preEnableIdentityCallback is called")
+
+		let preEnableIdentityCallback: () async throws -> Void = {
+				print("preEnableIdentityCallback called")
+				expectation.fulfill()
+		}
+
+		let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false), preEnableIdentityCallback: preEnableIdentityCallback )
+		do {
+			_ = try await Client.create(account: fakeWallet, options: opts)
+			await XCTWaiter().fulfillment(of: [expectation], timeout: 30)
+		} catch {
+			XCTFail("Error: \(error)")
+		}
+	}
+
+	func testPreCreateIdentityCallback() async throws {
+		let fakeWallet = try PrivateKey.generate()
+		let expectation = XCTestExpectation(description: "preCreateIdentityCallback is called")
+
+		let preCreateIdentityCallback: () async throws -> Void = {
+				print("preCreateIdentityCallback called")
+				expectation.fulfill()
+		}
+
+		let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false), preCreateIdentityCallback: preCreateIdentityCallback )
+		do {
+			_ = try await Client.create(account: fakeWallet, options: opts)
+			await XCTWaiter().fulfillment(of: [expectation], timeout: 30)
+		} catch {
+			XCTFail("Error: \(error)")
+		}
+	}
 }

@@ -55,8 +55,12 @@ public struct AttachmentCodec: ContentCodec {
 
 		return attachment
 	}
-    
+
     public func fallback(content: Attachment) throws -> String? {
         return "Can’t display “\(content.filename)”. This app doesn’t support attachments."
     }
+
+	public func shouldPush(content: Attachment) throws -> Bool {
+		return true
+	}
 }

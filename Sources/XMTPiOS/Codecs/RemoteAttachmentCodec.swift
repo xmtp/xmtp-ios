@@ -11,8 +11,25 @@ import web3
 
 public let ContentTypeRemoteAttachment = ContentTypeID(authorityID: "xmtp.org", typeID: "remoteStaticAttachment", versionMajor: 1, versionMinor: 0)
 
-public enum RemoteAttachmentError: Error {
+public enum RemoteAttachmentError: Error, CustomStringConvertible {
 	case invalidURL, v1NotSupported, invalidParameters(String), invalidDigest(String), invalidScheme(String), payloadNotFound
+
+	public var description: String {
+		switch self {
+		case .invalidURL:
+			return "RemoteAttachmentError.invalidURL"
+		case .v1NotSupported:
+			return "RemoteAttachmentError.v1NotSupported"
+		case .invalidParameters(let string):
+			return "RemoteAttachmentError.invalidParameters: \(string)"
+		case .invalidDigest(let string):
+			return "RemoteAttachmentError.invalidDigest: \(string)"
+		case .invalidScheme(let string):
+			return "RemoteAttachmentError.invalidScheme: \(string)"
+		case .payloadNotFound:
+			return "RemoteAttachmentError.payloadNotFound"
+		}
+	}
 }
 
 protocol RemoteContentFetcher {
@@ -132,7 +149,7 @@ public struct RemoteAttachment {
 }
 
 public struct RemoteAttachmentCodec: ContentCodec {
-    
+
 	public typealias T = RemoteAttachment
 
 	public init() {}
@@ -190,7 +207,7 @@ public struct RemoteAttachmentCodec: ContentCodec {
 
 		return attachment
 	}
-    
+
     public func fallback(content: RemoteAttachment) throws -> String? {
         return "Can’t display “\(String(describing: content.filename))”. This app doesn’t support attachments."
     }
@@ -205,5 +222,9 @@ public struct RemoteAttachmentCodec: ContentCodec {
 		}
 
 		return Data(parameterData)
+	}
+
+	public func shouldPush(content: RemoteAttachment) throws -> Bool {
+		return true
 	}
 }

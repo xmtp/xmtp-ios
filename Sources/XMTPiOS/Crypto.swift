@@ -8,7 +8,7 @@ import Foundation
 public typealias CipherText = Xmtp_MessageContents_Ciphertext
 
 enum CryptoError: Error {
-	case randomBytes, combinedPayload
+	case randomBytes, combinedPayload, hmacSignatureError
 }
 
 enum Crypto {
@@ -76,14 +76,13 @@ enum Crypto {
 
 	static func deriveKey(secret: Data, nonce: Data, info: Data) throws -> Data {
 		let key = HKDF<SHA256>.deriveKey(
-				inputKeyMaterial: SymmetricKey(data: secret),
-				salt: nonce,
-				info: info,
-				outputByteCount: 32
-		)
-        return key.withUnsafeBytes { body in
-            Data(body)
-        }
+			inputKeyMaterial: SymmetricKey(data: secret),
+			salt: nonce,
+			info: info,
+			outputByteCount: 32)
+		return key.withUnsafeBytes { body in
+			Data(body)
+		}
 	}
 
 	static func secureRandomBytes(count: Int) throws -> Data {
@@ -102,5 +101,47 @@ enum Crypto {
 		} else {
 			throw CryptoError.randomBytes
 		}
+	}
+	
+	static func hkdfHmacKey(secret: Data, info: Data) throws -> SymmetricKey {
+		let key = HKDF<SHA256>.deriveKey(
+			inputKeyMaterial: SymmetricKey(data: secret),
+			salt: Data(),
+			info: info,
+			outputByteCount: 32)
+		return key
+	}
+	
+	static func generateHmacSignature(secret: Data, info: Data, message: Data) throws -> Data {
+		do {
+		  let key = try hkdfHmacKey(secret: secret, info: info)
+		  let signature = HMAC<SHA256>.authenticationCode(for: message, using: key)
+		  return Data(signature)
+	  } catch {
+		  throw CryptoError.hmacSignatureError
+	  }
+	}
+	
+	static func exportHmacKey(key: SymmetricKey) -> Data {
+		var exportedData = Data(count: key.bitCount / 8)
+		exportedData.withUnsafeMutableBytes { buffer in
+			key.withUnsafeBytes { keyBuffer in
+				buffer.copyMemory(from: keyBuffer)
+			}
+		}
+		return exportedData
+	}
+
+	static func importHmacKey(keyData: Data) -> SymmetricKey {
+		return SymmetricKey(data: keyData)
+	}
+	
+	static func verifyHmacSignature(key: SymmetricKey, signature: Data, message: Data) -> Bool {
+		let isValid = HMAC<SHA256>.isValidAuthenticationCode(
+			signature,
+			authenticating: message,
+			using: key
+		)
+		return isValid
 	}
 }
