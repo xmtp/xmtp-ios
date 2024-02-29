@@ -60,6 +60,7 @@
       "location" : "https://github.com/xmtp/libxmtp-swift",
       "state" : {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "branch" : "ccbf6ac",
         "revision" : "ccbf6ac71b8c5a89c3078d8dc4057123bea8a291"
 ||||||| 7632a9b
@@ -69,6 +70,21 @@
         "revision" : "f6571b6b771b4c0a2a9469bd407ce124a9d91fed",
         "version" : "0.4.2-beta3"
 >>>>>>> d6a719d3e84816098eeb8c5787f0c78a511860f4
+||||||| merged common ancestors
+<<<<<<<<< Temporary merge branch 1
+        "branch" : "92274fe",
+        "revision" : "92274fe0dde1fc7f8f716ebcffa3d252813be56d"
+||||||||| 7632a9b
+        "branch" : "60b99d0",
+        "revision" : "60b99d04f642a7e2b15156d818dabc4aab65b1c0"
+=========
+        "branch" : "ccbf6ac",
+        "revision" : "ccbf6ac71b8c5a89c3078d8dc4057123bea8a291"
+>>>>>>>>> Temporary merge branch 2
+=======
+        "branch" : "92274fe",
+        "revision" : "92274fe0dde1fc7f8f716ebcffa3d252813be56d"
+>>>>>>> 7b4eba89bf2c502d5df695c19cc27016e003da62
       }
     },
     {
