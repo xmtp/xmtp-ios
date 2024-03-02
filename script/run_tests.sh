@@ -19,7 +19,7 @@ do
   fi
 done
 
-if [ $retries -ge 5 ]; then
+if [ $retries -ge 10 ]; then
   echo "Maximum number of retries exceeded. Exiting with status code 1."
   exit 1
 fi

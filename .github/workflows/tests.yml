@@ -1,9 +1,9 @@
 name: iOS Integration Tests
 on:
   push:
-#    branches:
-#      - main
-#  pull_request:
+    branches:
+      - main
+  pull_request:
 
 env:
   GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
