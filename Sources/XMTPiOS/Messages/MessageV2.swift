@@ -98,7 +98,8 @@ extension MessageV2 {
 
 		let ciphertext = try Crypto.encrypt(keyMaterial, signedBytes, additionalData: headerBytes)
 
-		let thirtyDayPeriodsSinceEpoch = Int(date.timeIntervalSince1970 / 60 / 60 / 24 / 30)
+		let daysSinceEpoch = Date().timeIntervalSince1970 / (60 * 60 * 24)
+		let thirtyDayPeriodsSinceEpoch = Int(floor(daysSinceEpoch / 30))
 		let info = "\(thirtyDayPeriodsSinceEpoch)-\(client.address)"
 		guard let infoEncoded = info.data(using: .utf8) else {
 			throw MessageV2Error.invalidData
