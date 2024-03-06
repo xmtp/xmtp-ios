@@ -587,7 +587,9 @@ public actor Conversations {
 	}
 	
 	public func getHmacKeys(request: Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest? = nil) -> Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse {
-		let thirtyDayPeriodsSinceEpoch = Int(Date().timeIntervalSince1970) / (60 * 60 * 24 * 30)
+		let daysSinceEpoch = Date().timeIntervalSince1970 / (60 * 60 * 24)
+		let thirtyDayPeriodsSinceEpoch = Int(floor(daysSinceEpoch / 30))
+		
 		var hmacKeysResponse = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse()
 		
 		var topics = conversationsByTopic
