@@ -9,6 +9,8 @@
 	import UIKit
 	import UserNotifications
 
+	public typealias NotificationSubscription = Notifications_V1_Subscription
+
 	enum XMTPPushError: Error {
 		case noPushServer
 	}
@@ -77,7 +79,7 @@
 			_ = await client.subscribe(request: request)
 		}
 		
-		public func subscribeWithMetadata(subscriptions: [Notifications_V1_Subscription]) async throws {
+		public func subscribeWithMetadata(subscriptions: [NotificationSubscription]) async throws {
 			if pushServer == "" {
 				throw XMTPPushError.noPushServer
 			}
@@ -136,6 +138,10 @@
 		}
 
 		public func subscribe(topics _: [String]) async throws {
+			fatalError("XMTPPush not available")
+		}
+		
+		public func subscribeWithMetadata(subscriptions _: [NotificationSubscription]) async throws {
 			fatalError("XMTPPush not available")
 		}
         
