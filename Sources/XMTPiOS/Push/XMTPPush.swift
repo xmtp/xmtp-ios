@@ -10,6 +10,7 @@
 	import UserNotifications
 
 	public typealias NotificationSubscription = Notifications_V1_Subscription
+	public typealias NotificationSubscriptionHmacKey = Notifications_V1_Subscription.HmacKey
 
 	enum XMTPPushError: Error {
 		case noPushServer
