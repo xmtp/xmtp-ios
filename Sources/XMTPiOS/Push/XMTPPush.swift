@@ -76,6 +76,19 @@
 
 			_ = await client.subscribe(request: request)
 		}
+		
+		public func subscribeWithMetadata(subscriptions: [Notifications_V1_Subscription]) async throws {
+			if pushServer == "" {
+				throw XMTPPushError.noPushServer
+			}
+
+			let request = Notifications_V1_SubscribeWithMetadataRequest.with { request in
+				request.installationID = installationID
+				request.subscriptions = subscriptions
+			}
+
+			_ = await client.subscribeWithMetadata(request: request)
+		}
         
         public func unsubscribe(topics: [String]) async throws {
             if pushServer == "" {
