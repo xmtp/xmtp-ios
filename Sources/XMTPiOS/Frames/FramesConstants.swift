@@ -7,6 +7,6 @@
 
 import Foundation
 
-let OPEN_FRAMES_PROXY_URL = "https://frames.xmtp.chat/";
+let OPEN_FRAMES_PROXY_URL = "https://frames.xmtp.chat/"
 
-let PROTOCOL_VERSION = "2024-02-09";
+let PROTOCOL_VERSION = "2024-02-09"

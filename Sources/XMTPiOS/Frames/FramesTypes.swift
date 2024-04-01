@@ -90,7 +90,6 @@ struct OpenFrameResult: Codable {
 struct GetMetadataResponse: Codable {
     let url: String
     let extractedTags: [String: String]
-    let frameInfo: OpenFrameResult?
 }
 
 struct PostRedirectResponse: Codable  {

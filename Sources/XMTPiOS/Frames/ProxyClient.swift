@@ -28,45 +28,45 @@ class ProxyClient {
     func readMetadata(url: String) async throws -> GetMetadataResponse {
         let encodedUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let fullUrl = "\(self.baseUrl)?url=\(encodedUrl)"
-            guard let url = URL(string: fullUrl) else {
-                throw URLError(.badURL)
-            }
+        guard let url = URL(string: fullUrl) else {
+            throw URLError(.badURL)
+        }
 
-            let (data, response) = try await URLSession.shared.data(from: url)
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw URLError(.badServerResponse)
-            }
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
 
-            guard httpResponse.statusCode == 200 else {
-                throw FramesApiError.customError("Failed to read metadata for \(url)", httpResponse.statusCode)
-            }
+        guard httpResponse.statusCode == 200 else {
+            throw FramesApiError.customError("Failed to read metadata for \(url)", httpResponse.statusCode)
+        }
 
-            let decoder = JSONDecoder()
-            let metadataResponse = try decoder.decode(GetMetadataResponse.self, from: data)
-            return metadataResponse
+        let decoder = JSONDecoder()
+        let metadataResponse: GetMetadataResponse = try decoder.decode(GetMetadataResponse.self, from: data)
+        return metadataResponse
     }
 
     func post(url: String, payload: Codable) async throws -> GetMetadataResponse {
         
         let encodedUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let fullUrl = "\(self.baseUrl)?url=\(encodedUrl)"
-            guard let url = URL(string: fullUrl) else {
-                throw URLError(.badURL)
-            }
+        guard let url = URL(string: fullUrl) else {
+            throw URLError(.badURL)
+        }
+        let encoder = JSONEncoder()
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try encoder.encode(payload)
 
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
 
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                throw URLError(.badServerResponse)
-            }
-
-            let decoder = JSONDecoder()
-            let metadataResponse = try decoder.decode(GetMetadataResponse.self, from: data)
-            return metadataResponse
+        let decoder = JSONDecoder()
+        let metadataResponse = try decoder.decode(GetMetadataResponse.self, from: data)
+        return metadataResponse
     }
 
     func postRedirect(url: String, payload: Codable) async throws -> PostRedirectResponse {

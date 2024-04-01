@@ -40,14 +40,14 @@ class FramesClient {
 
         let signedAction = try await self.buildSignedFrameAction(actionBodyInputs: toSign)
 
-        var untrustedData = FramePostUntrustedData(
+        let untrustedData = FramePostUntrustedData(
             url: frameUrl, timestamp: UInt64(now), buttonIndex: buttonIndex, inputText: inputText, state: state, walletAddress: self.xmtpClient.address, opaqueConversationIdentifier: opaqueConversationIdentifier, unixTimestamp: UInt32(now)
         )
 
 
-        var trustedData = FramePostTrustedData(messageBytes: signedAction.base64EncodedString())
+        let trustedData = FramePostTrustedData(messageBytes: signedAction.base64EncodedString())
 
-        var payload = FramePostPayload(
+        let payload = FramePostPayload(
             clientProtocol: "xmtp@\(PROTOCOL_VERSION)", untrustedData: untrustedData, trustedData: trustedData
         )
 
@@ -62,7 +62,7 @@ class FramesClient {
     }
     
     private func getPublicKeyBundle() async throws -> PublicKeyBundle {
-        let bundleBytes = await self.xmtpClient.publicKeyBundle;
+        let bundleBytes = self.xmtpClient.publicKeyBundle;
         return try PublicKeyBundle(bundleBytes);
       }
     
@@ -90,7 +90,9 @@ class FramesClient {
             guard let conversationTopic = dmInputs.conversationTopic else {
                 throw InvalidArgumentsError()
             }
-            let combined = (conversationTopic.lowercased() + dmInputs.participantAccountAddresses.map { $0.lowercased() }.sorted().joined()).data(using: .utf8)!
+            guard let combined = (conversationTopic.lowercased() + dmInputs.participantAccountAddresses.map { $0.lowercased() }.sorted().joined()).data(using: .utf8) else {
+                throw InvalidArgumentsError()
+            }
             let digest = sha256(input: combined)
             return digest.base64EncodedString()
         }
