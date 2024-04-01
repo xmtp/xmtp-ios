@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  FramesClient.swift
 //  
 //
 //  Created by Alex Risch on 3/28/24.
@@ -11,16 +11,16 @@ import LibXMTP
 public typealias FrameActionBody = Xmtp_MessageContents_FrameActionBody
 public typealias FrameAction = Xmtp_MessageContents_FrameAction
 
-class FramesClient {
+public class FramesClient {
     var xmtpClient: Client
-    var proxy: OpenFramesProxy
+    public var proxy: OpenFramesProxy
 
-    init(xmtpClient: Client, proxy: OpenFramesProxy? = nil) {
+    public init(xmtpClient: Client, proxy: OpenFramesProxy? = nil) {
         self.xmtpClient = xmtpClient
         self.proxy = proxy ?? OpenFramesProxy()
     }
 
-    func signFrameAction(inputs: FrameActionInputs) async throws -> FramePostPayload {
+    public func signFrameAction(inputs: FrameActionInputs) async throws -> FramePostPayload {
         let opaqueConversationIdentifier = try self.buildOpaqueIdentifier(inputs: inputs)
         let frameUrl = inputs.frameUrl
         let buttonIndex = inputs.buttonIndex

@@ -64,18 +64,18 @@ enum OpenFrameButton: Codable {
     }
 }
 
-struct OpenFrameImage: Codable {
+public struct OpenFrameImage: Codable {
     let content: String
     let aspectRatio: AspectRatio?
     let alt: String?
 }
 
-enum AspectRatio: String, Codable {
+public enum AspectRatio: String, Codable {
     case ratio_1_91_1 = "1.91.1"
     case ratio_1_1 = "1:1"
 }
 
-struct TextInput: Codable {
+public struct TextInput: Codable {
     let content: String
 }
 
@@ -89,17 +89,17 @@ struct OpenFrameResult: Codable {
     let state: String?
 };
 
-struct GetMetadataResponse: Codable {
+public struct GetMetadataResponse: Codable {
     let url: String
-    let extractedTags: [String: String]
+    public let extractedTags: [String: String]
 }
 
-struct PostRedirectResponse: Codable  {
+public struct PostRedirectResponse: Codable  {
     let originalUrl: String
     let redirectedTo: String
 };
 
-struct OpenFramesUntrustedData: Codable {
+public struct OpenFramesUntrustedData: Codable {
     let url: String
         let timestamp: Int
         let buttonIndex: Int
@@ -107,9 +107,9 @@ struct OpenFramesUntrustedData: Codable {
         let state: String?
 }
 
-typealias FramesApiRedirectResponse = PostRedirectResponse;
+public typealias FramesApiRedirectResponse = PostRedirectResponse;
 
-struct FramePostUntrustedData: Codable {
+public struct FramePostUntrustedData: Codable {
     let url: String
     let timestamp: UInt64
     let buttonIndex: Int32
@@ -120,36 +120,47 @@ struct FramePostUntrustedData: Codable {
     let unixTimestamp: UInt32
 }
 
-struct FramePostTrustedData: Codable {
+public struct FramePostTrustedData: Codable {
     let messageBytes: String
 }
 
-struct FramePostPayload: Codable {
+public struct FramePostPayload: Codable {
     let clientProtocol: String
     let untrustedData: FramePostUntrustedData
     let trustedData: FramePostTrustedData
 }
 
-struct DmActionInputs: Codable {
-    let conversationTopic: String?
-    let participantAccountAddresses: [String]
+public struct DmActionInputs: Codable {
+    public let conversationTopic: String?
+    public let participantAccountAddresses: [String]
+    public init(conversationTopic: String? = nil, participantAccountAddresses: [String]) {
+        self.conversationTopic = conversationTopic
+        self.participantAccountAddresses = participantAccountAddresses
+    }
 }
 
-struct GroupActionInputs: Codable {
+public struct GroupActionInputs: Codable {
     let groupId: Data
     let groupSecret: Data
 }
 
-enum ConversationActionInputs: Codable {
+public enum ConversationActionInputs: Codable {
     case dm(DmActionInputs)
     case group(GroupActionInputs)
 }
 
-struct FrameActionInputs: Codable {
+public struct FrameActionInputs: Codable {
     let frameUrl: String
     let buttonIndex: Int32
     let inputText: String?
     let state: String?
     let conversationInputs: ConversationActionInputs
+    public init(frameUrl: String, buttonIndex: Int32, inputText: String?, state: String?, conversationInputs: ConversationActionInputs) {
+        self.frameUrl = frameUrl
+        self.buttonIndex = buttonIndex
+        self.inputText = inputText
+        self.state = state
+        self.conversationInputs = conversationInputs
+    }
 }
 

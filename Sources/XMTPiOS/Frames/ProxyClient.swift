@@ -7,14 +7,10 @@
 
 import Foundation
 
-//async throws -> Metadata
-//func readMetadata(url: String) async throws -> Metadata
-
 struct Metadata: Codable {
     let title: String
     let description: String
     let imageUrl: String
-    // Add other properties as needed
 }
 
 
