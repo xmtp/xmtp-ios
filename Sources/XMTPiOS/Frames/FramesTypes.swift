@@ -22,14 +22,16 @@ enum OpenFrameButton: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let action = try container.decode(String.self, forKey: .action)
-        let target = try container.decodeIfPresent(String.self, forKey: .target)
+        guard let target = try container.decodeIfPresent(String.self, forKey: .target) else {
+            throw InvalidArgumentsError()
+        }
         let label = try container.decode(String.self, forKey: .label)
 
         switch action {
         case "link":
-            self = .link(target: target!, label: label)
+            self = .link(target: target, label: label)
         case "mint":
-            self = .mint(target: target!, label: label)
+            self = .mint(target: target, label: label)
         case "post":
             self = .post(target: target, label: label)
         case "post_redirect":
