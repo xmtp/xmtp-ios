@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CodecRegistry {
+public struct CodecRegistry {
 	var codecs: [String: any ContentCodec] = [
 		TextCodec().id: TextCodec(),
 	]
@@ -16,7 +16,7 @@ struct CodecRegistry {
 		codecs[codec.id] = codec
 	}
 
-	func find(for contentType: ContentTypeID?) -> any ContentCodec {
+	public func find(for contentType: ContentTypeID?) -> any ContentCodec {
 		guard let contentType else {
 			return TextCodec()
 		}

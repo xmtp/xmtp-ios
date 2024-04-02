@@ -103,7 +103,7 @@ public final class Client {
 		apiClient.environment
 	}
 
-	var codecRegistry = CodecRegistry()
+	public var codecRegistry = CodecRegistry()
 
 	public func register(codec: any ContentCodec) {
 		codecRegistry.register(codec: codec)
