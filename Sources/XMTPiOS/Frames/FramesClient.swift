@@ -11,6 +11,13 @@ import LibXMTP
 public typealias FrameActionBody = Xmtp_MessageContents_FrameActionBody
 public typealias FrameAction = Xmtp_MessageContents_FrameAction
 
+enum FramesClientError: Error {
+    case missingConversationTopic
+    case missingTarget
+    case readMetadataFailed(message: String, code: Int)
+    case postFrameFailed(message: String, code: Int)
+}
+
 public class FramesClient {
     var xmtpClient: Client
     public var proxy: OpenFramesProxy
@@ -88,10 +95,10 @@ public class FramesClient {
             return digest.base64EncodedString()
         case .dm(let dmInputs):
             guard let conversationTopic = dmInputs.conversationTopic else {
-                throw InvalidArgumentsError()
+                throw FramesClientError.missingConversationTopic
             }
             guard let combined = (conversationTopic.lowercased() + dmInputs.participantAccountAddresses.map { $0.lowercased() }.sorted().joined()).data(using: .utf8) else {
-                throw InvalidArgumentsError()
+                throw FramesClientError.missingConversationTopic
             }
             let digest = sha256(input: combined)
             return digest.base64EncodedString()

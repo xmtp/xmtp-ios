@@ -23,7 +23,7 @@ enum OpenFrameButton: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let action = try container.decode(String.self, forKey: .action)
         guard let target = try container.decodeIfPresent(String.self, forKey: .target) else {
-            throw InvalidArgumentsError()
+            throw FramesClientError.missingTarget
         }
         let label = try container.decode(String.self, forKey: .label)
 

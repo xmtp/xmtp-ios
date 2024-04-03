@@ -34,7 +34,7 @@ class ProxyClient {
         }
 
         guard httpResponse.statusCode == 200 else {
-            throw FramesApiError.customError("Failed to read metadata for \(url)", httpResponse.statusCode)
+            throw FramesClientError.readMetadataFailed(message: "Failed to read metadata for \(url)", code: httpResponse.statusCode)
         }
 
         let decoder = JSONDecoder()
@@ -83,7 +83,7 @@ class ProxyClient {
             }
 
             guard httpResponse.statusCode == 200 else {
-                throw FramesApiError.customError("Failed to post to frame \(url)", httpResponse.statusCode)
+                throw FramesClientError.postFrameFailed(message: "Failed to post to frame \(url)", code: httpResponse.statusCode)
             }
 
             let decoder = JSONDecoder()
