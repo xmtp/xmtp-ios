@@ -81,4 +81,19 @@ class ContactsTests: XCTestCase {
 		result = await contacts.isDenied(fixtures.alice.address)
 		XCTAssertTrue(result)
 	}
+    
+    func testRefreshConsentListPagination() async throws {
+        let fixtures = await fixtures()
+        let contacts = fixtures.bobClient.contacts
+        let aliceAddress = fixtures.alice.address
+        try await contacts.deny(addresses: [aliceAddress])
+        let date = Date()
+        try await contacts.allow(addresses: [aliceAddress])
+
+        let result = try await contacts.consentList.load(pagination: Pagination(before: date, direction: .ascending))
+        XCTAssertTrue(result.entries[ConsentListEntry.address(aliceAddress).key]?.consentType == .denied)
+        
+        let afterResult = try await contacts.consentList.load(pagination: Pagination(after: date, direction: .ascending))
+        XCTAssertTrue(afterResult.entries[ConsentListEntry.address(aliceAddress).key]?.consentType == .allowed)
+    }
 }

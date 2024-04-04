@@ -55,12 +55,13 @@ public class ConsentList {
 		identifier = try? LibXMTP.generatePrivatePreferencesTopicIdentifier(privateKey: privateKey)
 	}
 
-	func load() async throws -> ConsentList {
+	func load(pagination: Pagination? = nil) async throws -> ConsentList {
 		guard let identifier = identifier else {
 			throw ContactError.invalidIdentifier
 		}
 
-		let envelopes = try await client.apiClient.envelopes(topic: Topic.preferenceList(identifier).description, pagination: Pagination(direction: .ascending))
+		let pagination = pagination ?? Pagination(direction: .ascending)
+		let envelopes = try await client.apiClient.envelopes(topic: Topic.preferenceList(identifier).description, pagination: pagination)
 		let consentList = ConsentList(client: client)
 
 		var preferences: [PrivatePreferencesAction] = []
