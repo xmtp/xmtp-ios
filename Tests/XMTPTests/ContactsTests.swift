@@ -88,12 +88,10 @@ class ContactsTests: XCTestCase {
         let aliceAddress = fixtures.alice.address
         try await contacts.deny(addresses: [aliceAddress])
         let date = Date()
-        try await contacts.allow(addresses: [aliceAddress])
 
-        let result = try await contacts.consentList.load(pagination: Pagination(before: date, direction: .ascending))
-        XCTAssertTrue(result.entries[ConsentListEntry.address(aliceAddress).key]?.consentType == .denied)
-        
-        let afterResult = try await contacts.consentList.load(pagination: Pagination(after: date, direction: .ascending))
-        XCTAssertTrue(afterResult.entries[ConsentListEntry.address(aliceAddress).key]?.consentType == .allowed)
+        let result = try await contacts.consentList.load(afterDate: date)
+        XCTAssertNil(result.entries[ConsentListEntry.address(aliceAddress).key]?.consentType)
+        let allResult = try await contacts.consentList.load()
+        XCTAssertNotNil(allResult.entries[ConsentListEntry.address(aliceAddress).key]?.consentType)
     }
 }

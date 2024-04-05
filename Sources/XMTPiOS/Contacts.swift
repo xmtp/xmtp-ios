@@ -55,12 +55,15 @@ public class ConsentList {
 		identifier = try? LibXMTP.generatePrivatePreferencesTopicIdentifier(privateKey: privateKey)
 	}
 
-	func load(pagination: Pagination? = nil) async throws -> ConsentList {
+	func load(afterDate: Date? = nil) async throws -> ConsentList {
 		guard let identifier = identifier else {
 			throw ContactError.invalidIdentifier
 		}
 
-		let pagination = pagination ?? Pagination(direction: .ascending)
+		let pagination = Pagination(
+      after: afterDate,
+      direction: .ascending
+    )
 		let envelopes = try await client.apiClient.envelopes(topic: Topic.preferenceList(identifier).description, pagination: pagination)
 		let consentList = ConsentList(client: client)
 
@@ -205,8 +208,8 @@ public actor Contacts {
 		consentList = ConsentList(client: client)
 	}
 
-	public func refreshConsentList() async throws -> ConsentList {
-		consentList = try await ConsentList(client: client).load()
+  public func refreshConsentList(afterDate: Date? = nil) async throws -> ConsentList {
+		consentList = try await ConsentList(client: client).load(afterDate: afterDate)
 		return consentList
 	}
 
