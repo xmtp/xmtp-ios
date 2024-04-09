@@ -82,16 +82,28 @@ class ContactsTests: XCTestCase {
 		XCTAssertTrue(result)
 	}
     
-    func testRefreshConsentListPagination() async throws {
+    func testHandleMultipleAddresses() async throws {
         let fixtures = await fixtures()
-        let contacts = fixtures.bobClient.contacts
-        let aliceAddress = fixtures.alice.address
-        try await contacts.deny(addresses: [aliceAddress])
-        let date = Date()
+        let caro = try PrivateKey.generate()
+        let fakeApiClient = FakeApiClient()
+        let caroClient = try await Client.create(account: caro, apiClient: fakeApiClient)
 
-        let result = try await contacts.consentList.load(afterDate: date)
-        XCTAssertNil(result.entries[ConsentListEntry.address(aliceAddress).key]?.consentType)
-        let allResult = try await contacts.consentList.load()
-        XCTAssertNotNil(allResult.entries[ConsentListEntry.address(aliceAddress).key]?.consentType)
+        let contacts = fixtures.bobClient.contacts
+        var result = await contacts.isAllowed(fixtures.alice.address)
+        XCTAssertFalse(result)
+        result = await contacts.isAllowed(caroClient.address)
+        XCTAssertFalse(result)
+
+        try await contacts.deny(addresses: [fixtures.alice.address, caroClient.address])
+
+        var aliceResult = await contacts.isDenied(fixtures.alice.address)
+        XCTAssertTrue(aliceResult)
+        var caroResult = await contacts.isDenied(fixtures.alice.address)
+        XCTAssertTrue(caroResult)
+        try await contacts.allow(addresses: [fixtures.alice.address, caroClient.address])
+        aliceResult = await contacts.isAllowed(fixtures.alice.address)
+        XCTAssertTrue(aliceResult)
+        caroResult = await contacts.isAllowed(fixtures.alice.address)
+        XCTAssertTrue(caroResult)
     }
 }
