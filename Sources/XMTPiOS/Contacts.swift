@@ -74,9 +74,9 @@ public class ConsentList {
 		let newDate = Date()
 
 		let pagination = Pagination(
+			limit: 500,
             after: lastFetched,
-            direction: .ascending,
-			limit = 500
+            direction: .ascending
         )
 		let envelopes = try await client.apiClient.envelopes(topic: Topic.preferenceList(identifier).description, pagination: pagination)
     lastFetched = newDate
