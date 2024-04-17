@@ -89,19 +89,19 @@ public class ConsentList {
 		}
 		for preference in preferences {
 			for address in preference.allowAddress.walletAddresses {
-				_ = allow(address: address)
+				_ = await allow(address: address)
 			}
 
 			for address in preference.denyAddress.walletAddresses {
-				_ = deny(address: address)
+				_ = await deny(address: address)
 			}
 
 			for groupId in preference.allowGroup.groupIds {
-				_ = allowGroup(groupId: groupId)
+				_ = await allowGroup(groupId: groupId)
 			}
 
 			for groupId in preference.denyGroup.groupIds {
-				_ = denyGroup(groupId: groupId)
+				_ = await denyGroup(groupId: groupId)
 			}
 		}
 
