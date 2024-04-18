@@ -133,8 +133,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 			try await client.contacts.allowGroup(groupIds: [id])
 		}
 
-		try await ffiGroup.send(contentBytes: encodedContent.serializedData())
-		return id.toHex
+		let messageId = try await ffiGroup.send(contentBytes: encodedContent.serializedData())
+		return messageId.toHex
 	}
 
 	public func prepareMessage<T>(content: T, options: SendOptions?) async throws -> EncodedContent {
