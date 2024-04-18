@@ -395,6 +395,40 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual("sup gang", try bobMessage.content())
 	}
 	
+	func testCanListGroupMessages() async throws {
+		let fixtures = try await localFixtures()
+		let aliceGroup = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+		_ = try await aliceGroup.send(content: "howdy")
+		_ = try await aliceGroup.send(content: "gm")
+
+		var aliceMessagesCount = try await aliceGroup.messages().count
+		var aliceMessagesUnpublishedCount = try await aliceGroup.messages(deliveryStatus: .unpublished).count
+		var aliceMessagesPublishedCount = try await aliceGroup.messages(deliveryStatus: .published).count
+		XCTAssertEqual(3, aliceMessagesCount)
+		XCTAssertEqual(2, aliceMessagesUnpublishedCount)
+		XCTAssertEqual(1, aliceMessagesPublishedCount)
+
+		try await aliceGroup.sync()
+		
+		aliceMessagesCount = try await aliceGroup.messages().count
+		aliceMessagesUnpublishedCount = try await aliceGroup.messages(deliveryStatus: .unpublished).count
+		aliceMessagesPublishedCount = try await aliceGroup.messages(deliveryStatus: .published).count
+		XCTAssertEqual(3, aliceMessagesCount)
+		XCTAssertEqual(0, aliceMessagesUnpublishedCount)
+		XCTAssertEqual(3, aliceMessagesPublishedCount)
+
+		try await fixtures.bobClient.conversations.sync()
+		let bobGroup = try await fixtures.bobClient.conversations.groups()[0]
+		try await bobGroup.sync()
+		
+		var bobMessagesCount = try await bobGroup.messages().count
+		var bobMessagesUnpublishedCount = try await bobGroup.messages(deliveryStatus: .unpublished).count
+		var bobMessagesPublishedCount = try await bobGroup.messages(deliveryStatus: .published).count
+		XCTAssertEqual(2, bobMessagesCount)
+		XCTAssertEqual(0, bobMessagesUnpublishedCount)
+		XCTAssertEqual(2, bobMessagesPublishedCount)
+
+	}
 	
 	func testCanSendMessagesToGroupDecrypted() async throws {
 		let fixtures = try await localFixtures()

@@ -218,22 +218,13 @@ public struct Group: Identifiable, Equatable, Hashable {
 		after: Date? = nil,
 		limit: Int? = nil,
 		direction: PagingInfoSortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus? = .all
+		deliveryStatus: MessageDeliveryStatus = .all
 	) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(
 			sentBeforeNs: nil,
 			sentAfterNs: nil,
 			limit: nil,
-			deliveryStatus: switch deliveryStatus {
-							case .published:
-								deliveryStatus = .published
-							case .unpublished:
-								deliveryStatus = .unpublished
-							case .failed:
-								deliveryStatus = .failed
-							default:
-								deliveryStatus = nil
-							}
+			deliveryStatus: nil
 		)
 
 		if let before {
@@ -247,6 +238,13 @@ public struct Group: Identifiable, Equatable, Hashable {
 		if let limit {
 			options.limit = Int64(limit)
 		}
+
+		options.deliveryStatus = switch deliveryStatus {
+									case .published: FfiDeliveryStatus.published
+									case .unpublished: FfiDeliveryStatus.unpublished
+									case .failed: FfiDeliveryStatus.failed
+									default: nil
+								}
 
 		let messages = try ffiGroup.findMessages(opts: options).compactMap { ffiMessage in
 			return MessageV3(client: self.client, ffiMessage: ffiMessage).decodeOrNull()
@@ -270,17 +268,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 		var options = FfiListMessagesOptions(
 			sentBeforeNs: nil,
 			sentAfterNs: nil,
-			limit: nil
-			deliveryStatus: switch deliveryStatus {
-							case .published:
-								deliveryStatus = .published
-							case .unpublished:
-								deliveryStatus = .unpublished
-							case .failed:
-								deliveryStatus = .failed
-							default:
-								deliveryStatus = nil
-							}
+			limit: nil,
+			deliveryStatus: nil
 		)
 
 		if let before {
@@ -294,6 +283,13 @@ public struct Group: Identifiable, Equatable, Hashable {
 		if let limit {
 			options.limit = Int64(limit)
 		}
+		
+		options.deliveryStatus = switch deliveryStatus {
+									case .published: FfiDeliveryStatus.published
+									case .unpublished: FfiDeliveryStatus.unpublished
+									case .failed: FfiDeliveryStatus.failed
+									default: nil
+								}
 
 		let messages = try ffiGroup.findMessages(opts: options).compactMap { ffiMessage in
 			return MessageV3(client: self.client, ffiMessage: ffiMessage).decryptOrNull()
