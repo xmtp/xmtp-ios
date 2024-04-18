@@ -213,8 +213,28 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func messages(before: Date? = nil, after: Date? = nil, limit: Int? = nil, direction: PagingInfoSortDirection? = .descending) async throws -> [DecodedMessage] {
-		var options = FfiListMessagesOptions(sentBeforeNs: nil, sentAfterNs: nil, limit: nil)
+	public func messages(
+		before: Date? = nil,
+		after: Date? = nil,
+		limit: Int? = nil,
+		direction: PagingInfoSortDirection? = .descending,
+		deliveryStatus: MessageDeliveryStatus? = .all
+	) async throws -> [DecodedMessage] {
+		var options = FfiListMessagesOptions(
+			sentBeforeNs: nil,
+			sentAfterNs: nil,
+			limit: nil,
+			deliveryStatus: switch deliveryStatus {
+							case .published:
+								deliveryStatus = .published
+							case .unpublished:
+								deliveryStatus = .unpublished
+							case .failed:
+								deliveryStatus = .failed
+							default:
+								deliveryStatus = nil
+							}
+		)
 
 		if let before {
 			options.sentBeforeNs = Int64(before.millisecondsSinceEpoch * 1_000_000)
@@ -240,8 +260,28 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func decryptedMessages(before: Date? = nil, after: Date? = nil, limit: Int? = nil, direction: PagingInfoSortDirection? = .descending) async throws -> [DecryptedMessage] {
-		var options = FfiListMessagesOptions(sentBeforeNs: nil, sentAfterNs: nil, limit: nil)
+	public func decryptedMessages(
+		before: Date? = nil,
+		after: Date? = nil,
+		limit: Int? = nil,
+		direction: PagingInfoSortDirection? = .descending,
+		deliveryStatus: MessageDeliveryStatus? = .all
+	) async throws -> [DecryptedMessage] {
+		var options = FfiListMessagesOptions(
+			sentBeforeNs: nil,
+			sentAfterNs: nil,
+			limit: nil
+			deliveryStatus: switch deliveryStatus {
+							case .published:
+								deliveryStatus = .published
+							case .unpublished:
+								deliveryStatus = .unpublished
+							case .failed:
+								deliveryStatus = .failed
+							default:
+								deliveryStatus = nil
+							}
+		)
 
 		if let before {
 			options.sentBeforeNs = Int64(before.millisecondsSinceEpoch * 1_000_000)
