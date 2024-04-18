@@ -6,12 +6,17 @@ import Foundation
 
 /// Handles topic generation for conversations.
 public typealias InvitationV1 = Xmtp_MessageContents_InvitationV1
+public typealias ConsentProofPayload = Xmtp_MessageContents_ConsentProofPayload
+public typealias ConsentProofPayloadVersion = Xmtp_MessageContents_ConsentProofPayloadVersion
+
+
 
 extension InvitationV1 {
 	static func createDeterministic(
 			sender: PrivateKeyBundleV2,
 			recipient: SignedPublicKeyBundle,
-			context: InvitationV1.Context? = nil
+			context: InvitationV1.Context? = nil,
+            consentProofSignature: String? = nil
 	) throws -> InvitationV1 {
 		let context = context ?? InvitationV1.Context()
         let myAddress = try sender.toV1().walletAddress
@@ -33,14 +38,26 @@ extension InvitationV1 {
 
 		var aes256GcmHkdfSha256 = InvitationV1.Aes256gcmHkdfsha256()
 		aes256GcmHkdfSha256.keyMaterial = Data(keyMaterial)
+		// If consentProofSignature is not nil, create a ConsentProofPayload
+		// with the signature and add it to the InvitationV1
+        var consentProofPayload: ConsentProofPayload? = nil
+        
+		if let signature = consentProofSignature {
+			var consentProof = ConsentProofPayload()
+            consentProof.signature = signature
+            consentProof.timestamp = UInt64(Date().timeIntervalSince1970 * 1000)
+            consentProof.payloadVersion = .consentProofPayloadVersion1
+            consentProofPayload = consentProof
+        }
 
 		return try InvitationV1(
 				topic: topic,
 				context: context,
-				aes256GcmHkdfSha256: aes256GcmHkdfSha256)
+				aes256GcmHkdfSha256: aes256GcmHkdfSha256,
+                consentProof: consentProofPayload)
 	}
 
-	init(topic: Topic, context: InvitationV1.Context? = nil, aes256GcmHkdfSha256: InvitationV1.Aes256gcmHkdfsha256) throws {
+    init(topic: Topic, context: InvitationV1.Context? = nil, aes256GcmHkdfSha256: InvitationV1.Aes256gcmHkdfsha256, consentProof: ConsentProofPayload? = nil) throws {
 		self.init()
 
 		self.topic = topic.description
@@ -48,6 +65,9 @@ extension InvitationV1 {
 		if let context {
 			self.context = context
 		}
+        if let consentProof {
+            self.consentProof = consentProof
+        }
 
 		self.aes256GcmHkdfSha256 = aes256GcmHkdfSha256
 	}

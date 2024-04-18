@@ -447,7 +447,7 @@ public actor Conversations {
 		return Group(ffiGroup: group, client: client)
 	}
 
-	public func newConversation(with peerAddress: String, context: InvitationV1.Context? = nil) async throws -> Conversation {
+    public func newConversation(with peerAddress: String, context: InvitationV1.Context? = nil, consentProofSignature: String? = nil) async throws -> Conversation {
 		if peerAddress.lowercased() == client.address.lowercased() {
 			throw ConversationError.recipientIsSender
 		}
@@ -470,7 +470,8 @@ public actor Conversations {
 		let invitation = try InvitationV1.createDeterministic(
 			sender: client.keys,
 			recipient: recipient,
-			context: context
+			context: context,
+            consentProofSignature
 		)
 		let sealedInvitation = try await sendInvitation(recipient: recipient, invitation: invitation, created: Date())
 		let conversationV2 = try ConversationV2.create(client: client, invitation: invitation, header: sealedInvitation.v1.header)
