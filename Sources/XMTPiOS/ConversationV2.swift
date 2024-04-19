@@ -17,7 +17,7 @@ public struct ConversationV2Container: Codable {
 	var peerAddress: String
 	var createdAtNs: UInt64?
 	var header: SealedInvitationHeaderV1
-    var consentProof: Data?
+    var consentProof: ConsentProofPayload?
 
 	public func decode(with client: Client) -> ConversationV2 {
 		let context = InvitationV1.Context(conversationID: conversationID ?? "", metadata: metadata)
@@ -32,7 +32,7 @@ public struct ConversationV2 {
 	public var context: InvitationV1.Context
 	public var peerAddress: String
 	public var client: Client
-    public var consentProof: Data?
+    public var consentProof: ConsentProofPayload?
 	var createdAtNs: UInt64?
 	private var header: SealedInvitationHeaderV1
 
@@ -43,7 +43,6 @@ public struct ConversationV2 {
 		let peerAddress = try peer.walletAddress
 
 		let keyMaterial = Data(invitation.aes256GcmHkdfSha256.keyMaterial)
-        let consentProof = try invitation.consentProof.serializedData()
 
 		return ConversationV2(
 			topic: invitation.topic,
@@ -53,11 +52,11 @@ public struct ConversationV2 {
 			client: client,
 			createdAtNs: header.createdNs,
 			header: header,
-            consentProof: consentProof
+            consentProof: invitation.consentProof
 		)
 	}
 
-  public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, createdAtNs: UInt64? = nil, consentProof: Data? = nil) {
+  public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, createdAtNs: UInt64? = nil, consentProof: ConsentProofPayload? = nil) {
 		self.topic = topic
 		self.keyMaterial = keyMaterial
 		self.context = context
@@ -68,7 +67,7 @@ public struct ConversationV2 {
 		header = SealedInvitationHeaderV1()
 	}
 
-	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, createdAtNs: UInt64? = nil, header: SealedInvitationHeaderV1, consentProof: Data? = nil) {
+	public init(topic: String, keyMaterial: Data, context: InvitationV1.Context, peerAddress: String, client: Client, createdAtNs: UInt64? = nil, header: SealedInvitationHeaderV1, consentProof: ConsentProofPayload? = nil) {
 		self.topic = topic
 		self.keyMaterial = keyMaterial
 		self.context = context

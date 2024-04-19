@@ -69,3 +69,38 @@ public extension InvitationV1.Context {
 		self.metadata = metadata
 	}
 }
+
+extension ConsentProofPayload: Codable {
+    enum CodingKeys: CodingKey {
+        case signature, timestamp, payloadVersion
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(signature, forKey: .signature)
+        try container.encode(timestamp, forKey: .timestamp)
+        try container.encode(payloadVersion, forKey: .payloadVersion)
+    }
+
+    public init(from decoder: Decoder) throws {
+        self.init()
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        signature = try container.decode(String.self, forKey: .signature)
+        timestamp = try container.decode(UInt64.self, forKey: .timestamp)
+        payloadVersion = try container.decode(Xmtp_MessageContents_ConsentProofPayloadVersion.self, forKey: .payloadVersion)
+    }
+}
+
+extension ConsentProofPayloadVersion: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(Int.self)
+        self.init(rawValue: rawValue)!
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
+}

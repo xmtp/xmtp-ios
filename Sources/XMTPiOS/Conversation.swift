@@ -324,16 +324,12 @@ public enum Conversation: Sendable {
 		}
 	}
 
-	public func consentProof() throws -> ConsentProofPayload? {
+    public var consentProof: ConsentProofPayload? {
 		switch self {
 		case .v1(_):
 			return nil
 		case let .v2(conversationV2):
-			if let consentProof = conversationV2.consentProof {
-				let val = try ConsentProofPayload(serializedData: consentProof)
-				return val
-			}
-			return nil
+			return conversationV2.consentProof
 		case .group(_):
 			return nil
 		}

@@ -373,7 +373,7 @@ public final class Client {
 			peerAddress: export.peerAddress,
 			client: self,
 			header: SealedInvitationHeaderV1(),
-            consentProof: try consentProof?.serializedData()
+            consentProof: consentProof
 		))
 	}
 
