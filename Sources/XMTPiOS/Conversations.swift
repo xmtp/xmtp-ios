@@ -471,7 +471,7 @@ public actor Conversations {
 			sender: client.keys,
 			recipient: recipient,
 			context: context,
-            consentProofSignature
+            consentProofSignature: consentProofSignature
 		)
 		let sealedInvitation = try await sendInvitation(recipient: recipient, invitation: invitation, created: Date())
 		let conversationV2 = try ConversationV2.create(client: client, invitation: invitation, header: sealedInvitation.v1.header)
@@ -540,10 +540,20 @@ public actor Conversations {
 
 	private func makeConversation(from sealedInvitation: SealedInvitation) throws -> ConversationV2 {
 		let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)
-		let conversation = try ConversationV2.create(client: client, invitation: unsealed, header: sealedInvitation.v1.header)
+        
+        let conversation = try ConversationV2.create(client: client, invitation: unsealed, header: sealedInvitation.v1.header)
 
 		return conversation
 	}
+    
+    private func handleConsentProof(consentProof: ConsentProofPayload, peerAddress: String) async throws {
+//        TODO: Validate signature
+        let contacts = client.contacts
+        let _ = try await contacts.refreshConsentList()
+        if await (contacts.consentList.state(address: peerAddress) == .unknown) {
+            try await contacts.allow(addresses: [peerAddress])
+        }
+    }
 
 	public func list(includeGroups: Bool = false) async throws -> [Conversation] {
 		if (includeGroups) {
@@ -578,9 +588,16 @@ public actor Conversations {
 
 		for sealedInvitation in try await listInvitations(pagination: pagination) {
 			do {
-				try newConversations.append(
-					Conversation.v2(makeConversation(from: sealedInvitation))
+                let newConversation = Conversation.v2(try makeConversation(from: sealedInvitation))
+				newConversations.append(
+                    newConversation
 				)
+                let consentProof = try newConversation.consentProof()
+                if let consentProof = consentProof {
+                    try await self.handleConsentProof(consentProof: consentProof
+                                            , peerAddress: newConversation.peerAddress)
+                
+                }
 			} catch {
 				print("Error loading invitations: \(error)")
 			}

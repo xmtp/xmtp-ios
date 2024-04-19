@@ -352,6 +352,16 @@ public final class Client {
 		guard let keyMaterial = Data(base64Encoded: Data(export.keyMaterial.utf8)) else {
 			throw ConversationImportError.invalidData
 		}
+        
+        var consentProof: ConsentProofPayload? = nil
+        if let exportConsentProof = export.consentProof {
+            var proof = ConsentProofPayload()
+            proof.signature = exportConsentProof.signature
+            proof.timestamp = exportConsentProof.timestamp
+            proof.payloadVersion = ConsentProofPayloadVersion.consentProofPayloadVersion1
+            consentProof = proof
+        }
+        
 
 		return .v2(ConversationV2(
 			topic: export.topic,
@@ -362,7 +372,8 @@ public final class Client {
 			),
 			peerAddress: export.peerAddress,
 			client: self,
-			header: SealedInvitationHeaderV1()
+			header: SealedInvitationHeaderV1(),
+            consentProof: try consentProof?.serializedData()
 		))
 	}
 

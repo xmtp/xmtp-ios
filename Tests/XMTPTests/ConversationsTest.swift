@@ -193,4 +193,28 @@ class ConversationsTests: XCTestCase {
 			}
 		}
 	}
+    
+    func testSendConversationWithConsentSignature() async throws {
+        let fixtures = await fixtures()
+        let bo = try PrivateKey.generate()
+        let alix = try PrivateKey.generate()
+    
+        let boClient = try await Client.create(account: bo, apiClient: fixtures.fakeApiClient)
+        let alixClient = try await Client.create(account: alix, apiClient: fixtures.fakeApiClient)
+
+        let privateKeyBundle = alixClient.keys
+        let signedPrivateKey =  privateKeyBundle.identityKey
+        let privateKey = try PrivateKey(signedPrivateKey)
+        let signature = try await privateKey.sign(Data([1,2,3]))
+        let hex = Data(try signature.serializedData()).toHex
+        let boConversation =
+        try await boClient.conversations.newConversation(with: alixClient.address, context: nil, consentProofSignature: hex)
+        let alixConversations = try await
+            alixClient.conversations.list()
+        let alixConversation = alixConversations.first(where: { $0.topic == boConversation.topic })
+        XCTAssertNotNil(alixConversation)
+        let consentStatus = await alixClient.contacts.isAllowed(boClient.address)
+        XCTAssertTrue(consentStatus)
+
+    }
 }
