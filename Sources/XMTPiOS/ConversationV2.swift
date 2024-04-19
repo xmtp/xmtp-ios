@@ -53,7 +53,7 @@ public struct ConversationV2 {
 			client: client,
 			createdAtNs: header.createdNs,
 			header: header,
-      consentProof: consentProof
+            consentProof: consentProof
 		)
 	}
 
@@ -64,7 +64,7 @@ public struct ConversationV2 {
 		self.peerAddress = peerAddress
 		self.client = client
 		self.createdAtNs = createdAtNs
-    self.consentProof = consentProof
+        self.consentProof = consentProof
 		header = SealedInvitationHeaderV1()
 	}
 

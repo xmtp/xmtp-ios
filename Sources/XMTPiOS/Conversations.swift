@@ -447,7 +447,7 @@ public actor Conversations {
 		return Group(ffiGroup: group, client: client)
 	}
 
-    public func newConversation(with peerAddress: String, context: InvitationV1.Context? = nil, consentProofSignature: String? = nil) async throws -> Conversation {
+    public func newConversation(with peerAddress: String, context: InvitationV1.Context? = nil, consentProofPayload: ConsentProofPayload? = nil) async throws -> Conversation {
 		if peerAddress.lowercased() == client.address.lowercased() {
 			throw ConversationError.recipientIsSender
 		}
@@ -471,7 +471,7 @@ public actor Conversations {
 			sender: client.keys,
 			recipient: recipient,
 			context: context,
-            consentProofSignature: consentProofSignature
+            consentProofPayload: consentProofPayload
 		)
 		let sealedInvitation = try await sendInvitation(recipient: recipient, invitation: invitation, created: Date())
 		let conversationV2 = try ConversationV2.create(client: client, invitation: invitation, header: sealedInvitation.v1.header)
@@ -546,8 +546,41 @@ public actor Conversations {
 		return conversation
 	}
     
+    private func validateConsentSignature(signature: String, clientAddress: String, peerAddress: String, timestamp: UInt64) -> Bool {
+        let message = Signature.consentProofText(peerAddress: peerAddress, timestamp: timestamp)
+
+        guard let signatureData = Data(hex: signature) else {
+            print("Invalid signature format")
+            return false
+        }
+        var sig = Signature()
+        do {
+            sig = try Signature(serializedData: signatureData)
+        } catch {
+            print("Invalid signature format: \(error)")
+            return false
+        }
+        // Convert the message to Data
+        guard let messageData = message.data(using: .utf8) else {
+            print("Invalid message format")
+            return false
+        }
+        do {
+            let recoveredKey = try KeyUtilx.recoverPublicKeyKeccak256(from: sig.rawData, message: messageData)
+            let address = KeyUtilx.generateAddress(from: recoveredKey).toChecksumAddress()
+
+            return clientAddress == address
+        } catch {
+            return false
+        }
+    }
+    
     private func handleConsentProof(consentProof: ConsentProofPayload, peerAddress: String) async throws {
-//        TODO: Validate signature
+        let signature = consentProof.signature
+
+        if (!validateConsentSignature(signature: signature, clientAddress: client.address, peerAddress: peerAddress, timestamp: consentProof.timestamp)) {
+            return
+        }
         let contacts = client.contacts
         let _ = try await contacts.refreshConsentList()
         if await (contacts.consentList.state(address: peerAddress) == .unknown) {
@@ -594,8 +627,7 @@ public actor Conversations {
 				)
                 let consentProof = try newConversation.consentProof()
                 if let consentProof = consentProof {
-                    try await self.handleConsentProof(consentProof: consentProof
-                                            , peerAddress: newConversation.peerAddress)
+                    try await self.handleConsentProof(consentProof: consentProof, peerAddress: newConversation.peerAddress)
                 
                 }
 			} catch {

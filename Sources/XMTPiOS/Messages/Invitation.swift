@@ -16,7 +16,7 @@ extension InvitationV1 {
 			sender: PrivateKeyBundleV2,
 			recipient: SignedPublicKeyBundle,
 			context: InvitationV1.Context? = nil,
-            consentProofSignature: String? = nil
+            consentProofPayload: ConsentProofPayload? = nil
 	) throws -> InvitationV1 {
 		let context = context ?? InvitationV1.Context()
         let myAddress = try sender.toV1().walletAddress
@@ -38,18 +38,6 @@ extension InvitationV1 {
 
 		var aes256GcmHkdfSha256 = InvitationV1.Aes256gcmHkdfsha256()
 		aes256GcmHkdfSha256.keyMaterial = Data(keyMaterial)
-		// If consentProofSignature is not nil, create a ConsentProofPayload
-		// with the signature and add it to the InvitationV1
-        var consentProofPayload: ConsentProofPayload? = nil
-        
-		if let signature = consentProofSignature {
-			var consentProof = ConsentProofPayload()
-            consentProof.signature = signature
-            consentProof.timestamp = UInt64(Date().timeIntervalSince1970 * 1000)
-            consentProof.payloadVersion = .consentProofPayloadVersion1
-            consentProofPayload = consentProof
-        }
-
 		return try InvitationV1(
 				topic: topic,
 				context: context,
