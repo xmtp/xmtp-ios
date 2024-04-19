@@ -96,7 +96,7 @@ extension ConsentProofPayloadVersion: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let rawValue = try container.decode(Int.self)
-        self.init(rawValue: rawValue)!
+        self = ConsentProofPayloadVersion(rawValue: rawValue) ?? ConsentProofPayloadVersion.UNRECOGNIZED(0)
     }
 
     public func encode(to encoder: Encoder) throws {

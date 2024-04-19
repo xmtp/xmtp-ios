@@ -352,7 +352,7 @@ public final class Client {
 		guard let keyMaterial = Data(base64Encoded: Data(export.keyMaterial.utf8)) else {
 			throw ConversationImportError.invalidData
 		}
-        
+
         var consentProof: ConsentProofPayload? = nil
         if let exportConsentProof = export.consentProof {
             var proof = ConsentProofPayload()
@@ -361,7 +361,6 @@ public final class Client {
             proof.payloadVersion = ConsentProofPayloadVersion.consentProofPayloadVersion1
             consentProof = proof
         }
-        
 
 		return .v2(ConversationV2(
 			topic: export.topic,

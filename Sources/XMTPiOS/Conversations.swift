@@ -582,7 +582,7 @@ public actor Conversations {
             return
         }
         let contacts = client.contacts
-        let _ = try await contacts.refreshConsentList()
+        _ = try await contacts.refreshConsentList()
         if await (contacts.consentList.state(address: peerAddress) == .unknown) {
             try await contacts.allow(addresses: [peerAddress])
         }
@@ -625,8 +625,7 @@ public actor Conversations {
 				newConversations.append(
                     newConversation
 				)
-                let consentProof = try newConversation.consentProof()
-                if let consentProof = consentProof {
+                if let consentProof = newConversation.consentProof {
                     try await self.handleConsentProof(consentProof: consentProof, peerAddress: newConversation.peerAddress)
                 
                 }
