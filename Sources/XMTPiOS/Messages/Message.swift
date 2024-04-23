@@ -13,7 +13,7 @@ public enum MessageVersion: String, RawRepresentable {
 	     v2
 }
 
-public enum MessageDeliveryStatus: String, RawRepresentable, Sendable {	
+public enum MessageDeliveryStatus: Sendable {
 	case all,
 		 published,
 		 unpublished,
