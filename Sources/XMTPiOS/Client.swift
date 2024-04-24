@@ -241,20 +241,20 @@ public final class Client {
 		return nil
 	}
 
-	public func canMessageV3(address: String) async throws -> [String: Bool] {
+	public func canMessageV3(address: String) async throws -> Bool {
 		guard let client = v3Client else {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
 
-		return try await client.canMessage(addresses)
+		return try await client.canMessage(accountAddresses: [address])[address] ?? false
 	}
 
-	public func canMessageV3(addresses: [String]) async throws -> Bool {
-		guard let v3Client else {
-			return false
+	public func canMessageV3(addresses: [String]) async throws -> [String: Bool]  {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
 
-		return try await !v3Client.canMessage(accountAddresses: addresses).contains(false)
+		return try await client.canMessage(accountAddresses: addresses)
 	}
 
 	public static func from(bundle: PrivateKeyBundle, options: ClientOptions? = nil) async throws -> Client {
