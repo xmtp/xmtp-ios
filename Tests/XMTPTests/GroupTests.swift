@@ -300,6 +300,25 @@ class GroupTests: XCTestCase {
 		XCTAssert(!isFredActive)
 	}
 
+	func testAddedByAddress() async throws {
+		// Create clients
+		let fixtures = try await localFixtures()
+
+		// Alice creates a group and adds Bob to the group
+		_ = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+
+		// Bob syncs groups - this will decrypt the Welcome and then
+		// identify who added Bob to the group
+		try await fixtures.bobClient.conversations.sync()
+		
+		// Check Bob's group for the added_by_address of the inviter
+		let bobGroup = try await fixtures.bobClient.conversations.groups().first
+		let aliceAddress = fixtures.alice.address.localizedLowercase
+		let whoAddedBob = try bobGroup?.addedByAddress().localizedLowercase
+		
+		// Verify the welcome host_credential is equal to Amal's
+		XCTAssertEqual(aliceAddress, whoAddedBob)
+	}
 
 	func testCannotStartGroupWithSelf() async throws {
 		let fixtures = try await localFixtures()
@@ -353,12 +372,14 @@ class GroupTests: XCTestCase {
 	func testCanSendMessagesToGroup() async throws {
 		let fixtures = try await localFixtures()
 		let aliceGroup = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+		let membershipChange = GroupMembershipChanges()
 
 		try await fixtures.bobClient.conversations.sync()
 		let bobGroup = try await fixtures.bobClient.conversations.groups()[0]
 
 		_ = try await aliceGroup.send(content: "sup gang original")
-		_ = try await aliceGroup.send(content: "sup gang")
+		let messageId = try await aliceGroup.send(content: "sup gang")
+		_ = try await aliceGroup.send(content: membershipChange, options: SendOptions(contentType: ContentTypeGroupMembershipChanged))
 
 		try await aliceGroup.sync()
 		let aliceGroupsCount = try await aliceGroup.messages().count
@@ -371,7 +392,44 @@ class GroupTests: XCTestCase {
 		let bobMessage = try await bobGroup.messages().first!
 
 		XCTAssertEqual("sup gang", try aliceMessage.content())
+		XCTAssertEqual(messageId, aliceMessage.id)
+		XCTAssertEqual(.published, aliceMessage.deliveryStatus)
 		XCTAssertEqual("sup gang", try bobMessage.content())
+	}
+	
+	func testCanListGroupMessages() async throws {
+		let fixtures = try await localFixtures()
+		let aliceGroup = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+		_ = try await aliceGroup.send(content: "howdy")
+		_ = try await aliceGroup.send(content: "gm")
+
+		var aliceMessagesCount = try await aliceGroup.messages().count
+		var aliceMessagesUnpublishedCount = try await aliceGroup.messages(deliveryStatus: .unpublished).count
+		var aliceMessagesPublishedCount = try await aliceGroup.messages(deliveryStatus: .published).count
+		XCTAssertEqual(3, aliceMessagesCount)
+		XCTAssertEqual(2, aliceMessagesUnpublishedCount)
+		XCTAssertEqual(1, aliceMessagesPublishedCount)
+
+		try await aliceGroup.sync()
+		
+		aliceMessagesCount = try await aliceGroup.messages().count
+		aliceMessagesUnpublishedCount = try await aliceGroup.messages(deliveryStatus: .unpublished).count
+		aliceMessagesPublishedCount = try await aliceGroup.messages(deliveryStatus: .published).count
+		XCTAssertEqual(3, aliceMessagesCount)
+		XCTAssertEqual(0, aliceMessagesUnpublishedCount)
+		XCTAssertEqual(3, aliceMessagesPublishedCount)
+
+		try await fixtures.bobClient.conversations.sync()
+		let bobGroup = try await fixtures.bobClient.conversations.groups()[0]
+		try await bobGroup.sync()
+		
+		var bobMessagesCount = try await bobGroup.messages().count
+		var bobMessagesUnpublishedCount = try await bobGroup.messages(deliveryStatus: .unpublished).count
+		var bobMessagesPublishedCount = try await bobGroup.messages(deliveryStatus: .published).count
+		XCTAssertEqual(2, bobMessagesCount)
+		XCTAssertEqual(0, bobMessagesUnpublishedCount)
+		XCTAssertEqual(2, bobMessagesPublishedCount)
+
 	}
 	
 	func testCanSendMessagesToGroupDecrypted() async throws {
@@ -396,6 +454,25 @@ class GroupTests: XCTestCase {
 
 		XCTAssertEqual("sup gang", String(data: Data(aliceMessage.encodedContent.content), encoding: .utf8))
 		XCTAssertEqual("sup gang", String(data: Data(bobMessage.encodedContent.content), encoding: .utf8))
+	}
+	
+	func testCanStreamGroupMessages() async throws {
+		let fixtures = try await localFixtures()
+		let group = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
+		let membershipChange = GroupMembershipChanges()
+		let expectation1 = expectation(description: "got a message")
+		expectation1.expectedFulfillmentCount = 1
+
+		Task(priority: .userInitiated) {
+			for try await _ in group.streamMessages() {
+				expectation1.fulfill()
+			}
+		}
+
+		_ = try await group.send(content: "hi")
+		_ = try await group.send(content: membershipChange, options: SendOptions(contentType: ContentTypeGroupMembershipChanged))
+
+		await waitForExpectations(timeout: 3)
 	}
 	
 	func testCanStreamGroups() async throws {
@@ -454,6 +531,7 @@ class GroupTests: XCTestCase {
 	
 	func testCanStreamAllDecryptedMessages() async throws {
 		let fixtures = try await localFixtures()
+		let membershipChange = GroupMembershipChanges()
 
 		let expectation1 = expectation(description: "got a conversation")
 		expectation1.expectedFulfillmentCount = 2
@@ -467,6 +545,7 @@ class GroupTests: XCTestCase {
 		}
 
 		_ = try await group.send(content: "hi")
+		_ = try await group.send(content: membershipChange, options: SendOptions(contentType: ContentTypeGroupMembershipChanged))
 		_ = try await convo.send(content: "hi")
 
 		await waitForExpectations(timeout: 3)
