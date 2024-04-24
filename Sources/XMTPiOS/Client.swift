@@ -245,8 +245,8 @@ public final class Client {
 		guard let client = v3Client else {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
-
-		return try await client.canMessage(accountAddresses: [address])[address] ?? false
+		let canMessage = try await client.canMessage(accountAddresses: [address])
+		return canMessage[address.lowercased()] ?? false
 	}
 
 	public func canMessageV3(addresses: [String]) async throws -> [String: Bool]  {
