@@ -52,7 +52,7 @@ public struct ConversationV2 {
 			client: client,
 			createdAtNs: header.createdNs,
 			header: header,
-            consentProof: invitation.consentProof
+      consentProof: invitation.hasConsentProof ? invitation.consentProof : nil
 		)
 	}
 

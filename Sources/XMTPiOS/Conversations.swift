@@ -577,6 +577,9 @@ public actor Conversations {
     
     private func handleConsentProof(consentProof: ConsentProofPayload, peerAddress: String) async throws {
         let signature = consentProof.signature
+        if (signature == "") {
+            return
+        }
 
         if (!validateConsentSignature(signature: signature, clientAddress: client.address, peerAddress: peerAddress, timestamp: consentProof.timestamp)) {
             return
@@ -626,8 +629,9 @@ public actor Conversations {
                     newConversation
 				)
                 if let consentProof = newConversation.consentProof {
-                    try await self.handleConsentProof(consentProof: consentProof, peerAddress: newConversation.peerAddress)
-                
+                    if consentProof.signature != "" {
+                        try await self.handleConsentProof(consentProof: consentProof, peerAddress: newConversation.peerAddress)
+                    }
                 }
 			} catch {
 				print("Error loading invitations: \(error)")
