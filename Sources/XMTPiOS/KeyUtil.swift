@@ -129,10 +129,13 @@ enum KeyUtilx {
         }
 
 		var size = 65
-		var rv = Data(count: size)
-		_ = rv.withUnsafeMutableBytes {
-			secp256k1_ec_pubkey_serialize(ctx, $0.bindMemory(to: UInt8.self).baseAddress!, &size, pubkey, UInt32(SECP256K1_EC_UNCOMPRESSED))
-		}
+        var rv = Data(count: size)
+        rv.withUnsafeMutableBytes { buffer -> Void in
+            guard let baseAddress = buffer.bindMemory(to: UInt8.self).baseAddress else {
+                return // Optionally, handle the error or log this condition
+            }
+            secp256k1_ec_pubkey_serialize(ctx, baseAddress, &size, pubkey, UInt32(SECP256K1_EC_UNCOMPRESSED))
+        }
 
 		return rv
 	}
