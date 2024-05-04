@@ -575,7 +575,7 @@ public actor Conversations {
         }
     }
     
-    public func handleConsentProof(consentProof: ConsentProofPayload, peerAddress: String) async throws {
+    private func handleConsentProof(consentProof: ConsentProofPayload, peerAddress: String) async throws {
         let signature = consentProof.signature
         if (signature == "") {
             return
