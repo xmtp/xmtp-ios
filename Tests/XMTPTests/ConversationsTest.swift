@@ -204,9 +204,9 @@ class ConversationsTests: XCTestCase {
 
         let timestamp = UInt64(Date().timeIntervalSince1970 * 1000)
         let signatureText = Signature.consentProofText(peerAddress: boClient.address, timestamp: timestamp)
-        let digest = Data(signatureText.utf8)
-        let signature = try await alix.sign(Util.keccak256(digest))
-        let hex = Data(try signature.serializedData()).toHex
+        let signature = try await alix.sign(message: signatureText)
+        
+        let hex = signature.rawData.toHex
         var consentProofPayload = ConsentProofPayload()
         consentProofPayload.signature = hex
         consentProofPayload.timestamp = timestamp
@@ -231,9 +231,8 @@ class ConversationsTests: XCTestCase {
 
         let timestamp = UInt64(Date().timeIntervalSince1970 * 1000)
         let signatureText = Signature.consentProofText(peerAddress: boClient.address, timestamp: timestamp)
-        let digest = Data(signatureText.utf8)
-        let signature = try await alix.sign(Util.keccak256(digest))
-        let hex = Data(try signature.serializedData()).toHex
+        let signature = try await alix.sign(message: signatureText)
+        let hex = signature.rawData.toHex
         var consentProofPayload = ConsentProofPayload()
         consentProofPayload.signature = hex
         consentProofPayload.timestamp = timestamp
@@ -259,9 +258,8 @@ class ConversationsTests: XCTestCase {
 
         let timestamp = UInt64(Date().timeIntervalSince1970 * 1000)
         let signatureText = Signature.consentProofText(peerAddress: boClient.address, timestamp: timestamp + 1)
-        let digest = Data(signatureText.utf8)
-        let signature = try await alix.sign(Util.keccak256(digest))
-        let hex = Data(try signature.serializedData()).toHex
+        let signature = try await alix.sign(message:signatureText)
+        let hex = signature.rawData.toHex
         var consentProofPayload = ConsentProofPayload()
         consentProofPayload.signature = hex
         consentProofPayload.timestamp = timestamp
@@ -274,5 +272,28 @@ class ConversationsTests: XCTestCase {
         XCTAssertNotNil(alixConversation)
         let isAllowed = await alixClient.contacts.isAllowed(boClient.address)
         XCTAssertFalse(isAllowed)
+    }
+    
+    func testHardCode() async throws {
+        let message = "XMTP : Grant inbox consent to sender\n\nCurrent Time: 1714785568964\nFrom Address: 0x83A5D283F5B8c4D2c1913EA971a3B7FD8473F446\n\nFor more info: https://xmtp.org/signatures/"
+        let keyBundle =
+          "CooDCsIBCNODs8vTMRIiCiAX1cOb/Fd9VVxByqoWpW/+5xXPUcVjGXFOlYfeAq+i/xqUAQjTg7PL0zESRgpECkCv4ioiERGdb6PjKdbevjb9Y2j/up2bRfxQ9BHMfP1Lhx+7EXm9/ilPY/apoc98NLTq70LonXxkzfTJd99p4LiDEAEaQwpBBG9pNdML2/SSlsEAaQvh6mhPSaxVIoKVQZrHXVXvv4nlV/uJbT6hUfh74i/zaSJGI/151gaz6NFIRh0/iIsHDxwSwgEIvdGzy9MxEiIKICi1CtsGZ7irJSqkGhMy1zyw0ICg6lbWQ9VlUhudGBlrGpQBCL3Rs8vTMRJGCkQKQOhzxhSnIDWZyCYkFJvhET4S5eT86n3hw5pjlftVvCycWsNfLmtDhD7lhGc3B1fiWAmyc1jifx0ZaXicbfE23/EQARpDCkEEZ8ppzlYqzw7WxVVPutJD88twhKjSOBCUUMq2O6UQIql8Gpb2NtpRtOhh9lhs1dSBK58R6in4xIICnNIwoS+wQg=="
+        guard let keyBundleData = Data(base64Encoded: keyBundle),
+              let bundle = try? PrivateKeyBundle(serializedData: keyBundleData)
+        else {
+            return
+        }
+        let opts = ClientOptions(api: ClientOptions.Api(env: .dev, isSecure: false))
+        let alex = try await Client.from(bundle: bundle, options: opts)
+        let timestamp = UInt64(1714785568964)
+        let sig =
+          "0xbb272200f471cd70b94570ff07daca1de8e663883c698adb191f6677e76bd47b02a44b9928c61260bf1520e214f362fe3b766d22a526512f2f7699340840bacd1b"
+        var consentProofPayload = ConsentProofPayload()
+        consentProofPayload.signature = sig
+        consentProofPayload.timestamp = timestamp
+        consentProofPayload.payloadVersion = .consentProofPayloadVersion1
+        let peer = "0x83A5D283F5B8c4D2c1913EA971a3B7FD8473F446"
+        try await alex.conversations.handleConsentProof(consentProof: consentProofPayload, peerAddress: peer)
+        
     }
 }
