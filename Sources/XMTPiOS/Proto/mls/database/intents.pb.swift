@@ -275,6 +275,117 @@ public struct Xmtp_Mls_Database_RemoveMembersData {
   public init() {}
 }
 
+/// The data required to make a commit that updates group membership
+/// Handles both Add and Remove actions
+public struct Xmtp_Mls_Database_UpdateGroupMembershipData {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var version: Xmtp_Mls_Database_UpdateGroupMembershipData.OneOf_Version? = nil
+
+  public var v1: Xmtp_Mls_Database_UpdateGroupMembershipData.V1 {
+    get {
+      if case .v1(let v)? = version {return v}
+      return Xmtp_Mls_Database_UpdateGroupMembershipData.V1()
+    }
+    set {version = .v1(newValue)}
+  }
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public enum OneOf_Version: Equatable {
+    case v1(Xmtp_Mls_Database_UpdateGroupMembershipData.V1)
+
+  #if !swift(>=4.1)
+    public static func ==(lhs: Xmtp_Mls_Database_UpdateGroupMembershipData.OneOf_Version, rhs: Xmtp_Mls_Database_UpdateGroupMembershipData.OneOf_Version) -> Bool {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch (lhs, rhs) {
+      case (.v1, .v1): return {
+        guard case .v1(let l) = lhs, case .v1(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      }
+    }
+  #endif
+  }
+
+  /// V1 of UpdateGroupMembershipPublishData
+  public struct V1 {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    /// Contains delta of membership updates that need to be applied
+    public var membershipUpdates: Dictionary<String,UInt64> = [:]
+
+    /// Contains the list of members that will be removed
+    public var removedMembers: [String] = []
+
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    public init() {}
+  }
+
+  public init() {}
+}
+
+/// The data required to update group metadata
+public struct Xmtp_Mls_Database_UpdateMetadataData {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var version: Xmtp_Mls_Database_UpdateMetadataData.OneOf_Version? = nil
+
+  public var v1: Xmtp_Mls_Database_UpdateMetadataData.V1 {
+    get {
+      if case .v1(let v)? = version {return v}
+      return Xmtp_Mls_Database_UpdateMetadataData.V1()
+    }
+    set {version = .v1(newValue)}
+  }
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public enum OneOf_Version: Equatable {
+    case v1(Xmtp_Mls_Database_UpdateMetadataData.V1)
+
+  #if !swift(>=4.1)
+    public static func ==(lhs: Xmtp_Mls_Database_UpdateMetadataData.OneOf_Version, rhs: Xmtp_Mls_Database_UpdateMetadataData.OneOf_Version) -> Bool {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch (lhs, rhs) {
+      case (.v1, .v1): return {
+        guard case .v1(let l) = lhs, case .v1(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      }
+    }
+  #endif
+  }
+
+  /// V1 of UpdateMetadataPublishData
+  public struct V1 {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    public var fieldName: String = String()
+
+    public var fieldValue: String = String()
+
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    public init() {}
+  }
+
+  public init() {}
+}
+
 /// Generic data-type for all post-commit actions
 public struct Xmtp_Mls_Database_PostCommitAction {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
@@ -358,6 +469,12 @@ extension Xmtp_Mls_Database_AddMembersData.V1: @unchecked Sendable {}
 extension Xmtp_Mls_Database_RemoveMembersData: @unchecked Sendable {}
 extension Xmtp_Mls_Database_RemoveMembersData.OneOf_Version: @unchecked Sendable {}
 extension Xmtp_Mls_Database_RemoveMembersData.V1: @unchecked Sendable {}
+extension Xmtp_Mls_Database_UpdateGroupMembershipData: @unchecked Sendable {}
+extension Xmtp_Mls_Database_UpdateGroupMembershipData.OneOf_Version: @unchecked Sendable {}
+extension Xmtp_Mls_Database_UpdateGroupMembershipData.V1: @unchecked Sendable {}
+extension Xmtp_Mls_Database_UpdateMetadataData: @unchecked Sendable {}
+extension Xmtp_Mls_Database_UpdateMetadataData.OneOf_Version: @unchecked Sendable {}
+extension Xmtp_Mls_Database_UpdateMetadataData.V1: @unchecked Sendable {}
 extension Xmtp_Mls_Database_PostCommitAction: @unchecked Sendable {}
 extension Xmtp_Mls_Database_PostCommitAction.OneOf_Kind: @unchecked Sendable {}
 extension Xmtp_Mls_Database_PostCommitAction.Installation: @unchecked Sendable {}
@@ -745,6 +862,178 @@ extension Xmtp_Mls_Database_RemoveMembersData.V1: SwiftProtobuf.Message, SwiftPr
 
   public static func ==(lhs: Xmtp_Mls_Database_RemoveMembersData.V1, rhs: Xmtp_Mls_Database_RemoveMembersData.V1) -> Bool {
     if lhs._addressesOrInstallationIds != rhs._addressesOrInstallationIds {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Xmtp_Mls_Database_UpdateGroupMembershipData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".UpdateGroupMembershipData"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try {
+        var v: Xmtp_Mls_Database_UpdateGroupMembershipData.V1?
+        var hadOneofValue = false
+        if let current = self.version {
+          hadOneofValue = true
+          if case .v1(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.version = .v1(v)
+        }
+      }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if case .v1(let v)? = self.version {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Xmtp_Mls_Database_UpdateGroupMembershipData, rhs: Xmtp_Mls_Database_UpdateGroupMembershipData) -> Bool {
+    if lhs.version != rhs.version {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Xmtp_Mls_Database_UpdateGroupMembershipData.V1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = Xmtp_Mls_Database_UpdateGroupMembershipData.protoMessageName + ".V1"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "membership_updates"),
+    2: .standard(proto: "removed_members"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMap<SwiftProtobuf.ProtobufString,SwiftProtobuf.ProtobufUInt64>.self, value: &self.membershipUpdates) }()
+      case 2: try { try decoder.decodeRepeatedStringField(value: &self.removedMembers) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.membershipUpdates.isEmpty {
+      try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMap<SwiftProtobuf.ProtobufString,SwiftProtobuf.ProtobufUInt64>.self, value: self.membershipUpdates, fieldNumber: 1)
+    }
+    if !self.removedMembers.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.removedMembers, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Xmtp_Mls_Database_UpdateGroupMembershipData.V1, rhs: Xmtp_Mls_Database_UpdateGroupMembershipData.V1) -> Bool {
+    if lhs.membershipUpdates != rhs.membershipUpdates {return false}
+    if lhs.removedMembers != rhs.removedMembers {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Xmtp_Mls_Database_UpdateMetadataData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".UpdateMetadataData"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try {
+        var v: Xmtp_Mls_Database_UpdateMetadataData.V1?
+        var hadOneofValue = false
+        if let current = self.version {
+          hadOneofValue = true
+          if case .v1(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.version = .v1(v)
+        }
+      }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if case .v1(let v)? = self.version {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Xmtp_Mls_Database_UpdateMetadataData, rhs: Xmtp_Mls_Database_UpdateMetadataData) -> Bool {
+    if lhs.version != rhs.version {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Xmtp_Mls_Database_UpdateMetadataData.V1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = Xmtp_Mls_Database_UpdateMetadataData.protoMessageName + ".V1"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "field_name"),
+    2: .standard(proto: "field_value"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.fieldName) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.fieldValue) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.fieldName.isEmpty {
+      try visitor.visitSingularStringField(value: self.fieldName, fieldNumber: 1)
+    }
+    if !self.fieldValue.isEmpty {
+      try visitor.visitSingularStringField(value: self.fieldValue, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Xmtp_Mls_Database_UpdateMetadataData.V1, rhs: Xmtp_Mls_Database_UpdateMetadataData.V1) -> Bool {
+    if lhs.fieldName != rhs.fieldName {return false}
+    if lhs.fieldValue != rhs.fieldValue {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
