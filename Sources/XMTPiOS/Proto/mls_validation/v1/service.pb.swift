@@ -53,6 +53,8 @@ public struct Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse {
 
     public var installationPublicKey: Data = Data()
 
+    public var expiration: UInt64 = 0
+
     public var unknownFields = SwiftProtobuf.UnknownStorage()
 
     public init() {}
@@ -80,6 +82,8 @@ public struct Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest {
     // methods supported on all messages.
 
     public var keyPackageBytesTlsSerialized: Data = Data()
+
+    public var isInboxIDCredential: Bool = false
 
     public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -363,6 +367,7 @@ extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse.Response: Swi
     2: .standard(proto: "error_message"),
     3: .same(proto: "credential"),
     4: .standard(proto: "installation_public_key"),
+    5: .same(proto: "expiration"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -375,6 +380,7 @@ extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse.Response: Swi
       case 2: try { try decoder.decodeSingularStringField(value: &self.errorMessage) }()
       case 3: try { try decoder.decodeSingularMessageField(value: &self._credential) }()
       case 4: try { try decoder.decodeSingularBytesField(value: &self.installationPublicKey) }()
+      case 5: try { try decoder.decodeSingularUInt64Field(value: &self.expiration) }()
       default: break
       }
     }
@@ -397,6 +403,9 @@ extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse.Response: Swi
     if !self.installationPublicKey.isEmpty {
       try visitor.visitSingularBytesField(value: self.installationPublicKey, fieldNumber: 4)
     }
+    if self.expiration != 0 {
+      try visitor.visitSingularUInt64Field(value: self.expiration, fieldNumber: 5)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -405,6 +414,7 @@ extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse.Response: Swi
     if lhs.errorMessage != rhs.errorMessage {return false}
     if lhs._credential != rhs._credential {return false}
     if lhs.installationPublicKey != rhs.installationPublicKey {return false}
+    if lhs.expiration != rhs.expiration {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -446,6 +456,7 @@ extension Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest.KeyPackage: SwiftProt
   public static let protoMessageName: String = Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest.protoMessageName + ".KeyPackage"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "key_package_bytes_tls_serialized"),
+    2: .standard(proto: "is_inbox_id_credential"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -455,6 +466,7 @@ extension Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest.KeyPackage: SwiftProt
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularBytesField(value: &self.keyPackageBytesTlsSerialized) }()
+      case 2: try { try decoder.decodeSingularBoolField(value: &self.isInboxIDCredential) }()
       default: break
       }
     }
@@ -464,11 +476,15 @@ extension Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest.KeyPackage: SwiftProt
     if !self.keyPackageBytesTlsSerialized.isEmpty {
       try visitor.visitSingularBytesField(value: self.keyPackageBytesTlsSerialized, fieldNumber: 1)
     }
+    if self.isInboxIDCredential != false {
+      try visitor.visitSingularBoolField(value: self.isInboxIDCredential, fieldNumber: 2)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest.KeyPackage, rhs: Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest.KeyPackage) -> Bool {
     if lhs.keyPackageBytesTlsSerialized != rhs.keyPackageBytesTlsSerialized {return false}
+    if lhs.isInboxIDCredential != rhs.isInboxIDCredential {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
