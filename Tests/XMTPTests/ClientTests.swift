@@ -103,16 +103,14 @@ class ClientTests: XCTestCase {
 				appropriateFor: nil,
 				create: false
 			)
-		
-		let dbPath = documentsURL.appendingPathComponent("xmtp-\(bo.walletAddress).db3").path
-		
+				
 		let client = try await Client.create(
 			account: bo,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
 				mlsAlpha: true,
 				mlsEncryptionKey: key,
-				mlsDbPath: dbPath
+				mlsDbDirectory: "xmtp_db"
 			)
 		)
 		
@@ -123,7 +121,7 @@ class ClientTests: XCTestCase {
 				api: .init(env: .local, isSecure: false),
 				mlsAlpha: true,
 				mlsEncryptionKey: key,
-				mlsDbPath: dbPath
+				mlsDbDirectory: "xmtp_db"
 			)
 		)
 
@@ -137,7 +135,7 @@ class ClientTests: XCTestCase {
 					api: .init(env: .local, isSecure: false),
 					mlsAlpha: true,
 					mlsEncryptionKey: nil,
-					mlsDbPath: dbPath
+					mlsDbDirectory: "xmtp_db"
 				)
 			)
 		)
@@ -149,7 +147,7 @@ class ClientTests: XCTestCase {
 					api: .init(env: .local, isSecure: false),
 					mlsAlpha: true,
 					mlsEncryptionKey: key,
-					mlsDbPath: nil
+					mlsDbDirectory: nil
 				)
 			)
 		)

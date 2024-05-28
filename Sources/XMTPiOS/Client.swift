@@ -202,7 +202,7 @@ public final class Client {
 			signingKey: account
 		)
 
-		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", v3Client?.inboxId() ?? "")
+		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", inboxID: v3Client?.inboxId() ?? "")
 		let conversations = client.conversations
 		let contacts = client.contacts
 		try await client.ensureUserContactPublished()
