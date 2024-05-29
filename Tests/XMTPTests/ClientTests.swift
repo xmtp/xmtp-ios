@@ -93,68 +93,6 @@ class ClientTests: XCTestCase {
 		}
 	}
 	
-	func testPassingMLSEncryptionKeyAndDatabasePath() async throws {		
-		let bo = try PrivateKey.generate()
-		let key = try Crypto.secureRandomBytes(count: 32)
-		let documentsURL = try
-			FileManager.default.url(
-				for: .documentDirectory,
-				in: .userDomainMask,
-				appropriateFor: nil,
-				create: false
-			)
-		
-		let dbPath = documentsURL.appendingPathComponent("xmtp-\(bo.walletAddress).db3").path
-		
-		let client = try await Client.create(
-			account: bo,
-			options: .init(
-				api: .init(env: .local, isSecure: false),
-				mlsAlpha: true,
-				mlsEncryptionKey: key,
-				mlsDbPath: dbPath
-			)
-		)
-		
-		let keys = client.privateKeyBundle
-		let bundleClient = try await Client.from(
-			bundle: keys,
-			options: .init(
-				api: .init(env: .local, isSecure: false),
-				mlsAlpha: true,
-				mlsEncryptionKey: key,
-				mlsDbPath: dbPath
-			)
-		)
-
-		XCTAssertEqual(client.address, bundleClient.address)
-		XCTAssert(!client.installationID.isEmpty)
-		
-		await assertThrowsAsyncError(
-			_ = try await Client.from(
-				bundle: keys,
-				options: .init(
-					api: .init(env: .local, isSecure: false),
-					mlsAlpha: true,
-					mlsEncryptionKey: nil,
-					mlsDbPath: dbPath
-				)
-			)
-		)
-		
-		await assertThrowsAsyncError(
-			_ = try await Client.from(
-				bundle: keys,
-				options: .init(
-					api: .init(env: .local, isSecure: false),
-					mlsAlpha: true,
-					mlsEncryptionKey: key,
-					mlsDbPath: nil
-				)
-			)
-		)
-	}
-	
 	func testCanDeleteDatabase() async throws {
 		let bo = try PrivateKey.generate()
 		let alix = try PrivateKey.generate()
@@ -193,6 +131,41 @@ class ClientTests: XCTestCase {
 		try await boClient.conversations.sync()
 		groupCount = try await boClient.conversations.groups().count
 		XCTAssertEqual(groupCount, 0)
+	}
+	
+	func testCanDropReconnectDatabase() async throws {
+		let bo = try PrivateKey.generate()
+		let alix = try PrivateKey.generate()
+		var boClient = try await Client.create(
+			account: bo,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				mlsAlpha: true
+			)
+		)
+	
+		let alixClient = try await Client.create(
+			account: alix,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				mlsAlpha: true
+			)
+		)
+
+		_ = try await boClient.conversations.newGroup(with: [alixClient.address])
+		try await boClient.conversations.sync()
+
+		var groupCount = try await boClient.conversations.groups().count
+		XCTAssertEqual(groupCount, 1)
+
+		try boClient.dropLocalDatabaseConnection()
+
+		await assertThrowsAsyncError(try await boClient.conversations.groups())
+
+		try await boClient.reconnectLocalDatabase()
+
+		groupCount = try await boClient.conversations.groups().count
+		XCTAssertEqual(groupCount, 1)
 	}
 
 	func testCanMessage() async throws {
