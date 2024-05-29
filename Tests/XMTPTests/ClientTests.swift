@@ -93,66 +93,6 @@ class ClientTests: XCTestCase {
 		}
 	}
 	
-	func testPassingMLSEncryptionKeyAndDatabasePath() async throws {		
-		let bo = try PrivateKey.generate()
-		let key = try Crypto.secureRandomBytes(count: 32)
-		let documentsURL = try
-			FileManager.default.url(
-				for: .documentDirectory,
-				in: .userDomainMask,
-				appropriateFor: nil,
-				create: false
-			)
-				
-		let client = try await Client.create(
-			account: bo,
-			options: .init(
-				api: .init(env: .local, isSecure: false),
-				mlsAlpha: true,
-				mlsEncryptionKey: key,
-				mlsDbDirectory: "xmtp_db"
-			)
-		)
-		
-		let keys = client.privateKeyBundle
-		let bundleClient = try await Client.from(
-			bundle: keys,
-			options: .init(
-				api: .init(env: .local, isSecure: false),
-				mlsAlpha: true,
-				mlsEncryptionKey: key,
-				mlsDbDirectory: "xmtp_db"
-			)
-		)
-
-		XCTAssertEqual(client.address, bundleClient.address)
-		XCTAssert(!client.installationID.isEmpty)
-		
-		await assertThrowsAsyncError(
-			_ = try await Client.from(
-				bundle: keys,
-				options: .init(
-					api: .init(env: .local, isSecure: false),
-					mlsAlpha: true,
-					mlsEncryptionKey: nil,
-					mlsDbDirectory: "xmtp_db"
-				)
-			)
-		)
-		
-		await assertThrowsAsyncError(
-			_ = try await Client.from(
-				bundle: keys,
-				options: .init(
-					api: .init(env: .local, isSecure: false),
-					mlsAlpha: true,
-					mlsEncryptionKey: key,
-					mlsDbDirectory: nil
-				)
-			)
-		)
-	}
-	
 	func testCanDeleteDatabase() async throws {
 		let bo = try PrivateKey.generate()
 		let alix = try PrivateKey.generate()

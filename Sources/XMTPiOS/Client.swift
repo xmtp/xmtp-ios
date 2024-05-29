@@ -64,8 +64,7 @@ public struct ClientOptions {
 		preEnableIdentityCallback: PreEventCallback? = nil,
 		preCreateIdentityCallback: PreEventCallback? = nil,
 		mlsAlpha: Bool = false,
-		mlsEncryptionKey: Data? = nil,
-		mlsDbDirectory: String? = nil
+		mlsEncryptionKey: Data? = nil
 	) {
 		self.api = api
 		self.codecs = codecs
@@ -73,7 +72,6 @@ public struct ClientOptions {
 		self.preCreateIdentityCallback = preCreateIdentityCallback
 		self.mlsAlpha = mlsAlpha
 		self.mlsEncryptionKey = mlsEncryptionKey
-		self.mlsDbDirectory = mlsDbDirectory
 	}
 }
 
@@ -148,13 +146,7 @@ public final class Client {
 			}
 			
 			let alias = "xmtp-\(options?.api.env.rawValue ?? "")-\(inboxId ?? address).db3"
-			let dbURL: String
-			if let mlsDbDirectory = options?.mlsDbDirectory {
-				let mlsDbDirectoryURL = URL(fileURLWithPath: mlsDbDirectory)
-				dbURL = mlsDbDirectoryURL.appendingPathComponent(alias).path
-			} else {
-				dbURL = URL.documentsDirectory.appendingPathComponent(alias).path
-			}
+			let dbURL = URL.documentsDirectory.appendingPathComponent(alias).path
 
 			let encryptionKey = options?.mlsEncryptionKey
 
