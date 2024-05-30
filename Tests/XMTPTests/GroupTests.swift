@@ -682,14 +682,14 @@ class GroupTests: XCTestCase {
 		XCTAssert(!isAllowed)
 		XCTAssert(!isDenied)
 
-		try await fixtures.bobClient.contacts.allowInbox(inboxIds: [fixtures.aliceClient.inboxID])
+		try await fixtures.bobClient.contacts.allowInboxes(inboxIds: [fixtures.aliceClient.inboxID])
 
 		let isAllowed2 = await fixtures.bobClient.contacts.isInboxAllowed(inboxId: fixtures.aliceClient.inboxID)
 		let isDenied2 = await fixtures.bobClient.contacts.isInboxDenied(inboxId: fixtures.aliceClient.inboxID)
 		XCTAssert(isAllowed2)
 		XCTAssert(!isDenied2)
 
-		try await fixtures.bobClient.contacts.denyInbox(inboxIds: [fixtures.aliceClient.inboxID])
+		try await fixtures.bobClient.contacts.denyInboxes(inboxIds: [fixtures.aliceClient.inboxID])
 
 		let isAllowed3 = await fixtures.bobClient.contacts.isInboxAllowed(inboxId: fixtures.aliceClient.inboxID)
 		let isDenied3 = await fixtures.bobClient.contacts.isInboxDenied(inboxId: fixtures.aliceClient.inboxID)

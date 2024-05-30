@@ -327,7 +327,7 @@ public actor Contacts {
         try await consentList.publish(entries: entries)
 	}
 
-	public func allowGroup(groupIds: [Data]) async throws {
+	public func allowGroups(groupIds: [Data]) async throws {
 		var entries: [ConsentListEntry] = []
 
 		try await withThrowingTaskGroup(of: ConsentListEntry.self) { group in
@@ -344,7 +344,7 @@ public actor Contacts {
         try await consentList.publish(entries: entries)
 	}
 
-	public func denyGroup(groupIds: [Data]) async throws {
+	public func denyGroups(groupIds: [Data]) async throws {
 		var entries: [ConsentListEntry] = []
 
 		try await withThrowingTaskGroup(of: ConsentListEntry.self) { group in
@@ -361,7 +361,7 @@ public actor Contacts {
 		try await consentList.publish(entries: entries)
 	}
 	
-	public func allowInbox(inboxIds: [String]) async throws {
+	public func allowInboxes(inboxIds: [String]) async throws {
 		var entries: [ConsentListEntry] = []
 
 		try await withThrowingTaskGroup(of: ConsentListEntry.self) { group in
@@ -378,7 +378,7 @@ public actor Contacts {
 		try await consentList.publish(entries: entries)
 	}
 
-	public func denyInbox(inboxIds: [String]) async throws {
+	public func denyInboxes(inboxIds: [String]) async throws {
 		var entries: [ConsentListEntry] = []
 
 		try await withThrowingTaskGroup(of: ConsentListEntry.self) { group in
