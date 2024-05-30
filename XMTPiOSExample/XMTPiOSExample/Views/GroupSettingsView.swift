@@ -116,7 +116,7 @@ struct GroupSettingsView: View {
 	private func syncGroupMembers() async {
 		try? await group.sync()
 		await MainActor.run {
-			self.groupMembers = group.memberAddresses
+			self.groupMembers = try! group.members.map(\.inboxId)
 		}
 	}
 }
