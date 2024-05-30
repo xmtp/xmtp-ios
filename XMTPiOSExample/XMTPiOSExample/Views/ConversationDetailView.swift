@@ -18,10 +18,10 @@ struct ConversationDetailView: View {
 		VStack {
 			MessageListView(myAddress: client.address, messages: messages)
 				.refreshable {
-					try? await loadMessages()
+					await loadMessages()
 				}
 				.task {
-					try? await loadMessages()
+					await loadMessages()
 				}
 				.task {
 					do {
@@ -43,7 +43,7 @@ struct ConversationDetailView: View {
 				}
 			}
 		}
-		.navigationTitle(try! conversation.peerAddress)
+		.navigationTitle((try? conversation.peerAddress) ?? "")
 		.navigationBarTitleDisplayMode(.inline)
 	}
 
@@ -54,7 +54,7 @@ struct ConversationDetailView: View {
 				self.messages = messages
 			}
 		} catch {
-			print("Error loading messages for \(try! conversation.peerAddress)")
+			print("Error loading messages for \(conversation.topic)")
 		}
 	}
 }

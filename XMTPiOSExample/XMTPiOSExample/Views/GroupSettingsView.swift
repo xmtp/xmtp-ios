@@ -108,15 +108,15 @@ struct GroupSettingsView: View {
 			}
 			.navigationTitle("Group Settings")
 			.task {
-				await syncGroupMembers()
+				try? await syncGroupMembers()
 			}
 		}
 	}
 
-	private func syncGroupMembers() async {
+	private func syncGroupMembers() async throws {
 		try? await group.sync()
-		await MainActor.run {
-			self.groupMembers = try! group.members.map(\.inboxId)
+		try await MainActor.run {
+			self.groupMembers = try group.members.map(\.inboxId)
 		}
 	}
 }
