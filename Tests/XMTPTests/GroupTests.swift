@@ -97,23 +97,20 @@ class GroupTests: XCTestCase {
 		
 		try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
 		try await bobGroup.sync()
-        // Issue members is not returning correctly for non group creators:
-        // https://github.com/xmtp/libxmtp/issues/769
-//		XCTAssertEqual(try aliceGroup.members.count, 3)
+
+		XCTAssertEqual(try aliceGroup.members.count, 3)
 		XCTAssertEqual(try bobGroup.members.count, 3)
 
 		try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
 		try await bobGroup.sync()
-        // Issue members is not returning correctly for non group creators:
-        // https://github.com/xmtp/libxmtp/issues/769
-//      XCTAssertEqual(try aliceGroup.members.count, 2)
+
+        XCTAssertEqual(try aliceGroup.members.count, 2)
 		XCTAssertEqual(try bobGroup.members.count, 2)
 
 		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
-        // Issue members is not returning correctly for non group creators:
-        // https://github.com/xmtp/libxmtp/issues/769
-//		XCTAssertEqual(try aliceGroup.members.count, 3)
+
+		XCTAssertEqual(try aliceGroup.members.count, 3)
 		XCTAssertEqual(try bobGroup.members.count, 3)
 		
 		XCTAssertEqual(try bobGroup.permissionLevel(), .allMembers)
@@ -125,7 +122,7 @@ class GroupTests: XCTestCase {
         XCTAssert(try !aliceGroup.isAdmin(inboxId: fixtures.aliceClient.inboxID))
 		
 	}
-//
+
 	func testCanCreateAGroupWithAdminPermissions() async throws {
 		let fixtures = try await localFixtures()
 		let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address], permissions: GroupPermissions.adminOnly)
@@ -142,34 +139,30 @@ class GroupTests: XCTestCase {
 
 		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
-        // Issue members is not returning correctly for non group creators:
-        // https://github.com/xmtp/libxmtp/issues/769
-//		XCTAssertEqual(try aliceGroup.members.count, 3)
+
+		XCTAssertEqual(try aliceGroup.members.count, 3)
 		XCTAssertEqual(try bobGroup.members.count, 3)
 
 		await assertThrowsAsyncError(
 			try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
 		)
 		try await bobGroup.sync()
-        // Issue members is not returning correctly for non group creators:
-        // https://github.com/xmtp/libxmtp/issues/769
-//		XCTAssertEqual(try aliceGroup.members.count, 3)
+
+		XCTAssertEqual(try aliceGroup.members.count, 3)
 		XCTAssertEqual(try bobGroup.members.count, 3)
 		
 		try await bobGroup.removeMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
-        // Issue members is not returning correctly for non group creators:
-        // https://github.com/xmtp/libxmtp/issues/769
-//		XCTAssertEqual(try aliceGroup.members.count, 2)
+
+		XCTAssertEqual(try aliceGroup.members.count, 2)
 		XCTAssertEqual(try bobGroup.members.count, 2)
 
 		await assertThrowsAsyncError(
 			try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
 		)
 		try await bobGroup.sync()
-        // Issue members is not returning correctly for non group creators:
-        // https://github.com/xmtp/libxmtp/issues/769
-//		XCTAssertEqual(try aliceGroup.members.count, 2)
+
+		XCTAssertEqual(try aliceGroup.members.count, 2)
 		XCTAssertEqual(try bobGroup.members.count, 2)
 		
 		XCTAssertEqual(try bobGroup.permissionLevel(), .adminOnly)
