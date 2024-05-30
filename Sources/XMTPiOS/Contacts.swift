@@ -285,11 +285,11 @@ public actor Contacts {
 		return await consentList.groupState(groupId: groupId) == .denied
 	}
 	
-	public func isInboxIdAllowed(inboxId: String) async -> Bool {
+	public func isInboxAllowed(inboxId: String) async -> Bool {
 		return await consentList.inboxIdState(inboxId: inboxId) == .allowed
 	}
 
-	public func isInboxIdDenied(inboxId: String) async -> Bool {
+	public func isInboxDenied(inboxId: String) async -> Bool {
 		return await consentList.inboxIdState(inboxId: inboxId) == .denied
 	}
 
@@ -361,7 +361,7 @@ public actor Contacts {
 		try await consentList.publish(entries: entries)
 	}
 	
-	public func allowInboxId(inboxIds: [String]) async throws {
+	public func allowInbox(inboxIds: [String]) async throws {
 		var entries: [ConsentListEntry] = []
 
 		try await withThrowingTaskGroup(of: ConsentListEntry.self) { group in
@@ -378,7 +378,7 @@ public actor Contacts {
 		try await consentList.publish(entries: entries)
 	}
 
-	public func denyInboxId(inboxIds: [String]) async throws {
+	public func denyInbox(inboxIds: [String]) async throws {
 		var entries: [ConsentListEntry] = []
 
 		try await withThrowingTaskGroup(of: ConsentListEntry.self) { group in
