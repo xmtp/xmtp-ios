@@ -51,7 +51,7 @@ struct GroupSettingsView: View {
 								Button("Remove", role: .destructive) {
 									Task {
 										try await group.removeMembers(addresses: [member])
-										await syncGroupMembers()
+										try await syncGroupMembers()
 									}
 								}
 							}
