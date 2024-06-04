@@ -193,7 +193,7 @@ public final class Client {
 		let privateKeyBundleV1 = try await loadOrCreateKeys(for: account, apiClient: apiClient, options: options)
 
 		let (v3Client, dbPath) = try await initV3Client(
-			address: account.address,
+			accountAddress: account.address,
 			options: options,
 			privateKeyBundleV1: privateKeyBundleV1,
 			signingKey: account
@@ -286,7 +286,7 @@ public final class Client {
 		let options = options ?? ClientOptions()
 
 		let (v3Client, dbPath) = try await initV3Client(
-			address: address,
+			accountAddress: address,
 			options: options,
 			privateKeyBundleV1: v1Bundle,
 			signingKey: nil
