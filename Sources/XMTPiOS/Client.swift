@@ -166,18 +166,16 @@ public final class Client {
 			)
 			
 			if let signatureRequest = v3Client.signatureRequest() {
-				if (await signatureRequest.isReady()) {
-					if let signingKey = signingKey {
-						do {
-							let signedData = try await signingKey.sign(message: signatureRequest.signatureText())
-							try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
-							try await v3Client.registerIdentity(signatureRequest: signatureRequest)
-						} catch {
-							throw ClientError.creationError("Failed to sign the message: \(error.localizedDescription)")
-						}
-					} else {
-						throw ClientError.creationError("No v3 keys found, you must pass a SigningKey in order to enable alpha MLS features")
+				if let signingKey = signingKey {
+					do {
+						let signedData = try await signingKey.sign(message: signatureRequest.signatureText())
+						try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+						try await v3Client.registerIdentity(signatureRequest: signatureRequest)
+					} catch {
+						throw ClientError.creationError("Failed to sign the message: \(error.localizedDescription)")
 					}
+				} else {
+					throw ClientError.creationError("No v3 keys found, you must pass a SigningKey in order to enable alpha MLS features")
 				}
 			}
 
