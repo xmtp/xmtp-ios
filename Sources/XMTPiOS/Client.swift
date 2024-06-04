@@ -135,17 +135,20 @@ public final class Client {
 	) async throws -> (FfiXmtpClient?, String) {
 		if options?.mlsAlpha == true, options?.api.env.supportsMLS == true {
 			let address = accountAddress.lowercased()
-			var inboxId = try await getInboxIdForAddress(
-				logger: XMTPLogger(),
-				host: (options?.api.env ?? .local).url,
-				isSecure: options?.api.env.isSecure == true,
-				accountAddress: address
-			)
-			if inboxId?.isEmpty ?? true {
+
+			var inboxId: String
+			do {
+				inboxId = try await getInboxIdForAddress(
+					logger: XMTPLogger(),
+					host: (options?.api.env ?? .local).url,
+					isSecure: options?.api.env.isSecure == true,
+					accountAddress: address
+				) ?? generateInboxId(accountAddress: address, nonce: 0)
+			} catch {
 				inboxId = generateInboxId(accountAddress: address, nonce: 0)
 			}
 			
-			let alias = "xmtp-\(options?.api.env.rawValue ?? "")-\(inboxId ?? address).db3"
+			let alias = "xmtp-\(options?.api.env.rawValue ?? "")-\(inboxId).db3"
 			let dbURL = URL.documentsDirectory.appendingPathComponent(alias).path
 
 			let encryptionKey = options?.mlsEncryptionKey
@@ -156,7 +159,7 @@ public final class Client {
 				isSecure: options?.api.env.isSecure == true,
 				db: dbURL,
 				encryptionKey: encryptionKey,
-				inboxId: inboxId!,
+				inboxId: inboxId,
 				accountAddress: address,
 				nonce: 0,
 				legacySignedPrivateKeyProto: try privateKeyBundleV1.toV2().identityKey.serializedData()
