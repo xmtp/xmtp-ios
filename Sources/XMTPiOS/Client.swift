@@ -155,10 +155,13 @@ public final class Client {
 			if let mlsDbDirectory = mlsDbDirectory {
 				let fileManager = FileManager.default
 				directoryURL = URL(fileURLWithPath: mlsDbDirectory, isDirectory: true)
-				do {
-					try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
-				} catch {
-					throw ClientError.creationError("Failed db directory \(mlsDbDirectory)")
+				// Check if the directory exists, if not, create it
+				if !fileManager.fileExists(atPath: directoryURL.path) {
+					do {
+						try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
+					} catch {
+						throw ClientError.creationError("Failed db directory \(mlsDbDirectory)")
+					}
 				}
 			} else {
 				directoryURL = URL.documentsDirectory
