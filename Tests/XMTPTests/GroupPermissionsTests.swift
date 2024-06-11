@@ -228,5 +228,30 @@ class GroupPermissionTests: XCTestCase {
         XCTAssertEqual(superAdmins.count, 2)
         XCTAssertTrue(regularMembers.isEmpty)
     }
-
+    
+    func testCanCommitAfterInvalidPermissionsCommit() async throws {
+        let fixtures = try await localFixtures()
+        let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.walletAddress, fixtures.caro.walletAddress], permissions: .allMembers)
+        try await fixtures.aliceClient.conversations.sync()
+        let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+        
+        // Verify that alice can NOT add an admin
+        XCTAssertEqual(try bobGroup.groupName(), "")
+        await assertThrowsAsyncError(
+            try await aliceGroup.addAdmin(inboxId: fixtures.aliceClient.inboxID)
+        )
+        
+        try await aliceGroup.sync()
+        try await bobGroup.sync()
+        
+        // Verify that alice can update group name
+        try await bobGroup.sync()
+        try await aliceGroup.sync()
+        try await aliceGroup.updateGroupName(groupName: "Alice group name")
+        try await aliceGroup.sync()
+        try await bobGroup.sync()
+        
+        XCTAssertEqual(try bobGroup.groupName(), "Alice group name")
+        XCTAssertEqual(try aliceGroup.groupName(), "Alice group name")
+    }
 }
