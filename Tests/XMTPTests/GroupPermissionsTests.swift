@@ -107,15 +107,15 @@ class GroupPermissionTests: XCTestCase {
         XCTAssertTrue(superAdminList.contains(fixtures.bobClient.inboxID))
         
         // Verify that alice can NOT update group name
-        XCTAssertEqual(try bobGroup.groupName(), "New Group")
+        XCTAssertEqual(try bobGroup.groupName(), "")
         await assertThrowsAsyncError(
             try await aliceGroup.updateGroupName(groupName: "Alice group name")
         )
         
         try await aliceGroup.sync()
         try await bobGroup.sync()
-        XCTAssertEqual(try bobGroup.groupName(), "New Group")
-        XCTAssertEqual(try aliceGroup.groupName(), "New Group")
+        XCTAssertEqual(try bobGroup.groupName(), "")
+        XCTAssertEqual(try aliceGroup.groupName(), "")
         
         try await bobGroup.addAdmin(inboxId: fixtures.aliceClient.inboxID)
         try await bobGroup.sync()
