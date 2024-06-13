@@ -92,11 +92,18 @@ public actor Conversations {
 	public func streamGroups() async throws -> AsyncThrowingStream<Group, Error> {
 		AsyncThrowingStream { continuation in
 			Task {
-				self.streamHolder.stream = try await self.client.v3Client?.conversations().stream(
-					callback: GroupStreamCallback(client: self.client) { group in
-						continuation.yield(group)
-					}
-				)
+				let groupCallback = GroupStreamCallback(client: self.client) { group in
+					continuation.yield(group)
+				}
+				
+				guard let stream = try await self.client.v3Client?.conversations().stream(callback: groupCallback) else {
+					continuation.finish(throwing: GroupError.notSupportedByGroups)
+					return
+				}
+				
+				continuation.onTermination = { @Sendable reason in
+					stream.end()
+				}
 			}
 		}
 	}
@@ -303,7 +310,7 @@ public actor Conversations {
 			@Sendable func forwardStreamToMerged(stream: AsyncThrowingStream<DecodedMessage, Error>) async {
 				do {
 					var iterator = stream.makeAsyncIterator()
-					while let element = try await  iterator.next() {
+					while let element = try await iterator.next() {
 						continuation.yield(element)
 					}
 					continuation.finish()
@@ -315,7 +322,7 @@ public actor Conversations {
 			Task {
 				await forwardStreamToMerged(stream: try streamAllV2Messages())
 			}
-			if (includeGroups) {
+			if includeGroups {
 				Task {
 					await forwardStreamToMerged(stream: streamAllGroupMessages())
 				}
