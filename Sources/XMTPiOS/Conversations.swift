@@ -17,7 +17,7 @@ public enum ConversationError: Error, CustomStringConvertible {
 }
 
 public enum GroupError: Error, CustomStringConvertible {
-	case alphaMLSNotEnabled, memberCannotBeSelf, memberNotRegistered([String]), groupsRequireMessagePassed, notSupportedByGroups
+	case alphaMLSNotEnabled, memberCannotBeSelf, memberNotRegistered([String]), groupsRequireMessagePassed, notSupportedByGroups, streamingFailure
 
 	public var description: String {
 		switch self {
@@ -31,6 +31,8 @@ public enum GroupError: Error, CustomStringConvertible {
 			return "GroupError.groupsRequireMessagePassed you cannot call this method without passing a message instead of an envelope"
 		case .notSupportedByGroups:
 			return "GroupError.notSupportedByGroups this method is not supported by groups"
+		case .streamingFailure:
+			return "GroupError.streamingFailure a stream has failed"
 		}
 	}
 }
@@ -97,7 +99,7 @@ public actor Conversations {
 				}
 				
 				guard let stream = try await self.client.v3Client?.conversations().stream(callback: groupCallback) else {
-					continuation.finish(throwing: GroupError.notSupportedByGroups)
+					continuation.finish(throwing: GroupError.streamingFailure)
 					return
 				}
 				
