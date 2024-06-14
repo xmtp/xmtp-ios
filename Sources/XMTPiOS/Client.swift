@@ -54,9 +54,9 @@ public struct ClientOptions {
 	/// `preCreateIdentityCallback` will be called immediately before a Create Identity wallet signature is requested from the user.
 	public var preCreateIdentityCallback: PreEventCallback?
 
-	public var mlsAlpha = false
-	public var mlsEncryptionKey: Data?
-	public var mlsDbDirectory: String?
+	public var enableV3 = false
+	public var dbEncryptionKey: Data?
+	public var dbDirectory: String?
 
 	public init(
 		api: Api = Api(),
@@ -71,9 +71,9 @@ public struct ClientOptions {
 		self.codecs = codecs
 		self.preEnableIdentityCallback = preEnableIdentityCallback
 		self.preCreateIdentityCallback = preCreateIdentityCallback
-		self.mlsAlpha = mlsAlpha
-		self.mlsEncryptionKey = mlsEncryptionKey
-		self.mlsDbDirectory = mlsDbDirectory
+		self.enableV3 = mlsAlpha
+		self.dbEncryptionKey = mlsEncryptionKey
+		self.dbDirectory = mlsDbDirectory
 	}
 }
 
@@ -135,7 +135,7 @@ public final class Client {
 		privateKeyBundleV1: PrivateKeyBundleV1,
 		signingKey: SigningKey?
 	) async throws -> (FfiXmtpClient?, String) {
-		if options?.mlsAlpha == true, options?.api.env.supportsMLS == true {
+		if options?.enableV3 == true {
 			let address = accountAddress.lowercased()
 
 			var inboxId: String
@@ -150,7 +150,7 @@ public final class Client {
 				inboxId = generateInboxId(accountAddress: address, nonce: 0)
 			}
 			
-			let mlsDbDirectory = options?.mlsDbDirectory
+			let mlsDbDirectory = options?.dbDirectory
 			var directoryURL: URL
 			if let mlsDbDirectory = mlsDbDirectory {
 				let fileManager = FileManager.default
@@ -170,7 +170,7 @@ public final class Client {
 			let alias = "xmtp-\(options?.api.env.rawValue ?? "")-\(inboxId).db3"
 			let dbURL = directoryURL.appendingPathComponent(alias).path
 			
-			let encryptionKey = options?.mlsEncryptionKey
+			let encryptionKey = options?.dbEncryptionKey
 
 			let v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
