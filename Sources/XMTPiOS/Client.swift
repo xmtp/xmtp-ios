@@ -63,17 +63,17 @@ public struct ClientOptions {
 		codecs: [any ContentCodec] = [],
 		preEnableIdentityCallback: PreEventCallback? = nil,
 		preCreateIdentityCallback: PreEventCallback? = nil,
-		mlsAlpha: Bool = false,
-		mlsEncryptionKey: Data? = nil,
-		mlsDbDirectory: String? = nil
+		enableV3: Bool = false,
+		encryptionKey: Data? = nil,
+		dbDirectory: String? = nil
 	) {
 		self.api = api
 		self.codecs = codecs
 		self.preEnableIdentityCallback = preEnableIdentityCallback
 		self.preCreateIdentityCallback = preCreateIdentityCallback
-		self.enableV3 = mlsAlpha
-		self.dbEncryptionKey = mlsEncryptionKey
-		self.dbDirectory = mlsDbDirectory
+		self.enableV3 = enableV3
+		self.dbEncryptionKey = encryptionKey
+		self.dbDirectory = dbDirectory
 	}
 }
 
