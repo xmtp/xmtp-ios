@@ -591,9 +591,10 @@ class GroupTests: XCTestCase {
 		let fixtures = try await localFixtures()
 		
 		let expectation = expectation(description: "got a message")
+		expectation.expectedFulfillmentCount = 5
 
 		Task(priority: .userInitiated) {
-			for try await _ in try await fixtures.aliceClient.conversations.streamAllGroupMessages(){
+			for try await _ in try await fixtures.bobClient.conversations.streamAllGroupMessages(){
 				expectation.fulfill()
 			}
 		}
