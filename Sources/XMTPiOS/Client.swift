@@ -521,4 +521,40 @@ public final class Client {
 		let peerAddress = EthereumAddress(peerAddress).toChecksumAddress()
 		return try await contacts.find(peerAddress)
 	}
+	
+	public func inboxIdFromAddress(address: String) async throws -> String? {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error no V3 client initialized")
+		}
+		return try await client.findInboxId(address: address.lowercased())
+	}
+	
+	public func findGroup(groupId: Data) throws -> Group? {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error no V3 client initialized")
+		}
+		do {
+			return Group(ffiGroup: try client.group(groupId: groupId), client: self)
+		} catch {
+			return nil
+		}
+	}
+
+	public func findMessage(messageId: Data) throws -> MessageV3? {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error no V3 client initialized")
+		}
+		do {
+			return MessageV3(client: self, ffiMessage: try client.message(messageId: messageId))
+		} catch {
+			return nil
+		}
+	}
+	
+	public func requestMessageHistorySync() async throws {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error no V3 client initialized")
+		}
+		try await client.requestHistorySync()
+	}
 }
