@@ -188,7 +188,10 @@ public actor Conversations {
 				createdAtNs: data.createdNs
 			))
 		}
-		conversationsByTopic[conversation.topic] = conversation
+		// Ensure modification is done in actor context
+		Task {
+			await self.addConversation(conversation)
+		}
 		return conversation
 	}
 
@@ -605,31 +608,24 @@ public actor Conversations {
     }
 
 	public func list(includeGroups: Bool = false) async throws -> [Conversation] {
-		if (includeGroups) {
+		if includeGroups {
 			try await sync()
 			let groups = try await groups()
 
-			groups.forEach { group in
-				conversationsByTopic[group.id.toHex] = Conversation.group(group)
+			for group in groups {
+				await self.addConversation(.group(group))
 			}
 		}
+
 		var newConversations: [Conversation] = []
-		let mostRecent = conversationsByTopic.values.max { a, b in
-			a.createdAt < b.createdAt
-		}
+		let mostRecent = await self.getMostRecentConversation()
 		let pagination = Pagination(after: mostRecent?.createdAt)
+
 		do {
 			let seenPeers = try await listIntroductionPeers(pagination: pagination)
 			for (peerAddress, sentAt) in seenPeers {
-				newConversations.append(
-					Conversation.v1(
-						ConversationV1(
-							client: client,
-							peerAddress: peerAddress,
-							sentAt: sentAt
-						)
-					)
-				)
+				let newConversation = Conversation.v1(ConversationV1(client: client, peerAddress: peerAddress, sentAt: sentAt))
+				newConversations.append(newConversation)
 			}
 		} catch {
 			print("Error loading introduction peers: \(error)")
@@ -637,30 +633,41 @@ public actor Conversations {
 
 		for sealedInvitation in try await listInvitations(pagination: pagination) {
 			do {
-                let newConversation = Conversation.v2(try makeConversation(from: sealedInvitation))
-				newConversations.append(
-                    newConversation
-				)
-                if let consentProof = newConversation.consentProof {
-                    if consentProof.signature != "" {
-                        try await self.handleConsentProof(consentProof: consentProof, peerAddress: newConversation.peerAddress)
-                    }
-                }
+				let newConversation = Conversation.v2(try makeConversation(from: sealedInvitation))
+				newConversations.append(newConversation)
+				
+				if let consentProof = newConversation.consentProof, consentProof.signature != "" {
+					try await self.handleConsentProof(consentProof: consentProof, peerAddress: newConversation.peerAddress)
+				}
 			} catch {
 				print("Error loading invitations: \(error)")
 			}
 		}
 
-		try newConversations
-			.filter { try $0.peerAddress != client.address && Topic.isValidTopic(topic: $0.topic) }
-			.forEach { conversationsByTopic[$0.topic] = $0 }
+		for conversation in newConversations {
+			if try conversation.peerAddress != client.address && Topic.isValidTopic(topic: conversation.topic) {
+				await self.addConversation(conversation)
+			}
+		}
 
-		// TODO(perf): use DB to persist + sort
+		return await self.getSortedConversations()
+	}
+
+	private func addConversation(_ conversation: Conversation) async {
+		conversationsByTopic[conversation.topic] = conversation
+	}
+
+	private func getMostRecentConversation() async -> Conversation? {
+		return conversationsByTopic.values.max { a, b in
+			a.createdAt < b.createdAt
+		}
+	}
+
+	private func getSortedConversations() async -> [Conversation] {
 		return conversationsByTopic.values.sorted { a, b in
 			a.createdAt < b.createdAt
 		}
 	}
-	
 	public func getHmacKeys(request: Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest? = nil) -> Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse {
 		let thirtyDayPeriodsSinceEpoch = Int(Date().timeIntervalSince1970) / (60 * 60 * 24 * 30)
 		var hmacKeysResponse = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse()
