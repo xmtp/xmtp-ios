@@ -57,6 +57,7 @@ public struct ClientOptions {
 	public var enableV3 = false
 	public var dbEncryptionKey: Data?
 	public var dbDirectory: String?
+	public var historySyncUrl: String?
 
 	public init(
 		api: Api = Api(),
@@ -65,7 +66,8 @@ public struct ClientOptions {
 		preCreateIdentityCallback: PreEventCallback? = nil,
 		enableV3: Bool = false,
 		encryptionKey: Data? = nil,
-		dbDirectory: String? = nil
+		dbDirectory: String? = nil,
+		historySyncUrl: String? = nil
 	) {
 		self.api = api
 		self.codecs = codecs
@@ -74,6 +76,7 @@ public struct ClientOptions {
 		self.enableV3 = enableV3
 		self.dbEncryptionKey = encryptionKey
 		self.dbDirectory = dbDirectory
+		self.historySyncUrl = historySyncUrl
 	}
 }
 
@@ -182,7 +185,7 @@ public final class Client {
 				accountAddress: address,
 				nonce: 0,
 				legacySignedPrivateKeyProto: try privateKeyBundleV1.toV2().identityKey.serializedData(),
-				historySyncUrl: nil
+				historySyncUrl: options?.historySyncUrl
 			)
 			
 			if let signatureRequest = v3Client.signatureRequest() {
