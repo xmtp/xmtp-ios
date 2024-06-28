@@ -144,7 +144,7 @@ public class FakeApiClient: ApiClient {
 	}
 	
 	public func subscribe(request: LibXMTP.FfiV2SubscribeRequest, callback: any LibXMTP.FfiV2SubscriptionCallback) async throws -> LibXMTP.FfiV2Subscription {
-		FfiV2Subscription(noPointer: FfiV2Subscription.NoPointer())
+		abort() // Not supported on Fake
 	}
 
 	public func setAuthToken(_ token: String) {
@@ -259,6 +259,9 @@ public struct Fixtures {
 
 	public var bob: PrivateKey!
 	public var bobClient: Client!
+	let clientOptions: ClientOptions? = ClientOptions(
+		api: ClientOptions.Api(env: XMTPEnvironment.local, isSecure: false)
+	)
 
 	init() async throws {
 		alice = try PrivateKey.generate()
@@ -266,8 +269,9 @@ public struct Fixtures {
 
 		fakeApiClient = FakeApiClient()
 
-		aliceClient = try await Client.create(account: alice, apiClient: fakeApiClient)
-		bobClient = try await Client.create(account: bob, apiClient: fakeApiClient)
+
+		aliceClient = try await Client.create(account: alice, options: clientOptions)
+		bobClient = try await Client.create(account: bob, options: clientOptions)
 	}
 
 	public func publishLegacyContact(client: Client) async throws {
