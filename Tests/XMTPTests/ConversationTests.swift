@@ -112,7 +112,7 @@ class ConversationTests: XCTestCase {
 		expectation1.expectedFulfillmentCount = 2
 
 		Task(priority: .userInitiated) {
-			for try await conversation in await client.conversations.stream() {
+			for try await conversation in try await client.conversations.stream() {
 				expectation1.fulfill()
 			}
 		}

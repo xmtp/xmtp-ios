@@ -265,7 +265,7 @@ public actor Conversations {
 				}
 
 				var subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
-				var stream: FfiV2Subscription
+				var stream: FfiV2Subscription?
 
 				let subscriptionCallback = V2SubscriptionCallback { envelope in
 					Task {
@@ -276,13 +276,17 @@ public actor Conversations {
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
 								let conversation = try self.fromInvite(envelope: envelope)
 								await self.addConversation(conversation)
-								try await stream.update(req: subscriptionRequest)
+								topics.append(conversation.topic)
+								subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
+								try await stream?.update(req: subscriptionRequest)
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
 								let conversation = try self.fromIntro(envelope: envelope)
 								await self.addConversation(conversation)
 								let decoded = try conversation.decode(envelope)
 								continuation.yield(decoded)
-								try await stream.update(req: subscriptionRequest)
+								topics.append(conversation.topic)
+								subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
+								try await stream?.update(req: subscriptionRequest)
 							} else {
 								print("huh \(envelope)")
 							}
@@ -296,11 +300,7 @@ public actor Conversations {
 				
 //				continuation.onTermination = { @Sendable reason in
 //					Task {
-//						do {
-//							try await stream.end()
-//						} catch {
-//							// Handle the error if needed
-//						}
+//						try await stream.end()
 //					}
 //				}
 			}
@@ -408,7 +408,7 @@ public actor Conversations {
 				}
 
 				var subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
-				var stream: FfiV2Subscription
+				var stream: FfiV2Subscription?
 
 				let subscriptionCallback = V2SubscriptionCallback { envelope in
 					Task {
@@ -419,13 +419,17 @@ public actor Conversations {
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/invite-") {
 								let conversation = try self.fromInvite(envelope: envelope)
 								await self.addConversation(conversation)
-								try await stream.update(req: subscriptionRequest)
+								topics.append(conversation.topic)
+								subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
+								try await stream?.update(req: subscriptionRequest)
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
 								let conversation = try self.fromIntro(envelope: envelope)
 								await self.addConversation(conversation)
 								let decrypted = try conversation.decrypt(envelope)
 								continuation.yield(decrypted)
-								try await stream.update(req: subscriptionRequest)
+								topics.append(conversation.topic)
+								subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
+								try await stream?.update(req: subscriptionRequest)
 							} else {
 								print("huh \(envelope)")
 							}
@@ -439,11 +443,7 @@ public actor Conversations {
 				
 //				continuation.onTermination = { @Sendable reason in
 //					Task {
-//						do {
-//							try await stream.end()
-//						} catch {
-//							// Handle the error if needed
-//						}
+//						try await stream.end()
 //					}
 //				}
 			}

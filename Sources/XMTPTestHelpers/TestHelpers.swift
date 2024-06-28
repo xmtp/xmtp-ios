@@ -81,6 +81,7 @@ class FakeStreamHolder: ObservableObject {
 
 @available(iOS 15, *)
 public class FakeApiClient: ApiClient {
+	
 	public func envelopes(topic: String, pagination: XMTPiOS.Pagination?) async throws -> [XMTPiOS.Envelope] {
 		try await query(topic: topic, pagination: pagination).envelopes
 	}
@@ -141,15 +142,9 @@ public class FakeApiClient: ApiClient {
 		self.environment = environment
         self.appVersion = appVersion ?? "0.0.0"
 	}
-
-	public func subscribe(topics: [String]) -> AsyncThrowingStream<XMTPiOS.Envelope, Error> {
-		AsyncThrowingStream { continuation in
-			self.cancellable = stream.$envelope.sink(receiveValue: { env in
-				if let env, topics.contains(env.contentTopic) {
-					continuation.yield(env)
-				}
-			})
-		}
+	
+	public func subscribe(request: LibXMTP.FfiV2SubscribeRequest, callback: any LibXMTP.FfiV2SubscriptionCallback) async throws -> LibXMTP.FfiV2Subscription {
+		FfiV2Subscription(noPointer: FfiV2Subscription.NoPointer())
 	}
 
 	public func setAuthToken(_ token: String) {

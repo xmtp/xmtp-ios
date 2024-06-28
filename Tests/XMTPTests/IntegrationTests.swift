@@ -520,7 +520,7 @@ final class IntegrationTests: XCTestCase {
 		expectation1.expectedFulfillmentCount = 2
 
 		Task(priority: .userInitiated) {
-			for try await convo in await bobClient.conversations.stream() {
+			for try await convo in try await bobClient.conversations.stream() {
 				expectation1.fulfill()
 			}
 		}
