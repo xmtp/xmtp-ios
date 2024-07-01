@@ -59,7 +59,6 @@ final class V2SubscriptionCallback: FfiV2SubscriptionCallback {
 	}
 	
 	func onMessage(message: LibXMTP.FfiEnvelope) {
-		print("EIGEN")
 		self.callback(message.fromFFI)
 	}
 }
@@ -287,8 +286,6 @@ public actor Conversations {
 
 				let subscriptionCallback = V2SubscriptionCallback { envelope in
 					Task {
-						print("LOPI")
-						print("envelope")
 						do {
 							if let conversation = self.conversationsByTopic[envelope.contentTopic] {
 								let decoded = try conversation.decode(envelope)
@@ -433,8 +430,6 @@ public actor Conversations {
 
 				let subscriptionCallback = V2SubscriptionCallback { envelope in
 					Task {
-						print("LOPI")
-						print("envelope")
 						do {
 							if let conversation = self.conversationsByTopic[envelope.contentTopic] {
 								let decrypted = try conversation.decrypt(envelope)

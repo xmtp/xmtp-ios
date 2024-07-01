@@ -12,7 +12,7 @@ import XMTPTestHelpers
 import CryptoKit
 
 @available(macOS 13.0, *)
-@available(iOS 15, *)
+@available(iOS 16, *)
 class ConversationsTests: XCTestCase {
 	func testCanGetConversationFromIntroEnvelope() async throws {
 		let fixtures = await fixtures()
@@ -61,7 +61,6 @@ class ConversationsTests: XCTestCase {
 	func testStreamAllMessagesGetsMessageFromKnownConversation() async throws {
 		let fixtures = await fixtures()
 		let client = fixtures.aliceClient!
-
 		let bobConversation = try await fixtures.bobClient.conversations.newConversation(with: client.address)
 
 		let expectation1 = expectation(description: "got a message")
@@ -71,7 +70,8 @@ class ConversationsTests: XCTestCase {
 				expectation1.fulfill()
 			}
 		}
-
+		
+		try await Task.sleep(for: .milliseconds(500))
 		_ = try await bobConversation.send(text: "hi")
 
 		await waitForExpectations(timeout: 3)
