@@ -21,8 +21,6 @@ class PaginationTests: XCTestCase {
 	}
 
 	func testLongConvo() async throws {
-		try TestConfig.skipIfNotRunningLocalNodeTests()
-
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
 
@@ -73,8 +71,6 @@ class PaginationTests: XCTestCase {
 	}
 
 	func testCanStreamConversationsV2() async throws {
-	    try TestConfig.skipIfNotRunningLocalNodeTests()
-
 		let alice = try PrivateKey.generate()
 		let bob = try PrivateKey.generate()
 

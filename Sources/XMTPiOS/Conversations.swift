@@ -54,12 +54,29 @@ final class GroupStreamCallback: FfiConversationCallback {
 final class V2SubscriptionCallback: FfiV2SubscriptionCallback {
 	let callback: (Envelope) -> Void
 
-	init(_ callback: @escaping (Envelope) -> Void) {
+	init(callback: @escaping (Envelope) -> Void) {
 		self.callback = callback
 	}
 	
 	func onMessage(message: LibXMTP.FfiEnvelope) {
-		callback(message.fromFFI)
+		print("EIGEN")
+		self.callback(message.fromFFI)
+	}
+}
+
+class StreamManager {
+	var stream: FfiV2Subscription?
+
+	func updateStream(with request: FfiV2SubscribeRequest) async throws {
+		try await stream?.update(req: request)
+	}
+
+	func endStream() async throws {
+		try await stream?.end()
+	}
+
+	func setStream(_ newStream: FfiV2Subscription?) {
+		self.stream = newStream
 	}
 }
 
@@ -254,6 +271,8 @@ public actor Conversations {
 
 	func streamAllV2Messages() -> AsyncThrowingStream<DecodedMessage, Error> {
 		AsyncThrowingStream { continuation in
+			let streamManager = StreamManager()
+			
 			Task {
 				var topics: [String] = [
 					Topic.userInvite(client.address).description,
@@ -265,10 +284,11 @@ public actor Conversations {
 				}
 
 				var subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
-				var stream: FfiV2Subscription?
 
 				let subscriptionCallback = V2SubscriptionCallback { envelope in
 					Task {
+						print("LOPI")
+						print("envelope")
 						do {
 							if let conversation = self.conversationsByTopic[envelope.contentTopic] {
 								let decoded = try conversation.decode(envelope)
@@ -278,7 +298,7 @@ public actor Conversations {
 								await self.addConversation(conversation)
 								topics.append(conversation.topic)
 								subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
-								try await stream?.update(req: subscriptionRequest)
+								try await streamManager.updateStream(with: subscriptionRequest)
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
 								let conversation = try self.fromIntro(envelope: envelope)
 								await self.addConversation(conversation)
@@ -286,7 +306,7 @@ public actor Conversations {
 								continuation.yield(decoded)
 								topics.append(conversation.topic)
 								subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
-								try await stream?.update(req: subscriptionRequest)
+								try await streamManager.updateStream(with: subscriptionRequest)
 							} else {
 								print("huh \(envelope)")
 							}
@@ -295,18 +315,17 @@ public actor Conversations {
 						}
 					}
 				}
-
-				stream = try await client.subscribe2(request: subscriptionRequest, callback: subscriptionCallback)
+				let newStream = try await client.subscribe2(request: subscriptionRequest, callback: subscriptionCallback)
+				streamManager.setStream(newStream)
 				
-//				continuation.onTermination = { @Sendable reason in
-//					Task {
-//						try await stream.end()
-//					}
-//				}
+				continuation.onTermination = { @Sendable reason in
+					Task {
+						try await streamManager.endStream()
+					}
+				}
 			}
 		}
 	}
-
 
 	public func streamAllGroupMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
 		AsyncThrowingStream { continuation in
@@ -341,7 +360,7 @@ public actor Conversations {
 				}
 			}
 			Task {
-				await forwardStreamToMerged(stream: try streamAllV2Messages())
+				await forwardStreamToMerged(stream: streamAllV2Messages())
 			}
 			if includeGroups {
 				Task {
@@ -394,9 +413,12 @@ public actor Conversations {
 			}
 		}
 	}
-
-	func streamAllV2DecryptedMessages() async throws -> AsyncThrowingStream<DecryptedMessage, Error> {
+	
+	
+	func streamAllV2DecryptedMessages() -> AsyncThrowingStream<DecryptedMessage, Error> {
 		AsyncThrowingStream { continuation in
+			let streamManager = StreamManager()
+			
 			Task {
 				var topics: [String] = [
 					Topic.userInvite(client.address).description,
@@ -408,10 +430,11 @@ public actor Conversations {
 				}
 
 				var subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
-				var stream: FfiV2Subscription?
 
 				let subscriptionCallback = V2SubscriptionCallback { envelope in
 					Task {
+						print("LOPI")
+						print("envelope")
 						do {
 							if let conversation = self.conversationsByTopic[envelope.contentTopic] {
 								let decrypted = try conversation.decrypt(envelope)
@@ -421,7 +444,7 @@ public actor Conversations {
 								await self.addConversation(conversation)
 								topics.append(conversation.topic)
 								subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
-								try await stream?.update(req: subscriptionRequest)
+								try await streamManager.updateStream(with: subscriptionRequest)
 							} else if envelope.contentTopic.hasPrefix("/xmtp/0/intro-") {
 								let conversation = try self.fromIntro(envelope: envelope)
 								await self.addConversation(conversation)
@@ -429,7 +452,7 @@ public actor Conversations {
 								continuation.yield(decrypted)
 								topics.append(conversation.topic)
 								subscriptionRequest = FfiV2SubscribeRequest(contentTopics: topics)
-								try await stream?.update(req: subscriptionRequest)
+								try await streamManager.updateStream(with: subscriptionRequest)
 							} else {
 								print("huh \(envelope)")
 							}
@@ -438,14 +461,14 @@ public actor Conversations {
 						}
 					}
 				}
-
-				stream = try await client.subscribe2(request: subscriptionRequest, callback: subscriptionCallback)
+				let newStream = try await client.subscribe2(request: subscriptionRequest, callback: subscriptionCallback)
+				streamManager.setStream(newStream)
 				
-//				continuation.onTermination = { @Sendable reason in
-//					Task {
-//						try await stream.end()
-//					}
-//				}
+				continuation.onTermination = { @Sendable reason in
+					Task {
+						try await streamManager.endStream()
+					}
+				}
 			}
 		}
 	}
