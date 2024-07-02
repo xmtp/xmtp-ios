@@ -172,6 +172,35 @@ public struct Group: Identifiable, Equatable, Hashable {
 	public func updateGroupDescription(groupDescription: String) async throws {
 		try await ffiGroup.updateGroupDescription(groupDescription: groupDescription)
 	}
+
+	public func updateAddMemberPermission(newPermissionOption: PermissionOption) async throws {
+        try await ffiGroup.updatePermissionPolicy(permissionUpdateType: FfiPermissionUpdateType.addMember, permissionPolicyOption: PermissionOption.toFfiPermissionPolicy(option: newPermissionOption), metadataField: nil)
+	}
+
+	public func updateRemoveMemberPermission(newPermissionOption: PermissionOption) async throws {
+        try await ffiGroup.updatePermissionPolicy(permissionUpdateType: FfiPermissionUpdateType.removeMember, permissionPolicyOption: PermissionOption.toFfiPermissionPolicy(option: newPermissionOption), metadataField: nil)
+	}
+
+	public func updateAddAdminPermission(newPermissionOption: PermissionOption) async throws {
+        try await ffiGroup.updatePermissionPolicy(permissionUpdateType: FfiPermissionUpdateType.addAdmin, permissionPolicyOption: PermissionOption.toFfiPermissionPolicy(option: newPermissionOption), metadataField: nil)
+	}
+
+	public func updateRemoveAdminPermission(newPermissionOption: PermissionOption) async throws {
+        try await ffiGroup.updatePermissionPolicy(permissionUpdateType: FfiPermissionUpdateType.removeAdmin, permissionPolicyOption: PermissionOption.toFfiPermissionPolicy(option: newPermissionOption), metadataField: nil)
+	}
+
+	public func updateGroupNamePermission(newPermissionOption: PermissionOption) async throws {
+        try await ffiGroup.updatePermissionPolicy(permissionUpdateType: FfiPermissionUpdateType.updateMetadata, permissionPolicyOption: PermissionOption.toFfiPermissionPolicy(option: newPermissionOption), metadataField: FfiMetadataField.groupName)
+	}
+
+	public func updateGroupDescriptionPermission(newPermissionOption: PermissionOption) async throws {
+        try await ffiGroup.updatePermissionPolicy(permissionUpdateType: FfiPermissionUpdateType.updateMetadata, permissionPolicyOption: PermissionOption.toFfiPermissionPolicy(option: newPermissionOption), metadataField: FfiMetadataField.description)
+	}
+
+	public func updateGroupImageUrlSquarePermission(newPermissionOption: PermissionOption) async throws {
+        try await ffiGroup.updatePermissionPolicy(permissionUpdateType: FfiPermissionUpdateType.updateMetadata, permissionPolicyOption: PermissionOption.toFfiPermissionPolicy(option: newPermissionOption), metadataField: FfiMetadataField.imageUrlSquare)
+	}
+
 	
 	public func processMessage(envelopeBytes: Data) async throws -> DecodedMessage {
 		let message = try await ffiGroup.processStreamedGroupMessage(envelopeBytes: envelopeBytes)

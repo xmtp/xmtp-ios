@@ -481,9 +481,9 @@ class GroupTests: XCTestCase {
 		let bobGroup = try await fixtures.bobClient.conversations.groups()[0]
 		try await bobGroup.sync()
 		
-		var bobMessagesCount = try await bobGroup.messages().count
-		var bobMessagesUnpublishedCount = try await bobGroup.messages(deliveryStatus: .unpublished).count
-		var bobMessagesPublishedCount = try await bobGroup.messages(deliveryStatus: .published).count
+		let bobMessagesCount = try await bobGroup.messages().count
+        let bobMessagesUnpublishedCount = try await bobGroup.messages(deliveryStatus: .unpublished).count
+		let bobMessagesPublishedCount = try await bobGroup.messages(deliveryStatus: .published).count
 		XCTAssertEqual(2, bobMessagesCount)
 		XCTAssertEqual(0, bobMessagesUnpublishedCount)
 		XCTAssertEqual(2, bobMessagesPublishedCount)

@@ -254,4 +254,37 @@ class GroupPermissionTests: XCTestCase {
         XCTAssertEqual(try bobGroup.groupName(), "Alice group name")
         XCTAssertEqual(try aliceGroup.groupName(), "Alice group name")
     }
+    
+    func testCanUpdatePermissions() async throws {
+            let fixtures = try await localFixtures()
+            let bobGroup = try await fixtures.bobClient.conversations.newGroup(
+                with: [fixtures.alice.walletAddress, fixtures.caro.walletAddress],
+                permissions: .adminOnly
+            )
+            try await fixtures.aliceClient.conversations.sync()
+            let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+
+            // Verify that Alice cannot update group description
+            XCTAssertEqual(try bobGroup.groupDescription(), "")
+            await assertThrowsAsyncError(
+                try await aliceGroup.updateGroupDescription(groupDescription: "new group description")
+            )
+            
+            try await aliceGroup.sync()
+            try await bobGroup.sync()
+            XCTAssertEqual(try bobGroup.permissionPolicySet().updateGroupDescriptionPolicy, .admin)
+
+            // Update group description permissions so Alice can update
+            try await bobGroup.updateGroupDescriptionPermission(newPermissionOption: .allow)
+            try await bobGroup.sync()
+            try await aliceGroup.sync()
+            XCTAssertEqual(try bobGroup.permissionPolicySet().updateGroupDescriptionPolicy, .allow)
+
+            // Verify that Alice can now update group description
+            try await aliceGroup.updateGroupDescription(groupDescription: "Alice group description")
+            try await aliceGroup.sync()
+            try await bobGroup.sync()
+            XCTAssertEqual(try bobGroup.groupDescription(), "Alice group description")
+            XCTAssertEqual(try aliceGroup.groupDescription(), "Alice group description")
+        }
 }
