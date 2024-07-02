@@ -72,7 +72,7 @@ class GroupPermissionTests: XCTestCase {
         try await fixtures.aliceClient.conversations.sync()
         let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
         
-        XCTAssertTrue(try bobGroup.isAdmin(inboxId: fixtures.bobClient.inboxID))
+        XCTAssertFalse(try bobGroup.isAdmin(inboxId: fixtures.bobClient.inboxID))
         XCTAssertTrue(try bobGroup.isSuperAdmin(inboxId: fixtures.bobClient.inboxID))
         XCTAssertFalse(try aliceGroup.isCreator())
         XCTAssertFalse(try aliceGroup.isAdmin(inboxId: fixtures.aliceClient.inboxID))
@@ -81,8 +81,8 @@ class GroupPermissionTests: XCTestCase {
         let adminList = try bobGroup.listAdmins()
         let superAdminList = try bobGroup.listSuperAdmins()
         
-        XCTAssertEqual(adminList.count, 1)
-        XCTAssertTrue(adminList.contains(fixtures.bobClient.inboxID))
+        XCTAssertEqual(adminList.count, 0)
+        XCTAssertFalse(adminList.contains(fixtures.bobClient.inboxID))
         XCTAssertEqual(superAdminList.count, 1)
         XCTAssertTrue(superAdminList.contains(fixtures.bobClient.inboxID))
     }
@@ -93,7 +93,7 @@ class GroupPermissionTests: XCTestCase {
         try await fixtures.aliceClient.conversations.sync()
         let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
         
-        XCTAssertTrue(try bobGroup.isAdmin(inboxId: fixtures.bobClient.inboxID))
+        XCTAssertFalse(try bobGroup.isAdmin(inboxId: fixtures.bobClient.inboxID))
         XCTAssertTrue(try bobGroup.isSuperAdmin(inboxId: fixtures.bobClient.inboxID))
         XCTAssertFalse(try aliceGroup.isCreator())
         XCTAssertFalse(try aliceGroup.isAdmin(inboxId: fixtures.aliceClient.inboxID))
@@ -101,8 +101,8 @@ class GroupPermissionTests: XCTestCase {
         
         var adminList = try bobGroup.listAdmins()
         var superAdminList = try bobGroup.listSuperAdmins()
-        XCTAssertEqual(adminList.count, 1)
-        XCTAssertTrue(adminList.contains(fixtures.bobClient.inboxID))
+        XCTAssertEqual(adminList.count, 0)
+        XCTAssertFalse(adminList.contains(fixtures.bobClient.inboxID))
         XCTAssertEqual(superAdminList.count, 1)
         XCTAssertTrue(superAdminList.contains(fixtures.bobClient.inboxID))
         
@@ -125,7 +125,7 @@ class GroupPermissionTests: XCTestCase {
         superAdminList = try bobGroup.listSuperAdmins()
         
         XCTAssertTrue(try aliceGroup.isAdmin(inboxId: fixtures.aliceClient.inboxID))
-        XCTAssertEqual(adminList.count, 2)
+        XCTAssertEqual(adminList.count, 1)
         XCTAssertTrue(adminList.contains(fixtures.aliceClient.inboxID))
         XCTAssertEqual(superAdminList.count, 1)
         
@@ -144,7 +144,7 @@ class GroupPermissionTests: XCTestCase {
         superAdminList = try bobGroup.listSuperAdmins()
         
         XCTAssertFalse(try aliceGroup.isAdmin(inboxId: fixtures.aliceClient.inboxID))
-        XCTAssertEqual(adminList.count, 1)
+        XCTAssertEqual(adminList.count, 0)
         XCTAssertFalse(adminList.contains(fixtures.aliceClient.inboxID))
         XCTAssertEqual(superAdminList.count, 1)
         
