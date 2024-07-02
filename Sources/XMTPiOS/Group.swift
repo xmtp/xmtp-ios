@@ -157,12 +157,20 @@ public struct Group: Identifiable, Equatable, Hashable {
 		return try ffiGroup.groupImageUrlSquare()
 	}
 
+	public func groupDescription() throws -> String {
+		return try ffiGroup.groupDescription()
+	}
+
     public func updateGroupName(groupName: String) async throws {
         try await ffiGroup.updateGroupName(groupName: groupName)
     }
 	
 	public func updateGroupImageUrlSquare(imageUrlSquare: String) async throws {
 		try await ffiGroup.updateGroupImageUrlSquare(groupImageUrlSquare: imageUrlSquare)
+	}
+
+	public func updateGroupDescription(groupDescription: String) async throws {
+		try await ffiGroup.updateGroupDescription(groupDescription: groupDescription)
 	}
 	
 	public func processMessage(envelopeBytes: Data) async throws -> DecodedMessage {
