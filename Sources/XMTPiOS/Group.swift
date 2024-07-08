@@ -31,12 +31,12 @@ public struct Group: Identifiable, Equatable, Hashable {
 	var client: Client
 	let streamHolder = StreamHolder()
 
-	public var id: Data {
-		ffiGroup.id()
+	public var id: String {
+		ffiGroup.id().toHex
 	}
 	
 	public var topic: String {
-		Topic.groupMessage(id.toHex).description
+		Topic.groupMessage(id).description
 	}
 
 	func metadata() throws -> FfiGroupMetadata {

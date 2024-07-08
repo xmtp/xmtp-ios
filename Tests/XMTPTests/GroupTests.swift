@@ -790,7 +790,7 @@ class GroupTests: XCTestCase {
 		try await fixtures.aliceClient.conversations.sync()
 		let alixGroup = try fixtures.aliceClient.findGroup(groupId: boGroup.id)
 
-		XCTAssertEqual(alixGroup?.id.toHex, boGroup.id.toHex)
+		XCTAssertEqual(alixGroup?.id, boGroup.id)
 	}
 
 	func testCanFetchMessageById() async throws {
@@ -802,9 +802,9 @@ class GroupTests: XCTestCase {
 		try await fixtures.aliceClient.conversations.sync()
 		let alixGroup = try fixtures.aliceClient.findGroup(groupId: boGroup.id)
 		try await alixGroup?.sync()
-		let alixMessage = try fixtures.aliceClient.findMessage(messageId: boMessageId.hexToData)
+		let alixMessage = try fixtures.aliceClient.findMessage(messageId: boMessageId)
 
-		XCTAssertEqual(alixGroup?.id.toHex, boGroup.id.toHex)
+		XCTAssertEqual(alixGroup?.id, boGroup.id)
 	}
 	
 	func testUnpublishedMessages() async throws {
