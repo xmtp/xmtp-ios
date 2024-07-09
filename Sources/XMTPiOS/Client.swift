@@ -141,7 +141,6 @@ public final class Client {
 		if options?.enableV3 == true {
 			let address = accountAddress.lowercased()
 
-<<<<<<< HEAD
 			var inboxId: String
 			do {
 				inboxId = try await getInboxIdForAddress(
