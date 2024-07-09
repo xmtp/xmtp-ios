@@ -141,6 +141,7 @@ public final class Client {
 		if options?.enableV3 == true {
 			let address = accountAddress.lowercased()
 
+<<<<<<< HEAD
 			var inboxId: String
 			do {
 				inboxId = try await getInboxIdForAddress(
@@ -173,7 +174,10 @@ public final class Client {
 			let alias = "xmtp-\(options?.api.env.rawValue ?? "")-\(inboxId).db3"
 			let dbURL = directoryURL.appendingPathComponent(alias).path
 			
-			let encryptionKey = options?.dbEncryptionKey
+			var encryptionKey = options?.dbEncryptionKey
+			if (encryptionKey == nil) {
+				throw ClientError.creationError("No encryption key passed for the database. Please store and provide a secure encryption key.")
+			}
 
 			let v3Client = try await LibXMTP.createClient(
 				logger: XMTPLogger(),
