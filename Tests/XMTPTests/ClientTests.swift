@@ -138,13 +138,15 @@ class ClientTests: XCTestCase {
 	}
 	
 	func testCanDropReconnectDatabase() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
 		let bo = try PrivateKey.generate()
 		let alix = try PrivateKey.generate()
 		var boClient = try await Client.create(
 			account: bo,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
-				enableV3: true
+				enableV3: true,
+				encryptionKey: key
 			)
 		)
 	
@@ -152,7 +154,8 @@ class ClientTests: XCTestCase {
 			account: alix,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
-				enableV3: true
+				enableV3: true,
+				encryptionKey: key
 			)
 		)
 
@@ -344,13 +347,15 @@ class ClientTests: XCTestCase {
 	}
 	
 	func testCanGetAnInboxIdFromAddress() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
 		let bo = try PrivateKey.generate()
 		let alix = try PrivateKey.generate()
 		let boClient = try await Client.create(
 			account: bo,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
-				enableV3: true
+				enableV3: true,
+				encryptionKey: key
 			)
 		)
 	
@@ -358,7 +363,8 @@ class ClientTests: XCTestCase {
 			account: alix,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
-				enableV3: true
+				enableV3: true,
+				encryptionKey: key
 			)
 		)
 		let boInboxId = try await alixClient.inboxIdFromAddress(address: boClient.address)
