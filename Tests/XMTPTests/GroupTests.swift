@@ -662,6 +662,7 @@ class GroupTests: XCTestCase {
 	
 	func testCanStreamAllDecryptedMessages() async throws {
 		let fixtures = try await localFixtures()
+		let membershipChange = GroupUpdated()
 
 		let expectation1 = expectation(description: "got a conversation")
 		expectation1.expectedFulfillmentCount = 2
@@ -675,6 +676,7 @@ class GroupTests: XCTestCase {
 		}
 
 		_ = try await group.send(content: "hi")
+		_ = try await group.send(content: membershipChange, options: SendOptions(contentType: ContentTypeGroupUpdated))
 		_ = try await convo.send(content: "hi")
 
 		await waitForExpectations(timeout: 3)
