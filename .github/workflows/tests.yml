@@ -13,7 +13,7 @@ jobs:
   ios-tests:
     name: iOS Tests
     # macos-14 currently breaks Colima
-    runs-on: macos-13
+    runs-on: macos-latest
     
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
