@@ -837,4 +837,37 @@ class GroupTests: XCTestCase {
 
 		XCTAssertEqual(preparedMessageId, messages.first!.id)
 	}
+	
+	func createGroups(client: Client, peer: Client, numGroups: Int) async throws {
+		for i in 0..<numGroups {
+			try await client.conversations.newGroup(with: [peer.address])
+		}
+	}
+	
+	func testGroupListPerformance() async throws {
+		let fixtures = try await localFixtures()
+
+		try await createGroups(client: fixtures.aliceClient, peer: fixtures.bobClient, numGroups: 50)
+
+		var start = Date()
+		var groups = try await fixtures.aliceClient.conversations.groups()
+		var end = Date()
+		print("Alix loaded \(groups.count) groups in \(end.timeIntervalSince(start) * 1000)ms")
+
+		start = Date()
+		try await fixtures.aliceClient.conversations.sync()
+		end = Date()
+		print("Alix synced \(groups.count) groups in \(end.timeIntervalSince(start) * 1000)ms")
+
+		start = Date()
+		try await fixtures.bobClient.conversations.sync()
+		end = Date()
+		print("Bo synced \(groups.count) groups in \(end.timeIntervalSince(start) * 1000)ms")
+
+		start = Date()
+		groups = try await fixtures.bobClient.conversations.groups()
+		end = Date()
+		print("Bo loaded \(groups.count) groups in \(end.timeIntervalSince(start) * 1000)ms")
+
+	}
 }
