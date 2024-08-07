@@ -75,7 +75,7 @@ public struct ClientOptions {
 		enableV3: Bool = false,
 		encryptionKey: Data? = nil,
 		dbDirectory: String? = nil,
-		historySyncUrl: String? = nil
+		historySyncUrl: String = "https://message-history.dev.ephemera.network/"
 	) {
 		self.api = api
 		self.codecs = codecs
