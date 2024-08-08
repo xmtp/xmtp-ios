@@ -602,4 +602,26 @@ public final class Client {
 		}
 		try await client.requestHistorySync()
 	}
+	
+	public func addWallet(account: SigningKey) async throws {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error: No V3 client initialized")
+		}
+
+		do {
+			let signatureRequest = try await client.addWallet(existingWalletAddress: self.address, newWalletAddress: account.address)
+			
+			let signedData = try await account.sign(message: signatureRequest.signatureText())
+			
+			if let chainRPCUrl = account.chainRPCUrl {
+				try await signatureRequest.addScwSignature(signatureBytes: signedData.rawData, address: account.address, chainRpcUrl: chainRPCUrl)
+			} else {
+				try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+			}
+			
+			try await client.registerIdentity(signatureRequest: signatureRequest)
+		} catch {
+			throw ClientError.creationError("Failed to sign the message: \(error.localizedDescription)")
+		}
+	}
 }
