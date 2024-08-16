@@ -10,7 +10,6 @@ import XCTest
 @testable import XMTPiOS
 import LibXMTP
 import XMTPTestHelpers
-import Combine
 
 func assertThrowsAsyncError<T>(
 		_ expression: @autoclosure () async throws -> T,
@@ -841,24 +840,28 @@ class GroupTests: XCTestCase {
 	
 	func testCreate10GroupsInParallel() async throws {
 		let fixtures = try await localFixtures()
-		// Creating 9 groups in parallel
-		Task {
-			do {
-				let groups = try await createGroupsInParallel(client1: fixtures.aliceClient, client2: fixtures.bobClient, size: 9)
-			} catch {
-				print("Failed to create groups: \(error)")
-			}
+
+		// Step 1: Create 9 groups in parallel and wait for them to complete
+		do {
+			print("Creating 9 groups...")
+			let groups9 = try await createGroupsInParallel(client1: fixtures.aliceClient, client2: fixtures.bobClient, size: 9)
+			print("Created 9 groups")
+		} catch {
+			print("Failed to create 9 groups: \(error)")
+			throw error // Rethrow the error to fail the test if group creation fails
+		}
+
+		// Step 2: Create 10 groups in parallel and wait for them to complete
+		do {
+			print("Creating 10 groups...")
+			let groups10 = try await createGroupsInParallel(client1: fixtures.aliceClient, client2: fixtures.bobClient, size: 10)
+			print("Created 10 groups")
+		} catch {
+			print("Failed to create 10 groups: \(error)")
+			throw error // Rethrow the error to fail the test if group creation fails
 		}
 		
-
-		// Creating 10 groups in parallel
-		Task {
-			do {
-				let groups = try await createGroupsInParallel(client1: fixtures.aliceClient, client2: fixtures.bobClient, size: 10)
-			} catch {
-				print("Failed to create groups: \(error)")
-			}
-		}
+		print("Test completed successfully")
 	}
 	
 	func createGroupsInParallel(client1: Client, client2: Client, size: Int) async throws -> [Group] {
