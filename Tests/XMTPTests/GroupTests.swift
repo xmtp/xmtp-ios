@@ -10,6 +10,7 @@ import XCTest
 @testable import XMTPiOS
 import LibXMTP
 import XMTPTestHelpers
+import Combine
 
 func assertThrowsAsyncError<T>(
 		_ expression: @autoclosure () async throws -> T,
@@ -836,5 +837,49 @@ class GroupTests: XCTestCase {
 		let messages = try await alixGroup.messages()
 
 		XCTAssertEqual(preparedMessageId, messages.first!.id)
+	}
+	
+	func testCreate10GroupsInParallel() async throws {
+		let fixtures = try await localFixtures()
+		// Creating 9 groups in parallel
+		Task {
+			do {
+				let groups = try await createGroupsInParallel(client1: fixtures.aliceClient, client2: fixtures.bobClient, size: 9)
+			} catch {
+				print("Failed to create groups: \(error)")
+			}
+		}
+		
+
+		// Creating 10 groups in parallel
+		Task {
+			do {
+				let groups = try await createGroupsInParallel(client1: fixtures.aliceClient, client2: fixtures.bobClient, size: 10)
+			} catch {
+				print("Failed to create groups: \(error)")
+			}
+		}
+	}
+	
+	func createGroupsInParallel(client1: Client, client2: Client, size: Int) async throws -> [Group] {
+		var groups: [Group] = []
+
+		print("Creating \(size) groups...")
+		
+		try await withThrowingTaskGroup(of: Group.self) { taskGroup in
+			for _ in 0..<size {
+				taskGroup.addTask {
+					return try await client1.conversations.newGroup(with: [client2.address])
+				}
+			}
+
+			for try await group in taskGroup {
+				groups.append(group)
+			}
+		}
+		
+		print("Created \(size) groups")
+		
+		return groups
 	}
 }
