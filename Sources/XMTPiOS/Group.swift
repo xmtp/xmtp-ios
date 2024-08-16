@@ -111,17 +111,22 @@ public struct Group: Identifiable, Equatable, Hashable {
 		return try ffiGroup.addedByInboxId()
 	}
 
-	public var members: [Member] {
-		get throws {
-			return try ffiGroup.listMembers().map { ffiGroupMember in
-				Member(ffiGroupMember: ffiGroupMember)
-			}
+	public func members() throws -> [Member] {
+		print("Starting load")
+		let start = Date()
+		let members = try ffiGroup.listMembers()
+		let end = Date()
+		print("Loaded \(members.count) members in \(end.timeIntervalSince(start))s")
+		return members.map { ffiGroupMember in
+			print("LOPI")
+			print(ffiGroupMember.inboxId)
+			return Member(ffiGroupMember: ffiGroupMember)
 		}
 	}
 
 	public var peerInboxIds: [String] {
 		get throws {
-			var ids = try members.map(\.inboxId)
+			var ids = try members().map(\.inboxId)
 			if let index = ids.firstIndex(of: client.inboxID) {
 				ids.remove(at: index)
 			}
