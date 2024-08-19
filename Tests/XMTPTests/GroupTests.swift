@@ -98,16 +98,16 @@ class GroupTests: XCTestCase {
 		try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
 		try await bobGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members().count, 3)
-		XCTAssertEqual(try bobGroup.members().count, 3)
+		XCTAssertEqual(try aliceGroup.members.count, 3)
+		XCTAssertEqual(try bobGroup.members.count, 3)
         
         try await bobGroup.addAdmin(inboxId: fixtures.aliceClient.inboxID)
 
 		try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
 		try await bobGroup.sync()
 
-        XCTAssertEqual(try aliceGroup.members().count, 2)
-		XCTAssertEqual(try bobGroup.members().count, 2)
+        XCTAssertEqual(try aliceGroup.members.count, 2)
+		XCTAssertEqual(try bobGroup.members.count, 2)
 
 		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
@@ -115,8 +115,8 @@ class GroupTests: XCTestCase {
         try await bobGroup.removeAdmin(inboxId: fixtures.aliceClient.inboxID)
         try await aliceGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members().count, 3)
-		XCTAssertEqual(try bobGroup.members().count, 3)
+		XCTAssertEqual(try aliceGroup.members.count, 3)
+		XCTAssertEqual(try bobGroup.members.count, 3)
 		
         XCTAssertEqual(try bobGroup.permissionPolicySet().addMemberPolicy, .allow)
 		XCTAssertEqual(try aliceGroup.permissionPolicySet().addMemberPolicy, .allow)
@@ -145,30 +145,30 @@ class GroupTests: XCTestCase {
 		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members().count, 3)
-		XCTAssertEqual(try bobGroup.members().count, 3)
+		XCTAssertEqual(try aliceGroup.members.count, 3)
+		XCTAssertEqual(try bobGroup.members.count, 3)
 
 		await assertThrowsAsyncError(
 			try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
 		)
 		try await bobGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members().count, 3)
-		XCTAssertEqual(try bobGroup.members().count, 3)
+		XCTAssertEqual(try aliceGroup.members.count, 3)
+		XCTAssertEqual(try bobGroup.members.count, 3)
 		
 		try await bobGroup.removeMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members().count, 2)
-		XCTAssertEqual(try bobGroup.members().count, 2)
+		XCTAssertEqual(try aliceGroup.members.count, 2)
+		XCTAssertEqual(try bobGroup.members.count, 2)
 
 		await assertThrowsAsyncError(
 			try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
 		)
 		try await bobGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members().count, 2)
-		XCTAssertEqual(try bobGroup.members().count, 2)
+		XCTAssertEqual(try aliceGroup.members.count, 2)
+		XCTAssertEqual(try bobGroup.members.count, 2)
 		
         XCTAssertEqual(try bobGroup.permissionPolicySet().addMemberPolicy, .admin)
         XCTAssertEqual(try aliceGroup.permissionPolicySet().addMemberPolicy, .admin)
@@ -210,7 +210,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
 
 		try await group.sync()
-		let members = try group.members().map(\.inboxId).sorted()
+		let members = try group.members.map(\.inboxId).sorted()
 		let peerMembers = try Conversation.group(group).peerAddresses.sorted()
 
 		XCTAssertEqual([fixtures.bobClient.inboxID, fixtures.aliceClient.inboxID].sorted(), members)
@@ -224,7 +224,7 @@ class GroupTests: XCTestCase {
 		try await group.addMembers(addresses: [fixtures.fred.address])
 
 		try await group.sync()
-		let members = try group.members().map(\.inboxId).sorted()
+		let members = try group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -243,7 +243,7 @@ class GroupTests: XCTestCase {
 		try await group.addMembersByInboxId(inboxIds: [fixtures.fredClient.inboxID])
 
 		try await group.sync()
-		let members = try group.members().map(\.inboxId).sorted()
+		let members = try group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -260,7 +260,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
 
 		try await group.sync()
-		let members = try group.members().map(\.inboxId).sorted()
+		let members = try group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -272,7 +272,7 @@ class GroupTests: XCTestCase {
 
 		try await group.sync()
 
-		let newMembers = try group.members().map(\.inboxId).sorted()
+		let newMembers = try group.members.map(\.inboxId).sorted()
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
 			fixtures.aliceClient.inboxID,
@@ -287,7 +287,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
 
 		try await group.sync()
-		let members = try group.members().map(\.inboxId).sorted()
+		let members = try group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -299,7 +299,7 @@ class GroupTests: XCTestCase {
 
 		try await group.sync()
 
-		let newMembers = try group.members().map(\.inboxId).sorted()
+		let newMembers = try group.members.map(\.inboxId).sorted()
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
 			fixtures.aliceClient.inboxID,
@@ -323,7 +323,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
 
 		try await group.sync()
-		let members = try group.members().map(\.inboxId).sorted()
+		let members = try group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -345,7 +345,7 @@ class GroupTests: XCTestCase {
 
 		try await group.sync()
 
-		let newMembers = try group.members().map(\.inboxId).sorted()
+		let newMembers = try group.members.map(\.inboxId).sorted()
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
 			fixtures.aliceClient.inboxID,
@@ -851,7 +851,7 @@ class GroupTests: XCTestCase {
 		do {
 			let _ = try await listMembersInParallel(groups: groups)
 		} catch {
-			print("Failed to list 20 groups members: \(error)")
+			print("Failed to list groups members: \(error)")
 			throw error // Rethrow the error to fail the test if group creation fails
 		}
 
@@ -859,8 +859,6 @@ class GroupTests: XCTestCase {
 	}
 	
 	func listMembersInParallel(groups: [Group]) async throws {
-		print("List \(groups.count) groups members...")
-		
 		await withThrowingTaskGroup(of: [Member].self) { taskGroup in
 			for group in groups {
 				taskGroup.addTask {
@@ -868,8 +866,5 @@ class GroupTests: XCTestCase {
 				}
 			}
 		}
-		
-		print("Listed \(groups.count) groups members")
-		
 	}
 }
