@@ -488,9 +488,40 @@ class ClientTests: XCTestCase {
 			)
 		XCTAssertEqual(alix.addresses.count, 1)
 
-		let alixWallet2 = try PrivateKey.generate()
+		let alixWallet2 = try FakeSCWWallet.generate()
 		try await alix.addWallet(account: alixWallet2)
 		XCTAssertEqual(alix.addresses.count, 2)
+	}
+	
+	public struct FakeSCWWallet: SigningKey {
+		public static func generate() throws -> FakeWallet {
+			let key = try PrivateKey.generate()
+			return FakeWallet(key)
+		}
+
+		public var address: String {
+			"eip155:1:\(key.walletAddress)"
+		}
+		
+		public var isSmartContractWallet: Bool {
+			true
+		}
+
+		public func sign(_ data: Data) async throws -> XMTPiOS.Signature {
+			let signature = try await key.sign(data)
+			return signature
+		}
+
+		public func sign(message: String) async throws -> XMTPiOS.Signature {
+			let signature = try await key.sign(message: message)
+			return signature
+		}
+
+		public var key: PrivateKey
+
+		public init(_ key: PrivateKey) {
+			self.key = key
+		}
 	}
 
 }
