@@ -620,17 +620,45 @@ public final class Client {
 			let signatureRequest = try await client.addWallet(existingWalletAddress: self.address, newWalletAddress: account.address)
 			
 			let signedData = try await account.sign(message: signatureRequest.signatureText())
-			
-			if (account.isSmartContractWallet)
-				if (chainRPCUrl == nil) throw ClientError.addWalletError("ChainRPCUrl required to add smart contract wallet")
-				try await signatureRequest.addScwSignature(signatureBytes: signedData.rawData, address: account.address, chainRpcUrl: chainRPCUrl)
+
+			if account.isSmartContractWallet {
+				guard let chainRPCUrl = chainRPCUrl else {
+					throw ClientError.addWalletError("ChainRPCUrl required to add smart contract wallet")
+				}
+				guard isValidAccountID(account.address) else {
+					throw ClientError.addWalletError("Account address must conform to CAIP format")
+				}
+
+				try await signatureRequest.addScwSignature(
+					signatureBytes: signedData.rawData,
+					address: account.address,
+					chainRpcUrl: chainRPCUrl
+				)
 			} else {
 				try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
 			}
-			
+
 			try await client.registerIdentity(signatureRequest: signatureRequest)
 		} catch {
 			throw ClientError.addWalletError("Failed to sign the message: \(error.localizedDescription)")
+		}
+	}
+
+	// See for more details https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-10.md
+	func isValidAccountID(_ accountAddress: String) -> Bool {
+		// Define the regular expressions for chain_id and account_address
+		let chainIDPattern = "[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}"
+		let accountAddressPattern = "[-.%a-zA-Z0-9]{1,128}"
+		
+		// Combine them to match the entire account_id format
+		let accountIDPattern = "^\(chainIDPattern):\(accountAddressPattern)$"
+		
+		let regex = try? NSRegularExpression(pattern: accountIDPattern)
+		
+		if let match = regex?.firstMatch(in: accountID, options: [], range: NSRange(location: 0, length: accountID.utf16.count)) {
+			return match.range.location != NSNotFound
+		} else {
+			return false
 		}
 	}
 }
