@@ -28,11 +28,7 @@ enum PrivateKeyError: Error, CustomStringConvertible {
 	}
 }
 
-extension PrivateKey: SigningKey {
-	public var chainRPCUrl: String? {
-		nil
-	}
-	
+extension PrivateKey: SigningKey {	
 	public var address: String {
 		walletAddress
 	}

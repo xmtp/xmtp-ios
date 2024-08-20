@@ -455,4 +455,42 @@ class ClientTests: XCTestCase {
 
 		XCTAssertEqual(inboxId, alixClient.inboxID)
 	}
+	
+	func testAddAdditionalEOAWallets() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let alixWallet1 = try PrivateKey.generate()
+		let alix = try await Client.create(
+			account: alixWallet1,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				   enableV3: true,
+				   encryptionKey: key
+			   )
+			)
+		XCTAssertEqual(alix.addresses.count, 1)
+
+		let alixWallet2 = try PrivateKey.generate()
+		try await alix.addWallet(account: alixWallet2)
+		XCTAssertEqual(alix.addresses.count, 2)
+	}
+	
+	func testAddAdditionalSCWWallets() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let alixWallet1 = try PrivateKey.generate()
+		let alix = try await Client.create(
+			account: alixWallet1,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				   enableV3: true,
+				   encryptionKey: key,
+				   chainRPCUrl: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"
+			   )
+			)
+		XCTAssertEqual(alix.addresses.count, 1)
+
+		let alixWallet2 = try PrivateKey.generate()
+		try await alix.addWallet(account: alixWallet2)
+		XCTAssertEqual(alix.addresses.count, 2)
+	}
+
 }
