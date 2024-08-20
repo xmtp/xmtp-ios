@@ -126,6 +126,7 @@ public final class Client {
 	public let dbPath: String
 	public let installationID: String
 	public let inboxID: String
+	public let chainRPCUrl: String
 
 	/// Access ``Conversations`` for this Client.
 	public lazy var conversations: Conversations = .init(client: self)
@@ -249,7 +250,7 @@ public final class Client {
 			inboxId: inboxId
 		)
 
-		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", inboxID: v3Client?.inboxId() ?? inboxId)
+		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", inboxID: v3Client?.inboxId() ?? inboxId, chainRPCUrl: options?.chainRPCUrl ?? "")
 		let conversations = client.conversations
 		let contacts = client.contacts
 		try await client.ensureUserContactPublished()
@@ -367,7 +368,7 @@ public final class Client {
 			rustClient: client
 		)
 
-		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", inboxID: v3Client?.inboxId() ?? inboxId)
+		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", inboxID: v3Client?.inboxId() ?? inboxId, chainRPCUrl: options.chainRPCUrl ?? "")
 		let conversations = result.conversations
 		let contacts = result.contacts
 		for codec in options.codecs {
@@ -377,7 +378,7 @@ public final class Client {
 		return result
 	}
 
-	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient?, dbPath: String = "", installationID: String, inboxID: String) throws {
+	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient?, dbPath: String = "", installationID: String, inboxID: String, chainRPCUrl: String) throws {
 		self.address = address
 		self.privateKeyBundleV1 = privateKeyBundleV1
 		self.apiClient = apiClient
@@ -385,6 +386,7 @@ public final class Client {
 		self.dbPath = dbPath
 		self.installationID = installationID
 		self.inboxID = inboxID
+		self.chainRPCUrl = chainRPCUrl
 	}
 
 	public var privateKeyBundle: PrivateKeyBundle {
@@ -622,7 +624,7 @@ public final class Client {
 			let signedData = try await account.sign(message: signatureRequest.signatureText())
 
 			if account.isSmartContractWallet {
-				guard let chainRPCUrl = chainRPCUrl else {
+				guard !chainRPCUrl.isEmpty else {
 					throw ClientError.addWalletError("ChainRPCUrl required to add smart contract wallet")
 				}
 				guard isValidAccountID(account.address) else {
@@ -655,7 +657,7 @@ public final class Client {
 		
 		let regex = try? NSRegularExpression(pattern: accountIDPattern)
 		
-		if let match = regex?.firstMatch(in: accountID, options: [], range: NSRange(location: 0, length: accountID.utf16.count)) {
+		if let match = regex?.firstMatch(in: accountAddress, options: [], range: NSRange(location: 0, length: accountAddress.utf16.count)) {
 			return match.range.location != NSNotFound
 		} else {
 			return false

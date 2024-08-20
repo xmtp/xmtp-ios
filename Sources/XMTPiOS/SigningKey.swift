@@ -21,7 +21,7 @@ public protocol SigningKey {
 	var address: String { get }
 	
 	/// If this signing key is a smart contract wallet
-	var isSmartContractWallet: Bool? { get }
+	var isSmartContractWallet: Bool { get }
 
 	/// Sign the data and return a secp256k1 compact recoverable signature.
 	func sign(_ data: Data) async throws -> Signature
@@ -32,6 +32,10 @@ public protocol SigningKey {
 }
 
 extension SigningKey {
+	public var isSmartContractWallet: Bool {
+		return false
+	}
+
 	func createIdentity(_ identity: PrivateKey, preCreateIdentityCallback: PreEventCallback? = nil) async throws -> AuthorizedIdentity {
 		var slimKey = PublicKey()
 		slimKey.timestamp = UInt64(Date().millisecondsSinceEpoch)
