@@ -467,11 +467,15 @@ class ClientTests: XCTestCase {
 				   encryptionKey: key
 			   )
 			)
-		XCTAssertEqual(alix.addresses.count, 1)
+		
+		let group = try await alix.conversations.newGroup(with: [])
+		try await group.sync()
+		XCTAssertEqual(try group.members[0].addresses.count, 1)
 
 		let alixWallet2 = try PrivateKey.generate()
 		try await alix.addWallet(account: alixWallet2)
-		XCTAssertEqual(alix.addresses.count, 2)
+		try await group.sync()
+		XCTAssertEqual(try group.members[0].addresses.count, 2)
 	}
 	
 	func testAddAdditionalSCWWallets() async throws {
@@ -486,11 +490,14 @@ class ClientTests: XCTestCase {
 				   chainRPCUrl: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"
 			   )
 			)
-		XCTAssertEqual(alix.addresses.count, 1)
+		let group = try await alix.conversations.newGroup(with: [])
+		try await group.sync()
+		XCTAssertEqual(try group.members[0].addresses.count, 1)
 
 		let alixWallet2 = try FakeSCWWallet.generate()
 		try await alix.addWallet(account: alixWallet2)
-		XCTAssertEqual(alix.addresses.count, 2)
+		try await group.sync()
+		XCTAssertEqual(try group.members[0].addresses.count, 2)
 	}
 	
 	public struct FakeSCWWallet: SigningKey {
