@@ -14,6 +14,8 @@ public typealias PreEventCallback = () async throws -> Void
 public enum ClientError: Error, CustomStringConvertible, LocalizedError {
 	case creationError(String)
 	case noV3Client(String)
+	case addWalletError(String)
+
 
 	public var description: String {
 		switch self {
@@ -21,6 +23,8 @@ public enum ClientError: Error, CustomStringConvertible, LocalizedError {
 			return "ClientError.creationError: \(err)"
 		case .noV3Client(let err):
 			return "ClientError.noV3Client: \(err)"
+		case .addWalletError(let err):
+			return "ClientError.addWalletError: \(err)"
 		}
 	}
 
@@ -65,6 +69,8 @@ public struct ClientOptions {
 	public var dbEncryptionKey: Data?
 	public var dbDirectory: String?
 	public var historySyncUrl: String?
+	public var chainRPCUrl: String?
+
 
 	public init(
 		api: Api = Api(),
@@ -75,7 +81,8 @@ public struct ClientOptions {
 		enableV3: Bool = false,
 		encryptionKey: Data? = nil,
 		dbDirectory: String? = nil,
-		historySyncUrl: String? = nil
+		historySyncUrl: String? = nil,
+		chainRPCUrl: String? = nil
 	) {
 		self.api = api
 		self.codecs = codecs
@@ -85,6 +92,7 @@ public struct ClientOptions {
 		self.enableV3 = enableV3
 		self.dbEncryptionKey = encryptionKey
 		self.dbDirectory = dbDirectory
+		self.chainRPCUrl = chainRPCUrl
 		if (historySyncUrl == nil) {
 			switch api.env {
 			case .production:
@@ -613,7 +621,8 @@ public final class Client {
 			
 			let signedData = try await account.sign(message: signatureRequest.signatureText())
 			
-			if let chainRPCUrl = account.chainRPCUrl {
+			if (account.isSmartContractWallet)
+				if (chainRPCUrl == nil) throw ClientError.addWalletError("ChainRPCUrl required to add smart contract wallet")
 				try await signatureRequest.addScwSignature(signatureBytes: signedData.rawData, address: account.address, chainRpcUrl: chainRPCUrl)
 			} else {
 				try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
@@ -621,7 +630,7 @@ public final class Client {
 			
 			try await client.registerIdentity(signatureRequest: signatureRequest)
 		} catch {
-			throw ClientError.creationError("Failed to sign the message: \(error.localizedDescription)")
+			throw ClientError.addWalletError("Failed to sign the message: \(error.localizedDescription)")
 		}
 	}
 }

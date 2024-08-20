@@ -20,8 +20,8 @@ public protocol SigningKey {
 	/// A wallet address for this key
 	var address: String { get }
 	
-	/// Chain rpc url for the smart contract wallet
-	var chainRPCUrl: String? { get }
+	/// If this signing key is a smart contract wallet
+	var isSmartContractWallet: Bool? { get }
 
 	/// Sign the data and return a secp256k1 compact recoverable signature.
 	func sign(_ data: Data) async throws -> Signature
