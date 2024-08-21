@@ -24,7 +24,7 @@ public struct InboxState {
 	}
 	
 	public var installationIds: [String] {
-		ffiInboxState.installationIds.map { id in id.toHex}
+		ffiInboxState.installationIds.map { $0.toHex }
 	}
 	
 	public var recoveryAddress: String {
