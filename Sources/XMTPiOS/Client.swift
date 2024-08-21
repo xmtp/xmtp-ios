@@ -612,8 +612,8 @@ public final class Client {
 		let signatureRequest = try await client.revokeAllOtherInstallations()
 		do {
 			let signedData = try await signingKey.sign(message: signatureRequest.signatureText())
-			signatureRequest.
 			try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+			try await client.applySignatureRequest(signatureRequest: signatureRequest)
 		} catch {
 			throw ClientError.creationError("Failed to sign the message: \(error.localizedDescription)")
 		}
