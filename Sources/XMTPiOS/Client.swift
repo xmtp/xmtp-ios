@@ -603,4 +603,27 @@ public final class Client {
 		}
 		try await client.requestHistorySync()
 	}
+	
+	public func revokeAllOtherInstallations(signingKey: SigningKey) async throws {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error: No V3 client initialized")
+		}
+		
+		if let signatureRequest = try await client.revokeAllOtherInstallations() {
+			do {
+				let signedData = try await signingKey.sign(message: signatureRequest.signatureText())
+				try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+				try await client.registerIdentity(signatureRequest: signatureRequest)
+			} catch {
+				throw ClientError.creationError("Failed to sign the message: \(error.localizedDescription)")
+			}
+		}
+	}
+	
+	public func inboxState(refreshFromNetwork: Bool) async throws -> InboxState {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error: No V3 client initialized")
+		}
+		return InboxState(ffiInboxState: client.inboxState(refreshFromNetwork: refreshFromNetwork))
+	}
 }
