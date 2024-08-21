@@ -858,13 +858,67 @@ class GroupTests: XCTestCase {
 		}
 	}
 	
-	func listMembersInParallel(groups: [Group]) async throws {
-		await withThrowingTaskGroup(of: [Member].self) { taskGroup in
-			for group in groups {
-				taskGroup.addTask {
-					return try group.members
-				}
-			}
-		}
-	}
+    func testCanSyncManyGroupsInParallelInUnderASecond() async throws {
+        let fixtures = try await localFixtures()
+        var groups: [Group] = []
+
+        for _ in 0..<40 {
+            var group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+            groups.append(group)
+        }
+        do {
+            let start = Date()
+            let _ = try await syncGroupsInParallel(groups: groups)
+            let end = Date()
+            print(end.timeIntervalSince(start))
+            XCTAssert(end.timeIntervalSince(start) < 1)
+        } catch {
+            print("Failed to list groups members: \(error)")
+            throw error // Rethrow the error to fail the test if group creation fails
+        }
+    }
+    
+    func testCanSyncSameGroupManyTimesInParallelInUnderASecond() async throws {
+        let fixtures = try await localFixtures()
+        var groups: [Group] = []
+        var group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+
+        for _ in 0..<40 {
+            groups.append(group)
+        }
+        do {
+            let start = Date()
+            let _ = try await syncGroupsInParallel(groups: groups)
+            let end = Date()
+            print(end.timeIntervalSince(start))
+            XCTAssert(end.timeIntervalSince(start) < 1)
+        } catch {
+            print("Failed to list groups members: \(error)")
+            throw error // Rethrow the error to fail the test if group creation fails
+        }
+    }
+    
+    func listMembersInParallel(groups: [Group]) async throws {
+        await withThrowingTaskGroup(of: [Member].self) { taskGroup in
+            for group in groups {
+                taskGroup.addTask {
+                    return try group.members
+                }
+            }
+        }
+    }
+
+    func syncGroupsInParallel(groups: [Group]) async throws {
+        try await withThrowingTaskGroup(of: Void.self) { taskGroup in
+            // Loop over each group and add a task to the group
+            for group in groups {
+                taskGroup.addTask {
+                    try await group.sync()
+                }
+            }
+            
+            // Wait for all tasks to complete
+            try await taskGroup.waitForAll()
+        }
+    }
 }
