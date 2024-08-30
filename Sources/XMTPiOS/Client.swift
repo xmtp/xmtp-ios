@@ -553,6 +553,7 @@ public final class Client {
 	}
 
 	public func deleteLocalDatabase() throws {
+		try dropLocalDatabaseConnection()
 		let fm = FileManager.default
 		try fm.removeItem(atPath: dbPath)
 	}
@@ -640,7 +641,7 @@ public final class Client {
 				try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
 			}
 
-			try await client.registerIdentity(signatureRequest: signatureRequest)
+			try await client.applySignatureRequest(signatureRequest: signatureRequest)
 		} catch {
 			throw ClientError.addWalletError("Failed to sign the message: \(error.localizedDescription)")
 		}
@@ -662,5 +663,27 @@ public final class Client {
 		} else {
 			return false
 		}
+	}
+	
+	public func revokeAllOtherInstallations(signingKey: SigningKey) async throws {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error: No V3 client initialized")
+		}
+		
+		let signatureRequest = try await client.revokeAllOtherInstallations()
+		do {
+			let signedData = try await signingKey.sign(message: signatureRequest.signatureText())
+			try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+			try await client.applySignatureRequest(signatureRequest: signatureRequest)
+		} catch {
+			throw ClientError.creationError("Failed to sign the message: \(error.localizedDescription)")
+		}
+	}
+	
+	public func inboxState(refreshFromNetwork: Bool) async throws -> InboxState {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error: No V3 client initialized")
+		}
+		return InboxState(ffiInboxState: try await client.inboxState(refreshFromNetwork: refreshFromNetwork))
 	}
 }

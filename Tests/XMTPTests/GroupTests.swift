@@ -838,6 +838,51 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(preparedMessageId, messages.first!.id)
 	}
 	
+	func testCanSyncManyGroupsInUnderASecond() async throws {
+		let fixtures = try await localFixtures()
+		var groups: [Group] = []
+
+		for _ in 0..<100 {
+			var group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
+			groups.append(group)
+		}
+		try await fixtures.bobClient.conversations.sync()
+		let bobGroup = try fixtures.bobClient.findGroup(groupId: groups[0].id)
+		try await groups[0].send(content: "hi")
+		let messageCount = try await bobGroup!.messages().count
+		XCTAssertEqual(messageCount, 0)
+		do {
+			let start = Date()
+			let numGroupsSynced = try await fixtures.bobClient.conversations.syncAllGroups()
+			let end = Date()
+			print(end.timeIntervalSince(start))
+			XCTAssert(end.timeIntervalSince(start) < 1)
+            XCTAssert(numGroupsSynced == 100)
+		} catch {
+			print("Failed to list groups members: \(error)")
+			throw error // Rethrow the error to fail the test if group creation fails
+		}
+		
+		let messageCount2 = try await bobGroup!.messages().count
+		XCTAssertEqual(messageCount2, 1)
+        
+        for aliceConv in try await fixtures.aliceClient.conversations.list(includeGroups: true) {
+            guard case let .group(aliceGroup) = aliceConv else {
+                   XCTFail("failed converting conversation to group")
+                   return
+               }
+            try await aliceGroup.removeMembers(addresses: [fixtures.bobClient.address])
+        }
+        
+        // first syncAllGroups after removal still sync groups in order to process the removal
+        var numGroupsSynced = try await fixtures.bobClient.conversations.syncAllGroups()
+        XCTAssert(numGroupsSynced == 100)
+        
+        // next syncAllGroups only will sync active groups
+        numGroupsSynced = try await fixtures.bobClient.conversations.syncAllGroups()
+        XCTAssert(numGroupsSynced == 0)
+	}
+	
 	func testCanListManyMembersInParallelInUnderASecond() async throws {
 		let fixtures = try await localFixtures()
 		var groups: [Group] = []
