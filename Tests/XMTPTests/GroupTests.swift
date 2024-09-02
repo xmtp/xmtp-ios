@@ -579,7 +579,7 @@ class GroupTests: XCTestCase {
 		}
 		
 		Task(priority: .userInitiated) {
-			for try await _ in try await fixtures.aliceClient.conversations.streamAllMessages(includeGroups: true) {
+			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages(includeGroups: true) {
 				expectation2.fulfill()
 			}
 		}
@@ -587,8 +587,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
 		_ = try await group.send(content: "hello")
 
-		await fulfillment(of: [expectation1], timeout: 3)
-		await fulfillment(of: [expectation2], timeout: 3)
+		await fulfillment(of: [expectation1, expectation2], timeout: 3)
 	}
 	
 	func testCanStreamAndUpdateNameWithoutForkingGroup() async throws {
