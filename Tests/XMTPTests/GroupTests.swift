@@ -550,11 +550,11 @@ class GroupTests: XCTestCase {
 	func testCanStreamGroupsAndConversationsWorksGroups() async throws {
 		let fixtures = try await localFixtures()
 
-		let expectation1 = expectation(description: "got a conversation")
+		let expectation1 = XCTestExpectation(description: "got a conversation")
 		expectation1.expectedFulfillmentCount = 2
 
 		Task(priority: .userInitiated) {
-			for try await _ in try await fixtures.aliceClient.conversations.streamAll() {
+			for try await _ in await fixtures.aliceClient.conversations.streamAll() {
 				expectation1.fulfill()
 			}
 		}
@@ -562,7 +562,7 @@ class GroupTests: XCTestCase {
 		_ = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
 		_ = try await fixtures.bobClient.conversations.newConversation(with: fixtures.alice.address)
 
-		await waitForExpectations(timeout: 3)
+		await fulfillment(of: [expectation1], timeout: 3)
 	}
 	
 	func testStreamGroupsAndAllMessages() async throws {
@@ -910,6 +910,55 @@ class GroupTests: XCTestCase {
 					return try group.members
 				}
 			}
+		}
+	}
+	
+	func testCanStreamAllDecryptedMessagesAndCancelStream() async throws {
+		let fixtures = try await localFixtures()
+
+		var messages = 0
+		let messagesQueue = DispatchQueue(label: "messages.queue")  // Serial queue to synchronize access to `messages`
+
+		let convo = try await fixtures.bobClient.conversations.newConversation(with: fixtures.alice.address)
+		let group = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
+		try await fixtures.aliceClient.conversations.sync()
+
+		// Create a Task to handle streaming
+		let streamingTask = Task(priority: .userInitiated) {
+			for try await _ in try await fixtures.aliceClient.conversations.streamAllDecryptedMessages(includeGroups: true) {
+				// Update the messages count in a thread-safe manner
+				messagesQueue.sync {
+					messages += 1
+				}
+			}
+		}
+
+		// Send messages to trigger the stream
+		_ = try await group.send(content: "hi")
+		_ = try await convo.send(content: "hi")
+
+		// Allow some time for messages to be processed (adjust this according to your needs)
+		try await Task.sleep(nanoseconds: 1_000_000_000)
+
+		// Cancel the streaming task
+		streamingTask.cancel()
+
+		// Check the message count
+		messagesQueue.sync {
+			XCTAssertEqual(messages, 2)
+		}
+		
+		try await Task.sleep(nanoseconds: 1_000_000_000)
+		
+		_ = try await group.send(content: "hi")
+		_ = try await group.send(content: "hi")
+		_ = try await group.send(content: "hi")
+		_ = try await convo.send(content: "hi")
+		
+		try await Task.sleep(nanoseconds: 1_000_000_000)
+		
+		messagesQueue.sync {
+			XCTAssertEqual(messages, 2)
 		}
 	}
 }

@@ -426,20 +426,26 @@ public actor Conversations {
 
 	public func streamAllGroupDecryptedMessages() -> AsyncThrowingStream<DecryptedMessage, Error> {
 		AsyncThrowingStream { continuation in
-			Task {
-				do {
-					self.streamHolder.stream = try await self.client.v3Client?.conversations().streamAllMessages(
-						messageCallback: MessageCallback(client: self.client) { message in
-							do {
-								continuation.yield(try MessageV3(client: self.client, ffiMessage: message).decrypt())
-							} catch {
-								print("Error onMessage \(error)")
-							}
+			let task = Task {
+				self.streamHolder.stream = await self.client.v3Client?.conversations().streamAllMessages(
+					messageCallback: MessageCallback(client: self.client) { message in
+						guard !Task.isCancelled else {
+							continuation.finish()
+							self.streamHolder.stream?.end() // End the stream upon cancellation
+							return
 						}
-					)
-				} catch {
-					print("STREAM ERR: \(error)")
-				}
+						do {
+							continuation.yield(try MessageV3(client: self.client, ffiMessage: message).decrypt())
+						} catch {
+							print("Error onMessage \(error)")
+						}
+					}
+				)
+			}
+
+			continuation.onTermination = { _ in
+				task.cancel() // Ensure the task is cancelled if the stream ends
+				self.streamHolder.stream?.end() // Ensure the stream is ended if the task is cancelled
 			}
 		}
 	}
@@ -450,6 +456,11 @@ public actor Conversations {
 				do {
 					var iterator = stream.makeAsyncIterator()
 					while let element = try await iterator.next() {
+						guard !Task.isCancelled else {
+							continuation.finish()
+							self.streamHolder.stream?.end() // End the stream upon cancellation
+							return
+						}
 						continuation.yield(element)
 					}
 					continuation.finish()
@@ -457,16 +468,25 @@ public actor Conversations {
 					continuation.finish(throwing: error)
 				}
 			}
-			Task {
-				await forwardStreamToMerged(stream: try streamAllV2DecryptedMessages())
+
+			let task = Task {
+				await forwardStreamToMerged(stream: streamAllV2DecryptedMessages())
 			}
-			if (includeGroups) {
+
+			if includeGroups {
 				Task {
 					await forwardStreamToMerged(stream: streamAllGroupDecryptedMessages())
 				}
 			}
+
+			continuation.onTermination = { _ in
+				task.cancel() // Ensure the task is cancelled if the stream ends
+				self.streamHolder.stream?.end() // Ensure the stream is ended if the task is cancelled
+			}
 		}
 	}
+
+
 	
 	
 	func streamAllV2DecryptedMessages() -> AsyncThrowingStream<DecryptedMessage, Error> {
