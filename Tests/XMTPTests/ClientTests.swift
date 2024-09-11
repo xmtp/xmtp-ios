@@ -492,4 +492,41 @@ class ClientTests: XCTestCase {
 		let newState = try await alixClient3.inboxState(refreshFromNetwork: true)
 		XCTAssertEqual(newState.installationIds.count, 1)
 	}
+
+	func testSignMessage() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let alix = try PrivateKey.generate()
+		let options = ClientOptions.init(
+			api: .init(env: .local, isSecure: false),
+			   enableV3: true,
+			   encryptionKey: key
+		   )
+
+		let alixClient = try await Client.create(
+			account: alix,
+			options: options
+		)
+		let privateKey = try PrivateKey(alixClient.keys.identityKey)
+
+		let stringToSign1 = "TEST_STRING_TO_SIGN"
+		
+		let signature1_1 = try await privateKey.sign(stringToSign1.data(using: .utf8)!)
+		let uint1_1 = try [UInt8](signature1_1.serializedData())
+
+		let signature1_2 = try await privateKey.sign(stringToSign1.data(using: .utf8)!)
+		let uint1_2 = try [UInt8](signature1_2.serializedData())
+
+		XCTAssertEqual(uint1_1, uint1_2)
+
+		let stringToSign2 = "short"
+		
+		let signature2_1 = try await privateKey.sign(stringToSign2.data(using: .utf8)!)
+		let uint2_1 = try [UInt8](signature2_1.serializedData())
+
+		let signature2_2 = try await privateKey.sign(stringToSign2.data(using: .utf8)!)
+		let uint2_2 = try [UInt8](signature2_2.serializedData())
+
+		XCTAssertEqual(uint2_1, uint2_2)
+	}
+	
 }
