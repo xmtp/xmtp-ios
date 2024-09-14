@@ -28,7 +28,7 @@ enum PrivateKeyError: Error, CustomStringConvertible {
 	}
 }
 
-extension PrivateKey: SigningKey {
+extension PrivateKey: SigningKey {	
 	public var address: String {
 		walletAddress
 	}

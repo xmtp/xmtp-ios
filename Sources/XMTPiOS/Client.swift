@@ -14,6 +14,8 @@ public typealias PreEventCallback = () async throws -> Void
 public enum ClientError: Error, CustomStringConvertible, LocalizedError {
 	case creationError(String)
 	case noV3Client(String)
+	case addWalletError(String)
+
 
 	public var description: String {
 		switch self {
@@ -21,6 +23,8 @@ public enum ClientError: Error, CustomStringConvertible, LocalizedError {
 			return "ClientError.creationError: \(err)"
 		case .noV3Client(let err):
 			return "ClientError.noV3Client: \(err)"
+		case .addWalletError(let err):
+			return "ClientError.addWalletError: \(err)"
 		}
 	}
 
@@ -65,6 +69,8 @@ public struct ClientOptions {
 	public var dbEncryptionKey: Data?
 	public var dbDirectory: String?
 	public var historySyncUrl: String?
+	public var chainRPCUrl: String?
+
 
 	public init(
 		api: Api = Api(),
@@ -75,7 +81,8 @@ public struct ClientOptions {
 		enableV3: Bool = false,
 		encryptionKey: Data? = nil,
 		dbDirectory: String? = nil,
-		historySyncUrl: String? = nil
+		historySyncUrl: String? = nil,
+		chainRPCUrl: String? = nil
 	) {
 		self.api = api
 		self.codecs = codecs
@@ -85,6 +92,7 @@ public struct ClientOptions {
 		self.enableV3 = enableV3
 		self.dbEncryptionKey = encryptionKey
 		self.dbDirectory = dbDirectory
+		self.chainRPCUrl = chainRPCUrl
 		if (historySyncUrl == nil) {
 			switch api.env {
 			case .production:
@@ -118,6 +126,7 @@ public final class Client {
 	public let dbPath: String
 	public let installationID: String
 	public let inboxID: String
+	public let chainRPCUrl: String
 
 	/// Access ``Conversations`` for this Client.
 	public lazy var conversations: Conversations = .init(client: self)
@@ -241,7 +250,7 @@ public final class Client {
 			inboxId: inboxId
 		)
 
-		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", inboxID: v3Client?.inboxId() ?? inboxId)
+		let client = try Client(address: account.address, privateKeyBundleV1: privateKeyBundleV1, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", inboxID: v3Client?.inboxId() ?? inboxId, chainRPCUrl: options?.chainRPCUrl ?? "")
 		let conversations = client.conversations
 		let contacts = client.contacts
 		try await client.ensureUserContactPublished()
@@ -359,7 +368,7 @@ public final class Client {
 			rustClient: client
 		)
 
-		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", inboxID: v3Client?.inboxId() ?? inboxId)
+		let result = try Client(address: address, privateKeyBundleV1: v1Bundle, apiClient: apiClient, v3Client: v3Client, dbPath: dbPath, installationID: v3Client?.installationId().toHex ?? "", inboxID: v3Client?.inboxId() ?? inboxId, chainRPCUrl: options.chainRPCUrl ?? "")
 		let conversations = result.conversations
 		let contacts = result.contacts
 		for codec in options.codecs {
@@ -369,7 +378,7 @@ public final class Client {
 		return result
 	}
 
-	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient?, dbPath: String = "", installationID: String, inboxID: String) throws {
+	init(address: String, privateKeyBundleV1: PrivateKeyBundleV1, apiClient: ApiClient, v3Client: LibXMTP.FfiXmtpClient?, dbPath: String = "", installationID: String, inboxID: String, chainRPCUrl: String) throws {
 		self.address = address
 		self.privateKeyBundleV1 = privateKeyBundleV1
 		self.apiClient = apiClient
@@ -377,6 +386,7 @@ public final class Client {
 		self.dbPath = dbPath
 		self.installationID = installationID
 		self.inboxID = inboxID
+		self.chainRPCUrl = chainRPCUrl
 	}
 
 	public var privateKeyBundle: PrivateKeyBundle {
@@ -602,6 +612,57 @@ public final class Client {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
 		try await client.requestHistorySync()
+	}
+	
+	public func addWallet(account: SigningKey) async throws {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error: No V3 client initialized")
+		}
+
+		do {
+			let signatureRequest = try await client.addWallet(existingWalletAddress: self.address, newWalletAddress: account.address)
+			
+			let signedData = try await account.sign(message: signatureRequest.signatureText())
+
+			if account.isSmartContractWallet {
+				guard !chainRPCUrl.isEmpty else {
+					throw ClientError.addWalletError("ChainRPCUrl required to add smart contract wallet")
+				}
+				guard isValidAccountID(account.address) else {
+					throw ClientError.addWalletError("Account address must conform to CAIP format")
+				}
+
+				try await signatureRequest.addScwSignature(
+					signatureBytes: signedData.rawData,
+					address: account.address,
+					chainRpcUrl: chainRPCUrl
+				)
+			} else {
+				try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+			}
+
+			try await client.applySignatureRequest(signatureRequest: signatureRequest)
+		} catch {
+			throw ClientError.addWalletError("Failed to sign the message: \(error.localizedDescription)")
+		}
+	}
+
+	// See for more details https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-10.md
+	func isValidAccountID(_ accountAddress: String) -> Bool {
+		// Define the regular expressions for chain_id and account_address
+		let chainIDPattern = "[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}"
+		let accountAddressPattern = "[-.%a-zA-Z0-9]{1,128}"
+		
+		// Combine them to match the entire account_id format
+		let accountIDPattern = "^\(chainIDPattern):\(accountAddressPattern)$"
+		
+		let regex = try? NSRegularExpression(pattern: accountIDPattern)
+		
+		if let match = regex?.firstMatch(in: accountAddress, options: [], range: NSRange(location: 0, length: accountAddress.utf16.count)) {
+			return match.range.location != NSNotFound
+		} else {
+			return false
+		}
 	}
 	
 	public func revokeAllOtherInstallations(signingKey: SigningKey) async throws {
