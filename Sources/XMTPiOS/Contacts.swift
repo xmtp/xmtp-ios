@@ -308,7 +308,7 @@ public actor Contacts {
 		return try await consentList.groupState(groupId: groupId) == .allowed
 	}
 
-	public func isGroupDenied(groupId: String) async -throws > Bool {
+	public func isGroupDenied(groupId: String) async throws -> Bool {
 		return try await consentList.groupState(groupId: groupId) == .denied
 	}
 	
