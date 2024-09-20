@@ -50,7 +50,7 @@ class ClientTests: XCTestCase {
 			)
 		)
 
-		let keys = client.privateKeyBundle
+		let keys = try client.privateKeyBundle
 		let otherClient = try await Client.from(
 			bundle: keys,
 			options: .init(
@@ -204,9 +204,9 @@ class ClientTests: XCTestCase {
 		let fakeWallet = try PrivateKey.generate()
 		let client = try await Client.create(account: fakeWallet, options: opts)
 
-		XCTAssertEqual(1, client.privateKeyBundleV1.preKeys.count)
+		XCTAssertEqual(1, try client.v1keys.preKeys.count)
 
-		let preKey = client.privateKeyBundleV1.preKeys[0]
+		let preKey = try client.v1keys.preKeys[0]
 
 		XCTAssert(preKey.publicKey.hasSignature, "prekey not signed")
 	}
@@ -216,12 +216,12 @@ class ClientTests: XCTestCase {
 		let fakeWallet = try PrivateKey.generate()
 		let client = try await Client.create(account: fakeWallet)
 
-		let bundle = client.privateKeyBundle
+		let bundle = try client.privateKeyBundle
 		let clientFromV1Bundle = try await Client.from(bundle: bundle)
 
 		XCTAssertEqual(client.address, clientFromV1Bundle.address)
-		XCTAssertEqual(client.privateKeyBundleV1.identityKey, clientFromV1Bundle.privateKeyBundleV1.identityKey)
-		XCTAssertEqual(client.privateKeyBundleV1.preKeys, clientFromV1Bundle.privateKeyBundleV1.preKeys)
+		XCTAssertEqual(try client.v1keys.identityKey, try clientFromV1Bundle.v1keys.identityKey)
+		XCTAssertEqual(try client.v1keys.preKeys, try clientFromV1Bundle.v1keys.preKeys)
 	}
 
 	func testCanBeCreatedWithV1Bundle() async throws {
@@ -229,20 +229,20 @@ class ClientTests: XCTestCase {
 		let fakeWallet = try PrivateKey.generate()
 		let client = try await Client.create(account: fakeWallet)
 
-		let bundleV1 = client.v1keys
+		let bundleV1 = try client.v1keys
 		let clientFromV1Bundle = try await Client.from(v1Bundle: bundleV1)
 
 		XCTAssertEqual(client.address, clientFromV1Bundle.address)
-		XCTAssertEqual(client.privateKeyBundleV1.identityKey, clientFromV1Bundle.privateKeyBundleV1.identityKey)
-		XCTAssertEqual(client.privateKeyBundleV1.preKeys, clientFromV1Bundle.privateKeyBundleV1.preKeys)
+		XCTAssertEqual(try client.v1keys.identityKey, try clientFromV1Bundle.v1keys.identityKey)
+		XCTAssertEqual(try client.v1keys.preKeys, try clientFromV1Bundle.v1keys.preKeys)
 	}
 
 	func testCanAccessPublicKeyBundle() async throws {
 		let fakeWallet = try PrivateKey.generate()
 		let client = try await Client.create(account: fakeWallet)
 
-		let publicKeyBundle = client.keys.getPublicKeyBundle()
-		XCTAssertEqual(publicKeyBundle, client.publicKeyBundle)
+		let publicKeyBundle = try client.keys.getPublicKeyBundle()
+		XCTAssertEqual(publicKeyBundle, try client.publicKeyBundle)
 	}
 
 	func testCanSignWithPrivateIdentityKey() async throws {
@@ -254,7 +254,7 @@ class ClientTests: XCTestCase {
 
 		let recovered = try KeyUtilx.recoverPublicKeyKeccak256(from: signature.rawData, message: Data("hello world".utf8))
 
-		XCTAssertEqual(recovered, client.keys.identityKey.publicKey.secp256K1Uncompressed.bytes)
+		XCTAssertEqual(recovered, try client.keys.identityKey.publicKey.secp256K1Uncompressed.bytes)
 	}
 
 	func testPreEnableIdentityCallback() async throws {
@@ -331,7 +331,7 @@ class ClientTests: XCTestCase {
 			)
 		)
 
-		let keys = client.privateKeyBundle
+		let keys = try client.privateKeyBundle
 		let bundleClient = try await Client.from(
 			bundle: keys,
 			options: .init(
@@ -467,7 +467,7 @@ class ClientTests: XCTestCase {
 
 
 		let inboxId = try await Client.getOrCreateInboxId(options: options, address: alix.address)
-		let alixClient = try await Client.create(
+		let alixClient = try await Client.createOrBuild(
 			account: alix,
 			options: options
 		)

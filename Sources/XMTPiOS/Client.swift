@@ -114,8 +114,8 @@ public struct ClientOptions {
 public final class Client {
 	/// The wallet address of the ``SigningKey`` used to create this Client.
 	public let address: String
-	let privateKeyBundleV1: PrivateKeyBundleV1?
-	let apiClient: ApiClient?
+	var privateKeyBundleV1: PrivateKeyBundleV1? = nil
+	var apiClient: ApiClient? = nil
 	public let v3Client: LibXMTP.FfiXmtpClient?
 	public let libXMTPVersion: String = getVersionInfo()
 	public let dbPath: String
@@ -191,6 +191,7 @@ public final class Client {
 		for codec in (options.codecs) {
 			client.register(codec: codec)
 		}
+		return client
 	}
 
 	static func initV3Client(
