@@ -24,7 +24,10 @@ public protocol SigningKey {
 	var isSmartContractWallet: Bool { get }
 	
 	/// The name of the chainId for example "eip155:1"
-	var chainId: String { get }
+	var chainId: UInt64 { get }
+	
+	/// The blockNumber of the chain for example "1"
+	var blockNumber: UInt64 { get }
 
 	/// Sign the data and return a secp256k1 compact recoverable signature.
 	func sign(_ data: Data) async throws -> Signature
@@ -39,7 +42,11 @@ extension SigningKey {
 		return false
 	}
 	
-	public var chainId: String {
+	public var chainId: UInt64 {
+		return "eip155:1"
+	}
+	
+	public var blockNumber: UInt64 {
 		return "eip155:1"
 	}
 

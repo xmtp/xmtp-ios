@@ -247,7 +247,14 @@ public final class Client {
 				if let signingKey = signingKey {
 					do {
 						let signedData = try await signingKey.sign(message: signatureRequest.signatureText())
-						try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+						if signingKey.isSmartContractWallet {
+							guard isValidAccountID(signingKey.address) else {
+								throw ClientError.creationError("Account address must conform to CAIP format")
+							}
+							try await signatureRequest.addScwSignature(signatureBytes: signedData.rawData, address: signingKey.address, chainId: signingKey.chainId, blockNumber: signingKey.blockNumber)
+						} else {
+							try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+						}
 						try await v3Client.registerIdentity(signatureRequest: signatureRequest)
 					} catch {
 						throw ClientError.creationError("Failed to sign the message: \(error.localizedDescription)")
@@ -695,5 +702,23 @@ public final class Client {
 			throw ClientError.noV3Client("Error: No V3 client initialized")
 		}
 		return InboxState(ffiInboxState: try await client.inboxState(refreshFromNetwork: refreshFromNetwork))
+	}
+	
+	// See for more details https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-10.md
+	public func isValidAccountID(_ accountAddress: String) -> Bool {
+		// Define the regular expressions for chain_id and account_address
+		let chainIDPattern = "[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}"
+		let accountAddressPattern = "[-.%a-zA-Z0-9]{1,128}"
+
+		// Combine them to match the entire account_id format
+		let accountIDPattern = "^\(chainIDPattern):\(accountAddressPattern)$"
+
+		let regex = try? NSRegularExpression(pattern: accountIDPattern)
+
+		if let match = regex?.firstMatch(in: accountAddress, options: [], range: NSRange(location: 0, length: accountAddress.utf16.count)) {
+			return match.range.location != NSNotFound
+		} else {
+			return false
+		}
 	}
 }
