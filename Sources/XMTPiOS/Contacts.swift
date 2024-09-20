@@ -81,7 +81,10 @@ public class ConsentList {
 				after: lastFetched,
 				direction: .ascending
 			)
-			let envelopes = try await client.apiClient!.envelopes(topic: Topic.preferenceList(identifier).description, pagination: pagination)
+			guard let apiClient = client.apiClient else {
+				throw ClientError.noV2Client("Error no V2 client initialized")
+			}
+			let envelopes = try await apiClient.envelopes(topic: Topic.preferenceList(identifier).description, pagination: pagination)
 			lastFetched = newDate
 			
 			var preferences: [PrivatePreferencesAction] = []
