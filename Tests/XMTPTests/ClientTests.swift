@@ -456,6 +456,25 @@ class ClientTests: XCTestCase {
 		XCTAssertEqual(inboxId, alixClient.inboxID)
 	}
 	
+	func testCreatesAPureV3Client() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let alix = try PrivateKey.generate()
+		let options = ClientOptions.init(
+			api: .init(env: .local, isSecure: false),
+			   enableV3: true,
+			   encryptionKey: key
+		   )
+
+
+		let inboxId = try await Client.getOrCreateInboxId(options: options, address: alix.address)
+		let alixClient = try await Client.create(
+			account: alix,
+			options: options
+		)
+
+		XCTAssertEqual(inboxId, alixClient.inboxID)
+	}
+	
 	func testRevokesAllOtherInstallations() async throws {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
