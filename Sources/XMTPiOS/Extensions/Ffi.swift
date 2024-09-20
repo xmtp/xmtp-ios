@@ -206,3 +206,33 @@ extension FfiGroupMember {
 		Member(ffiGroupMember: self)
 	}
 }
+
+extension ConsentState {
+	var toFFI: FfiConsentState{
+		switch (self) {
+		case .allowed: FfiConsentState.allowed
+		case .denied: FfiConsentState.denied
+		default: FfiConsentState.unknown
+		}
+	}
+}
+
+extension FfiConsentState {
+	var fromFFI: ConsentState{
+		switch (self) {
+		case .allowed: ConsentState.allowed
+		case .denied: ConsentState.denied
+		default: ConsentState.unknown
+		}
+	}
+}
+
+extension EntryType {
+	var toFFI: FfiConsentEntityType{
+		switch (self) {
+		case .group_id: FfiConsentEntityType.groupId
+		case .inbox_id: FfiConsentEntityType.inboxId
+		case .address: FfiConsentEntityType.address
+		}
+	}
+}

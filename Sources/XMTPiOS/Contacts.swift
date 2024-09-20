@@ -13,12 +13,11 @@ public typealias PrivatePreferencesAction = Xmtp_MessageContents_PrivatePreferen
 public enum ConsentState: String, Codable {
 	case allowed, denied, unknown
 }
+public enum EntryType: String, Codable {
+	case address, group_id, inbox_id
+}
 
 public struct ConsentListEntry: Codable, Hashable {
-	public enum EntryType: String, Codable {
-		case address, group_id, inbox_id
-	}
-
 	static func address(_ address: String, type: ConsentState = .unknown) -> ConsentListEntry {
 		ConsentListEntry(value: address, entryType: .address, consentType: type)
 	}

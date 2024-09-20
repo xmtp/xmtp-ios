@@ -213,6 +213,21 @@ public struct Group: Identifiable, Equatable, Hashable {
         try await ffiGroup.updatePermissionPolicy(permissionUpdateType: FfiPermissionUpdateType.updateMetadata, permissionPolicyOption: PermissionOption.toFfiPermissionPolicy(option: newPermissionOption), metadataField: FfiMetadataField.pinnedFrameUrl)
 	}
 
+	public func updateConsentState(state: ConsentState) async throws {
+		if (client.hasV2Client) {
+			switch (state) {
+			case .allowed: client.contacts.allowGroups(groupIds: [id])
+			case .denied: client.contacts.denyGroups(groupIds: [id])
+			case .unknown: Unit
+			}
+		}
+
+		try await ffiGroup.updateConsentState(state: state.toFFI)
+	}
+
+	public func consentState() throws -> ConsentState{
+		return try ffiGroup.consentState().fromFFI
+	}
 	
 	public func processMessage(envelopeBytes: Data) async throws -> DecodedMessage {
 		let message = try await ffiGroup.processStreamedGroupMessage(envelopeBytes: envelopeBytes)
