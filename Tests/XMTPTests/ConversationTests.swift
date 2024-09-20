@@ -97,7 +97,7 @@ class ConversationTests: XCTestCase {
 	}
 
 	func testCanStreamConversationsV2() async throws {
-		let options = ClientOptions(api: ClientOptions.Api(env: .dev, isSecure: true))
+		let options = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let wallet = try PrivateKey.generate()
 		let client = try await Client.create(account: wallet, options: options)
 		

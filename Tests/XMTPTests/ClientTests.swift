@@ -15,9 +15,9 @@ import XMTPTestHelpers
 @available(iOS 15, *)
 class ClientTests: XCTestCase {
 	func testTakesAWallet() async throws {
-			try TestConfig.skip(because: "run manually against dev")
+		let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let fakeWallet = try PrivateKey.generate()
-		_ = try await Client.create(account: fakeWallet)
+		_ = try await Client.create(account: fakeWallet, options: opts)
 	}
 
 	func testPassingSavedKeysWithNoSignerWithMLSErrors() async throws {
@@ -212,12 +212,12 @@ class ClientTests: XCTestCase {
 	}
 
 	func testCanBeCreatedWithBundle() async throws {
-				try TestConfig.skip(because: "run manually against dev")
+		let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let fakeWallet = try PrivateKey.generate()
-		let client = try await Client.create(account: fakeWallet)
+		let client = try await Client.create(account: fakeWallet, options: opts)
 
 		let bundle = try client.privateKeyBundle
-		let clientFromV1Bundle = try await Client.from(bundle: bundle)
+		let clientFromV1Bundle = try await Client.from(bundle: bundle, options: opts)
 
 		XCTAssertEqual(client.address, clientFromV1Bundle.address)
 		XCTAssertEqual(try client.v1keys.identityKey, try clientFromV1Bundle.v1keys.identityKey)
@@ -225,12 +225,12 @@ class ClientTests: XCTestCase {
 	}
 
 	func testCanBeCreatedWithV1Bundle() async throws {
-				try TestConfig.skip(because: "run manually against dev")
+		let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let fakeWallet = try PrivateKey.generate()
-		let client = try await Client.create(account: fakeWallet)
+		let client = try await Client.create(account: fakeWallet, options: opts)
 
 		let bundleV1 = try client.v1keys
-		let clientFromV1Bundle = try await Client.from(v1Bundle: bundleV1)
+		let clientFromV1Bundle = try await Client.from(v1Bundle: bundleV1, options: opts)
 
 		XCTAssertEqual(client.address, clientFromV1Bundle.address)
 		XCTAssertEqual(try client.v1keys.identityKey, try clientFromV1Bundle.v1keys.identityKey)
@@ -238,23 +238,25 @@ class ClientTests: XCTestCase {
 	}
 
 	func testCanAccessPublicKeyBundle() async throws {
+		let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let fakeWallet = try PrivateKey.generate()
-		let client = try await Client.create(account: fakeWallet)
+		let client = try await Client.create(account: fakeWallet, options: opts)
 
 		let publicKeyBundle = try client.keys.getPublicKeyBundle()
 		XCTAssertEqual(publicKeyBundle, try client.publicKeyBundle)
 	}
 
 	func testCanSignWithPrivateIdentityKey() async throws {
+		let opts = ClientOptions(api: ClientOptions.Api(env: .local, isSecure: false))
 		let fakeWallet = try PrivateKey.generate()
-		let client = try await Client.create(account: fakeWallet)
+		let client = try await Client.create(account: fakeWallet, options: opts)
 
 		let digest = Util.keccak256(Data("hello world".utf8))
 		let signature = try await client.keys.identityKey.sign(digest)
 
 		let recovered = try KeyUtilx.recoverPublicKeyKeccak256(from: signature.rawData, message: Data("hello world".utf8))
-
-		XCTAssertEqual(recovered, try client.keys.identityKey.publicKey.secp256K1Uncompressed.bytes)
+		let bytes = try client.keys.identityKey.publicKey.secp256K1Uncompressed.bytes
+		XCTAssertEqual(recovered, bytes)
 	}
 
 	func testPreEnableIdentityCallback() async throws {
