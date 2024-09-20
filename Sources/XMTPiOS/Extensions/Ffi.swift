@@ -236,3 +236,9 @@ extension EntryType {
 		}
 	}
 }
+
+extension ConsentListEntry {
+	var toFFI: FfiConsent {
+		FfiConsent(entityType: entryType.toFFI, state: consentType.toFFI, entity: value)
+	}
+}

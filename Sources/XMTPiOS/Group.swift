@@ -216,13 +216,13 @@ public struct Group: Identifiable, Equatable, Hashable {
 	public func updateConsentState(state: ConsentState) async throws {
 		if (client.hasV2Client) {
 			switch (state) {
-			case .allowed: client.contacts.allowGroups(groupIds: [id])
-			case .denied: client.contacts.denyGroups(groupIds: [id])
-			case .unknown: Unit
+			case .allowed: try await client.contacts.allowGroups(groupIds: [id])
+			case .denied: try await client.contacts.denyGroups(groupIds: [id])
+			case .unknown: ()
 			}
 		}
 
-		try await ffiGroup.updateConsentState(state: state.toFFI)
+		try ffiGroup.updateConsentState(state: state.toFFI)
 	}
 
 	public func consentState() throws -> ConsentState{
