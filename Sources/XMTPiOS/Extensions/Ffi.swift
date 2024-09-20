@@ -210,9 +210,9 @@ extension FfiGroupMember {
 extension ConsentState {
 	var toFFI: FfiConsentState{
 		switch (self) {
-		case .allowed: FfiConsentState.allowed
-		case .denied: FfiConsentState.denied
-		default: FfiConsentState.unknown
+		case .allowed: return FfiConsentState.allowed
+		case .denied: return FfiConsentState.denied
+		default: return FfiConsentState.unknown
 		}
 	}
 }
@@ -220,9 +220,9 @@ extension ConsentState {
 extension FfiConsentState {
 	var fromFFI: ConsentState{
 		switch (self) {
-		case .allowed: ConsentState.allowed
-		case .denied: ConsentState.denied
-		default: ConsentState.unknown
+		case .allowed: return ConsentState.allowed
+		case .denied: return ConsentState.denied
+		default: return ConsentState.unknown
 		}
 	}
 }
@@ -230,9 +230,9 @@ extension FfiConsentState {
 extension EntryType {
 	var toFFI: FfiConsentEntityType{
 		switch (self) {
-		case .group_id: FfiConsentEntityType.groupId
-		case .inbox_id: FfiConsentEntityType.inboxId
-		case .address: FfiConsentEntityType.address
+		case .group_id: return FfiConsentEntityType.groupId
+		case .inbox_id: return FfiConsentEntityType.inboxId
+		case .address: return FfiConsentEntityType.address
 		}
 	}
 }
