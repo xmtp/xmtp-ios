@@ -245,10 +245,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 	}
 
 	public func send(encodedContent: EncodedContent) async throws -> String {
-		let groupState = await client.contacts.consentList.groupState(groupId: id)
-
-		if groupState == ConsentState.unknown {
-			try await client.contacts.allowGroups(groupIds: [id])
+		if (try consentState() == .unknown) {
+			try await updateConsentState(state: .allowed)
 		}
 
 		let messageId = try await ffiGroup.send(contentBytes: encodedContent.serializedData())
@@ -288,10 +286,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 	}
 	
 	public func prepareMessage<T>(content: T, options: SendOptions? = nil) async throws -> String {
-		let groupState = await client.contacts.consentList.groupState(groupId: id)
-
-		if groupState == ConsentState.unknown {
-			try await client.contacts.allowGroups(groupIds: [id])
+		if (try consentState() == .unknown) {
+			try await updateConsentState(state: .allowed)
 		}
 		
 		let encodeContent = try await encodeContent(content: content, options: options)
