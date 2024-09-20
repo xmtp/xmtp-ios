@@ -73,6 +73,7 @@ public class ConsentList {
 			guard let identifier = identifier else {
 				throw ContactError.invalidIdentifier
 			}
+
 			let newDate = Date()
 			
 			let pagination = Pagination(
