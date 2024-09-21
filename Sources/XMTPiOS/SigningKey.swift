@@ -23,7 +23,7 @@ public protocol SigningKey {
 	/// If this signing key is a smart contract wallet
 	var isSmartContractWallet: Bool { get }
 	
-	/// The name of the chainId for example "eip155:1"
+	/// The name of the chainId for example "8453" is the chainId for base
 	var chainId: UInt64 { get }
 	
 	/// The blockNumber of the chain for example "1"
@@ -43,11 +43,11 @@ extension SigningKey {
 	}
 	
 	public var chainId: UInt64 {
-		return "eip155:1"
+		return 8453
 	}
 	
 	public var blockNumber: UInt64 {
-		return "eip155:1"
+		return 0
 	}
 
 	func createIdentity(_ identity: PrivateKey, preCreateIdentityCallback: PreEventCallback? = nil) async throws -> AuthorizedIdentity {
