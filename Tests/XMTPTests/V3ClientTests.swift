@@ -64,7 +64,7 @@ class V3ClientTests: XCTestCase {
 	func testsCanCreateGroup() async throws {
 		let fixtures = try await localFixtures()
 		let group = try await fixtures.boV3Client.conversations.newGroup(with: [fixtures.caroV2V3.address])
-		let members = try group.members.map(\.inboxId).sorted()
+		let members = try await group.members.map(\.inboxId).sorted()
 		XCTAssertEqual([fixtures.caroV2V3Client.inboxID, fixtures.boV3Client.inboxID].sorted(), members)
 
 		await assertThrowsAsyncError(

@@ -98,16 +98,20 @@ class GroupTests: XCTestCase {
 		try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
 		try await bobGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members.count, 3)
-		XCTAssertEqual(try bobGroup.members.count, 3)
+		let aliceMembers = try await aliceGroup.members.count
+		let bobMembers = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembers, 3)
+		XCTAssertEqual(bobMembers, 3)
         
         try await bobGroup.addAdmin(inboxId: fixtures.aliceClient.inboxID)
 
 		try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
 		try await bobGroup.sync()
 
-        XCTAssertEqual(try aliceGroup.members.count, 2)
-		XCTAssertEqual(try bobGroup.members.count, 2)
+		let aliceMembers2 = try await aliceGroup.members.count
+		let bobMembers2 = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembers2, 2)
+		XCTAssertEqual(bobMembers2, 2)
 
 		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
@@ -115,8 +119,10 @@ class GroupTests: XCTestCase {
         try await bobGroup.removeAdmin(inboxId: fixtures.aliceClient.inboxID)
         try await aliceGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members.count, 3)
-		XCTAssertEqual(try bobGroup.members.count, 3)
+		let aliceMembers3 = try await aliceGroup.members.count
+		let bobMembers3 = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembers3, 3)
+		XCTAssertEqual(bobMembers3, 3)
 		
         XCTAssertEqual(try bobGroup.permissionPolicySet().addMemberPolicy, .allow)
 		XCTAssertEqual(try aliceGroup.permissionPolicySet().addMemberPolicy, .allow)
@@ -145,30 +151,38 @@ class GroupTests: XCTestCase {
 		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members.count, 3)
-		XCTAssertEqual(try bobGroup.members.count, 3)
+		let aliceMembers = try await aliceGroup.members.count
+		let bobMembers = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembers, 3)
+		XCTAssertEqual(bobMembers, 3)
 
 		await assertThrowsAsyncError(
 			try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
 		)
 		try await bobGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members.count, 3)
-		XCTAssertEqual(try bobGroup.members.count, 3)
+		let aliceMembers1 = try await aliceGroup.members.count
+		let bobMembers1 = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembers1, 3)
+		XCTAssertEqual(bobMembers1, 3)
 		
 		try await bobGroup.removeMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members.count, 2)
-		XCTAssertEqual(try bobGroup.members.count, 2)
+		let aliceMembers2 = try await aliceGroup.members.count
+		let bobMembers2 = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembers2, 2)
+		XCTAssertEqual(bobMembers2, 2)
 
 		await assertThrowsAsyncError(
 			try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
 		)
 		try await bobGroup.sync()
 
-		XCTAssertEqual(try aliceGroup.members.count, 2)
-		XCTAssertEqual(try bobGroup.members.count, 2)
+		let aliceMembers3 = try await aliceGroup.members.count
+		let bobMembers3 = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembers3, 2)
+		XCTAssertEqual(bobMembers2, 2)
 		
         XCTAssertEqual(try bobGroup.permissionPolicySet().addMemberPolicy, .admin)
         XCTAssertEqual(try aliceGroup.permissionPolicySet().addMemberPolicy, .admin)
@@ -210,7 +224,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
 
 		try await group.sync()
-		let members = try group.members.map(\.inboxId).sorted()
+		let members = try await group.members.map(\.inboxId).sorted()
 		let peerMembers = try Conversation.group(group).peerAddresses.sorted()
 
 		XCTAssertEqual([fixtures.bobClient.inboxID, fixtures.aliceClient.inboxID].sorted(), members)
@@ -224,7 +238,7 @@ class GroupTests: XCTestCase {
 		try await group.addMembers(addresses: [fixtures.fred.address])
 
 		try await group.sync()
-		let members = try group.members.map(\.inboxId).sorted()
+		let members = try await group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -243,7 +257,7 @@ class GroupTests: XCTestCase {
 		try await group.addMembersByInboxId(inboxIds: [fixtures.fredClient.inboxID])
 
 		try await group.sync()
-		let members = try group.members.map(\.inboxId).sorted()
+		let members = try await group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -260,7 +274,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
 
 		try await group.sync()
-		let members = try group.members.map(\.inboxId).sorted()
+		let members = try await group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -272,7 +286,7 @@ class GroupTests: XCTestCase {
 
 		try await group.sync()
 
-		let newMembers = try group.members.map(\.inboxId).sorted()
+		let newMembers = try await group.members.map(\.inboxId).sorted()
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
 			fixtures.aliceClient.inboxID,
@@ -287,7 +301,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
 
 		try await group.sync()
-		let members = try group.members.map(\.inboxId).sorted()
+		let members = try await group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -299,7 +313,7 @@ class GroupTests: XCTestCase {
 
 		try await group.sync()
 
-		let newMembers = try group.members.map(\.inboxId).sorted()
+		let newMembers = try await group.members.map(\.inboxId).sorted()
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
 			fixtures.aliceClient.inboxID,
@@ -323,7 +337,7 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address, fixtures.fred.address])
 
 		try await group.sync()
-		let members = try group.members.map(\.inboxId).sorted()
+		let members = try await group.members.map(\.inboxId).sorted()
 
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
@@ -345,7 +359,7 @@ class GroupTests: XCTestCase {
 
 		try await group.sync()
 
-		let newMembers = try group.members.map(\.inboxId).sorted()
+		let newMembers = try await group.members.map(\.inboxId).sorted()
 		XCTAssertEqual([
 			fixtures.bobClient.inboxID,
 			fixtures.aliceClient.inboxID,
@@ -907,7 +921,7 @@ class GroupTests: XCTestCase {
 		await withThrowingTaskGroup(of: [Member].self) { taskGroup in
 			for group in groups {
 				taskGroup.addTask {
-					return try group.members
+					return try await group.members
 				}
 			}
 		}
