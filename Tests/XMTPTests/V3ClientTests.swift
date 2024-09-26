@@ -123,7 +123,7 @@ class V3ClientTests: XCTestCase {
 
 		
 		try await fixtures.boV3Client.contacts.allowInboxes(inboxIds: [fixtures.caroV2V3Client.inboxID])
-		var caroMember = try boGroup.members.first(where: { member in member.inboxId == fixtures.caroV2V3Client.inboxID })
+		var caroMember = try await boGroup.members.first(where: { member in member.inboxId == fixtures.caroV2V3Client.inboxID })
 		XCTAssertEqual(caroMember?.consentState, .allowed)
 
 		isInboxAllowed = try await fixtures.boV3Client.contacts.isInboxAllowed(inboxId: fixtures.caroV2V3Client.inboxID)
@@ -136,7 +136,7 @@ class V3ClientTests: XCTestCase {
 		XCTAssert(!isAddressDenied)
 		
 		try await fixtures.boV3Client.contacts.denyInboxes(inboxIds: [fixtures.caroV2V3Client.inboxID])
-		caroMember = try boGroup.members.first(where: { member in member.inboxId == fixtures.caroV2V3Client.inboxID })
+		caroMember = try await boGroup.members.first(where: { member in member.inboxId == fixtures.caroV2V3Client.inboxID })
 		XCTAssertEqual(caroMember?.consentState, .denied)
 		
 		isInboxAllowed = try await fixtures.boV3Client.contacts.isInboxAllowed(inboxId: fixtures.caroV2V3Client.inboxID)

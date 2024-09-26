@@ -98,20 +98,20 @@ class GroupTests: XCTestCase {
 		try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
 		try await bobGroup.sync()
 
-		let aliceMembers = try await aliceGroup.members.count
-		let bobMembers = try await bobGroup.members.count
-		XCTAssertEqual(aliceMembers, 3)
-		XCTAssertEqual(bobMembers, 3)
+		var aliceMembersCount = try await aliceGroup.members.count
+		var bobMembersCount = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembersCount, 3)
+		XCTAssertEqual(bobMembersCount, 3)
         
         try await bobGroup.addAdmin(inboxId: fixtures.aliceClient.inboxID)
 
 		try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
 		try await bobGroup.sync()
 
-		let aliceMembers2 = try await aliceGroup.members.count
-		let bobMembers2 = try await bobGroup.members.count
-		XCTAssertEqual(aliceMembers2, 2)
-		XCTAssertEqual(bobMembers2, 2)
+		aliceMembersCount = try await aliceGroup.members.count
+		bobMembersCount = try await bobGroup.members.count
+        XCTAssertEqual(aliceMembersCount, 2)
+		XCTAssertEqual(bobMembersCount, 2)
 
 		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
@@ -119,10 +119,10 @@ class GroupTests: XCTestCase {
         try await bobGroup.removeAdmin(inboxId: fixtures.aliceClient.inboxID)
         try await aliceGroup.sync()
 
-		let aliceMembers3 = try await aliceGroup.members.count
-		let bobMembers3 = try await bobGroup.members.count
-		XCTAssertEqual(aliceMembers3, 3)
-		XCTAssertEqual(bobMembers3, 3)
+		aliceMembersCount = try await aliceGroup.members.count
+		bobMembersCount = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembersCount, 3)
+		XCTAssertEqual(bobMembersCount, 3)
 		
         XCTAssertEqual(try bobGroup.permissionPolicySet().addMemberPolicy, .allow)
 		XCTAssertEqual(try aliceGroup.permissionPolicySet().addMemberPolicy, .allow)
@@ -151,38 +151,38 @@ class GroupTests: XCTestCase {
 		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
 
-		let aliceMembers = try await aliceGroup.members.count
-		let bobMembers = try await bobGroup.members.count
-		XCTAssertEqual(aliceMembers, 3)
-		XCTAssertEqual(bobMembers, 3)
+		var aliceMembersCount = try await aliceGroup.members.count
+		var bobMembersCount = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembersCount, 3)
+		XCTAssertEqual(bobMembersCount, 3)
 
 		await assertThrowsAsyncError(
 			try await aliceGroup.removeMembers(addresses: [fixtures.fred.address])
 		)
 		try await bobGroup.sync()
 
-		let aliceMembers1 = try await aliceGroup.members.count
-		let bobMembers1 = try await bobGroup.members.count
-		XCTAssertEqual(aliceMembers1, 3)
-		XCTAssertEqual(bobMembers1, 3)
+		aliceMembersCount = try await aliceGroup.members.count
+		bobMembersCount = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembersCount, 3)
+		XCTAssertEqual(bobMembersCount, 3)
 		
 		try await bobGroup.removeMembers(addresses: [fixtures.fred.address])
 		try await aliceGroup.sync()
 
-		let aliceMembers2 = try await aliceGroup.members.count
-		let bobMembers2 = try await bobGroup.members.count
-		XCTAssertEqual(aliceMembers2, 2)
-		XCTAssertEqual(bobMembers2, 2)
+		aliceMembersCount = try await aliceGroup.members.count
+		bobMembersCount = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembersCount, 2)
+		XCTAssertEqual(bobMembersCount, 2)
 
 		await assertThrowsAsyncError(
 			try await aliceGroup.addMembers(addresses: [fixtures.fred.address])
 		)
 		try await bobGroup.sync()
 
-		let aliceMembers3 = try await aliceGroup.members.count
-		let bobMembers3 = try await bobGroup.members.count
-		XCTAssertEqual(aliceMembers3, 2)
-		XCTAssertEqual(bobMembers2, 2)
+		aliceMembersCount = try await aliceGroup.members.count
+		bobMembersCount = try await bobGroup.members.count
+		XCTAssertEqual(aliceMembersCount, 2)
+		XCTAssertEqual(bobMembersCount, 2)
 		
         XCTAssertEqual(try bobGroup.permissionPolicySet().addMemberPolicy, .admin)
         XCTAssertEqual(try aliceGroup.permissionPolicySet().addMemberPolicy, .admin)
@@ -800,7 +800,7 @@ class GroupTests: XCTestCase {
 
 		
 		try await fixtures.bobClient.contacts.allowInboxes(inboxIds: [fixtures.aliceClient.inboxID])
-		var alixMember = try boGroup.members.first(where: { member in member.inboxId == fixtures.aliceClient.inboxID })
+		var alixMember = try await boGroup.members.first(where: { member in member.inboxId == fixtures.aliceClient.inboxID })
 		XCTAssertEqual(alixMember?.consentState, .allowed)
 
 		isInboxAllowed = try await fixtures.bobClient.contacts.isInboxAllowed(inboxId: fixtures.aliceClient.inboxID)
@@ -810,7 +810,7 @@ class GroupTests: XCTestCase {
 
 		
 		try await fixtures.bobClient.contacts.denyInboxes(inboxIds: [fixtures.aliceClient.inboxID])
-		alixMember = try boGroup.members.first(where: { member in member.inboxId == fixtures.aliceClient.inboxID })
+		alixMember = try await boGroup.members.first(where: { member in member.inboxId == fixtures.aliceClient.inboxID })
 		XCTAssertEqual(alixMember?.consentState, .denied)
 		
 		isInboxAllowed = try await fixtures.bobClient.contacts.isInboxAllowed(inboxId: fixtures.aliceClient.inboxID)
