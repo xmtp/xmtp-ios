@@ -45,5 +45,4 @@ Pod::Spec.new do |spec|
   spec.dependency "GzipSwift"
   spec.dependency "Connect-Swift", "= 0.12.0"
   spec.dependency 'LibXMTP', '= 0.5.9-alpha2'
->>>>>>> 8197ea4bb2a8a61f1e3b483c0a96f706dba6be34
 end
