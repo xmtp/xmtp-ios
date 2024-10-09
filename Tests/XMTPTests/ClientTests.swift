@@ -514,4 +514,17 @@ class ClientTests: XCTestCase {
 		let newState = try await alixClient3.inboxState(refreshFromNetwork: true)
 		XCTAssertEqual(newState.installations.count, 1)
 	}
+	
+	func testCanCreateASCW() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let davonSCW = try FakeSCWWallet.generate()
+		let davonSCWClient = try await Client.createOrBuild(
+			account: davonSCW,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				enableV3: true,
+				encryptionKey: key
+			)
+		)
+	}
 }

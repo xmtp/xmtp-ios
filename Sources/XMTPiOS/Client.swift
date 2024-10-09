@@ -247,7 +247,15 @@ public final class Client {
 				if let signingKey = signingKey {
 					do {
 						let signedData = try await signingKey.sign(message: signatureRequest.signatureText())
-						try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+						if signingKey.isSmartContractWallet {
+							try await signatureRequest.addScwSignature(signatureBytes: signedData.rawData,
+																	   address: signingKey.address,
+																	   chainId: UInt64(signingKey.chainId),
+																	   blockNumber: signingKey.blockNumber.flatMap { $0 >= 0 ? UInt64($0) : nil })
+
+						} else {
+							try await signatureRequest.addEcdsaSignature(signatureBytes: signedData.rawData)
+						}
 						try await v3Client.registerIdentity(signatureRequest: signatureRequest)
 					} catch {
 						throw ClientError.creationError("Failed to sign the message: \(error.localizedDescription)")
