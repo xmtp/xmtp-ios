@@ -19,6 +19,15 @@ import LibXMTP
 public protocol SigningKey {
 	/// A wallet address for this key
 	var address: String { get }
+	
+	/// If this signing key is a smart contract wallet
+	var isSmartContractWallet: Bool { get }
+	
+	/// The name of the chainId for example "1"
+	var chainId: Int64 { get }
+	
+	/// The blockNumber of the chain for example "1"
+	var blockNumber: Int64? { get }
 
 	/// Sign the data and return a secp256k1 compact recoverable signature.
 	func sign(_ data: Data) async throws -> Signature
@@ -29,6 +38,18 @@ public protocol SigningKey {
 }
 
 extension SigningKey {
+	public var isSmartContractWallet: Bool {
+		return false
+	}
+	
+	public var chainId: Int64 {
+		return 1
+	}
+	
+	public var blockNumber: Int64? {
+		return nil
+	}
+
 	func createIdentity(_ identity: PrivateKey, preCreateIdentityCallback: PreEventCallback? = nil) async throws -> AuthorizedIdentity {
 		var slimKey = PublicKey()
 		slimKey.timestamp = UInt64(Date().millisecondsSinceEpoch)

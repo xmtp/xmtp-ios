@@ -5,7 +5,6 @@
 //  Created by Naomi Plasterer on 9/19/24.
 //
 
-import CryptoKit
 import XCTest
 @testable import XMTPiOS
 import LibXMTP
@@ -18,9 +17,11 @@ class V3ClientTests: XCTestCase {
 		var alixV2: PrivateKey!
 		var boV3: PrivateKey!
 		var caroV2V3: PrivateKey!
+		var davonSCW: FakeSCWWallet!
 		var alixV2Client: Client!
 		var boV3Client: Client!
 		var caroV2V3Client: Client!
+		var davonSCWClient: Client!
 	}
 	
 	func localFixtures() async throws -> LocalFixtures {
@@ -50,6 +51,17 @@ class V3ClientTests: XCTestCase {
 				encryptionKey: key
 			)
 		)
+		
+		let davonSCW = try FakeSCWWallet.generate()
+		let davonSCWClient = try await Client.createOrBuild(
+			account: davonSCW,
+			options: .init(
+				api: .init(env: .local, isSecure: false),
+				enableV3: true,
+				encryptionKey: key
+			)
+		)
+		
 		
 		return .init(
 			alixV2: alixV2,

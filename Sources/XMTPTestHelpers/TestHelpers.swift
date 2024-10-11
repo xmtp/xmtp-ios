@@ -7,6 +7,7 @@
 
 #if canImport(XCTest)
 import Combine
+import CryptoKit
 import XCTest
 @testable import XMTPiOS
 import LibXMTP
@@ -64,6 +65,45 @@ public struct FakeWallet: SigningKey {
 
 	public init(_ key: PrivateKey) {
 		self.key = key
+	}
+}
+
+public struct FakeSCWWallet: SigningKey {
+	public var walletAddress: String
+	private var internalSignature: String
+	
+	public init() throws {
+		// Simulate a wallet address (could be derived from a hash of some internal data)
+		self.walletAddress = UUID().uuidString // Using UUID for uniqueness in this fake example
+		self.internalSignature = Data(repeating: 0x01, count: 64).toHex // Fake internal signature
+	}
+	
+	public var address: String {
+		walletAddress
+	}
+
+	public var isSmartContractWallet: Bool {
+		true
+	}
+	
+	public var chainId: Int64 {
+		1
+	}
+	
+	public static func generate() throws -> FakeSCWWallet {
+		return try FakeSCWWallet()
+	}
+	
+	public func sign(_ data: Data) async throws -> XMTPiOS.Signature {
+		let signature = XMTPiOS.Signature.with {
+			$0.ecdsaCompact.bytes = internalSignature.hexToData
+		}
+		return signature
+	}
+	
+	public func sign(message: String) async throws -> XMTPiOS.Signature {
+		let digest = SHA256.hash(data: message.data(using: .utf8)!)
+		return try await sign(Data(digest))
 	}
 }
 
