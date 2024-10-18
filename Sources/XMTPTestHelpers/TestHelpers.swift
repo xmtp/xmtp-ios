@@ -94,16 +94,11 @@ public struct FakeSCWWallet: SigningKey {
 		return try FakeSCWWallet()
 	}
 	
-	public func sign(_ data: Data) async throws -> XMTPiOS.Signature {
-		let signature = XMTPiOS.Signature.with {
-			$0.ecdsaCompact.bytes = internalSignature.hexToData
-		}
-		return signature
-	}
-	
-	public func sign(message: String) async throws -> XMTPiOS.Signature {
+	public func signSCW(message: String) async throws -> Data {
+		// swiftlint:disable force_unwrapping
 		let digest = SHA256.hash(data: message.data(using: .utf8)!)
-		return try await sign(Data(digest))
+		// swiftlint:enable force_unwrapping
+		return Data(digest)
 	}
 }
 
