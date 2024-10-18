@@ -210,7 +210,7 @@ public final class Client {
 		)
 	}
 	
-	public static func buildV3(address: String, scwChainId: Int64?, options: ClientOptions) async throws -> Client {
+	public static func buildV3(address: String, scwChainId: Int64? = nil, options: ClientOptions) async throws -> Client {
 		let accountAddress = if(scwChainId != nil) { "eip155:\(String(describing: scwChainId)):\(address.lowercased())" } else { address }
 		let inboxId = try await getOrCreateInboxId(options: options, address: accountAddress)
 
@@ -688,7 +688,7 @@ public final class Client {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
 		do {
-			return Group(ffiGroup: try client.group(groupId: groupId.hexToData), client: self)
+			return Group(ffiGroup: try client.conversation(conversationId: groupId.hexToData), client: self)
 		} catch {
 			return nil
 		}

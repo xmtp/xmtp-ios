@@ -34,7 +34,7 @@ class V3ClientTests: XCTestCase {
 			)
 		)
 		let boV3 = try PrivateKey.generate()
-		let boV3Client = try await Client.createOrBuild(
+		let boV3Client = try await Client.createV3(
 			account: boV3,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
@@ -45,16 +45,6 @@ class V3ClientTests: XCTestCase {
 		let caroV2V3 = try PrivateKey.generate()
 		let caroV2V3Client = try await Client.create(
 			account: caroV2V3,
-			options: .init(
-				api: .init(env: .local, isSecure: false),
-				enableV3: true,
-				encryptionKey: key
-			)
-		)
-		
-		let davonSCW = try FakeSCWWallet.generate()
-		let davonSCWClient = try await Client.createOrBuild(
-			account: davonSCW,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
 				enableV3: true,

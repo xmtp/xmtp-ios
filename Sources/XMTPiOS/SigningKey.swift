@@ -74,4 +74,16 @@ extension SigningKey {
 
 		return AuthorizedIdentity(address: address, authorized: authorized, identity: identity)
 	}
+	
+	public func sign(_ data: Data) async throws -> Signature {
+		throw NSError(domain: "NotImplemented", code: 1, userInfo: [NSLocalizedDescriptionKey: "sign(Data) not implemented."])
+	}
+
+	public func sign(message: String) async throws -> Signature {
+		throw NSError(domain: "NotImplemented", code: 1, userInfo: [NSLocalizedDescriptionKey: "sign(String) not implemented."])
+	}
+
+	public func signSCW(message: String) async throws -> Data {
+		throw NSError(domain: "NotImplemented", code: 1, userInfo: [NSLocalizedDescriptionKey: "signSCW(String) not implemented."])
+	}
 }
