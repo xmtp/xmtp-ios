@@ -35,6 +35,9 @@ public protocol SigningKey {
 	/// Pass a personal Ethereum signed message string text to be signed, returning
 	/// a secp256k1 compact recoverable signature. You can use ``Signature.ethPersonalMessage`` to generate this text.
 	func sign(message: String) async throws -> Signature
+	
+	/// Pass a personal Ethereum signed message string text to be signed, return bytes to be verified
+	func signSCW(message: String) async throws -> Data
 }
 
 extension SigningKey {
