@@ -45,8 +45,8 @@ extension SigningKey {
 		return false
 	}
 	
-	public var chainId: Int64 {
-		return 1
+	public var chainId: Int64? {
+		return nil
 	}
 	
 	public var blockNumber: Int64? {

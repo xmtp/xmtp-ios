@@ -161,7 +161,7 @@ public final class Client {
 		}
 	}
 	
-	private static func initializeClient(
+	static func initializeClient(
 		accountAddress: String,
 		options: ClientOptions,
 		signingKey: SigningKey?,
@@ -210,8 +210,8 @@ public final class Client {
 		)
 	}
 	
-	public static func buildV3(address: String, scwChainId: Int64? = nil, options: ClientOptions) async throws -> Client {
-		let accountAddress = if(scwChainId != nil) { "eip155:\(String(describing: scwChainId)):\(address.lowercased())" } else { address }
+	public static func buildV3(address: String, chainId: Int64? = nil, options: ClientOptions) async throws -> Client {
+		let accountAddress = if(chainId != nil) { "eip155:\(String(describing: chainId)):\(address.lowercased())" } else { address }
 		let inboxId = try await getOrCreateInboxId(options: options, address: accountAddress)
 
 		return try await initializeClient(
@@ -275,10 +275,13 @@ public final class Client {
 				if let signingKey = signingKey {
 					do {
 						if signingKey.isSmartContractWallet {
+							guard let chainId = signingKey.chainId else {
+								throw ClientError.creationError("Chain id must be present to sign Smart Contract Wallet")
+							}
 							let signedData = try await signingKey.signSCW(message: signatureRequest.signatureText())
 							try await signatureRequest.addScwSignature(signatureBytes: signedData,
 																	   address: signingKey.address,
-																	   chainId: UInt64(signingKey.chainId),
+																	   chainId: UInt64(chainId),
 																	   blockNumber: signingKey.blockNumber.flatMap { $0 >= 0 ? UInt64($0) : nil })
 
 						} else {
