@@ -24,7 +24,7 @@ public protocol SigningKey {
 	var isSmartContractWallet: Bool { get }
 	
 	/// The name of the chainId for example "1"
-	var chainId: Int64 { get }
+	var chainId: Int64? { get }
 	
 	/// The blockNumber of the chain for example "1"
 	var blockNumber: Int64? { get }
