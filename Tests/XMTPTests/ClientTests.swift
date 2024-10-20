@@ -469,12 +469,19 @@ class ClientTests: XCTestCase {
 
 
 		let inboxId = try await Client.getOrCreateInboxId(options: options, address: alix.address)
-		let alixClient = try await Client.createOrBuild(
+		let alixClient = try await Client.createV3(
 			account: alix,
 			options: options
 		)
 
 		XCTAssertEqual(inboxId, alixClient.inboxID)
+		
+		let alixClient2 = try await Client.buildV3(
+			address: alix.address,
+			options: options
+		)
+		
+		XCTAssertEqual(alixClient2.inboxID, alixClient.inboxID)
 	}
 	
 	func testRevokesAllOtherInstallations() async throws {
