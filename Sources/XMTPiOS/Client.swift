@@ -210,9 +210,9 @@ public final class Client {
 		)
 	}
 	
-	public static func buildV3(address: String, chainId: Int64? = nil, options: ClientOptions) async throws -> Client {
+	public static func buildV3(address: String, chainId: UInt64? = nil, options: ClientOptions) async throws -> Client {
 		let accountAddress = chainId != nil ?
-			"eip155:\(String(describing: chainId)):\(address.lowercased())" :
+			"eip155:\(String(describing: chainId!)):\(address.lowercased())" :
 			address
 		let inboxId = try await getOrCreateInboxId(options: options, address: accountAddress)
 
