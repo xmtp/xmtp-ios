@@ -523,6 +523,7 @@ class ClientTests: XCTestCase {
 	}
 	
 	func testCreatesASCWClient() async throws {
+		throw XCTSkip("TODO: Need to write a SCW local deploy with anvil")
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let alix = try FakeSCWWallet.generate()
 		let options = ClientOptions.init(
@@ -533,11 +534,15 @@ class ClientTests: XCTestCase {
 
 
 		let inboxId = try await Client.getOrCreateInboxId(options: options, address: alix.address)
+		
 		let alixClient = try await Client.createV3(
 			account: alix,
 			options: options
 		)
-
+		
+		let alixClient2 = try await Client.buildV3(address: alix.address, options: options)
 		XCTAssertEqual(inboxId, alixClient.inboxID)
+		XCTAssertEqual(alixClient2.inboxID, alixClient.inboxID)
+
 	}
 }

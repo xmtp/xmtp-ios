@@ -86,7 +86,7 @@ public struct FakeSCWWallet: SigningKey {
 		WalletType.SCW
 	}
 	
-	public var chainId: Int64 {
+	public var chainId: Int64? {
 		1
 	}
 	
