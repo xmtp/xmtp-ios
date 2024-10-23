@@ -17,11 +17,9 @@ class V3ClientTests: XCTestCase {
 		var alixV2: PrivateKey!
 		var boV3: PrivateKey!
 		var caroV2V3: PrivateKey!
-		var davonSCW: FakeSCWWallet!
 		var alixV2Client: Client!
 		var boV3Client: Client!
 		var caroV2V3Client: Client!
-		var davonSCWClient: Client!
 	}
 	
 	func localFixtures() async throws -> LocalFixtures {
@@ -51,8 +49,7 @@ class V3ClientTests: XCTestCase {
 				encryptionKey: key
 			)
 		)
-		
-		
+
 		return .init(
 			alixV2: alixV2,
 			boV3: boV3,
