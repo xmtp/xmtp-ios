@@ -473,15 +473,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 
 		options.direction = direction
 
-		let messages = try ffiGroup.findMessages(opts: options).compactMap { ffiMessage in
+		return try ffiGroup.findMessages(opts: options).compactMap { ffiMessage in
 			return MessageV3(client: self.client, ffiMessage: ffiMessage).decryptOrNull()
-		}
-		
-		switch direction {
-		case .ascending:
-			return messages
-		default:
-			return messages.reversed()
 		}
 	}
 }
