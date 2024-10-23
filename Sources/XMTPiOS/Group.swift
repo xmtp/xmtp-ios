@@ -229,14 +229,9 @@ public struct Group: Identifiable, Equatable, Hashable {
 		return try ffiGroup.consentState().fromFFI
 	}
 	
-	public func processMessage(envelopeBytes: Data) async throws -> DecodedMessage {
+	public func processMessage(envelopeBytes: Data) async throws -> MessageV3 {
 		let message = try await ffiGroup.processStreamedConversationMessage(envelopeBytes: envelopeBytes)
-		return try MessageV3(client: client, ffiMessage: message).decode()
-	}
-	
-	public func processMessageDecrypted(envelopeBytes: Data) async throws -> DecryptedMessage {
-		let message = try await ffiGroup.processStreamedConversationMessage(envelopeBytes: envelopeBytes)
-		return try MessageV3(client: client, ffiMessage: message).decrypt()
+		return MessageV3(client: client, ffiMessage: message)
 	}
 
 	public func send<T>(content: T, options: SendOptions? = nil) async throws -> String {

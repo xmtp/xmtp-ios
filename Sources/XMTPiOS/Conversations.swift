@@ -741,6 +741,8 @@ public actor Conversations {
 			}
 		}
 	}
+	
+	// ------- V1 V2 to be deprecated ------
 
 	private func makeConversation(from sealedInvitation: SealedInvitation) throws -> ConversationV2 {
 		let unsealed = try sealedInvitation.v1.getInvitation(viewer: client.keys)

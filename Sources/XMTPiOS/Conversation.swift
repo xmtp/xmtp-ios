@@ -29,6 +29,47 @@ public enum Conversation: Sendable {
 	public enum Version {
 		case v1, v2, group, dm
 	}
+	
+	public var id: String {
+		get throws {
+			switch self {
+			case .v1(_):
+				throw ConversationError.v1NotSupported("id")
+			case .v2(_):
+				throw ConversationError.v2NotSupported("id")
+			case let .group(group):
+				return group.id
+			case let .dm(dm):
+				return dm.id
+			}
+		}
+	}
+	
+	public func isCreator() async throws -> Bool {
+		switch self {
+		case .v1(_):
+			throw ConversationError.v1NotSupported("isCreator")
+		case .v2(_):
+			throw ConversationError.v2NotSupported("isCreator")
+		case let .group(group):
+			return try group.isCreator()
+		case let .dm(dm):
+			return try dm.isCreator()
+		}
+	}
+	
+	public func members() async throws -> [Member] {
+		switch self {
+		case .v1(_):
+			throw ConversationError.v1NotSupported("members")
+		case .v2(_):
+			throw ConversationError.v2NotSupported("members")
+		case let .group(group):
+			return try await group.members
+		case let .dm(dm):
+			return try await dm.members
+		}
+	}
 
 	public func consentState() async throws -> ConsentState {
 		switch self {
@@ -40,6 +81,58 @@ public enum Conversation: Sendable {
 			return try group.consentState()
 		case let .dm(dm):
 			return try dm.consentState()
+		}
+	}
+	
+	public func updateConsentState(state: ConsentState) async throws {
+		switch self {
+		case .v1(_):
+			throw ConversationError.v1NotSupported("updateConsentState use contact.allowAddresses instead")
+		case .v2(_):
+			throw ConversationError.v2NotSupported("updateConsentState use contact.allowAddresses instead")
+		case let .group(group):
+			try await group.updateConsentState(state: state)
+		case let .dm(dm):
+			try await dm.updateConsentState(state: state)
+		}
+	}
+	
+	public func sync() async throws {
+		switch self {
+		case .v1(_):
+			throw ConversationError.v1NotSupported("sync")
+		case .v2(_):
+			throw ConversationError.v2NotSupported("sync")
+		case let .group(group):
+			try await group.sync()
+		case let .dm(dm):
+			try await dm.sync()
+		}
+	}
+
+	public func processMessage(envelopeBytes: Data) async throws -> MessageV3 {
+		switch self {
+		case .v1(_):
+			throw ConversationError.v1NotSupported("processMessage")
+		case .v2(_):
+			throw ConversationError.v2NotSupported("processMessage")
+		case let .group(group):
+			try await group.processMessage(envelopeBytes: envelopeBytes)
+		case let .dm(dm):
+			try await dm.processMessage(envelopeBytes: envelopeBytes)
+		}
+	}
+	
+	public func prepareMessageV3<T>(content: T, options: SendOptions? = nil) async throws -> String {
+		switch self {
+		case .v1(_):
+			throw ConversationError.v1NotSupported("prepareMessageV3 use prepareMessage instead")
+		case .v2(_):
+			throw ConversationError.v2NotSupported("prepareMessageV3 use prepareMessage instead")
+		case let .group(group):
+			try await group.prepareMessage(content: content, options: options)
+		case let .dm(dm):
+			try await dm.prepareMessage(content: content, options: options)
 		}
 	}
 
