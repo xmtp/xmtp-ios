@@ -373,7 +373,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 			sentBeforeNs: nil,
 			sentAfterNs: nil,
 			limit: nil,
-			deliveryStatus: nil
+			deliveryStatus: nil,
+			direction: nil
 		)
 
 		if let before {
@@ -402,16 +403,20 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}()
 
 		options.deliveryStatus = status
+		
+		let direction: FfiDirection? = {
+			switch direction {
+			case .ascending:
+				return FfiDirection.ascending
+			default:
+				return FfiDirection.descending
+			}
+		}()
 
-		let messages = try ffiGroup.findMessages(opts: options).compactMap { ffiMessage in
+		options.direction = direction
+
+		return try ffiGroup.findMessages(opts: options).compactMap { ffiMessage in
 			return MessageV3(client: self.client, ffiMessage: ffiMessage).decodeOrNull()
-		}
-
-		switch direction {
-		case .ascending:
-			return messages
-		default:
-			return messages.reversed()
 		}
 	}
 
@@ -426,7 +431,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 			sentBeforeNs: nil,
 			sentAfterNs: nil,
 			limit: nil,
-			deliveryStatus: nil
+			deliveryStatus: nil,
+			direction: nil
 		)
 
 		if let before {
@@ -455,6 +461,17 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}()
 		
 		options.deliveryStatus = status
+		
+		let direction: FfiDirection? = {
+			switch direction {
+			case .ascending:
+				return FfiDirection.ascending
+			default:
+				return FfiDirection.descending
+			}
+		}()
+
+		options.direction = direction
 
 		let messages = try ffiGroup.findMessages(opts: options).compactMap { ffiMessage in
 			return MessageV3(client: self.client, ffiMessage: ffiMessage).decryptOrNull()

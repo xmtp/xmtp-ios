@@ -9,6 +9,10 @@ import Foundation
 import web3
 import LibXMTP
 
+public enum WalletType {
+	case EOA, SCW
+}
+
 /// Defines a type that is used by a ``Client`` to sign keys and messages.
 ///
 /// You can use ``Account`` for an easier WalletConnect flow, or ``PrivateKey``
@@ -20,8 +24,8 @@ public protocol SigningKey {
 	/// A wallet address for this key
 	var address: String { get }
 	
-	/// If this signing key is a smart contract wallet
-	var isSmartContractWallet: Bool { get }
+	/// The wallet type if Smart Contract Wallet this should be type SCW. Default EOA
+	var type: WalletType { get }
 	
 	/// The name of the chainId for example "1"
 	var chainId: Int64? { get }
@@ -41,8 +45,8 @@ public protocol SigningKey {
 }
 
 extension SigningKey {
-	public var isSmartContractWallet: Bool {
-		return false
+	public var type: WalletType {
+		return WalletType.EOA
 	}
 	
 	public var chainId: Int64? {

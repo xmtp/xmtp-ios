@@ -82,8 +82,8 @@ public struct FakeSCWWallet: SigningKey {
 		walletAddress
 	}
 
-	public var isSmartContractWallet: Bool {
-		true
+	public var type: WalletType {
+		WalletType.SCW
 	}
 	
 	public var chainId: Int64 {

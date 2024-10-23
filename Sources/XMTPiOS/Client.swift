@@ -271,7 +271,7 @@ public final class Client {
 			if let signatureRequest = v3Client.signatureRequest() {
 				if let signingKey = signingKey {
 					do {
-						if signingKey.isSmartContractWallet {
+						if signingKey.type == WalletType.SCW {
 							guard let chainId = signingKey.chainId else {
 								throw ClientError.creationError("Chain id must be present to sign Smart Contract Wallet")
 							}
