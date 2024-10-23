@@ -196,8 +196,12 @@ extension FfiV2SubscribeRequest {
 // MARK: Group
 
 extension FfiConversation {
-	func fromFFI(client: Client) -> Group {
+	func groupFromFFI(client: Client) -> Group {
 		Group(ffiGroup: self, client: client)
+	}
+	
+	func dmFromFFI(client: Client) -> Dm {
+		Dm(ffiConversation: self, client: client)
 	}
 }
 

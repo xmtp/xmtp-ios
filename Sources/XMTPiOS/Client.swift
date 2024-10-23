@@ -700,9 +700,9 @@ public final class Client {
 		}
 		let conversation = try client.conversation(conversationId: conversationId.hexToData)
 		return if (try conversation.groupMetadata().conversationType() == "dm") {
-			Conversation.dm(Dm(ffiConversation: conversation, client: self))
+			Conversation.dm(conversation.dmFromFFI(client: self))
 		} else if (try conversation.groupMetadata().conversationType() == "group") {
-			Conversation.group(Group(ffiGroup: conversation, client: self))
+			Conversation.group(conversation.groupFromFFI(client: self))
 		} else {
 			nil
 		}
