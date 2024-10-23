@@ -197,9 +197,7 @@ public final class Client {
 	}
 
 	public static func createV3(account: SigningKey, options: ClientOptions) async throws -> Client {
-		let accountAddress = account.isSmartContractWallet ?
-			"eip155:\(String(describing: account.chainId)):\(account.address.lowercased())" :
-			account.address
+		let accountAddress = account.address
 		let inboxId = try await getOrCreateInboxId(options: options, address: accountAddress)
 
 		return try await initializeClient(
@@ -210,14 +208,11 @@ public final class Client {
 		)
 	}
 	
-	public static func buildV3(address: String, chainId: Int64? = nil, options: ClientOptions) async throws -> Client {
-		let accountAddress = chainId != nil ?
-			"eip155:\(String(describing: chainId)):\(address.lowercased())" :
-			address
-		let inboxId = try await getOrCreateInboxId(options: options, address: accountAddress)
+	public static func buildV3(address: String, options: ClientOptions) async throws -> Client {
+		let inboxId = try await getOrCreateInboxId(options: options, address: address)
 
 		return try await initializeClient(
-			accountAddress: accountAddress,
+			accountAddress: address,
 			options: options,
 			signingKey: nil,
 			inboxId: inboxId
