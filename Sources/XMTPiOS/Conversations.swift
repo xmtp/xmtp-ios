@@ -2,7 +2,7 @@ import Foundation
 import LibXMTP
 
 public enum ConversationError: Error, CustomStringConvertible, LocalizedError {
-	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String)
+	case recipientNotOnNetwork, recipientIsSender, v1NotSupported(String), v2NotSupported(String), v3NotSupported(String)
 
 	public var description: String {
 		switch self {
@@ -12,6 +12,10 @@ public enum ConversationError: Error, CustomStringConvertible, LocalizedError {
 			return "ConversationError.recipientNotOnNetwork: Recipient is not on network"
 		case .v1NotSupported(let str):
 			return "ConversationError.v1NotSupported: V1 does not support: \(str)"
+		case .v2NotSupported(let str):
+			return "ConversationError.v2NotSupported: V2 does not support: \(str)"
+		case .v3NotSupported(let str):
+			return "ConversationError.v3NotSupported: V3 does not support: \(str)"
 		}
 	}
 	

@@ -693,6 +693,51 @@ public final class Client {
 			return nil
 		}
 	}
+	
+	public func findConversation(conversationId: String) throws -> Conversation? {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error no V3 client initialized")
+		}
+		let conversation = try client.conversation(conversationId: conversationId.hexToData)
+		return if (try conversation.groupMetadata().conversationType() == "dm") {
+			Conversation.dm(Dm(ffiConversation: conversation, client: self))
+		} else if (try conversation.groupMetadata().conversationType() == "group") {
+			Conversation.group(Group(ffiGroup: conversation, client: self))
+		} else {
+			nil
+		}
+	}
+	
+	public func findConversationByTopic(topic: String) throws -> Conversation? {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error no V3 client initialized")
+		}
+		let regexPattern = #"/xmtp/mls/1/g-(.*?)/proto"#
+		if let regex = try? NSRegularExpression(pattern: regexPattern) {
+			let range = NSRange(location: 0, length: topic.utf16.count)
+			if let match = regex.firstMatch(in: topic, options: [], range: range) {
+				let conversationId = (topic as NSString).substring(with: match.range(at: 1))
+				let conversation = try client.conversation(conversationId: conversationId.hexToData)
+				if (try conversation.groupMetadata().conversationType() == "dm") {
+					return Conversation.dm(Dm(ffiConversation: conversation, client: self))
+				} else if (try conversation.groupMetadata().conversationType() == "group") {
+					return Conversation.group(Group(ffiGroup: conversation, client: self))
+				}
+			}
+		}
+		return nil
+	}
+	
+	public func findDm(address: String) async throws -> Dm? {
+		guard let client = v3Client else {
+			throw ClientError.noV3Client("Error no V3 client initialized")
+		}
+		guard let inboxId = try await inboxIdFromAddress(address: address) else {
+			throw ClientError.creationError("No inboxId present")
+		}
+		let conversation = try client.dmConversation(targetInboxId: inboxId)
+		return Dm(ffiConversation: conversation, client: self)
+	}
 
 	public func findMessage(messageId: String) throws -> MessageV3? {
 		guard let client = v3Client else {
