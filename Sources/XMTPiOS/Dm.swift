@@ -57,13 +57,16 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public var peerInboxIds: [String] {
+	public var peerInboxId: String {
 		get async throws {
 			var ids = try await members.map(\.inboxId)
 			if let index = ids.firstIndex(of: client.inboxID) {
 				ids.remove(at: index)
 			}
-			return ids
+			guard let inboxId = ids.first else {
+				throw ClientError.missingInboxId
+			}
+			return inboxId
 		}
 	}
 

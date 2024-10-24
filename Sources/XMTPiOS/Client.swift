@@ -15,6 +15,7 @@ public enum ClientError: Error, CustomStringConvertible, LocalizedError {
 	case creationError(String)
 	case noV3Client(String)
 	case noV2Client(String)
+	case missingInboxId
 
 	public var description: String {
 		switch self {
@@ -24,6 +25,8 @@ public enum ClientError: Error, CustomStringConvertible, LocalizedError {
 			return "ClientError.noV3Client: \(err)"
 		case .noV2Client(let err):
 			return "ClientError.noV2Client: \(err)"
+		case .missingInboxId:
+			return "ClientError.missingInboxId"
 		}
 	}
 
