@@ -70,6 +70,100 @@ class V3ClientTests: XCTestCase {
 			try await fixtures.boV3Client.conversations.newGroup(with: [fixtures.alixV2.address])
 		)
 	}
+
+	func testCanCreateDm() async throws {
+		let fixtures = try await localFixtures()
+
+		let dm = try await fixtures.boV3Client.conversations.findOrCreateDm(with: fixtures.caroV2V3.walletAddress)
+		let members = try await dm.members
+		XCTAssertEqual(members.count, 2)
+ 
+		let sameDm = try await fixtures.boV3Client.findDm(address: fixtures.caroV2V3.walletAddress)
+		XCTAssertEqual(sameDm?.id, dm.id)
+
+		try await fixtures.caroV2V3Client.conversations.sync()
+		let caroDm = try await fixtures.caroV2V3Client.findDm(address: fixtures.boV3Client.address)
+		XCTAssertEqual(caroDm?.id, dm.id)
+
+		await assertThrowsAsyncError(
+			try await fixtures.boV3Client.conversations.findOrCreateDm(with: fixtures.alixV2.walletAddress)
+		)
+	}
+
+	func testCanFindConversationByTopic() async throws {
+		let fixtures = try await localFixtures()
+
+		let group = try await fixtures.boV3Client.conversations.newGroup(with: [fixtures.caroV2V3.walletAddress])
+		let dm = try await fixtures.boV3Client.conversations.findOrCreateDm(with: fixtures.caroV2V3.walletAddress)
+
+		let sameDm = try fixtures.boV3Client.findConversationByTopic(topic: dm.topic)
+		let sameGroup = try fixtures.boV3Client.findConversationByTopic(topic: group.topic)
+
+		XCTAssertEqual(group.id, try sameGroup?.id)
+		XCTAssertEqual(dm.id, try sameDm?.id)
+	}
+
+	func testCanListConversations() async throws {
+		let fixtures = try await localFixtures()
+
+		let dm = try await fixtures.boV3Client.conversations.findOrCreateDm(with: fixtures.caroV2V3.walletAddress)
+		let group = try await fixtures.boV3Client.conversations.newGroup(with: [fixtures.caroV2V3.walletAddress])
+
+		let convoCount = try await fixtures.boV3Client.conversations.listConversations().count
+		let dmCount = try await fixtures.boV3Client.conversations.dms().count
+		let groupCount = try await fixtures.boV3Client.conversations.groups().count
+		XCTAssertEqual(convoCount, 2)
+		XCTAssertEqual(dmCount, 1)
+		XCTAssertEqual(groupCount, 1)
+
+		try await fixtures.caroV2V3Client.conversations.sync()
+		let convoCount2 = try await fixtures.caroV2V3Client.conversations.list(includeGroups: true).count
+		let groupCount2 = try await fixtures.caroV2V3Client.conversations.groups().count
+		XCTAssertEqual(convoCount2, 1)
+		XCTAssertEqual(groupCount2, 1)
+	}
+
+	func testCanListConversationsFiltered() async throws {
+		let fixtures = try await localFixtures()
+
+		let dm = try await fixtures.boV3Client.conversations.findOrCreateDm(with: fixtures.caroV2V3.walletAddress)
+		let group = try await fixtures.boV3Client.conversations.newGroup(with: [fixtures.caroV2V3.walletAddress])
+		
+		let convoCount = try await fixtures.boV3Client.conversations.listConversations().count
+		let convoCountConsent = try await fixtures.boV3Client.conversations.listConversations(consentState: .allowed).count
+
+		XCTAssertEqual(convoCount, 2)
+		XCTAssertEqual(convoCountConsent, 2)
+
+		try await group.updateConsentState(state: .denied)
+		
+		let convoCountAllowed = try await fixtures.boV3Client.conversations.listConversations(consentState: .allowed).count
+		let convoCountDenied = try await fixtures.boV3Client.conversations.listConversations(consentState: .allowed).count
+
+		XCTAssertEqual(convoCountAllowed, 1)
+		XCTAssertEqual(convoCountDenied, 1)
+	}
+
+	func testCanListConversationsOrder() async throws {
+		let fixtures = try await localFixtures()
+
+		let dm = try await fixtures.boV3Client.conversations.findOrCreateDm(with: fixtures.caroV2V3.walletAddress)
+		let group1 = try await fixtures.boV3Client.conversations.newGroup(with: [fixtures.caroV2V3.walletAddress])
+		let group2 = try await fixtures.boV3Client.conversations.newGroup(with: [fixtures.caroV2V3.walletAddress])
+
+		_ = try await dm.send(content: "Howdy")
+		_ = try await group2.send(content: "Howdy")
+		_ = try await fixtures.boV3Client.conversations.syncAllConversations()
+
+		let conversations = try await fixtures.boV3Client.conversations.listConversations()
+		let conversationsOrdered = try await fixtures.boV3Client.conversations.listConversations(order: .lastMessage)
+
+		XCTAssertEqual(conversations.count, 3)
+		XCTAssertEqual(conversationsOrdered.count, 3)
+
+		XCTAssertEqual(try conversations.map { try $0.id }, [dm.id, group1.id, group2.id])
+		XCTAssertEqual(try conversationsOrdered.map { try $0.id }, [group2.id, dm.id, group1.id])
+	}
 	
 	func testsCanSendMessages() async throws {
 		let fixtures = try await localFixtures()
