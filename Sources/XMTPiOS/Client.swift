@@ -200,7 +200,7 @@ public final class Client {
 	}
 
 	public static func createV3(account: SigningKey, options: ClientOptions) async throws -> Client {
-		let accountAddress = account.address
+		let accountAddress = account.address.lowercased()
 		let inboxId = try await getOrCreateInboxId(options: options, address: accountAddress)
 
 		return try await initializeClient(
@@ -212,10 +212,11 @@ public final class Client {
 	}
 	
 	public static func buildV3(address: String, options: ClientOptions) async throws -> Client {
-		let inboxId = try await getOrCreateInboxId(options: options, address: address)
+		let accountAddress = address.lowercased()
+		let inboxId = try await getOrCreateInboxId(options: options, address: accountAddress)
 
 		return try await initializeClient(
-			accountAddress: address,
+			accountAddress: accountAddress,
 			options: options,
 			signingKey: nil,
 			inboxId: inboxId
@@ -701,22 +702,30 @@ public final class Client {
 		guard let client = v3Client else {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
-		let conversation = try client.conversation(conversationId: conversationId.hexToData)
-		return try conversation.toConversation(client: self)
+		do {
+			let conversation = try client.conversation(conversationId: conversationId.hexToData)
+			return try conversation.toConversation(client: self)
+		} catch {
+			return nil
+		}
 	}
 	
 	public func findConversationByTopic(topic: String) throws -> Conversation? {
 		guard let client = v3Client else {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
-		let regexPattern = #"/xmtp/mls/1/g-(.*?)/proto"#
-		if let regex = try? NSRegularExpression(pattern: regexPattern) {
-			let range = NSRange(location: 0, length: topic.utf16.count)
-			if let match = regex.firstMatch(in: topic, options: [], range: range) {
-				let conversationId = (topic as NSString).substring(with: match.range(at: 1))
-				let conversation = try client.conversation(conversationId: conversationId.hexToData)
-				return try conversation.toConversation(client: self)
+		do {
+			let regexPattern = #"/xmtp/mls/1/g-(.*?)/proto"#
+			if let regex = try? NSRegularExpression(pattern: regexPattern) {
+				let range = NSRange(location: 0, length: topic.utf16.count)
+				if let match = regex.firstMatch(in: topic, options: [], range: range) {
+					let conversationId = (topic as NSString).substring(with: match.range(at: 1))
+					let conversation = try client.conversation(conversationId: conversationId.hexToData)
+					return try conversation.toConversation(client: self)
+				}
 			}
+		} catch {
+			return nil
 		}
 		return nil
 	}
@@ -728,8 +737,12 @@ public final class Client {
 		guard let inboxId = try await inboxIdFromAddress(address: address) else {
 			throw ClientError.creationError("No inboxId present")
 		}
-		let conversation = try client.dmConversation(targetInboxId: inboxId)
-		return Dm(ffiConversation: conversation, client: self)
+		do {
+			let conversation = try client.dmConversation(targetInboxId: inboxId)
+			return Dm(ffiConversation: conversation, client: self)
+		} catch {
+			return nil
+		}
 	}
 
 	public func findMessage(messageId: String) throws -> MessageV3? {

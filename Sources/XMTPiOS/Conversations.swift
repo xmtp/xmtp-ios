@@ -358,9 +358,19 @@ public actor Conversations {
 		if !canMessage  {
 			throw ConversationError.recipientNotOnNetwork
 		}
-		let dm = try await v3Client.conversations().createDm(accountAddress: peerAddress).dmFromFFI(client: client)
+		
 		try await client.contacts.allow(addresses: [peerAddress])
-		return dm
+
+		if let existingDm = try await client.findDm(address: peerAddress) {
+			return existingDm
+		}
+		
+		let newDm = try await v3Client.conversations()
+			.createDm(accountAddress: peerAddress.lowercased())
+			.dmFromFFI(client: client)
+		
+		try await client.contacts.allow(addresses: [peerAddress])
+		return newDm
 	}
     
     public func newGroup(with addresses: [String],
