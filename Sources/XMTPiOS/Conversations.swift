@@ -296,7 +296,7 @@ public actor Conversations {
 		}
 	}
 	
-	private func streamConversations() -> AsyncThrowingStream<Conversation, Error> {
+	public func streamConversations() -> AsyncThrowingStream<Conversation, Error> {
 		AsyncThrowingStream { continuation in
 			if (client.hasV2Client) {
 				continuation.finish(throwing: ConversationError.v2NotSupported("Only supported with V3 only clients use stream instead"))
