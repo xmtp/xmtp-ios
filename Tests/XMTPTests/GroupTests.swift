@@ -760,7 +760,10 @@ class GroupTests: XCTestCase {
                 return
             case .group(let group):
                 bobGroup = group
-        }
+		    case .dm(_):
+				XCTFail("failed converting conversation to group")
+				return
+		}
         groupName = try bobGroup.groupName()
         XCTAssertEqual(groupName, "Start Name")
         

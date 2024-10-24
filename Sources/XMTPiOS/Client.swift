@@ -699,13 +699,7 @@ public final class Client {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
 		let conversation = try client.conversation(conversationId: conversationId.hexToData)
-		return if (try conversation.groupMetadata().conversationType() == "dm") {
-			Conversation.dm(conversation.dmFromFFI(client: self))
-		} else if (try conversation.groupMetadata().conversationType() == "group") {
-			Conversation.group(conversation.groupFromFFI(client: self))
-		} else {
-			nil
-		}
+		return try conversation.toConversation(client: self)
 	}
 	
 	public func findConversationByTopic(topic: String) throws -> Conversation? {
@@ -718,11 +712,7 @@ public final class Client {
 			if let match = regex.firstMatch(in: topic, options: [], range: range) {
 				let conversationId = (topic as NSString).substring(with: match.range(at: 1))
 				let conversation = try client.conversation(conversationId: conversationId.hexToData)
-				if (try conversation.groupMetadata().conversationType() == "dm") {
-					return Conversation.dm(Dm(ffiConversation: conversation, client: self))
-				} else if (try conversation.groupMetadata().conversationType() == "group") {
-					return Conversation.group(Group(ffiGroup: conversation, client: self))
-				}
+				return try conversation.toConversation(client: self)
 			}
 		}
 		return nil
