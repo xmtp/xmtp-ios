@@ -206,9 +206,9 @@ extension FfiConversation {
 	
 	func toConversation(client: Client) throws -> Conversation {
 		if (try groupMetadata().conversationType() == "dm") {
-			Conversation.dm(self.dmFromFFI(client: client))
+			return Conversation.dm(self.dmFromFFI(client: client))
 		} else {
-			Conversation.group(self.groupFromFFI(client: client))
+			return Conversation.group(self.groupFromFFI(client: client))
 		}
 	}
 }

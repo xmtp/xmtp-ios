@@ -117,9 +117,9 @@ public enum Conversation: Sendable {
 		case .v2(_):
 			throw ConversationError.v2NotSupported("processMessage")
 		case let .group(group):
-			try await group.processMessage(envelopeBytes: envelopeBytes)
+			return try await group.processMessage(envelopeBytes: envelopeBytes)
 		case let .dm(dm):
-			try await dm.processMessage(envelopeBytes: envelopeBytes)
+			return try await dm.processMessage(envelopeBytes: envelopeBytes)
 		}
 	}
 	
