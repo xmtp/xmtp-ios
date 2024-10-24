@@ -138,7 +138,7 @@ class V3ClientTests: XCTestCase {
 		try await group.updateConsentState(state: .denied)
 		
 		let convoCountAllowed = try await fixtures.boV3Client.conversations.listConversations(consentState: .allowed).count
-		let convoCountDenied = try await fixtures.boV3Client.conversations.listConversations(consentState: .allowed).count
+		let convoCountDenied = try await fixtures.boV3Client.conversations.listConversations(consentState: .denied).count
 
 		XCTAssertEqual(convoCountAllowed, 1)
 		XCTAssertEqual(convoCountDenied, 1)
