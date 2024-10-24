@@ -274,7 +274,7 @@ class V3ClientTests: XCTestCase {
 		expectation1.expectedFulfillmentCount = 2
 		let convo = try await fixtures.boV3Client.conversations.findOrCreateDm(with: fixtures.caroV2V3.address)
 		let group = try await fixtures.caroV2V3Client.conversations.newGroup(with: [fixtures.boV3.address])
-		try await fixtures.caroV2V3Client.conversations.sync()
+		try await fixtures.boV3Client.conversations.sync()
 		Task(priority: .userInitiated) {
 			for try await _ in await fixtures.boV3Client.conversations.streamAllConversationMessages() {
 				expectation1.fulfill()
