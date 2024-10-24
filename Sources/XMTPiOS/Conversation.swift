@@ -130,9 +130,9 @@ public enum Conversation: Sendable {
 		case .v2(_):
 			throw ConversationError.v2NotSupported("prepareMessageV3 use prepareMessage instead")
 		case let .group(group):
-			try await group.prepareMessage(content: content, options: options)
+			return try await group.prepareMessage(content: content, options: options)
 		case let .dm(dm):
-			try await dm.prepareMessage(content: content, options: options)
+			return try await dm.prepareMessage(content: content, options: options)
 		}
 	}
 
