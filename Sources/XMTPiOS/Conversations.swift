@@ -128,7 +128,7 @@ public actor Conversations {
 		return try await v3Client.conversations().syncAllConversations()
 	}
 	
-	public func syncAllConversations() async throws ->  UInt32 {
+	public func syncAllConversations() async throws -> UInt32 {
 		guard let v3Client = client.v3Client else {
 			return 0
 		}
