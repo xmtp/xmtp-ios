@@ -196,8 +196,8 @@ class GroupTests: XCTestCase {
 	func testCanListGroups() async throws {
 		let fixtures = try await localFixtures()
 		_ = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
-		_ = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.bob.walletAddress)
-		_ = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.alice.walletAddress)
+		_ = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.bob.address)
+		_ = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.alice.address)
 		
 		try await fixtures.aliceClient.conversations.sync()
 		let aliceGroupCount = try await fixtures.aliceClient.conversations.groups().count
