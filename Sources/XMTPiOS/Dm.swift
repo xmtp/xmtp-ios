@@ -58,16 +58,7 @@ public struct Dm: Identifiable, Equatable, Hashable {
 	}
 
 	public var peerInboxId: String {
-		get async throws {
-			var ids = try await members.map(\.inboxId)
-			if let index = ids.firstIndex(of: client.inboxID) {
-				ids.remove(at: index)
-			}
-			guard let inboxId = ids.first else {
-				throw ClientError.missingInboxId
-			}
-			return inboxId
-		}
+		ffiConversation.dmPeerInboxId()
 	}
 
 	public var createdAt: Date {
