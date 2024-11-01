@@ -419,35 +419,4 @@ class V3ClientTests: XCTestCase {
 		}
 		return clients
 	}
-	
-	func testCompareV2AndV3Dms() async throws {
-		let alixClient = try await createV2Clients(num: 1).first!
-		let davonV3Client = try await createV3Clients(num: 1).first!
-
-		let initialPeers = try await createV2Clients(num: 50)
-		let initialV3Peers = try await createV3Clients(num: 50)
-
-		try await createDms(client: davonV3Client, peers: initialV3Peers, numMessages: 1)
-		try await createV2Convos(client: alixClient, peers: initialPeers, numMessages: 1)
-
-		var start = Date()
-		var v2Convos = try await alixClient.conversations.list()
-		var end = Date()
-		print("Alix loaded \(v2Convos.count) v2Convos in \(end.timeIntervalSince(start) * 1000)ms")
-		
-		start = Date()
-		v2Convos = try await alixClient.conversations.list()
-		end = Date()
-		print("Alix 2nd loaded \(v2Convos.count) v2Convos in \(end.timeIntervalSince(start) * 1000)ms")
-		
-		start = Date()
-		try await davonV3Client.conversations.sync()
-		end = Date()
-		print("Davon synced \(v2Convos.count) Dms in \(end.timeIntervalSince(start) * 1000)ms")
-		
-		start = Date()
-		let dms = try await davonV3Client.conversations.listConversations()
-		end = Date()
-		print("Davon loaded \(dms.count) Dms in \(end.timeIntervalSince(start) * 1000)ms")
-	}
 }
