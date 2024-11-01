@@ -54,6 +54,10 @@ public enum ConversationOrder {
 }
 
 final class ConversationStreamCallback: FfiConversationCallback {
+	func onError(error: LibXMTP.FfiSubscribeError) {
+		print("Error ConversationStreamCallback \(error)")
+	}
+	
 	let callback: (FfiConversation) -> Void
 
 	init(callback: @escaping (FfiConversation) -> Void) {
@@ -66,6 +70,10 @@ final class ConversationStreamCallback: FfiConversationCallback {
 }
 
 final class V2SubscriptionCallback: FfiV2SubscriptionCallback {
+	func onError(error: LibXMTP.GenericError) {
+		print("Error V2SubscriptionCallback \(error)")
+	}
+	
 	let callback: (Envelope) -> Void
 
 	init(callback: @escaping (Envelope) -> Void) {
@@ -139,7 +147,7 @@ public actor Conversations {
 		guard let v3Client = client.v3Client else {
 			return []
 		}
-		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil)
+		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil, consentState: nil)
 		if let createdAfter {
 			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
 		}
@@ -159,7 +167,7 @@ public actor Conversations {
 		guard let v3Client = client.v3Client else {
 			return []
 		}
-		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil)
+		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil, consentState: nil)
 		if let createdAfter {
 			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
 		}
@@ -180,7 +188,7 @@ public actor Conversations {
 		guard let v3Client = client.v3Client else {
 			return []
 		}
-		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil)
+		var options = FfiListConversationsOptions(createdAfterNs: nil, createdBeforeNs: nil, limit: nil, consentState: consentState?.toFFI)
 		if let createdAfter {
 			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
 		}
@@ -192,8 +200,7 @@ public actor Conversations {
 		}
 		let ffiConversations = try await v3Client.conversations().list(opts: options)
 
-		let filteredConversations = try filterByConsentState(ffiConversations, consentState: consentState)
-		let sortedConversations = try sortConversations(filteredConversations, order: order)
+		let sortedConversations = try sortConversations(ffiConversations, order: order)
 
 		return try sortedConversations.map { try $0.toConversation(client: client) }
 	}
@@ -224,14 +231,6 @@ public actor Conversations {
 		case .createdAt:
 			return conversations
 		}
-	}
-
-	private func filterByConsentState(
-	  _ conversations: [FfiConversation],
-	  consentState: ConsentState?
-	) throws -> [FfiConversation] {
-	  guard let state = consentState else { return conversations }
-		return try conversations.filter { try $0.consentState() == state.toFFI }
 	}
 
 	public func streamGroups() async throws -> AsyncThrowingStream<Group, Error> {

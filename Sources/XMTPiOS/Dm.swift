@@ -58,7 +58,9 @@ public struct Dm: Identifiable, Equatable, Hashable {
 	}
 
 	public var peerInboxId: String {
-		ffiConversation.dmPeerInboxId()
+		get throws {
+			try ffiConversation.dmPeerInboxId()
+		}
 	}
 
 	public var createdAt: Date {

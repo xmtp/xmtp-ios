@@ -9,6 +9,10 @@ import Foundation
 import LibXMTP
 
 final class MessageCallback: FfiMessageCallback {
+	func onError(error: LibXMTP.FfiSubscribeError) {
+		print("Error MessageCallback \(error)")
+	}
+	
 	let client: Client
 	let callback: (LibXMTP.FfiMessage) -> Void
 
