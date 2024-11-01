@@ -425,7 +425,7 @@ public final class Client {
 			accountAddress: address,
 			options: options,
 			privateKeyBundleV1: v1Bundle,
-			signingKey: nil,
+			signingKey: signingKey,
 			inboxId: inboxId
 		)
 

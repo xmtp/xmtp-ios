@@ -362,4 +362,92 @@ class V3ClientTests: XCTestCase {
 
 		await fulfillment(of: [expectation1], timeout: 3)
 	}
+	
+	func createDms(client: Client, peers: [Client], numMessages: Int) async throws -> [Dm] {
+		var dms: [Dm] = []
+		for peer in peers {
+			let dm = try await peer.conversations.findOrCreateDm(with: client.address)
+			dms.append(dm)
+			for i in 0..<numMessages {
+				try await dm.send(content: "Alix message \(i)")
+			}
+		}
+		return dms
+	}
+
+	func createV2Convos(client: Client, peers: [Client], numMessages: Int) async throws -> [Conversation] {
+		var convos: [Conversation] = []
+		for peer in peers {
+			let convo = try await peer.conversations.newConversation(with: client.address)
+			convos.append(convo)
+			for i in 0..<numMessages {
+				try await convo.send(content: "Alix message \(i)")
+			}
+		}
+		return convos
+	}
+	
+	func createV2Clients(num: Int) async throws -> [Client] {
+		var clients: [Client] = []
+		for _ in 0..<num {
+			let wallet = try PrivateKey.generate()
+			let client = try await Client.create(
+				account: wallet,
+				options: .init(
+					api: .init(env: .local, isSecure: false)
+				)
+			)
+			clients.append(client)
+		}
+		return clients
+	}
+	
+	func createV3Clients(num: Int) async throws -> [Client] {
+		let key = try Crypto.secureRandomBytes(count: 32)
+		var clients: [Client] = []
+		for _ in 0..<num {
+			let wallet = try PrivateKey.generate()
+			let client = try await Client.createV3(
+				account: wallet,
+				options: .init(
+					api: .init(env: .local, isSecure: false),
+					enableV3: true,
+					encryptionKey: key
+				)
+			)
+			clients.append(client)
+		}
+		return clients
+	}
+	
+	func testCompareV2AndV3Dms() async throws {
+		let alixClient = try await createV2Clients(num: 1).first!
+		let davonV3Client = try await createV3Clients(num: 1).first!
+
+		let initialPeers = try await createV2Clients(num: 50)
+		let initialV3Peers = try await createV3Clients(num: 50)
+
+		try await createDms(client: davonV3Client, peers: initialV3Peers, numMessages: 1)
+		try await createV2Convos(client: alixClient, peers: initialPeers, numMessages: 1)
+
+		var start = Date()
+		var v2Convos = try await alixClient.conversations.list()
+		var end = Date()
+		print("Alix loaded \(v2Convos.count) v2Convos in \(end.timeIntervalSince(start) * 1000)ms")
+		
+		start = Date()
+		v2Convos = try await alixClient.conversations.list()
+		end = Date()
+		print("Alix 2nd loaded \(v2Convos.count) v2Convos in \(end.timeIntervalSince(start) * 1000)ms")
+		
+		start = Date()
+		try await davonV3Client.conversations.sync()
+		end = Date()
+		print("Davon synced \(v2Convos.count) Dms in \(end.timeIntervalSince(start) * 1000)ms")
+		
+		start = Date()
+		let dms = try await davonV3Client.conversations.listConversations()
+		end = Date()
+		print("Davon loaded \(dms.count) Dms in \(end.timeIntervalSince(start) * 1000)ms")
+	}
 }
