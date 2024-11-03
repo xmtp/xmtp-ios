@@ -816,7 +816,7 @@ public actor Conversations {
 		Task {
 			await self.addConversation(conversation)
 		}
-		if (client.v3Client != nil) {
+		if client.v3Client != nil {
 			do {
 				try await client.conversations.findOrCreateDm(with: peerAddress)
 			} catch {
