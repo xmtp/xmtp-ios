@@ -88,6 +88,48 @@ class GroupTests: XCTestCase {
 		)
 	}
 	
+	func testCanListGroupMessagesAfter() async throws {
+		let fixtures = try await localFixtures()
+
+		let group = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.walletAddress])
+		
+		try await group.send(content: "howdy")
+		try await group.send(content: "gm")
+		
+		let time = Date()
+		
+		var messages = try await group.messages()
+		XCTAssertEqual(messages.count, 3)
+		
+		let messagesAfterTime = try await group.messages(after: time)
+		XCTAssertEqual(messagesAfterTime.count, 0)
+		
+		try await group.send(content: "howdy")
+		try await group.send(content: "gm")
+		
+		messages = try await group.messages()
+		XCTAssertEqual(messages.count, 5)
+		
+		let updatedMessagesAfterTime = try await group.messages(after: time)
+		XCTAssertEqual(updatedMessagesAfterTime.count, 2)
+		
+		try await fixtures.aliceClient.conversations.sync()
+		
+		let groups = try await fixtures.aliceClient.conversations.groups()
+		guard let sameGroup = groups.last else {
+			XCTFail("No groups found")
+			return
+		}
+		
+		try await sameGroup.sync()
+		
+		let sameGroupMessages = try await sameGroup.messages()
+		XCTAssertEqual(sameGroupMessages.count, 4)
+		
+		let sameGroupMessagesAfterTime = try await sameGroup.messages(after: time)
+		XCTAssertEqual(sameGroupMessagesAfterTime.count, 2)
+	}
+	
 	func testCanDualSendConversations() async throws {
 		let fixtures = try await localFixtures()
 		let v2Convo = try await fixtures.aliceClient.conversations.newConversation(with: fixtures.bob.walletAddress)
