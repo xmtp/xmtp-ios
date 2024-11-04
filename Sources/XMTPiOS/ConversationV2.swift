@@ -262,7 +262,7 @@ public struct ConversationV2 {
 					try await dm.send(encodedContent: encodedContent)
 				}
 			} catch {
-				print("ConversationV1 send \(error)")
+				print("ConversationV2 send \(error)")
 			}
 		}
         try await client.publish(envelopes: prepared.envelopes)
