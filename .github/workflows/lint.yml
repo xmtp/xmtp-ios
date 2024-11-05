@@ -10,9 +10,6 @@ jobs:
     name: Run swiftlint
     runs-on: macos-latest
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
       - uses: actions/checkout@v3
       - run: swiftlint Sources/ XMTPiOSExample/XMTPiOSExample
       - run: pod lib lint --allow-warnings
