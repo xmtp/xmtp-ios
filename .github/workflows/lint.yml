@@ -8,8 +8,26 @@ on:
 jobs:
   build:
     name: Run swiftlint
-    runs-on: macos-13
+    runs-on: warp-macos-14-arm64-6x
     steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
       - uses: actions/checkout@v3
-      - run: swiftlint Sources/ XMTPiOSExample/XMTPiOSExample
-      - run: pod lib lint --allow-warnings
+
+      # Install swiftlint
+      - name: Install swiftlint
+        run: brew install swiftlint
+
+      # Run swiftlint
+      - name: Run swiftlint
+        run: swiftlint Sources/ XMTPiOSExample/XMTPiOSExample
+
+      # Install CocoaPods dependencies
+      - name: Install CocoaPods dependencies
+        run: pod install
+
+      # Lint the podspec
+      - name: Lint podspec
+        run: pod lib lint --allow-warnings
