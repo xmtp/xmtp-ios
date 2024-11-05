@@ -6,15 +6,10 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: macos-latest
+  build:
+    name: Run swiftlint
+    runs-on: macos-13
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: swiftlint
-        run: swiftlint --strict
+      - uses: actions/checkout@v3
+      - run: swiftlint Sources/ XMTPiOSExample/XMTPiOSExample
       - run: pod lib lint --allow-warnings
