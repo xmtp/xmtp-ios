@@ -24,10 +24,6 @@ jobs:
       - name: Run swiftlint
         run: swiftlint Sources/ XMTPiOSExample/XMTPiOSExample
 
-      # Install CocoaPods dependencies
-      - name: Install CocoaPods dependencies
-        run: pod install
-
       # Lint the podspec
       - name: Lint podspec
         run: pod lib lint --allow-warnings
