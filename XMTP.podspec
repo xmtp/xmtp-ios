@@ -33,7 +33,7 @@ Pod::Spec.new do |spec|
   spec.license      	= "MIT"
   spec.author       	= { "XMTP" => "eng@xmtp.com" }
 
-	spec.platform      	= :ios, '14.0', :macos, '11.0'
+  spec.platform      	= :ios, '16.0'
 
   spec.swift_version  = '5.3'
 
