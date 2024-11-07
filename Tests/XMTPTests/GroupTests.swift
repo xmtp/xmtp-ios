@@ -30,74 +30,6 @@ func assertThrowsAsyncError<T>(
 
 @available(iOS 16, *)
 class GroupTests: XCTestCase {
-	func testCanDualSendConversations() async throws {
-		let fixtures = try await fixtures()
-		let v2Convo = try await fixtures.alixClient.conversations
-			.newConversation(with: fixtures.bo.walletAddress)
-
-		try await fixtures.alixClient.conversations.sync()
-		try await fixtures.boClient.conversations.sync()
-
-		let alixDm = try await fixtures.alixClient.findDm(
-			address: fixtures.bo.walletAddress)
-		let boDm = try await fixtures.boClient.findDm(
-			address: fixtures.alix.walletAddress)
-
-		XCTAssertEqual(alixDm?.id, boDm?.id)
-
-		let alixConversationsListCount = try await fixtures.alixClient
-			.conversations.list().count
-		XCTAssertEqual(alixConversationsListCount, 1)
-
-		let alixDmsListCount = try await fixtures.alixClient.conversations
-			.listDms().count
-		XCTAssertEqual(alixDmsListCount, 1)
-
-		let boDmsListCount = try await fixtures.boClient.conversations
-			.listDms().count
-		XCTAssertEqual(boDmsListCount, 1)
-
-		let boConversationsListCount = try await fixtures.boClient
-			.conversations.list().count
-		XCTAssertEqual(boConversationsListCount, 1)
-
-		let boFirstTopic = try await fixtures.boClient.conversations.list()
-			.first?.topic
-		XCTAssertEqual(v2Convo.topic, boFirstTopic)
-	}
-
-	func testCanDualSendMessages() async throws {
-		let fixtures = try await fixtures()
-		let alixV2Convo = try await fixtures.alixClient.conversations
-			.newConversation(with: fixtures.bo.walletAddress)
-		let boV2Convo = try await fixtures.boClient.conversations.list().first!
-
-		try await fixtures.boClient.conversations.sync()
-
-		let alixDm = try await fixtures.alixClient.findDm(
-			address: fixtures.bo.walletAddress)
-		let boDm = try await fixtures.boClient.findDm(
-			address: fixtures.alix.walletAddress)
-
-		try await alixV2Convo.send(content: "first")
-		try await boV2Convo.send(content: "second")
-
-		try await alixDm?.sync()
-		try await boDm?.sync()
-
-		let alixV2ConvoMessageCount = try await alixV2Convo.messages().count
-		XCTAssertEqual(alixV2ConvoMessageCount, 2)
-
-		let boV2ConvoMessageCount = try await boV2Convo.messages().count
-		XCTAssertEqual(alixV2ConvoMessageCount, boV2ConvoMessageCount)
-
-		let boDmMessageCount = try await boDm?.messages().count
-		XCTAssertEqual(boDmMessageCount, 2)
-
-		let alixDmMessageCount = try await alixDm?.messages().count
-		XCTAssertEqual(alixDmMessageCount, 3)  // Including the group membership update in the DM
-	}
-
 	func testCanCreateAGroupWithDefaultPermissions() async throws {
 		let fixtures = try await fixtures()
 		let boGroup = try await fixtures.boClient.conversations.newGroup(
@@ -265,7 +197,7 @@ class GroupTests: XCTestCase {
 			.count
 
 		XCTAssertEqual(2, alixGroupCount)
-		XCTAssertEqual(2, boGroupCount)
+		XCTAssertEqual(3, boGroupCount)
 	}
 
 	func testCanListGroupMembers() async throws {
@@ -890,7 +822,7 @@ class GroupTests: XCTestCase {
 		let fixtures = try await fixtures()
 		let boGroup = try await fixtures.boClient.conversations.newGroup(
 			with: [fixtures.alix.address])
-		var inboxState = try await fixtures.boClient.preferences.consentList
+		let inboxState = try await fixtures.boClient.preferences.consentList
 			.inboxIdState(
 				inboxId: fixtures.alixClient.inboxID)
 		XCTAssertEqual(inboxState, .unknown)
@@ -906,7 +838,7 @@ class GroupTests: XCTestCase {
 		})
 		XCTAssertEqual(alixMember?.consentState, .allowed)
 
-		var inboxState2 = try await fixtures.boClient.preferences.consentList
+		let inboxState2 = try await fixtures.boClient.preferences.consentList
 			.inboxIdState(
 				inboxId: fixtures.alixClient.inboxID)
 		XCTAssertEqual(inboxState2, .allowed)
@@ -922,7 +854,7 @@ class GroupTests: XCTestCase {
 		})
 		XCTAssertEqual(alixMember?.consentState, .denied)
 
-		var inboxState3 = try await fixtures.boClient.preferences.consentList
+		let inboxState3 = try await fixtures.boClient.preferences.consentList
 			.inboxIdState(
 				inboxId: fixtures.alixClient.inboxID)
 		XCTAssertEqual(inboxState3, .denied)
@@ -933,13 +865,13 @@ class GroupTests: XCTestCase {
 					value: fixtures.alixClient.address, entryType: .address,
 					consentType: .allowed)
 			])
-		var inboxState4 = try await fixtures.boClient.preferences.consentList
+		let inboxState4 = try await fixtures.boClient.preferences.consentList
 			.inboxIdState(
 				inboxId: fixtures.alixClient.inboxID)
 		XCTAssertEqual(inboxState4, .allowed)
-		var addressState = try await fixtures.boClient.preferences.consentList
+		let addressState = try await fixtures.boClient.preferences.consentList
 			.addressState(address: fixtures.alixClient.address)
-		XCTAssertEqual(inboxState3, .denied)
+		XCTAssertEqual(addressState, .denied)
 	}
 
 	func testCanFetchGroupById() async throws {

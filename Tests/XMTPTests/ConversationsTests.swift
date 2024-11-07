@@ -5,7 +5,7 @@ import XMTPTestHelpers
 @testable import XMTPiOS
 
 @available(iOS 16, *)
-class V3ClientTests: XCTestCase {
+class ConversationsTests: XCTestCase {
 	func testsCanCreateGroup() async throws {
 		let fixtures = try await fixtures()
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
