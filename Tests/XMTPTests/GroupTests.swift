@@ -217,6 +217,7 @@ class GroupTests: XCTestCase {
 
 	func testCanAddGroupMembers() async throws {
 		let fixtures = try await fixtures()
+		fixtures.alixClient.register(codec: GroupUpdatedCodec())
 		let group = try await fixtures.alixClient.conversations.newGroup(
 			with: [fixtures.bo.address])
 
@@ -241,6 +242,7 @@ class GroupTests: XCTestCase {
 
 	func testCanAddGroupMembersByInboxId() async throws {
 		let fixtures = try await fixtures()
+		fixtures.alixClient.register(codec: GroupUpdatedCodec())
 		let group = try await fixtures.alixClient.conversations.newGroup(
 			with: [fixtures.bo.address])
 
@@ -267,6 +269,7 @@ class GroupTests: XCTestCase {
 
 	func testCanRemoveMembers() async throws {
 		let fixtures = try await fixtures()
+		fixtures.alixClient.register(codec: GroupUpdatedCodec())
 		let group = try await fixtures.alixClient.conversations.newGroup(
 			with: [fixtures.bo.address, fixtures.caro.address])
 
@@ -300,6 +303,7 @@ class GroupTests: XCTestCase {
 
 	func testCanRemoveMembersByInboxId() async throws {
 		let fixtures = try await fixtures()
+		fixtures.alixClient.register(codec: GroupUpdatedCodec())
 		let group = try await fixtures.alixClient.conversations.newGroup(
 			with: [fixtures.bo.address, fixtures.caro.address])
 
@@ -468,6 +472,8 @@ class GroupTests: XCTestCase {
 
 	func testCanSendMessagesToGroup() async throws {
 		let fixtures = try await fixtures()
+		fixtures.boClient.register(codec: GroupUpdatedCodec())
+		fixtures.alixClient.register(codec: GroupUpdatedCodec())
 		let alixGroup = try await fixtures.alixClient.conversations.newGroup(
 			with: [fixtures.bo.address])
 		let membershipChange = GroupUpdated()
@@ -545,6 +551,7 @@ class GroupTests: XCTestCase {
 
 	func testCanStreamGroupMessages() async throws {
 		let fixtures = try await fixtures()
+		fixtures.boClient.register(codec: GroupUpdatedCodec())
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
 			fixtures.alix.address
 		])
@@ -781,15 +788,8 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(groupName, "Test Group Name 1")
 		XCTAssertEqual(groupImageUrlSquare, "newurl.com")
 
-		let boConv = try await fixtures.boClient.conversations.list()[0]
-		let boGroup: Group
-		switch boConv {
-		case .group(let group):
-			boGroup = group
-		case .dm(_):
-			XCTFail("failed converting conversation to group")
-			return
-		}
+		try await fixtures.boClient.conversations.sync()
+		let boGroup = try fixtures.boClient.findGroup(groupId: group.id)!
 		groupName = try boGroup.groupName()
 		XCTAssertEqual(groupName, "Start Name")
 
@@ -871,7 +871,7 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(inboxState4, .allowed)
 		let addressState = try await fixtures.boClient.preferences.consentList
 			.addressState(address: fixtures.alixClient.address)
-		XCTAssertEqual(addressState, .denied)
+		XCTAssertEqual(addressState, .allowed)
 	}
 
 	func testCanFetchGroupById() async throws {

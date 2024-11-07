@@ -58,7 +58,7 @@ class ReactionTests: XCTestCase {
 
 		fixtures.alixClient.register(codec: ReactionCodec())
 
-		try await conversation.send(text: "hey alix 2 bo")
+		_ = try await conversation.send(text: "hey alix 2 bo")
 
 		let messageToReact = try await conversation.messages()[0]
 
@@ -74,7 +74,7 @@ class ReactionTests: XCTestCase {
 			options: .init(contentType: ContentTypeReaction)
 		)
 
-		let updatedMessages = try await conversation.messages()
+		_ = try await conversation.messages()
 
 		let message = try await conversation.messages()[0]
 		let content: Reaction = try message.content()

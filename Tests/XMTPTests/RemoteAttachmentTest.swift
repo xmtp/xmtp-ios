@@ -111,7 +111,7 @@ class RemoteAttachmentTests: XCTestCase {
 
 	func testCannotUseNonHTTPSUrl() async throws {
 		let fixtures = try await fixtures()
-		let conversation = try await fixtures.alixClient.conversations
+		_ = try await fixtures.alixClient.conversations
 			.newConversation(with: fixtures.boClient.address)
 
 		fixtures.alixClient.register(codec: AttachmentCodec())
@@ -144,7 +144,7 @@ class RemoteAttachmentTests: XCTestCase {
 
 	func testVerifiesContentDigest() async throws {
 		let fixtures = try await fixtures()
-		let conversation = try await fixtures.alixClient.conversations
+		_ = try await fixtures.alixClient.conversations
 			.newConversation(with: fixtures.boClient.address)
 
 		let encryptedEncodedContent = try RemoteAttachment.encodeEncrypted(
@@ -164,7 +164,7 @@ class RemoteAttachmentTests: XCTestCase {
 			url: fakeHTTPSFileURL.absoluteString,
 			encryptedEncodedContent: encryptedEncodedContent)
 		remoteAttachment.fetcher = TestFetcher()
-		let expect = expectation(description: "raised error")
+		let expect = XCTestExpectation(description: "raised error")
 
 		// Tamper with content
 		try Data([1, 2, 3, 4, 5]).write(to: tempFileURL)
@@ -179,7 +179,9 @@ class RemoteAttachmentTests: XCTestCase {
 				expect.fulfill()
 			}
 		}
+		
 
-		wait(for: [expect], timeout: 3)
+
+		await fulfillment(of: [expect], timeout: 3)
 	}
 }

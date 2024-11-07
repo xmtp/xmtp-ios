@@ -12,7 +12,7 @@ class ReplyTests: XCTestCase {
 
 		fixtures.alixClient.register(codec: ReplyCodec())
 
-		try await conversation.send(text: "hey alix 2 bo")
+		_ = try await conversation.send(text: "hey alix 2 bo")
 
 		let messageToReply = try await conversation.messages()[0]
 
@@ -27,7 +27,7 @@ class ReplyTests: XCTestCase {
 			options: .init(contentType: ContentTypeReply)
 		)
 
-		let updatedMessages = try await conversation.messages()
+		_ = try await conversation.messages()
 
 		let message = try await conversation.messages()[0]
 		let content: Reply = try message.content()

@@ -24,7 +24,7 @@ class DmTests: XCTestCase {
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
 			with: fixtures.alix.walletAddress)
-		var members = try await dm.members
+		let members = try await dm.members
 		XCTAssertEqual(members.count, 2)
 
 		let peer = try dm.peerInboxId

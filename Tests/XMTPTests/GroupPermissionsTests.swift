@@ -360,7 +360,7 @@ class GroupPermissionTests: XCTestCase {
 			updateGroupImagePolicy: PermissionOption.admin,
 			updateGroupPinnedFrameUrlPolicy: PermissionOption.deny
 		)
-		let _boGroup = try await fixtures.boClient.conversations
+		_ = try await fixtures.boClient.conversations
 			.newGroupCustomPermissions(
 				with: [fixtures.alix.address, fixtures.caro.address],
 				permissionPolicySet: permissionPolicySet,

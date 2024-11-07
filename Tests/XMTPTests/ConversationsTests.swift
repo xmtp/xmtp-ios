@@ -3,7 +3,6 @@ import XCTest
 import XMTPTestHelpers
 
 @testable import XMTPiOS
-
 @available(iOS 16, *)
 class ConversationsTests: XCTestCase {
 	func testsCanCreateGroup() async throws {
@@ -27,16 +26,16 @@ class ConversationsTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.caro.walletAddress)
+			with: fixtures.alix.walletAddress)
 		let members = try await dm.members
 		XCTAssertEqual(members.count, 2)
 
 		let sameDm = try await fixtures.boClient.findDm(
-			address: fixtures.caro.walletAddress)
+			address: fixtures.alix.walletAddress)
 		XCTAssertEqual(sameDm?.id, dm.id)
 
-		try await fixtures.caroClient.conversations.sync()
-		let caroDm = try await fixtures.caroClient.findDm(
+		try await fixtures.alixClient.conversations.sync()
+		let caroDm = try await fixtures.alixClient.findDm(
 			address: fixtures.boClient.address)
 		XCTAssertEqual(caroDm?.id, dm.id)
 

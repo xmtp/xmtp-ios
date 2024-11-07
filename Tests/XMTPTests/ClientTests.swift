@@ -78,7 +78,7 @@ class ClientTests: XCTestCase {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let bo = try PrivateKey.generate()
 		let alix = try PrivateKey.generate()
-		var boClient = try await Client.create(
+		let boClient = try await Client.create(
 			account: bo,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
@@ -209,7 +209,7 @@ class ClientTests: XCTestCase {
 			)
 		)
 
-		let group = try await boClient.conversations.newGroup(with: [
+		_ = try await boClient.conversations.newGroup(with: [
 			alixClient.address
 		])
 

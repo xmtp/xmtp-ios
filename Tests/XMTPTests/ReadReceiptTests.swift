@@ -12,7 +12,7 @@ class ReadReceiptTests: XCTestCase {
 		let conversation = try await fixtures.alixClient.conversations
 			.newConversation(with: fixtures.boClient.address)
 
-		try await conversation.send(text: "hey alix 2 bo")
+		_ = try await conversation.send(text: "hey alix 2 bo")
 
 		let read = ReadReceipt()
 
@@ -21,7 +21,7 @@ class ReadReceiptTests: XCTestCase {
 			options: .init(contentType: ContentTypeReadReceipt)
 		)
 
-		let updatedMessages = try await conversation.messages()
+		_ = try await conversation.messages()
 
 		let message = try await conversation.messages()[0]
 		let contentType: String = message.encodedContent.type.typeID
