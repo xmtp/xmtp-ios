@@ -111,7 +111,7 @@ class DmTests: XCTestCase {
 		try await dm.sync()
 
 		let isAllowed = try await fixtures.boClient.contacts.isGroupAllowed(groupId: dm.id)
-		let dmState = try await fixtures.boClient.contacts.consentList.groupState(groupId: dm.id)
+		let dmState = try await fixtures.boClient.contacts.consentList.conversationState(groupId: dm.id)
 		XCTAssertTrue(isAllowed)
 		XCTAssertEqual(dmState, .allowed)
 		XCTAssertEqual(try dm.consentState(), .allowed)

@@ -200,10 +200,10 @@ class GroupTests: XCTestCase {
 		XCTAssert(!bobGroup.id.isEmpty)
 		XCTAssert(!aliceGroup.id.isEmpty)
 
-		let bobConsentResult = try await fixtures.bobClient.contacts.consentList.groupState(groupId: bobGroup.id)
+		let bobConsentResult = try await fixtures.bobClient.contacts.consentList.conversationState(groupId: bobGroup.id)
 		XCTAssertEqual(bobConsentResult, ConsentState.allowed)
 
-		let aliceConsentResult = try await fixtures.aliceClient.contacts.consentList.groupState(groupId: aliceGroup.id)
+		let aliceConsentResult = try await fixtures.aliceClient.contacts.consentList.conversationState(groupId: aliceGroup.id)
 		XCTAssertEqual(aliceConsentResult, ConsentState.unknown)
 
 		try await bobGroup.addMembers(addresses: [fixtures.fred.address])
@@ -500,7 +500,7 @@ class GroupTests: XCTestCase {
 		let isGroupAllowedResult = try await fixtures.bobClient.contacts.isGroupAllowed(groupId: bobGroup.id)
 		XCTAssertTrue(isGroupAllowedResult)
 
-		let groupStateResult = try await fixtures.bobClient.contacts.consentList.groupState(groupId: bobGroup.id)
+		let groupStateResult = try await fixtures.bobClient.contacts.consentList.conversationState(groupId: bobGroup.id)
 		XCTAssertEqual(groupStateResult, ConsentState.allowed)
 	}
 	

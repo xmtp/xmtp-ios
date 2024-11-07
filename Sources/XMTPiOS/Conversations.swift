@@ -274,9 +274,6 @@ public actor Conversations {
 		if !canMessage {
 			throw ConversationError.memberNotRegistered([peerAddress])
 		}
-
-		try await client.contacts.allow(addresses: [peerAddress])
-
 		if let existingDm = try await client.findDm(address: peerAddress) {
 			return existingDm
 		}
@@ -285,8 +282,6 @@ public actor Conversations {
 			try await ffiConversations
 			.createDm(accountAddress: peerAddress.lowercased())
 			.dmFromFFI(client: client)
-
-		try await client.contacts.allow(addresses: [peerAddress])
 		return newDm
 	}
 
@@ -379,7 +374,6 @@ public actor Conversations {
 				customPermissionPolicySet: permissionPolicySet
 			)
 		).groupFromFFI(client: client)
-		try await client.contacts.allowGroups(groupIds: [group.id])
 		return group
 	}
 

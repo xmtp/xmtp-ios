@@ -242,7 +242,7 @@ extension FfiConsentState {
 extension EntryType {
 	var toFFI: FfiConsentEntityType{
 		switch (self) {
-		case .group_id: return FfiConsentEntityType.conversationId
+		case .conversation_id: return FfiConsentEntityType.conversationId
 		case .inbox_id: return FfiConsentEntityType.inboxId
 		case .address: return FfiConsentEntityType.address
 		}

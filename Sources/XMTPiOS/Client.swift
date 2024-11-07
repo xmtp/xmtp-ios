@@ -131,11 +131,8 @@ public final class Client {
 	public let inboxID: String
 	public var hasV2Client: Bool = true
 
-	/// Access ``Conversations`` for this Client.
 	public lazy var conversations: Conversations = .init(client: self, ffiConversations: v3Client!.conversations())
-
-	/// Access ``Contacts`` for this Client.
-	public lazy var contacts: Contacts = .init(client: self)
+	public lazy var preferences: PrivatePreferences = .init(client: self, ffiClient: v3Client!)
 
 	/// The XMTP environment which specifies which network this Client is connected to.
 	public lazy var environment: XMTPEnvironment =
@@ -363,8 +360,7 @@ public final class Client {
 			installationID: v3Client?.installationId().toHex ?? "",
 			inboxID: v3Client?.inboxId() ?? inboxId)
 		let conversations = client.conversations
-		let contacts = client.contacts
-		try await client.ensureUserContactPublished()
+		let contacts = client.preferences
 
 		for codec in (options?.codecs ?? []) {
 			client.register(codec: codec)
@@ -512,7 +508,7 @@ public final class Client {
 			installationID: v3Client?.installationId().toHex ?? "",
 			inboxID: v3Client?.inboxId() ?? inboxId)
 		let conversations = result.conversations
-		let contacts = result.contacts
+		let contacts = result.preferences
 		for codec in options.codecs {
 			result.register(codec: codec)
 		}
@@ -593,17 +589,6 @@ public final class Client {
 		)
 		return try await apiClient.query(topic: Topic.contact(peerAddress))
 			.envelopes.count > 0
-	}
-
-	func ensureUserContactPublished() async throws {
-		if let contact = try await getUserContact(peerAddress: address),
-			case .v2 = contact.version,
-			try keys.getPublicKeyBundle().equals(contact.v2.keyBundle)
-		{
-			return
-		}
-
-		try await publishUserContact(legacy: true)
 	}
 
 	func publishUserContact(legacy: Bool = false) async throws {
@@ -712,11 +697,6 @@ public final class Client {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
 		try await client.dbReconnect()
-	}
-
-	func getUserContact(peerAddress: String) async throws -> ContactBundle? {
-		let peerAddress = EthereumAddress(peerAddress).toChecksumAddress()
-		return try await contacts.find(peerAddress)
 	}
 
 	public func inboxIdFromAddress(address: String) async throws -> String? {
