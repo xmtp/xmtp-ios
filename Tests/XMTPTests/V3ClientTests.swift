@@ -356,30 +356,6 @@ class V3ClientTests: XCTestCase {
 		await fulfillment(of: [expectation1], timeout: 3)
 	}
 
-	func testCanStreamAllDecryptedMessagesFromV3Users() async throws {
-		let fixtures = try await localFixtures()
-
-		let expectation1 = XCTestExpectation(description: "got a conversation")
-		expectation1.expectedFulfillmentCount = 2
-		let convo = try await fixtures.boV3Client.conversations.findOrCreateDm(
-			with: fixtures.caroV2V3.address)
-		let group = try await fixtures.caroV2V3Client.conversations.newGroup(
-			with: [fixtures.boV3.address])
-		try await fixtures.boV3Client.conversations.sync()
-		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.boV3Client.conversations
-				.streamAllDecryptedConversationMessages()
-			{
-				expectation1.fulfill()
-			}
-		}
-
-		_ = try await group.send(content: "hi")
-		_ = try await convo.send(content: "hi")
-
-		await fulfillment(of: [expectation1], timeout: 3)
-	}
-
 	func testCanStreamGroupsAndConversationsFromV3Users() async throws {
 		let fixtures = try await localFixtures()
 

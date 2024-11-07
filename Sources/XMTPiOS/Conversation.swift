@@ -72,7 +72,7 @@ public enum Conversation {
 		}
 	}
 
-	public func processMessage(messageBytes: Data) async throws -> MessageV3 {
+	public func processMessage(messageBytes: Data) async throws -> Message {
 		switch self {
 		case let .group(group):
 			return try await group.processMessage(messageBytes: messageBytes)
@@ -168,17 +168,6 @@ public enum Conversation {
 		}
 	}
 
-	public func streamDecryptedMessages() -> AsyncThrowingStream<
-		DecryptedMessage, Error
-	> {
-		switch self {
-		case let .group(group):
-			return group.streamDecryptedMessages()
-		case let .dm(dm):
-			return dm.streamDecryptedMessages()
-		}
-	}
-
 	public func messages(
 		limit: Int? = nil, before: Date? = nil, after: Date? = nil,
 		direction: PagingInfoSortDirection? = .descending
@@ -190,22 +179,6 @@ public enum Conversation {
 			)
 		case let .dm(dm):
 			return try await dm.messages(
-				before: before, after: after, limit: limit, direction: direction
-			)
-		}
-	}
-
-	public func decryptedMessages(
-		limit: Int? = nil, before: Date? = nil, after: Date? = nil,
-		direction: PagingInfoSortDirection? = .descending
-	) async throws -> [DecryptedMessage] {
-		switch self {
-		case let .group(group):
-			return try await group.decryptedMessages(
-				before: before, after: after, limit: limit, direction: direction
-			)
-		case let .dm(dm):
-			return try await dm.decryptedMessages(
 				before: before, after: after, limit: limit, direction: direction
 			)
 		}

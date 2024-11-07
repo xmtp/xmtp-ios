@@ -793,12 +793,12 @@ public final class Client {
 		}
 	}
 
-	public func findMessage(messageId: String) throws -> MessageV3? {
+	public func findMessage(messageId: String) throws -> Message? {
 		guard let client = v3Client else {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
 		do {
-			return MessageV3(
+			return Message(
 				client: self,
 				ffiMessage: try client.message(messageId: messageId.hexToData))
 		} catch {

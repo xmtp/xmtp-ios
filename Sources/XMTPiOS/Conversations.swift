@@ -403,7 +403,7 @@ public actor Conversations {
 							}
 							do {
 								continuation.yield(
-									try MessageV3(
+									try Message(
 										client: self.client, ffiMessage: message
 									).decode())
 							} catch {

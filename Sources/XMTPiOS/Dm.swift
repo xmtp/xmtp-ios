@@ -84,11 +84,11 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		return try ffiConversation.consentState().fromFFI
 	}
 
-	public func processMessage(messageBytes: Data) async throws -> MessageV3 {
+	public func processMessage(messageBytes: Data) async throws -> Message {
 		let message =
 			try await ffiConversation.processStreamedConversationMessage(
 				envelopeBytes: messageBytes)
-		return MessageV3(client: client, ffiMessage: message)
+		return Message(client: client, ffiMessage: message)
 	}
 
 	public func send<T>(content: T, options: SendOptions? = nil) async throws
@@ -181,7 +181,7 @@ public struct Dm: Identifiable, Equatable, Hashable {
 						}
 						do {
 							continuation.yield(
-								try MessageV3(
+								try Message(
 									client: self.client, ffiMessage: message
 								).decode())
 						} catch {
@@ -260,7 +260,7 @@ public struct Dm: Identifiable, Equatable, Hashable {
 
 		return try ffiConversation.findMessages(opts: options).compactMap {
 			ffiMessage in
-			return MessageV3(client: self.client, ffiMessage: ffiMessage)
+			return Message(client: self.client, ffiMessage: ffiMessage)
 				.decodeOrNull()
 		}
 	}
