@@ -50,38 +50,6 @@ final class ConversationStreamCallback: FfiConversationCallback {
 	}
 }
 
-final class V2SubscriptionCallback: FfiV2SubscriptionCallback {
-	func onError(error: LibXMTP.GenericError) {
-		print("Error V2SubscriptionCallback \(error)")
-	}
-
-	let callback: (Envelope) -> Void
-
-	init(callback: @escaping (Envelope) -> Void) {
-		self.callback = callback
-	}
-
-	func onMessage(message: LibXMTP.FfiEnvelope) {
-		self.callback(message.fromFFI)
-	}
-}
-
-class StreamManager {
-	var stream: FfiV2Subscription?
-
-	func updateStream(with request: FfiV2SubscribeRequest) async throws {
-		try await stream?.update(req: request)
-	}
-
-	func endStream() async throws {
-		try await stream?.end()
-	}
-
-	func setStream(_ newStream: FfiV2Subscription?) {
-		self.stream = newStream
-	}
-}
-
 actor FfiStreamActor {
 	private var ffiStream: FfiStreamCloser?
 
@@ -135,9 +103,6 @@ public actor Conversations {
 	public func listDms(
 		createdAfter: Date? = nil, createdBefore: Date? = nil, limit: Int? = nil
 	) async throws -> [Dm] {
-		guard let v3Client = client.v3Client else {
-			return []
-		}
 		var options = FfiListConversationsOptions(
 			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
 			consentState: nil)
@@ -269,7 +234,7 @@ public actor Conversations {
 		if peerAddress.lowercased() == client.address.lowercased() {
 			throw ConversationError.memberCannotBeSelf
 		}
-		let canMessage = try await self.client.canMessageV3(
+		let canMessage = try await self.client.canMessage(
 			address: peerAddress)
 		if !canMessage {
 			throw ConversationError.memberNotRegistered([peerAddress])
@@ -340,29 +305,15 @@ public actor Conversations {
 		}) != nil {
 			throw ConversationError.memberCannotBeSelf
 		}
-		let erroredAddresses = try await withThrowingTaskGroup(
-			of: (String?).self
-		) { group in
-			for address in addresses {
-				group.addTask {
-					if try await self.client.canMessageV3(address: address) {
-						return nil
-					} else {
-						return address
-					}
-				}
-			}
-			var results: [String] = []
-			for try await result in group {
-				if let result {
-					results.append(result)
-				}
-			}
-			return results
+		let addressMap = try await self.client.canMessage(addresses: addresses)
+		let unregisteredAddresses = addressMap
+			.filter { !$0.value }
+			.map { $0.key }
+
+		if !unregisteredAddresses.isEmpty {
+			throw ConversationError.memberNotRegistered(unregisteredAddresses)
 		}
-		if !erroredAddresses.isEmpty {
-			throw ConversationError.memberNotRegistered(erroredAddresses)
-		}
+
 		let group = try await ffiConversations.createGroup(
 			accountAddresses: addresses,
 			opts: FfiCreateGroupOptions(
