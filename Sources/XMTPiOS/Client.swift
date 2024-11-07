@@ -59,14 +59,14 @@ public struct ClientOptions {
 		api: Api = Api(),
 		codecs: [any ContentCodec] = [],
 		preAuthenticateToInboxCallback: PreEventCallback? = nil,
-		encryptionKey: Data,
+		dbEncryptionKey: Data,
 		dbDirectory: String? = nil,
 		historySyncUrl: String? = nil
 	) {
 		self.api = api
 		self.codecs = codecs
 		self.preAuthenticateToInboxCallback = preAuthenticateToInboxCallback
-		self.dbEncryptionKey = encryptionKey
+		self.dbEncryptionKey = dbEncryptionKey
 		self.dbDirectory = dbDirectory
 		if historySyncUrl == nil {
 			switch api.env {

@@ -1,24 +1,18 @@
-//
-//  ReadReceiptTests.swift
-//  
-//
-//  Created by Naomi Plasterer on 8/2/23.
-//
-
 import Foundation
-
 import XCTest
+
 @testable import XMTPiOS
 
 @available(iOS 15, *)
 class ReadReceiptTests: XCTestCase {
 	func testCanUseReadReceiptCodec() async throws {
-		let fixtures = await fixtures()
-		fixtures.aliceClient.register(codec: ReadReceiptCodec())
+		let fixtures = try await fixtures()
+		fixtures.alixClient.register(codec: ReadReceiptCodec())
 
-		let conversation = try await fixtures.aliceClient.conversations.newConversation(with: fixtures.bobClient.address)
+		let conversation = try await fixtures.alixClient.conversations
+			.newConversation(with: fixtures.boClient.address)
 
-		try await conversation.send(text: "hey alice 2 bob")
+		try await conversation.send(text: "hey alix 2 bo")
 
 		let read = ReadReceipt()
 

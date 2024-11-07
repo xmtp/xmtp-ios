@@ -76,10 +76,10 @@ public class ConsentList {
 		).fromFFI
 	}
 
-	func conversationState(groupId: String) async throws -> ConsentState {
+	func conversationState(conversationId: String) async throws -> ConsentState {
 		return try await ffiClient.getConsentState(
 			entityType: .conversationId,
-			entity: groupId
+			entity: conversationId
 		).fromFFI
 	}
 
