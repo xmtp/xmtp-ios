@@ -565,30 +565,6 @@ class GroupTests: XCTestCase {
 
 	}
 	
-	func testCanSendMessagesToGroupDecrypted() async throws {
-		let fixtures = try await localFixtures()
-		let aliceGroup = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
-
-		try await fixtures.bobClient.conversations.sync()
-		let bobGroup = try await fixtures.bobClient.conversations.listGroups()[0]
-
-		_ = try await aliceGroup.send(content: "sup gang original")
-		_ = try await aliceGroup.send(content: "sup gang")
-
-		try await aliceGroup.sync()
-		let aliceGroupsCount = try await aliceGroup.decryptedMessages().count
-		XCTAssertEqual(3, aliceGroupsCount)
-		let aliceMessage = try await aliceGroup.decryptedMessages().first!
-
-		try await bobGroup.sync()
-		let bobGroupsCount = try await bobGroup.decryptedMessages().count
-		XCTAssertEqual(2, bobGroupsCount)
-		let bobMessage = try await bobGroup.decryptedMessages().first!
-
-		XCTAssertEqual("sup gang", String(data: Data(aliceMessage.encodedContent.content), encoding: .utf8))
-		XCTAssertEqual("sup gang", String(data: Data(bobMessage.encodedContent.content), encoding: .utf8))
-	}
-	
 	func testCanStreamGroupMessages() async throws {
 		let fixtures = try await localFixtures()
 		let group = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
@@ -740,30 +716,6 @@ class GroupTests: XCTestCase {
 		await fulfillment(of: [expectation1], timeout: 3)
 	}
 	
-	func testCanStreamAllDecryptedMessages() async throws {
-		let fixtures = try await localFixtures()
-		let membershipChange = GroupUpdated()
-
-		let expectation1 = XCTestExpectation(description: "got a conversation")
-		expectation1.expectedFulfillmentCount = 2
-		let convo = try await fixtures.bobClient.conversations.newConversation(with: fixtures.alice.address)
-		let group = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
-		let dm = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.alice.address)
-		try await fixtures.aliceClient.conversations.sync()
-		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
-				expectation1.fulfill()
-			}
-		}
-
-		_ = try await group.send(content: "hi")
-		_ = try await group.send(content: membershipChange, options: SendOptions(contentType: ContentTypeGroupUpdated))
-		_ = try await convo.send(content: "hi")
-		_ = try await dm.send(content: "hi")
-
-		await fulfillment(of: [expectation1], timeout: 3)
-	}
-	
 	func testCanStreamAllGroupMessages() async throws {
 		let fixtures = try await localFixtures()
 
@@ -771,26 +723,6 @@ class GroupTests: XCTestCase {
 
 		let group = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
 		let dm = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.alice.address)
-		try await fixtures.aliceClient.conversations.sync()
-		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
-				expectation1.fulfill()
-			}
-		}
-
-		_ = try await group.send(content: "hi")
-		_ = try await dm.send(content: "hi")
-
-		await fulfillment(of: [expectation1], timeout: 3)
-	}
-	
-	func testCanStreamAllGroupDecryptedMessages() async throws {
-		let fixtures = try await localFixtures()
-
-		let expectation1 = XCTestExpectation(description: "got a conversation")
-		let group = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
-		let dm = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.alice.address)
-
 		try await fixtures.aliceClient.conversations.sync()
 		Task(priority: .userInitiated) {
 			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
@@ -1030,67 +962,6 @@ class GroupTests: XCTestCase {
 					return try await group.members
 				}
 			}
-		}
-	}
-	
-	func testCanStreamAllDecryptedMessagesAndCancelStream() async throws {
-		let fixtures = try await localFixtures()
-
-		var messages = 0
-		let messagesQueue = DispatchQueue(label: "messages.queue")  // Serial queue to synchronize access to `messages`
-
-		let convo = try await fixtures.bobClient.conversations.newConversation(with: fixtures.alice.address)
-		let group = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
-		try await fixtures.aliceClient.conversations.sync()
-
-		let streamingTask = Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
-				messagesQueue.sync {
-					messages += 1
-				}
-			}
-		}
-
-		_ = try await group.send(content: "hi")
-		_ = try await convo.send(content: "hi")
-
-		try await Task.sleep(nanoseconds: 1_000_000_000)
-
-		streamingTask.cancel()
-
-		messagesQueue.sync {
-			XCTAssertEqual(messages, 2)
-		}
-		
-		try await Task.sleep(nanoseconds: 1_000_000_000)
-		
-		_ = try await group.send(content: "hi")
-		_ = try await group.send(content: "hi")
-		_ = try await group.send(content: "hi")
-		_ = try await convo.send(content: "hi")
-		
-		try await Task.sleep(nanoseconds: 1_000_000_000)
-		
-		messagesQueue.sync {
-			XCTAssertEqual(messages, 2)
-		}
-		
-		let streamingTask2 = Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
-				// Update the messages count in a thread-safe manner
-				messagesQueue.sync {
-					messages += 1
-				}
-			}
-		}
-		
-		_ = try await group.send(content: "hi")
-		_ = try await convo.send(content: "hi")
-		
-		try await Task.sleep(nanoseconds: 1_000_000_000)
-		
-		messagesQueue.sync {
-			XCTAssertEqual(messages, 4)
 		}
 	}
 }

@@ -423,45 +423,6 @@ public actor Conversations {
 		}
 	}
 
-	public func streamAllDecryptedConversationMessages() -> AsyncThrowingStream<
-		DecryptedMessage, Error
-	> {
-		AsyncThrowingStream { continuation in
-			let ffiStreamActor = FfiStreamActor()
-			let task = Task {
-				let stream = await self.client.v3Client?.conversations()
-					.streamAllMessages(
-						messageCallback: MessageCallback(client: self.client) {
-							message in
-							guard !Task.isCancelled else {
-								continuation.finish()
-								Task {
-									await ffiStreamActor.endStream()  // End the stream upon cancellation
-								}
-								return
-							}
-							do {
-								continuation.yield(
-									try MessageV3(
-										client: self.client, ffiMessage: message
-									).decrypt())
-							} catch {
-								print("Error onMessage \(error)")
-							}
-						}
-					)
-				await ffiStreamActor.setFfiStream(stream)
-			}
-
-			continuation.onTermination = { _ in
-				task.cancel()
-				Task {
-					await ffiStreamActor.endStream()
-				}
-			}
-		}
-	}
-
 	public func fromWelcome(envelopeBytes: Data) async throws
 		-> Conversation?
 	{

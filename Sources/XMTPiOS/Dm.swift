@@ -203,42 +203,6 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func streamDecryptedMessages() -> AsyncThrowingStream<
-		DecryptedMessage, Error
-	> {
-		AsyncThrowingStream { continuation in
-			let task = Task.detached {
-				self.streamHolder.stream = await self.ffiConversation.stream(
-					messageCallback: MessageCallback(client: self.client) {
-						message in
-						guard !Task.isCancelled else {
-							continuation.finish()
-							return
-						}
-						do {
-							continuation.yield(
-								try MessageV3(
-									client: self.client, ffiMessage: message
-								).decrypt())
-						} catch {
-							print("Error onMessage \(error)")
-							continuation.finish(throwing: error)
-						}
-					}
-				)
-
-				continuation.onTermination = { @Sendable reason in
-					self.streamHolder.stream?.end()
-				}
-			}
-
-			continuation.onTermination = { @Sendable reason in
-				task.cancel()
-				self.streamHolder.stream?.end()
-			}
-		}
-	}
-
 	public func messages(
 		before: Date? = nil,
 		after: Date? = nil,
@@ -298,68 +262,6 @@ public struct Dm: Identifiable, Equatable, Hashable {
 			ffiMessage in
 			return MessageV3(client: self.client, ffiMessage: ffiMessage)
 				.decodeOrNull()
-		}
-	}
-
-	public func decryptedMessages(
-		before: Date? = nil,
-		after: Date? = nil,
-		limit: Int? = nil,
-		direction: PagingInfoSortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus? = .all
-	) async throws -> [DecryptedMessage] {
-		var options = FfiListMessagesOptions(
-			sentBeforeNs: nil,
-			sentAfterNs: nil,
-			limit: nil,
-			deliveryStatus: nil,
-			direction: nil
-		)
-
-		if let before {
-			options.sentBeforeNs = Int64(
-				before.millisecondsSinceEpoch * 1_000_000)
-		}
-
-		if let after {
-			options.sentAfterNs = Int64(
-				after.millisecondsSinceEpoch * 1_000_000)
-		}
-
-		if let limit {
-			options.limit = Int64(limit)
-		}
-
-		let status: FfiDeliveryStatus? = {
-			switch deliveryStatus {
-			case .published:
-				return FfiDeliveryStatus.published
-			case .unpublished:
-				return FfiDeliveryStatus.unpublished
-			case .failed:
-				return FfiDeliveryStatus.failed
-			default:
-				return nil
-			}
-		}()
-
-		options.deliveryStatus = status
-
-		let direction: FfiDirection? = {
-			switch direction {
-			case .ascending:
-				return FfiDirection.ascending
-			default:
-				return FfiDirection.descending
-			}
-		}()
-
-		options.direction = direction
-
-		return try ffiConversation.findMessages(opts: options).compactMap {
-			ffiMessage in
-			return MessageV3(client: self.client, ffiMessage: ffiMessage)
-				.decryptOrNull()
 		}
 	}
 }

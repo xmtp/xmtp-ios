@@ -8,11 +8,11 @@
 import Foundation
 import LibXMTP
 
-enum MessageV3Error: Error {
+enum MessageError: Error {
 	case decodeError(String)
 }
 
-public struct MessageV3: Identifiable {
+public struct Message: Identifiable {
 	let client: Client
 	let ffiMessage: FfiMessage
 	
@@ -54,7 +54,6 @@ public struct MessageV3: Identifiable {
 
 			let decodedMessage = DecodedMessage(
 				id: id,
-				client: client,
 				topic: Topic.groupMessage(convoId).description,
 				encodedContent: encodedContent,
 				senderAddress: senderInboxId,
@@ -63,12 +62,12 @@ public struct MessageV3: Identifiable {
 			)
 			
 			if decodedMessage.encodedContent.type == ContentTypeGroupUpdated && ffiMessage.kind != .membershipChange {
-				throw MessageV3Error.decodeError("Error decoding group membership change")
+				throw MessageError.decodeError("Error decoding group membership change")
 		 }
 			
 			return decodedMessage
 		} catch {
-			throw MessageV3Error.decodeError("Error decoding message: \(error.localizedDescription)")
+			throw MessageError.decodeError("Error decoding message: \(error.localizedDescription)")
 		}
 	}
 	
@@ -79,33 +78,5 @@ public struct MessageV3: Identifiable {
 			print("MESSAGE_V3: discarding message that failed to decode", error)
 			return nil
 		}
-	}
-	
-	public func decryptOrNull() -> DecryptedMessage? {
-		do {
-			return try decrypt()
-		} catch {
-			print("MESSAGE_V3: discarding message that failed to decrypt", error)
-			return nil
-		}
-	}
-	
-	public func decrypt() throws -> DecryptedMessage {
-		let encodedContent = try EncodedContent(serializedData: ffiMessage.content)
-
-		let decrytedMessage =  DecryptedMessage(
-			id: id,
-			encodedContent: encodedContent,
-			senderAddress: senderInboxId,
-			sentAt: sentAt,
-			topic: Topic.groupMessage(convoId).description,
-			deliveryStatus: deliveryStatus
-		)
-		
-		if decrytedMessage.encodedContent.type == ContentTypeGroupUpdated && ffiMessage.kind != .membershipChange {
-			throw MessageV3Error.decodeError("Error decoding group membership change")
-		}
-		
-		return decrytedMessage
 	}
 }
