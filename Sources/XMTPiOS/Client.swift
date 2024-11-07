@@ -132,7 +132,7 @@ public final class Client {
 	public var hasV2Client: Bool = true
 
 	/// Access ``Conversations`` for this Client.
-	public lazy var conversations: Conversations = .init(client: self)
+	public lazy var conversations: Conversations = .init(client: self, ffiConversations: v3Client!.conversations())
 
 	/// Access ``Contacts`` for this Client.
 	public lazy var contacts: Contacts = .init(client: self)
@@ -593,78 +593,6 @@ public final class Client {
 		)
 		return try await apiClient.query(topic: Topic.contact(peerAddress))
 			.envelopes.count > 0
-	}
-
-	public func importConversation(from conversationData: Data) throws
-		-> Conversation?
-	{
-		let jsonDecoder = JSONDecoder()
-
-		do {
-			let v2Export = try jsonDecoder.decode(
-				ConversationV2Export.self, from: conversationData)
-			return try importV2Conversation(export: v2Export)
-		} catch {
-			do {
-				let v1Export = try jsonDecoder.decode(
-					ConversationV1Export.self, from: conversationData)
-				return try importV1Conversation(export: v1Export)
-			} catch {
-				throw ConversationImportError.invalidData
-			}
-		}
-	}
-
-	func importV2Conversation(export: ConversationV2Export) throws
-		-> Conversation
-	{
-		guard
-			let keyMaterial = Data(base64Encoded: Data(export.keyMaterial.utf8))
-		else {
-			throw ConversationImportError.invalidData
-		}
-
-		var consentProof: ConsentProofPayload? = nil
-		if let exportConsentProof = export.consentProof {
-			var proof = ConsentProofPayload()
-			proof.signature = exportConsentProof.signature
-			proof.timestamp = exportConsentProof.timestamp
-			proof.payloadVersion =
-				ConsentProofPayloadVersion.consentProofPayloadVersion1
-			consentProof = proof
-		}
-
-		return .v2(
-			ConversationV2(
-				topic: export.topic,
-				keyMaterial: keyMaterial,
-				context: InvitationV1.Context(
-					conversationID: export.context?.conversationId ?? "",
-					metadata: export.context?.metadata ?? [:]
-				),
-				peerAddress: export.peerAddress,
-				client: self,
-				header: SealedInvitationHeaderV1(),
-				consentProof: consentProof
-			))
-	}
-
-	func importV1Conversation(export: ConversationV1Export) throws
-		-> Conversation
-	{
-		let formatter = ISO8601DateFormatter()
-		formatter.formatOptions.insert(.withFractionalSeconds)
-
-		guard let sentAt = formatter.date(from: export.createdAt) else {
-			throw ConversationImportError.invalidData
-		}
-
-		return .v1(
-			ConversationV1(
-				client: self,
-				peerAddress: export.peerAddress,
-				sentAt: sentAt
-			))
 	}
 
 	func ensureUserContactPublished() async throws {

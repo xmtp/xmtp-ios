@@ -133,7 +133,7 @@ class DmTests: XCTestCase {
 		XCTAssertEqual(messages.count, 3)
 
 		try await fixtures.alixClient.conversations.sync()
-		let sameDm = try await fixtures.alixClient.conversations.dms().last!
+		let sameDm = try await fixtures.alixClient.conversations.listDms().last!
 		try await sameDm.sync()
 
 		let sameMessages = try await sameDm.messages()
@@ -171,7 +171,7 @@ class DmTests: XCTestCase {
 		expectation1.expectedFulfillmentCount = 2
 		
 		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.alixClient.conversations.streamAllConversationMessages() {
+			for try await _ in await fixtures.alixClient.conversations.streamAllMessages() {
 				expectation1.fulfill()
 			}
 		}

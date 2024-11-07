@@ -283,9 +283,9 @@ public struct Group: Identifiable, Equatable, Hashable {
 		return try ffiGroup.consentState().fromFFI
 	}
 
-	public func processMessage(envelopeBytes: Data) async throws -> MessageV3 {
+	public func processMessage(messageBytes: Data) async throws -> MessageV3 {
 		let message = try await ffiGroup.processStreamedConversationMessage(
-			envelopeBytes: envelopeBytes)
+			envelopeBytes: messageBytes)
 		return MessageV3(client: client, ffiMessage: message)
 	}
 

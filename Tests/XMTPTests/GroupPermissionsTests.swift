@@ -92,7 +92,7 @@ class GroupPermissionTests: XCTestCase {
         let fixtures = try await localFixtures()
         let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
         try await fixtures.aliceClient.conversations.sync()
-        let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+        let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
         
         XCTAssertFalse(try bobGroup.isAdmin(inboxId: fixtures.bobClient.inboxID))
         XCTAssertTrue(try bobGroup.isSuperAdmin(inboxId: fixtures.bobClient.inboxID))
@@ -113,7 +113,7 @@ class GroupPermissionTests: XCTestCase {
         let fixtures = try await localFixtures()
         let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address, fixtures.caro.address], permissions: .adminOnly)
         try await fixtures.aliceClient.conversations.sync()
-        let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+        let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
         
         XCTAssertFalse(try bobGroup.isAdmin(inboxId: fixtures.bobClient.inboxID))
         XCTAssertTrue(try bobGroup.isSuperAdmin(inboxId: fixtures.bobClient.inboxID))
@@ -180,7 +180,7 @@ class GroupPermissionTests: XCTestCase {
         let fixtures = try await localFixtures()
         let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address, fixtures.caro.address], permissions: .adminOnly)
         try await fixtures.aliceClient.conversations.sync()
-        let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+        let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
 
         XCTAssertTrue(try bobGroup.isSuperAdmin(inboxId: fixtures.bobClient.inboxID))
         XCTAssertFalse(try aliceGroup.isSuperAdmin(inboxId: fixtures.aliceClient.inboxID))
@@ -210,7 +210,7 @@ class GroupPermissionTests: XCTestCase {
         let fixtures = try await localFixtures()
         let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address, fixtures.caro.address], permissions: .adminOnly)
         try await fixtures.aliceClient.conversations.sync()
-        let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+        let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
 
         // Initial checks for group members and their permissions
         var members = try await bobGroup.members
@@ -255,7 +255,7 @@ class GroupPermissionTests: XCTestCase {
         let fixtures = try await localFixtures()
         let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address, fixtures.caro.address], permissions: .allMembers)
         try await fixtures.aliceClient.conversations.sync()
-        let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+        let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
         
         // Verify that alice can NOT add an admin
         XCTAssertEqual(try bobGroup.groupName(), "")
@@ -284,7 +284,7 @@ class GroupPermissionTests: XCTestCase {
                 permissions: .adminOnly
             )
             try await fixtures.aliceClient.conversations.sync()
-            let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+            let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
 
             // Verify that Alice cannot update group description
             XCTAssertEqual(try bobGroup.groupDescription(), "")
@@ -318,7 +318,7 @@ class GroupPermissionTests: XCTestCase {
                 pinnedFrameUrl: "initial url"
             )
             try await fixtures.aliceClient.conversations.sync()
-            let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+            let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
 
             // Verify that Alice cannot update group pinned frame url
             XCTAssertEqual(try bobGroup.groupPinnedFrameUrl(), "initial url")
@@ -363,7 +363,7 @@ class GroupPermissionTests: XCTestCase {
         )
         
         try await fixtures.aliceClient.conversations.sync()
-        let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+        let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
         
         let alicePermissionSet = try aliceGroup.permissionPolicySet()
         XCTAssert(alicePermissionSet.addMemberPolicy == PermissionOption.admin)

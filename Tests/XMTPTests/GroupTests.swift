@@ -103,10 +103,10 @@ class GroupTests: XCTestCase {
 		let alixConversationsListCount = try await fixtures.aliceClient.conversations.list().count
 		XCTAssertEqual(alixConversationsListCount, 1)
 
-		let alixDmsListCount = try await fixtures.aliceClient.conversations.dms().count
+		let alixDmsListCount = try await fixtures.aliceClient.conversations.listDms().count
 		XCTAssertEqual(alixDmsListCount, 1)
 
-		let boDmsListCount = try await fixtures.bobClient.conversations.dms().count
+		let boDmsListCount = try await fixtures.bobClient.conversations.listDms().count
 		XCTAssertEqual(boDmsListCount, 1)
 
 		let boConversationsListCount = try await fixtures.bobClient.conversations.list().count
@@ -149,7 +149,7 @@ class GroupTests: XCTestCase {
 		let fixtures = try await localFixtures()
 		let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address])
 		try await fixtures.aliceClient.conversations.sync()
-		let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+		let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
 		XCTAssert(!bobGroup.id.isEmpty)
 		XCTAssert(!aliceGroup.id.isEmpty)
 		
@@ -196,7 +196,7 @@ class GroupTests: XCTestCase {
 		let fixtures = try await localFixtures()
 		let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address], permissions: GroupPermissionPreconfiguration.adminOnly)
 		try await fixtures.aliceClient.conversations.sync()
-		let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
+		let aliceGroup = try await fixtures.aliceClient.conversations.listGroups().first!
 		XCTAssert(!bobGroup.id.isEmpty)
 		XCTAssert(!aliceGroup.id.isEmpty)
 
@@ -257,10 +257,10 @@ class GroupTests: XCTestCase {
 		_ = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.alice.address)
 		
 		try await fixtures.aliceClient.conversations.sync()
-		let aliceGroupCount = try await fixtures.aliceClient.conversations.groups().count
+		let aliceGroupCount = try await fixtures.aliceClient.conversations.listGroups().count
 
 		try await fixtures.bobClient.conversations.sync()
-		let bobGroupCount = try await fixtures.bobClient.conversations.groups().count
+		let bobGroupCount = try await fixtures.bobClient.conversations.listGroups().count
 
 		XCTAssertEqual(1, aliceGroupCount)
 		XCTAssertEqual(1, bobGroupCount)
@@ -273,10 +273,10 @@ class GroupTests: XCTestCase {
 		_ = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.bob.walletAddress)
 		_ = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.alice.walletAddress)
 
-		let aliceGroupCount = try await fixtures.aliceClient.conversations.list(includeGroups: true).count
+		let aliceGroupCount = try await fixtures.aliceClient.conversations.list().count
 
 		try await fixtures.bobClient.conversations.sync()
-		let bobGroupCount = try await fixtures.bobClient.conversations.list(includeGroups: true).count
+		let bobGroupCount = try await fixtures.bobClient.conversations.list().count
 
 		XCTAssertEqual(2, aliceGroupCount)
 		XCTAssertEqual(2, bobGroupCount)
@@ -409,7 +409,7 @@ class GroupTests: XCTestCase {
 		].sorted(), members)
 		
 		try await fixtures.fredClient.conversations.sync()
-		let fredGroup = try await fixtures.fredClient.conversations.groups().first
+		let fredGroup = try await fixtures.fredClient.conversations.listGroups().first
 		try await fredGroup?.sync()
 
 		var isAliceActive = try group.isActive()
@@ -449,7 +449,7 @@ class GroupTests: XCTestCase {
 		try await fixtures.bobClient.conversations.sync()
 		
 		// Check Bob's group for the added_by_address of the inviter
-		let bobGroup = try await fixtures.bobClient.conversations.groups().first
+		let bobGroup = try await fixtures.bobClient.conversations.listGroups().first
 		let aliceAddress = fixtures.aliceClient.inboxID
 		let whoAddedBob = try bobGroup?.addedByInboxId()
 		
@@ -481,7 +481,7 @@ class GroupTests: XCTestCase {
 
 			XCTFail("did not throw error")
 		} catch {
-			if case let GroupError.memberNotRegistered(addresses) = error {
+			if case let ConversationError.memberNotRegistered(addresses) = error {
 				XCTAssertEqual([nonRegistered.address.lowercased()], addresses.map { $0.lowercased() })
 			} else {
 				XCTFail("did not throw correct error")
@@ -510,7 +510,7 @@ class GroupTests: XCTestCase {
 		let membershipChange = GroupUpdated()
 
 		try await fixtures.bobClient.conversations.sync()
-		let bobGroup = try await fixtures.bobClient.conversations.groups()[0]
+		let bobGroup = try await fixtures.bobClient.conversations.listGroups()[0]
 
 		_ = try await aliceGroup.send(content: "sup gang original")
 		let messageId = try await aliceGroup.send(content: "sup gang")
@@ -553,7 +553,7 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(3, aliceMessagesPublishedCount)
 
 		try await fixtures.bobClient.conversations.sync()
-		let bobGroup = try await fixtures.bobClient.conversations.groups()[0]
+		let bobGroup = try await fixtures.bobClient.conversations.listGroups()[0]
 		try await bobGroup.sync()
 		
 		let bobMessagesCount = try await bobGroup.messages().count
@@ -570,7 +570,7 @@ class GroupTests: XCTestCase {
 		let aliceGroup = try await fixtures.aliceClient.conversations.newGroup(with: [fixtures.bob.address])
 
 		try await fixtures.bobClient.conversations.sync()
-		let bobGroup = try await fixtures.bobClient.conversations.groups()[0]
+		let bobGroup = try await fixtures.bobClient.conversations.listGroups()[0]
 
 		_ = try await aliceGroup.send(content: "sup gang original")
 		_ = try await aliceGroup.send(content: "sup gang")
@@ -614,7 +614,7 @@ class GroupTests: XCTestCase {
 		let expectation1 = XCTestExpectation(description: "got a group")
 
 		Task(priority: .userInitiated) {
-			for try await _ in try await fixtures.aliceClient.conversations.streamGroups() {
+			for try await _ in try await fixtures.aliceClient.conversations.stream() {
 				expectation1.fulfill()
 			}
 		}
@@ -632,7 +632,7 @@ class GroupTests: XCTestCase {
 		expectation1.expectedFulfillmentCount = 2
 
 		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAll() {
+			for try await _ in await fixtures.aliceClient.conversations.stream() {
 				expectation1.fulfill()
 			}
 		}
@@ -652,13 +652,13 @@ class GroupTests: XCTestCase {
 
 
 		Task(priority: .userInitiated) {
-			for try await _ in try await fixtures.aliceClient.conversations.streamGroups() {
+			for try await _ in try await fixtures.aliceClient.conversations.stream() {
 				expectation1.fulfill()
 			}
 		}
 		
 		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages(includeGroups: true) {
+			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
 				expectation2.fulfill()
 			}
 		}
@@ -676,7 +676,7 @@ class GroupTests: XCTestCase {
 		expectation.expectedFulfillmentCount = 5
 
 		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.bobClient.conversations.streamAllGroupMessages(){
+			for try await _ in await fixtures.bobClient.conversations.streamAllMessages(){
 				expectation.fulfill()
 			}
 		}
@@ -687,7 +687,7 @@ class GroupTests: XCTestCase {
 		
 		try await fixtures.bobClient.conversations.sync()
 
-		let boGroups = try await fixtures.bobClient.conversations.groups()
+		let boGroups = try await fixtures.bobClient.conversations.listGroups()
 		XCTAssertEqual(boGroups.count, 1, "bo should have 1 group")
 		let boGroup = boGroups[0]
 		try await boGroup.sync()
@@ -728,7 +728,7 @@ class GroupTests: XCTestCase {
 
 		try await fixtures.aliceClient.conversations.sync()
 		Task(priority: .userInitiated) {
-			for try await _ in try await fixtures.aliceClient.conversations.streamAllMessages(includeGroups: true) {
+			for try await _ in try await fixtures.aliceClient.conversations.streamAllMessages() {
 				expectation1.fulfill()
 			}
 		}
@@ -751,7 +751,7 @@ class GroupTests: XCTestCase {
 		let dm = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.alice.address)
 		try await fixtures.aliceClient.conversations.sync()
 		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllDecryptedMessages(includeGroups: true) {
+			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
 				expectation1.fulfill()
 			}
 		}
@@ -773,7 +773,7 @@ class GroupTests: XCTestCase {
 		let dm = try await fixtures.davonV3Client.conversations.findOrCreateDm(with: fixtures.alice.address)
 		try await fixtures.aliceClient.conversations.sync()
 		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllGroupMessages() {
+			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
 				expectation1.fulfill()
 			}
 		}
@@ -793,7 +793,7 @@ class GroupTests: XCTestCase {
 
 		try await fixtures.aliceClient.conversations.sync()
 		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllGroupDecryptedMessages() {
+			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
 				expectation1.fulfill()
 			}
 		}
@@ -824,15 +824,9 @@ class GroupTests: XCTestCase {
         XCTAssertEqual(groupName, "Test Group Name 1")
 		XCTAssertEqual(groupImageUrlSquare, "newurl.com")
 		
-        let bobConv = try await fixtures.bobClient.conversations.list(includeGroups: true)[0]
+        let bobConv = try await fixtures.bobClient.conversations.list()[0]
         let bobGroup: Group;
         switch bobConv {
-            case .v1(_):
-                XCTFail("failed converting conversation to group")
-                return
-            case .v2(_):
-                XCTFail("failed converting conversation to group")
-                return
             case .group(let group):
                 bobGroup = group
 		    case .dm(_):
@@ -979,7 +973,7 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(messageCount, 0)
 		do {
 			let start = Date()
-			let numGroupsSynced = try await fixtures.bobClient.conversations.syncAllGroups()
+			let numGroupsSynced = try await fixtures.bobClient.conversations.syncAllConversations()
 			let end = Date()
 			print(end.timeIntervalSince(start))
 			XCTAssert(end.timeIntervalSince(start) < 1)
@@ -992,7 +986,7 @@ class GroupTests: XCTestCase {
 		let messageCount2 = try await bobGroup!.messages().count
 		XCTAssertEqual(messageCount2, 1)
         
-        for aliceConv in try await fixtures.aliceClient.conversations.list(includeGroups: true) {
+        for aliceConv in try await fixtures.aliceClient.conversations.list() {
             guard case let .group(aliceGroup) = aliceConv else {
                    XCTFail("failed converting conversation to group")
                    return
@@ -1001,11 +995,11 @@ class GroupTests: XCTestCase {
         }
         
         // first syncAllGroups after removal still sync groups in order to process the removal
-        var numGroupsSynced = try await fixtures.bobClient.conversations.syncAllGroups()
+        var numGroupsSynced = try await fixtures.bobClient.conversations.syncAllConversations()
         XCTAssert(numGroupsSynced == 100)
         
         // next syncAllGroups only will sync active groups
-        numGroupsSynced = try await fixtures.bobClient.conversations.syncAllGroups()
+		numGroupsSynced = try await fixtures.bobClient.conversations.syncAllConversations()
         XCTAssert(numGroupsSynced == 0)
 	}
 	
@@ -1050,7 +1044,7 @@ class GroupTests: XCTestCase {
 		try await fixtures.aliceClient.conversations.sync()
 
 		let streamingTask = Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllDecryptedMessages(includeGroups: true) {
+			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
 				messagesQueue.sync {
 					messages += 1
 				}
@@ -1082,7 +1076,7 @@ class GroupTests: XCTestCase {
 		}
 		
 		let streamingTask2 = Task(priority: .userInitiated) {
-			for try await _ in await fixtures.aliceClient.conversations.streamAllDecryptedMessages(includeGroups: true) {
+			for try await _ in await fixtures.aliceClient.conversations.streamAllMessages() {
 				// Update the messages count in a thread-safe manner
 				messagesQueue.sync {
 					messages += 1

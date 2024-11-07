@@ -118,7 +118,7 @@ class ClientTests: XCTestCase {
 		_ = try await boClient.conversations.newGroup(with: [alixClient.address])
 		try await boClient.conversations.sync()
 
-		var groupCount = try await boClient.conversations.groups().count
+		var groupCount = try await boClient.conversations.listGroups().count
 		XCTAssertEqual(groupCount, 1)
 
 		assert(!boClient.dbPath.isEmpty)
@@ -134,7 +134,7 @@ class ClientTests: XCTestCase {
 		)
 
 		try await boClient.conversations.sync()
-		groupCount = try await boClient.conversations.groups().count
+		groupCount = try await boClient.conversations.listGroups().count
 		XCTAssertEqual(groupCount, 0)
 	}
 	
@@ -163,16 +163,16 @@ class ClientTests: XCTestCase {
 		_ = try await boClient.conversations.newGroup(with: [alixClient.address])
 		try await boClient.conversations.sync()
 
-		var groupCount = try await boClient.conversations.groups().count
+		var groupCount = try await boClient.conversations.listGroups().count
 		XCTAssertEqual(groupCount, 1)
 
 		try boClient.dropLocalDatabaseConnection()
 
-		await assertThrowsAsyncError(try await boClient.conversations.groups())
+		await assertThrowsAsyncError(try await boClient.conversations.listGroups())
 
 		try await boClient.reconnectLocalDatabase()
 
-		groupCount = try await boClient.conversations.groups().count
+		groupCount = try await boClient.conversations.listGroups().count
 		XCTAssertEqual(groupCount, 1)
 	}
 

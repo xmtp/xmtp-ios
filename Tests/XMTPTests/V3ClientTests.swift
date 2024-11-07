@@ -129,20 +129,18 @@ class V3ClientTests: XCTestCase {
 		])
 
 		let convoCount = try await fixtures.boV3Client.conversations
-			.listConversations().count
-		let dmCount = try await fixtures.boV3Client.conversations.dms().count
-		let groupCount = try await fixtures.boV3Client.conversations.groups()
+			.list().count
+		let dmCount = try await fixtures.boV3Client.conversations.listDms().count
+		let groupCount = try await fixtures.boV3Client.conversations.listGroups()
 			.count
 		XCTAssertEqual(convoCount, 2)
 		XCTAssertEqual(dmCount, 1)
 		XCTAssertEqual(groupCount, 1)
 
 		try await fixtures.caroV2V3Client.conversations.sync()
-		let convoCount2 = try await fixtures.caroV2V3Client.conversations.list(
-			includeGroups: true
-		).count
+		let convoCount2 = try await fixtures.caroV2V3Client.conversations.list().count
 		let groupCount2 = try await fixtures.caroV2V3Client.conversations
-			.groups().count
+			.listGroups().count
 		XCTAssertEqual(convoCount2, 1)
 		XCTAssertEqual(groupCount2, 1)
 	}
@@ -157,9 +155,9 @@ class V3ClientTests: XCTestCase {
 		])
 
 		let convoCount = try await fixtures.boV3Client.conversations
-			.listConversations().count
+			.list().count
 		let convoCountConsent = try await fixtures.boV3Client.conversations
-			.listConversations(consentState: .allowed).count
+			.list(consentState: .allowed).count
 
 		XCTAssertEqual(convoCount, 2)
 		XCTAssertEqual(convoCountConsent, 2)
@@ -167,9 +165,9 @@ class V3ClientTests: XCTestCase {
 		try await group.updateConsentState(state: .denied)
 
 		let convoCountAllowed = try await fixtures.boV3Client.conversations
-			.listConversations(consentState: .allowed).count
+			.list(consentState: .allowed).count
 		let convoCountDenied = try await fixtures.boV3Client.conversations
-			.listConversations(consentState: .denied).count
+			.list(consentState: .denied).count
 
 		XCTAssertEqual(convoCountAllowed, 1)
 		XCTAssertEqual(convoCountDenied, 1)
@@ -190,9 +188,9 @@ class V3ClientTests: XCTestCase {
 		_ = try await fixtures.boV3Client.conversations.syncAllConversations()
 
 		let conversations = try await fixtures.boV3Client.conversations
-			.listConversations()
+			.list()
 		let conversationsOrdered = try await fixtures.boV3Client.conversations
-			.listConversations(order: .lastMessage)
+			.list(order: .lastMessage)
 
 		XCTAssertEqual(conversations.count, 3)
 		XCTAssertEqual(conversationsOrdered.count, 3)
@@ -220,7 +218,7 @@ class V3ClientTests: XCTestCase {
 		XCTAssertEqual(groupMessages.count, 3)
 
 		try await fixtures.caroV2V3Client.conversations.sync()
-		let sameGroup = try await fixtures.caroV2V3Client.conversations.groups()
+		let sameGroup = try await fixtures.caroV2V3Client.conversations.listGroups()
 			.last
 		try await sameGroup?.sync()
 
@@ -346,7 +344,7 @@ class V3ClientTests: XCTestCase {
 		try await fixtures.boV3Client.conversations.sync()
 		Task(priority: .userInitiated) {
 			for try await _ in await fixtures.boV3Client.conversations
-				.streamAllConversationMessages()
+				.streamAllMessages()
 			{
 				expectation1.fulfill()
 			}
@@ -390,7 +388,7 @@ class V3ClientTests: XCTestCase {
 
 		Task(priority: .userInitiated) {
 			for try await _ in await fixtures.boV3Client.conversations
-				.streamConversations()
+				.stream()
 			{
 				expectation1.fulfill()
 			}
@@ -400,54 +398,6 @@ class V3ClientTests: XCTestCase {
 			fixtures.boV3.address
 		])
 		_ = try await fixtures.boV3Client.conversations.findOrCreateDm(
-			with: fixtures.caroV2V3.address)
-
-		await fulfillment(of: [expectation1], timeout: 3)
-	}
-
-	func testCanStreamAllMessagesFromV2andV3Users() async throws {
-		let fixtures = try await localFixtures()
-
-		let expectation1 = XCTestExpectation(description: "got a conversation")
-		expectation1.expectedFulfillmentCount = 2
-		let convo = try await fixtures.alixV2Client.conversations
-			.newConversation(with: fixtures.caroV2V3.address)
-		let group = try await fixtures.boV3Client.conversations.newGroup(with: [
-			fixtures.caroV2V3.address
-		])
-		try await fixtures.caroV2V3Client.conversations.sync()
-		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.caroV2V3Client.conversations
-				.streamAllMessages(includeGroups: true)
-			{
-				expectation1.fulfill()
-			}
-		}
-
-		_ = try await group.send(content: "hi")
-		_ = try await convo.send(content: "hi")
-
-		await fulfillment(of: [expectation1], timeout: 3)
-	}
-
-	func testCanStreamGroupsAndConversationsFromV2andV3Users() async throws {
-		let fixtures = try await localFixtures()
-
-		let expectation1 = XCTestExpectation(description: "got a conversation")
-		expectation1.expectedFulfillmentCount = 2
-
-		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.caroV2V3Client.conversations
-				.streamAll()
-			{
-				expectation1.fulfill()
-			}
-		}
-
-		_ = try await fixtures.boV3Client.conversations.newGroup(with: [
-			fixtures.caroV2V3.address
-		])
-		_ = try await fixtures.alixV2Client.conversations.newConversation(
 			with: fixtures.caroV2V3.address)
 
 		await fulfillment(of: [expectation1], timeout: 3)
