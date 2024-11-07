@@ -1,10 +1,3 @@
-//
-//  Dm.swift
-//  XMTPiOS
-//
-//  Created by Naomi Plasterer on 10/23/24.
-//
-
 import Foundation
 import LibXMTP
 
@@ -199,7 +192,7 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		before: Date? = nil,
 		after: Date? = nil,
 		limit: Int? = nil,
-		direction: PagingInfoSortDirection? = .descending,
+		direction: SortDirection? = .descending,
 		deliveryStatus: MessageDeliveryStatus = .all
 	) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(

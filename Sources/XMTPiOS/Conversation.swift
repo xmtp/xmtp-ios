@@ -1,10 +1,3 @@
-//
-//  Conversation.swift
-//
-//
-//  Created by Pat Nakajima on 11/28/22.
-//
-
 import Foundation
 import LibXMTP
 
@@ -170,16 +163,19 @@ public enum Conversation {
 
 	public func messages(
 		limit: Int? = nil, before: Date? = nil, after: Date? = nil,
-		direction: PagingInfoSortDirection? = .descending
+		direction: SortDirection? = .descending,
+		deliveryStatus: MessageDeliveryStatus = .all
 	) async throws -> [DecodedMessage] {
 		switch self {
 		case let .group(group):
 			return try await group.messages(
-				before: before, after: after, limit: limit, direction: direction
+				before: before, after: after, limit: limit,
+				direction: direction, deliveryStatus: deliveryStatus
 			)
 		case let .dm(dm):
 			return try await dm.messages(
-				before: before, after: after, limit: limit, direction: direction
+				before: before, after: after, limit: limit,
+				direction: direction, deliveryStatus: deliveryStatus
 			)
 		}
 	}
