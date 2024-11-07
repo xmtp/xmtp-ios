@@ -6,18 +6,12 @@ public typealias PreEventCallback = () async throws -> Void
 
 public enum ClientError: Error, CustomStringConvertible, LocalizedError {
 	case creationError(String)
-	case noV3Client(String)
-	case noV2Client(String)
 	case missingInboxId
 
 	public var description: String {
 		switch self {
 		case .creationError(let err):
 			return "ClientError.creationError: \(err)"
-		case .noV3Client(let err):
-			return "ClientError.noV3Client: \(err)"
-		case .noV2Client(let err):
-			return "ClientError.noV2Client: \(err)"
 		case .missingInboxId:
 			return "ClientError.missingInboxId"
 		}
@@ -117,7 +111,7 @@ public final class Client {
 		signingKey: SigningKey?,
 		inboxId: String
 	) async throws -> Client {
-		let (libxmtpClient, dbPath) = try await initV3Client(
+		let (libxmtpClient, dbPath) = try await initFFiClient(
 			accountAddress: accountAddress,
 			options: options,
 			signingKey: signingKey,
@@ -126,7 +120,7 @@ public final class Client {
 
 		let client = try Client(
 			address: accountAddress,
-			v3Client: libxmtpClient,
+			ffiClient: libxmtpClient,
 			dbPath: dbPath,
 			installationID: libxmtpClient.installationId().toHex,
 			inboxID: libxmtpClient.inboxId(),
@@ -171,7 +165,7 @@ public final class Client {
 		)
 	}
 
-	static func initV3Client(
+	static func initFFiClient(
 		accountAddress: String,
 		options: ClientOptions,
 		signingKey: SigningKey?,
@@ -203,7 +197,7 @@ public final class Client {
 		let alias = "xmtp-\(options.api.env.rawValue)-\(inboxId).db3"
 		let dbURL = directoryURL.appendingPathComponent(alias).path
 
-		let v3Client = try await LibXMTP.createClient(
+		let ffiClient = try await LibXMTP.createClient(
 			logger: XMTPLogger(),
 			host: options.api.env.url,
 			isSecure: options.api.env.isSecure == true,
@@ -217,7 +211,7 @@ public final class Client {
 		)
 
 		try await options.preAuthenticateToInboxCallback?()
-		if let signatureRequest = v3Client.signatureRequest() {
+		if let signatureRequest = ffiClient.signatureRequest() {
 			if let signingKey = signingKey {
 				do {
 					if signingKey.type == WalletType.SCW {
@@ -242,7 +236,7 @@ public final class Client {
 						try await signatureRequest.addEcdsaSignature(
 							signatureBytes: signedData.rawData)
 					}
-					try await v3Client.registerIdentity(
+					try await ffiClient.registerIdentity(
 						signatureRequest: signatureRequest)
 				} catch {
 					throw ClientError.creationError(
@@ -258,7 +252,7 @@ public final class Client {
 
 		print("LibXMTP \(getVersionInfo())")
 
-		return (v3Client, dbURL)
+		return (ffiClient, dbURL)
 	}
 
 	public static func getOrCreateInboxId(
@@ -280,11 +274,11 @@ public final class Client {
 	}
 
 	init(
-		address: String, v3Client: LibXMTP.FfiXmtpClient, dbPath: String,
+		address: String, ffiClient: LibXMTP.FfiXmtpClient, dbPath: String,
 		installationID: String, inboxID: String, environment: XMTPEnvironment
 	) throws {
 		self.address = address
-		self.ffiClient = v3Client
+		self.ffiClient = ffiClient
 		self.dbPath = dbPath
 		self.installationID = installationID
 		self.inboxID = inboxID

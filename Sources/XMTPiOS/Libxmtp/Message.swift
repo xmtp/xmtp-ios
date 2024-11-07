@@ -87,7 +87,7 @@ public struct Message: Identifiable {
 		do {
 			return try decode()
 		} catch {
-			print("MESSAGE_V3: discarding message that failed to decode", error)
+			print("MESSAGE: discarding message that failed to decode", error)
 			return nil
 		}
 	}
