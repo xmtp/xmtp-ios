@@ -1,10 +1,3 @@
-//
-//  MessageV3.swift
-//
-//
-//  Created by Naomi Plasterer on 4/10/24.
-//
-
 import Foundation
 import LibXMTP
 
@@ -17,6 +10,10 @@ public enum MessageDeliveryStatus: String, RawRepresentable, Sendable {
 		published,
 		unpublished,
 		failed
+}
+
+public enum SortDirection {
+	case descending, ascending
 }
 
 public struct Message: Identifiable {
@@ -90,7 +87,7 @@ public struct Message: Identifiable {
 		do {
 			return try decode()
 		} catch {
-			print("MESSAGE_V3: discarding message that failed to decode", error)
+			print("MESSAGE: discarding message that failed to decode", error)
 			return nil
 		}
 	}

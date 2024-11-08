@@ -1,10 +1,3 @@
-//
-//  Group.swift
-//
-//
-//  Created by Pat Nakajima on 2/1/24.
-//
-
 import Foundation
 import LibXMTP
 
@@ -397,7 +390,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 		before: Date? = nil,
 		after: Date? = nil,
 		limit: Int? = nil,
-		direction: PagingInfoSortDirection? = .descending,
+		direction: SortDirection? = .descending,
 		deliveryStatus: MessageDeliveryStatus = .all
 	) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(
