@@ -1,10 +1,3 @@
-//
-//  WalletConnection.swift
-//
-//
-//  Created by Pat Nakajima on 11/22/22.
-//
-
 import Foundation
 import UIKit
 import WalletConnectSwift

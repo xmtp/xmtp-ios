@@ -1,12 +1,8 @@
-//
-//  web3.swift
-//  Copyright © 2022 Argent Labs Limited. All rights reserved.
-//
 import Foundation
 import Logging
 import secp256k1
-import web3
 import LibXMTP
+import CryptoSwift
 
 enum KeyUtilError: Error {
 	case invalidContext
@@ -18,7 +14,6 @@ enum KeyUtilError: Error {
 	case parseError
 }
 
-// Copied from web3.swift since its version is `internal`
 enum KeyUtilx {
 	static func generatePublicKey(from data: Data) throws -> Data {
 		let vec = try LibXMTP.publicKeyFromPrivateKeyK256(privateKeyBytes: data)
@@ -42,7 +37,7 @@ enum KeyUtilx {
 			secp256k1_context_destroy(ctx)
 		}
 
-		let msgData = hashing ? Util.keccak256(message) : message
+		let msgData = hashing ? message.sha3(.keccak256) : message
 		let msg = (msgData as NSData).bytes.assumingMemoryBound(to: UInt8.self)
 		let privateKeyPtr = (privateKey as NSData).bytes.assumingMemoryBound(to: UInt8.self)
 		let signaturePtr = UnsafeMutablePointer<secp256k1_ecdsa_recoverable_signature>.allocate(capacity: 1)
@@ -64,7 +59,7 @@ enum KeyUtilx {
 		defer {
 			outputWithRecidPtr.deallocate()
 		}
-		outputWithRecidPtr.assign(from: outputPtr, count: 64)
+		outputWithRecidPtr.update(from: outputPtr, count: 64)
 		outputWithRecidPtr.advanced(by: 64).pointee = UInt8(recid)
 
 		let signature = Data(bytes: outputWithRecidPtr, count: 65)
@@ -72,12 +67,12 @@ enum KeyUtilx {
 		return signature
 	}
 
-	static func generateAddress(from publicKey: Data) -> EthereumAddress {
+	static func generateAddress(from publicKey: Data) -> String {
 		let publicKeyData = publicKey.count == 64 ? publicKey : publicKey[1 ..< publicKey.count]
 
-		let hash = Util.keccak256(publicKeyData)
+		let hash = publicKeyData.sha3(.keccak256)
 		let address = hash.subdata(in: 12 ..< hash.count)
-		return EthereumAddress("0x" + address.toHex)
+		return "0x" + address.toHex
 	}
 
 	static func recoverPublicKey(message: Data, signature: Data) throws -> Data {

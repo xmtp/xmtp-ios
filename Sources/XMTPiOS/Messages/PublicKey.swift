@@ -1,7 +1,5 @@
-import CryptoKit
 import Foundation
 import LibXMTP
-import web3
 
 typealias PublicKey = Xmtp_MessageContents_PublicKey
 
