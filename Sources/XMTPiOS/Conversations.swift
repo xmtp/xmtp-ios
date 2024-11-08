@@ -50,38 +50,6 @@ final class ConversationStreamCallback: FfiConversationCallback {
 	}
 }
 
-final class V2SubscriptionCallback: FfiV2SubscriptionCallback {
-	func onError(error: LibXMTP.GenericError) {
-		print("Error V2SubscriptionCallback \(error)")
-	}
-
-	let callback: (Envelope) -> Void
-
-	init(callback: @escaping (Envelope) -> Void) {
-		self.callback = callback
-	}
-
-	func onMessage(message: LibXMTP.FfiEnvelope) {
-		self.callback(message.fromFFI)
-	}
-}
-
-class StreamManager {
-	var stream: FfiV2Subscription?
-
-	func updateStream(with request: FfiV2SubscribeRequest) async throws {
-		try await stream?.update(req: request)
-	}
-
-	func endStream() async throws {
-		try await stream?.end()
-	}
-
-	func setStream(_ newStream: FfiV2Subscription?) {
-		self.stream = newStream
-	}
-}
-
 actor FfiStreamActor {
 	private var ffiStream: FfiStreamCloser?
 
@@ -135,9 +103,6 @@ public actor Conversations {
 	public func listDms(
 		createdAfter: Date? = nil, createdBefore: Date? = nil, limit: Int? = nil
 	) async throws -> [Dm] {
-		guard let v3Client = client.v3Client else {
-			return []
-		}
 		var options = FfiListConversationsOptions(
 			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
 			consentState: nil)
@@ -269,14 +234,11 @@ public actor Conversations {
 		if peerAddress.lowercased() == client.address.lowercased() {
 			throw ConversationError.memberCannotBeSelf
 		}
-		let canMessage = try await self.client.canMessageV3(
+		let canMessage = try await self.client.canMessage(
 			address: peerAddress)
 		if !canMessage {
 			throw ConversationError.memberNotRegistered([peerAddress])
 		}
-
-		try await client.contacts.allow(addresses: [peerAddress])
-
 		if let existingDm = try await client.findDm(address: peerAddress) {
 			return existingDm
 		}
@@ -285,8 +247,6 @@ public actor Conversations {
 			try await ffiConversations
 			.createDm(accountAddress: peerAddress.lowercased())
 			.dmFromFFI(client: client)
-
-		try await client.contacts.allow(addresses: [peerAddress])
 		return newDm
 	}
 
@@ -345,29 +305,15 @@ public actor Conversations {
 		}) != nil {
 			throw ConversationError.memberCannotBeSelf
 		}
-		let erroredAddresses = try await withThrowingTaskGroup(
-			of: (String?).self
-		) { group in
-			for address in addresses {
-				group.addTask {
-					if try await self.client.canMessageV3(address: address) {
-						return nil
-					} else {
-						return address
-					}
-				}
-			}
-			var results: [String] = []
-			for try await result in group {
-				if let result {
-					results.append(result)
-				}
-			}
-			return results
+		let addressMap = try await self.client.canMessage(addresses: addresses)
+		let unregisteredAddresses = addressMap
+			.filter { !$0.value }
+			.map { $0.key }
+
+		if !unregisteredAddresses.isEmpty {
+			throw ConversationError.memberNotRegistered(unregisteredAddresses)
 		}
-		if !erroredAddresses.isEmpty {
-			throw ConversationError.memberNotRegistered(erroredAddresses)
-		}
+
 		let group = try await ffiConversations.createGroup(
 			accountAddresses: addresses,
 			opts: FfiCreateGroupOptions(
@@ -379,7 +325,6 @@ public actor Conversations {
 				customPermissionPolicySet: permissionPolicySet
 			)
 		).groupFromFFI(client: client)
-		try await client.contacts.allowGroups(groupIds: [group.id])
 		return group
 	}
 
@@ -403,48 +348,9 @@ public actor Conversations {
 							}
 							do {
 								continuation.yield(
-									try MessageV3(
+									try Message(
 										client: self.client, ffiMessage: message
 									).decode())
-							} catch {
-								print("Error onMessage \(error)")
-							}
-						}
-					)
-				await ffiStreamActor.setFfiStream(stream)
-			}
-
-			continuation.onTermination = { _ in
-				task.cancel()
-				Task {
-					await ffiStreamActor.endStream()
-				}
-			}
-		}
-	}
-
-	public func streamAllDecryptedConversationMessages() -> AsyncThrowingStream<
-		DecryptedMessage, Error
-	> {
-		AsyncThrowingStream { continuation in
-			let ffiStreamActor = FfiStreamActor()
-			let task = Task {
-				let stream = await self.client.v3Client?.conversations()
-					.streamAllMessages(
-						messageCallback: MessageCallback(client: self.client) {
-							message in
-							guard !Task.isCancelled else {
-								continuation.finish()
-								Task {
-									await ffiStreamActor.endStream()  // End the stream upon cancellation
-								}
-								return
-							}
-							do {
-								continuation.yield(
-									try MessageV3(
-										client: self.client, ffiMessage: message
-									).decrypt())
 							} catch {
 								print("Error onMessage \(error)")
 							}
