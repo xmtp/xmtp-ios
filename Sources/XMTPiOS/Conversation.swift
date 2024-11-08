@@ -1,22 +1,28 @@
 import Foundation
 import LibXMTP
 
-public enum Conversation {
+public enum Conversation: Identifiable, Equatable, Hashable {
 	case group(Group)
 	case dm(Dm)
+	
+	public static func == (lhs: Conversation, rhs: Conversation) -> Bool {
+		lhs.topic == rhs.topic
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(topic)
+	}
 
 	public enum ConversationType {
 		case group, dm
 	}
 
 	public var id: String {
-		get throws {
-			switch self {
-			case let .group(group):
-				return group.id
-			case let .dm(dm):
-				return dm.id
-			}
+		switch self {
+		case let .group(group):
+			return group.id
+		case let .dm(dm):
+			return dm.id
 		}
 	}
 
@@ -187,15 +193,5 @@ public enum Conversation {
 		case let .dm(dm):
 			return dm.client
 		}
-	}
-}
-
-extension Conversation: Hashable, Equatable {
-	public static func == (lhs: Conversation, rhs: Conversation) -> Bool {
-		lhs.topic == rhs.topic
-	}
-
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(topic)
 	}
 }
