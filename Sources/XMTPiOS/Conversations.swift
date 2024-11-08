@@ -34,6 +34,11 @@ public enum ConversationOrder {
 	case createdAt, lastMessage
 }
 
+
+public enum ConversationType {
+	case all, group, dm
+}
+
 final class ConversationStreamCallback: FfiConversationCallback {
 	func onError(error: LibXMTP.FfiSubscribeError) {
 		print("Error ConversationStreamCallback \(error)")
@@ -179,7 +184,7 @@ public actor Conversations {
 		}
 	}
 
-	public func stream() -> AsyncThrowingStream<
+	public func stream(type: ConversationType = .all) -> AsyncThrowingStream<
 		Conversation, Error
 	> {
 		AsyncThrowingStream { continuation in
@@ -328,7 +333,7 @@ public actor Conversations {
 		return group
 	}
 
-	public func streamAllMessages() -> AsyncThrowingStream<
+	public func streamAllMessages(type: ConversationType = .all) -> AsyncThrowingStream<
 		DecodedMessage, Error
 	> {
 		AsyncThrowingStream { continuation in
