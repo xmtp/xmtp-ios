@@ -8,95 +8,92 @@ struct ConversationListView: View {
 	@State private var conversations: [XMTPiOS.Conversation] = []
 	@State private var isShowingNewConversation = false
 
+	// Pre-sorted conversations to reduce complexity
+	private var sortedConversations: [XMTPiOS.Conversation] {
+		conversations.sorted(by: compareConversations)
+	}
+
 	var body: some View {
 		List {
-			ForEach(conversations.sorted(by: { $0.createdAt > $1.createdAt }), id: \.id) { item in
+			ForEach(sortedConversations, id: \.id) { item in
 				NavigationLink(destination: destinationView(for: item)) {
-					HStack {
-						switch item {
-						case .dm:
-							Image(systemName: "person.fill")
-								.resizable()
-								.scaledToFit()
-								.frame(width: 16, height: 16)
-								.foregroundStyle(.secondary)
-						case .group:
-							Image(systemName: "person.3.fill")
-								.resizable()
-								.scaledToFit()
-								.frame(width: 16, height: 16)
-								.foregroundStyle(.secondary)
-						}
-
-						VStack(alignment: .leading) {
-							switch item {
-							case .conversation(let conversation):
-								if let abbreviatedAddress = try? Util.abbreviate(address: conversation.peerAddress) {
-									Text(abbreviatedAddress)
-								} else {
-									Text("Unknown Address")
-										.foregroundStyle(.secondary)
-								}
-							case .group(let group):
-								let memberAddresses = try? group.members.map(\.inboxId).sorted().map { Util.abbreviate(address: $0) }
-								if let addresses = memberAddresses {
-									Text(addresses.joined(separator: ", "))
-								} else {
-									Text("Unknown Members")
-										.foregroundStyle(.secondary)
-								}
-							}
-
-							Text(item.createdAt.formatted())
-								.font(.caption)
-								.foregroundStyle(.secondary)
-						}
-					}
+					conversationRow(for: item)
 				}
 			}
 		}
 		.navigationTitle("Conversations")
-		.refreshable {
-			await loadConversations()
-		}
-		.task {
-			await loadConversations()
-		}
-		.task {
-			do {
-				for try await conversation in try await client.conversations.stream() {
-					await MainActor.run {
-						conversations.insert(conversation, at: 0)
-					}
-					await add(conversations: [conversation])
-				}
-			} catch {
-				print("Error streaming conversations: \(error)")
-			}
-		}
+		.refreshable { await loadConversations() }
+		.task { await loadConversations() }
+		.task { await startConversationStream() }
 		.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {
-				Button(action: {
-					self.isShowingNewConversation = true
-				}) {
+				Button(action: { isShowingNewConversation = true }) {
 					Label("New Conversation", systemImage: "plus")
 				}
 			}
 		}
 		.sheet(isPresented: $isShowingNewConversation) {
 			NewConversationView(client: client) { conversationOrGroup in
-				switch conversationOrGroup {
-				case .dm(let conversation):
-					conversations.insert(.dm(conversation), at: 0)
-					coordinator.path.append(conversationOrGroup)
-				case .group(let group):
-					conversations.insert(.group(group), at: 0)
-					coordinator.path.append(conversationOrGroup)
-				}
+				addConversation(conversationOrGroup)
 			}
 		}
 	}
 
+	// Helper function to compare conversations by createdAt date
+	private func compareConversations(_ lhs: XMTPiOS.Conversation, _ rhs: XMTPiOS.Conversation) -> Bool {
+		return lhs.createdAt > rhs.createdAt
+	}
+
+	// Extracted row view for each conversation
+	@ViewBuilder
+	private func conversationRow(for item: XMTPiOS.Conversation) -> some View {
+		HStack {
+			conversationIcon(for: item)
+			VStack(alignment: .leading) {
+				Text(conversationDisplayName(for: item))
+					.foregroundStyle(.secondary)
+				Text(formattedDate(for: item.createdAt))
+					.font(.caption)
+					.foregroundStyle(.secondary)
+			}
+		}
+	}
+
+	// Extracted icon view for conversation type
+	@ViewBuilder
+	private func conversationIcon(for item: XMTPiOS.Conversation) -> some View {
+		switch item {
+		case .dm:
+			Image(systemName: "person.fill")
+				.resizable()
+				.scaledToFit()
+				.frame(width: 16, height: 16)
+				.foregroundStyle(.secondary)
+		case .group:
+			Image(systemName: "person.3.fill")
+				.resizable()
+				.scaledToFit()
+				.frame(width: 16, height: 16)
+				.foregroundStyle(.secondary)
+		}
+	}
+
+	// Helper function to provide a display name based on the conversation type
+	private func conversationDisplayName(for item: XMTPiOS.Conversation) -> String {
+		switch item {
+		case .dm(let conversation):
+			return (try? Util.abbreviate(address: conversation.peerInboxId)) ?? "Unknown Address"
+		case .group(let group):
+			return try! group.groupName()
+		}
+	}
+
+	// Helper function to format the date
+	private func formattedDate(for date: Date) -> String {
+		return date.formatted()
+	}
+
+	// Define destination view based on conversation type
 	@ViewBuilder
 	private func destinationView(for item: XMTPiOS.Conversation) -> some View {
 		switch item {
@@ -107,6 +104,7 @@ struct ConversationListView: View {
 		}
 	}
 
+	// Async function to load conversations
 	func loadConversations() async {
 		do {
 			try await client.conversations.sync()
@@ -117,6 +115,32 @@ struct ConversationListView: View {
 			await add(conversations: loadedConversations)
 		} catch {
 			print("Error loading conversations: \(error)")
+		}
+	}
+
+	// Async function to stream conversations
+	func startConversationStream() async {
+		do {
+			for try await conversation in try await client.conversations.stream() {
+				await MainActor.run {
+					conversations.insert(conversation, at: 0)
+				}
+				await add(conversations: [conversation])
+			}
+		} catch {
+			print("Error streaming conversations: \(error)")
+		}
+	}
+
+	// Helper function to add a conversation or group
+	private func addConversation(_ conversationOrGroup: XMTPiOS.Conversation) {
+		switch conversationOrGroup {
+		case .dm(let conversation):
+			conversations.insert(.dm(conversation), at: 0)
+			coordinator.path.append(conversationOrGroup)
+		case .group(let group):
+			conversations.insert(.group(group), at: 0)
+			coordinator.path.append(conversationOrGroup)
 		}
 	}
 
