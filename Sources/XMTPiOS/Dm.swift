@@ -1,10 +1,3 @@
-//
-//  Dm.swift
-//  XMTPiOS
-//
-//  Created by Naomi Plasterer on 10/23/24.
-//
-
 import Foundation
 import LibXMTP
 
@@ -69,14 +62,6 @@ public struct Dm: Identifiable, Equatable, Hashable {
 	}
 
 	public func updateConsentState(state: ConsentState) async throws {
-		if client.hasV2Client {
-			switch state {
-			case .allowed: try await client.contacts.allowGroups(groupIds: [id])
-			case .denied: try await client.contacts.denyGroups(groupIds: [id])
-			case .unknown: ()
-			}
-		}
-
 		try ffiConversation.updateConsentState(state: state.toFFI)
 	}
 
@@ -207,7 +192,7 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		before: Date? = nil,
 		after: Date? = nil,
 		limit: Int? = nil,
-		direction: PagingInfoSortDirection? = .descending,
+		direction: SortDirection? = .descending,
 		deliveryStatus: MessageDeliveryStatus = .all
 	) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(

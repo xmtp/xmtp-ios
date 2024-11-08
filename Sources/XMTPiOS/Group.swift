@@ -1,10 +1,3 @@
-//
-//  Group.swift
-//
-//
-//  Created by Pat Nakajima on 2/1/24.
-//
-
 import Foundation
 import LibXMTP
 
@@ -268,14 +261,6 @@ public struct Group: Identifiable, Equatable, Hashable {
 	}
 
 	public func updateConsentState(state: ConsentState) async throws {
-		if client.hasV2Client {
-			switch state {
-			case .allowed: try await client.contacts.allowGroups(groupIds: [id])
-			case .denied: try await client.contacts.denyGroups(groupIds: [id])
-			case .unknown: ()
-			}
-		}
-
 		try ffiGroup.updateConsentState(state: state.toFFI)
 	}
 
@@ -405,7 +390,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 		before: Date? = nil,
 		after: Date? = nil,
 		limit: Int? = nil,
-		direction: PagingInfoSortDirection? = .descending,
+		direction: SortDirection? = .descending,
 		deliveryStatus: MessageDeliveryStatus = .all
 	) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(
