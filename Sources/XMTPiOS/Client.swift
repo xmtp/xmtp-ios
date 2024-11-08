@@ -268,7 +268,7 @@ public final class Client {
 					accountAddress: address
 				) ?? generateInboxId(accountAddress: address, nonce: 0)
 		} catch {
-			inboxId = generateInboxId(accountAddress: address, nonce: 0)
+			inboxId = try generateInboxId(accountAddress: address, nonce: 0)
 		}
 		return inboxId
 	}
@@ -387,7 +387,7 @@ public final class Client {
 	}
 
 	public func requestMessageHistorySync() async throws {
-		try await ffiClient.requestHistorySync()
+		try await ffiClient.sendSyncRequest(kind: .messages)
 	}
 
 	public func revokeAllOtherInstallations(signingKey: SigningKey) async throws
