@@ -256,15 +256,15 @@ public final class Client {
 	}
 
 	public static func getOrCreateInboxId(
-		options: ClientOptions, address: String
+		api: ClientOptions.Api, address: String
 	) async throws -> String {
 		var inboxId: String
 		do {
 			inboxId =
 				try await getInboxIdForAddress(
 					logger: XMTPLogger(),
-					host: options.api.env.url,
-					isSecure: options.api.env.isSecure == true,
+					host: api.env.url,
+					isSecure: api.env.isSecure == true,
 					accountAddress: address
 				) ?? generateInboxId(accountAddress: address, nonce: 0)
 		} catch {
