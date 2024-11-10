@@ -140,7 +140,7 @@ public final class Client {
 	{
 		let accountAddress = account.address.lowercased()
 		let inboxId = try await getOrCreateInboxId(
-			options: options, address: accountAddress)
+			api: options.api, address: accountAddress)
 
 		return try await initializeClient(
 			accountAddress: accountAddress,
@@ -155,7 +155,7 @@ public final class Client {
 	{
 		let accountAddress = address.lowercased()
 		let inboxId = try await getOrCreateInboxId(
-			options: options, address: accountAddress)
+			api: options.api, address: accountAddress)
 
 		return try await initializeClient(
 			accountAddress: accountAddress,
@@ -388,6 +388,10 @@ public final class Client {
 
 	public func requestMessageHistorySync() async throws {
 		try await ffiClient.sendSyncRequest(kind: .messages)
+	}
+
+	public func syncConsent() async throws {
+		try await ffiClient.sendSyncRequest(kind: .consent)
 	}
 
 	public func revokeAllOtherInstallations(signingKey: SigningKey) async throws

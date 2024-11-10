@@ -204,35 +204,44 @@ public actor Conversations {
 	> {
 		AsyncThrowingStream { continuation in
 			let ffiStreamActor = FfiStreamActor()
-			let task = Task {
-				let stream = await ffiConversations.stream(
-					callback: ConversationStreamCallback { conversation in
-						guard !Task.isCancelled else {
-							continuation.finish()
-							return
-						}
-						do {
-							let conversationType =
-								try conversation.groupMetadata()
-								.conversationType()
-							if conversationType == "dm" {
-								continuation.yield(
-									Conversation.dm(
-										conversation.dmFromFFI(
-											client: self.client))
-								)
-							} else if conversationType == "group" {
-								continuation.yield(
-									Conversation.group(
-										conversation.groupFromFFI(
-											client: self.client))
-								)
-							}
-						} catch {
-							// Do nothing if the conversation type is neither a group or dm
-						}
+			let conversationCallback = ConversationStreamCallback {
+				conversation in
+				guard !Task.isCancelled else {
+					continuation.finish()
+					return
+				}
+				do {
+					let conversationType = try conversation.groupMetadata()
+						.conversationType()
+					if conversationType == "dm" {
+						continuation.yield(
+							Conversation.dm(
+								conversation.dmFromFFI(client: self.client))
+						)
+					} else if conversationType == "group" {
+						continuation.yield(
+							Conversation.group(
+								conversation.groupFromFFI(client: self.client))
+						)
 					}
-				)
+				} catch {
+					// Do nothing if the conversation type is neither a group or dm
+				}
+			}
+
+			let task = Task {
+				let stream =
+					switch type {
+					case .group:
+						await ffiConversations.streamGroups(
+							callback: conversationCallback)
+					case .all:
+						await ffiConversations.stream(
+							callback: conversationCallback)
+					case .dm:
+						await ffiConversations.streamDms(
+							callback: conversationCallback)
+					}
 				await ffiStreamActor.setFfiStream(stream)
 				continuation.onTermination = { @Sendable reason in
 					Task {
@@ -350,35 +359,46 @@ public actor Conversations {
 	}
 
 	public func streamAllMessages(type: ConversationType = .all)
-		-> AsyncThrowingStream<
-			DecodedMessage, Error
-		>
+		-> AsyncThrowingStream<DecodedMessage, Error>
 	{
 		AsyncThrowingStream { continuation in
 			let ffiStreamActor = FfiStreamActor()
+
+			let messageCallback = MessageCallback(client: self.client) {
+				message in
+				guard !Task.isCancelled else {
+					continuation.finish()
+					Task {
+						await ffiStreamActor.endStream()
+					}
+					return
+				}
+				do {
+					continuation.yield(
+						try Message(client: self.client, ffiMessage: message)
+							.decode()
+					)
+				} catch {
+					print("Error onMessage \(error)")
+				}
+			}
+
 			let task = Task {
 				let stream =
-					await ffiConversations
-					.streamAllMessages(
-						messageCallback: MessageCallback(client: self.client) {
-							message in
-							guard !Task.isCancelled else {
-								continuation.finish()
-								Task {
-									await ffiStreamActor.endStream()  // End the stream upon cancellation
-								}
-								return
-							}
-							do {
-								continuation.yield(
-									try Message(
-										client: self.client, ffiMessage: message
-									).decode())
-							} catch {
-								print("Error onMessage \(error)")
-							}
-						}
-					)
+					switch type {
+					case .group:
+						await ffiConversations.streamAllGroupMessages(
+							messageCallback: messageCallback
+						)
+					case .dm:
+						await ffiConversations.streamAllDmMessages(
+							messageCallback: messageCallback
+						)
+					case .all:
+						await ffiConversations.streamAllMessages(
+							messageCallback: messageCallback
+						)
+					}
 				await ffiStreamActor.setFfiStream(stream)
 			}
 
