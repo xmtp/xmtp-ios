@@ -230,16 +230,16 @@ public actor Conversations {
 			}
 
 			let task = Task {
-				let stream =
+				let stream: FfiStreamCloser
 					switch type {
 					case .groups:
-						await ffiConversations.streamGroups(
+						stream = await ffiConversations.streamGroups(
 							callback: conversationCallback)
 					case .all:
-						await ffiConversations.stream(
+						stream = await ffiConversations.stream(
 							callback: conversationCallback)
 					case .dms:
-						await ffiConversations.streamDms(
+						stream = await ffiConversations.streamDms(
 							callback: conversationCallback)
 					}
 				await ffiStreamActor.setFfiStream(stream)
@@ -384,18 +384,18 @@ public actor Conversations {
 			}
 
 			let task = Task {
-				let stream =
+				let stream: FfiStreamCloser
 					switch type {
 					case .groups:
-						await ffiConversations.streamAllGroupMessages(
+						stream = await ffiConversations.streamAllGroupMessages(
 							messageCallback: messageCallback
 						)
 					case .dms:
-						await ffiConversations.streamAllDmMessages(
+						stream = await ffiConversations.streamAllDmMessages(
 							messageCallback: messageCallback
 						)
 					case .all:
-						await ffiConversations.streamAllMessages(
+						stream = await ffiConversations.streamAllMessages(
 							messageCallback: messageCallback
 						)
 					}
