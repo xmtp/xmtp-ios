@@ -34,7 +34,6 @@ public enum ConversationOrder {
 	case createdAt, lastMessage
 }
 
-
 public enum ConversationType {
 	case all, group, dm
 }
@@ -85,11 +84,13 @@ public actor Conversations {
 	}
 
 	public func listGroups(
-		createdAfter: Date? = nil, createdBefore: Date? = nil, limit: Int? = nil
+		createdAfter: Date? = nil, createdBefore: Date? = nil,
+		limit: Int? = nil, order: ConversationOrder = .createdAt,
+		consentState: ConsentState? = nil
 	) async throws -> [Group] {
 		var options = FfiListConversationsOptions(
 			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
-			consentState: nil)
+			consentState: consentState?.toFFI)
 		if let createdAfter {
 			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
 		}
@@ -100,17 +101,25 @@ public actor Conversations {
 		if let limit {
 			options.limit = Int64(limit)
 		}
-		return try await ffiConversations.listGroups(opts: options).map {
+		let conversations = try await ffiConversations.listGroups(
+			opts: options)
+
+		let sortedConversations = try sortConversations(
+			conversations, order: order)
+
+		return sortedConversations.map {
 			$0.groupFromFFI(client: client)
 		}
 	}
 
 	public func listDms(
-		createdAfter: Date? = nil, createdBefore: Date? = nil, limit: Int? = nil
+		createdAfter: Date? = nil, createdBefore: Date? = nil,
+		limit: Int? = nil, order: ConversationOrder = .createdAt,
+		consentState: ConsentState? = nil
 	) async throws -> [Dm] {
 		var options = FfiListConversationsOptions(
 			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
-			consentState: nil)
+			consentState: consentState?.toFFI)
 		if let createdAfter {
 			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
 		}
@@ -121,7 +130,13 @@ public actor Conversations {
 		if let limit {
 			options.limit = Int64(limit)
 		}
-		return try await ffiConversations.listDms(opts: options).map {
+		let conversations = try await ffiConversations.listDms(
+			opts: options)
+
+		let sortedConversations = try sortConversations(
+			conversations, order: order)
+
+		return sortedConversations.map {
 			$0.dmFromFFI(client: client)
 		}
 	}
@@ -311,7 +326,8 @@ public actor Conversations {
 			throw ConversationError.memberCannotBeSelf
 		}
 		let addressMap = try await self.client.canMessage(addresses: addresses)
-		let unregisteredAddresses = addressMap
+		let unregisteredAddresses =
+			addressMap
 			.filter { !$0.value }
 			.map { $0.key }
 
@@ -333,9 +349,11 @@ public actor Conversations {
 		return group
 	}
 
-	public func streamAllMessages(type: ConversationType = .all) -> AsyncThrowingStream<
-		DecodedMessage, Error
-	> {
+	public func streamAllMessages(type: ConversationType = .all)
+		-> AsyncThrowingStream<
+			DecodedMessage, Error
+		>
+	{
 		AsyncThrowingStream { continuation in
 			let ffiStreamActor = FfiStreamActor()
 			let task = Task {
