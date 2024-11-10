@@ -35,7 +35,7 @@ public enum ConversationOrder {
 }
 
 public enum ConversationType {
-	case all, group, dm
+	case all, groups, dms
 }
 
 final class ConversationStreamCallback: FfiConversationCallback {
@@ -232,13 +232,13 @@ public actor Conversations {
 			let task = Task {
 				let stream =
 					switch type {
-					case .group:
+					case .groups:
 						await ffiConversations.streamGroups(
 							callback: conversationCallback)
 					case .all:
 						await ffiConversations.stream(
 							callback: conversationCallback)
-					case .dm:
+					case .dms:
 						await ffiConversations.streamDms(
 							callback: conversationCallback)
 					}
@@ -386,11 +386,11 @@ public actor Conversations {
 			let task = Task {
 				let stream =
 					switch type {
-					case .group:
+					case .groups:
 						await ffiConversations.streamAllGroupMessages(
 							messageCallback: messageCallback
 						)
-					case .dm:
+					case .dms:
 						await ffiConversations.streamAllDmMessages(
 							messageCallback: messageCallback
 						)

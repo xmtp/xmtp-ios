@@ -44,7 +44,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func consentState() async throws -> ConsentState {
+	public func consentState() throws -> ConsentState {
 		switch self {
 		case let .group(group):
 			return try group.consentState()
