@@ -4,7 +4,7 @@ import LibXMTP
 public enum Conversation: Identifiable, Equatable, Hashable {
 	case group(Group)
 	case dm(Dm)
-	
+
 	public static func == (lhs: Conversation, rhs: Conversation) -> Bool {
 		lhs.topic == rhs.topic
 	}
@@ -168,19 +168,21 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 	}
 
 	public func messages(
-		limit: Int? = nil, before: Date? = nil, after: Date? = nil,
+		limit: Int? = nil,
+		beforeNs: Int64? = nil,
+		afterNs: Int64? = nil,
 		direction: SortDirection? = .descending,
 		deliveryStatus: MessageDeliveryStatus = .all
 	) async throws -> [DecodedMessage] {
 		switch self {
 		case let .group(group):
 			return try await group.messages(
-				before: before, after: after, limit: limit,
+				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
 				direction: direction, deliveryStatus: deliveryStatus
 			)
 		case let .dm(dm):
 			return try await dm.messages(
-				before: before, after: after, limit: limit,
+				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
 				direction: direction, deliveryStatus: deliveryStatus
 			)
 		}
