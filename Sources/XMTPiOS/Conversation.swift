@@ -92,6 +92,15 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 				content: content, options: options)
 		}
 	}
+	
+	public func publishMessages() async throws {
+		switch self {
+		case let .group(group):
+			return try await group.publishMessages()
+		case let .dm(dm):
+			return try await dm.publishMessages()
+		}
+	}
 
 	public var type: ConversationType {
 		switch self {
