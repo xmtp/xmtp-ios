@@ -310,7 +310,7 @@ public final class Client {
 			accountAddress: address,
 			options: options,
 			privateKeyBundleV1: v1Bundle,
-			signingKey: nil
+			signingKey: signingKey
 		)
 
 		let client = try await LibXMTP.createV2Client(host: options.api.env.url, isSecure: options.api.env.isSecure)
