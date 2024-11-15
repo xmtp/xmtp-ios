@@ -241,7 +241,7 @@ class V3ClientTests: XCTestCase {
 		XCTAssertEqual(dmMessages.first?.body, "gm")
 		XCTAssertEqual(dmMessages.first?.id, messageId)
 		XCTAssertEqual(dmMessages.first?.deliveryStatus, .published)
-		XCTAssertEqual(dmMessages.count, 3)
+		XCTAssertEqual(dmMessages.count, 2)
 
 		try await fixtures.caroV2V3Client.conversations.sync()
 		let sameDm = try await fixtures.caroV2V3Client.findDm(
