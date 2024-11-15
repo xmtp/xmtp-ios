@@ -30,7 +30,7 @@ let package = Package(
 				.product(name: "Gzip", package: "GzipSwift"),
 				.product(name: "Connect", package: "connect-swift"),
 				.product(name: "LibXMTP", package: "libxmtp-swift"),
-				.product(name: "Crypto", package: "CryptoSwift")
+				.product(name: "CryptoSwift", package: "CryptoSwift")
 			]
 		),
 		.target(
