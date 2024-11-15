@@ -180,7 +180,7 @@ public final class Client {
 		inboxId: String
 	) async throws -> Client {
 		let (libxmtpClient, dbPath) = try await initV3Client(
-			accountAddress: accountAddress,
+			accountAddress: accountAddress.lowercased(),
 			options: options,
 			privateKeyBundleV1: nil,
 			signingKey: signingKey,
@@ -192,7 +192,7 @@ public final class Client {
 		}
 
 		let client = try Client(
-			address: accountAddress,
+			address: accountAddress.lowercased(),
 			v3Client: v3Client,
 			dbPath: dbPath,
 			installationID: v3Client.installationId().toHex,
@@ -307,7 +307,7 @@ public final class Client {
 								message: signatureRequest.signatureText())
 							try await signatureRequest.addScwSignature(
 								signatureBytes: signedData,
-								address: signingKey.address,
+								address: signingKey.address.lowercased(),
 								chainId: UInt64(chainId),
 								blockNumber: signingKey.blockNumber.flatMap {
 									$0 >= 0 ? UInt64($0) : nil
@@ -445,10 +445,10 @@ public final class Client {
 					logger: XMTPLogger(),
 					host: options.api.env.url,
 					isSecure: options.api.env.isSecure == true,
-					accountAddress: address
-				) ?? generateInboxId(accountAddress: address, nonce: 0)
+					accountAddress: address.lowercased()
+				) ?? generateInboxId(accountAddress: address.lowercased(), nonce: 0)
 		} catch {
-			inboxId = generateInboxId(accountAddress: address, nonce: 0)
+			inboxId = try generateInboxId(accountAddress: address.lowercased(), nonce: 0)
 		}
 		return inboxId
 	}
@@ -882,7 +882,7 @@ public final class Client {
 		guard let client = v3Client else {
 			throw ClientError.noV3Client("Error no V3 client initialized")
 		}
-		try await client.requestHistorySync()
+		try await client.sendSyncRequest(kind: .messages)
 	}
 
 	public func revokeAllOtherInstallations(signingKey: SigningKey) async throws

@@ -40,6 +40,8 @@ extension GenericErrorDescribing {
 			let .SignatureRequestError(message),
 			let .Erc1271SignatureError(message),
 			let	.FailedToConvertToU32(message),
+			let .Association(message),
+			let .DeviceSync(message),
 			let .Verifier(message):
 			return message
 		}
