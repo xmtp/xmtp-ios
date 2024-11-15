@@ -367,7 +367,7 @@ public actor Conversations {
 						}
 						do {
 							let conversationType =
-								try conversation().conversationType()
+								try conversation.conversationType()
 							if conversationType == .dm {
 								continuation.yield(
 									Conversation.dm(
