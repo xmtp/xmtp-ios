@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6AEE396E29F330CD0027B657 /* secp256k1 in Frameworks */ = {isa = PBXBuildFile; productRef = 6AEE396D29F330CD0027B657 /* secp256k1 */; };
+		E5BCC0952CEBA58F00E11814 /* secp256k1 in Frameworks */ = {isa = PBXBuildFile; productRef = E5BCC0952CEBA58F00E11814 /* secp256k1 */; };
 		A60FC8BF293AD054001697E3 /* MessageComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60FC8BE293AD054001697E3 /* MessageComposerView.swift */; };
 		A60FC8C1293AD171001697E3 /* ConversationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60FC8C0293AD171001697E3 /* ConversationDetailView.swift */; };
 		A60FC8C3293AD18A001697E3 /* PreviewClientProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60FC8C2293AD18A001697E3 /* PreviewClientProvider.swift */; };
@@ -86,7 +86,7 @@
 			files = (
 				E513AEA32CE6AF2700BC31C3 /* CryptoSwift in Frameworks */,
 				A6606A1A2B5EE80000E2ED4D /* XMTPiOS in Frameworks */,
-				6AEE396E29F330CD0027B657 /* secp256k1 in Frameworks */,
+				E5BCC0952CEBA58F00E11814 /* secp256k1 in Frameworks */,
 				A6C0F37B2AC1E321008C6AA7 /* Starscream in Frameworks */,
 				A65F070A297B5E8600C3C76E /* KeychainAccess in Frameworks */,
 			);
@@ -203,7 +203,7 @@
 			name = XMTPiOSExample;
 			packageProductDependencies = (
 				A65F0709297B5E8600C3C76E /* KeychainAccess */,
-				6AEE396D29F330CD0027B657 /* secp256k1 */,
+				E5BCC0952CEBA58F00E11814 /* secp256k1 */,
 				A6C0F37A2AC1E321008C6AA7 /* Starscream */,
 				A6606A192B5EE80000E2ED4D /* XMTPiOS */,
 				E513AEA22CE6AF2700BC31C3 /* CryptoSwift */,
@@ -238,9 +238,9 @@
 			mainGroup = A6281986292DC825004B9117;
 			packageReferences = (
 				A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				6AEE396C29F330CD0027B657 /* XCRemoteSwiftPackageReference "secp256k1.swift" */,
 				A6C0F3792AC1E321008C6AA7 /* XCRemoteSwiftPackageReference "Starscream" */,
 				E513AEA12CE6AF2700BC31C3 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
+				E5BCC0952CEBA58F00E11814 /* XCRemoteSwiftPackageReference "swift-secp256k1" */,
 			);
 			productRefGroup = A6281990292DC825004B9117 /* Products */;
 			projectDirPath = "";
@@ -531,14 +531,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		6AEE396C29F330CD0027B657 /* XCRemoteSwiftPackageReference "secp256k1.swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/GigaBitcoin/secp256k1.swift.git";
-			requirement = {
-				kind = exactVersion;
-				version = 0.10.0;
-			};
-		};
 		A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
@@ -563,14 +555,22 @@
 				minimumVersion = 1.8.3;
 			};
 		};
+		E5BCC0952CEBA58F00E11814 /* XCRemoteSwiftPackageReference "swift-secp256k1" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/21-DOT-DEV/swift-secp256k1.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.18.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6AEE396D29F330CD0027B657 /* secp256k1 */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6AEE396C29F330CD0027B657 /* XCRemoteSwiftPackageReference "secp256k1.swift" */;
-			productName = secp256k1;
-		};
+-		E5BCC0952CEBA58F00E11814 /* secp256k1 */ = {
+-			isa = XCSwiftPackageProductDependency;
+-			package = E5BCC0952CEBA58F00E11814 /* XCRemoteSwiftPackageReference "secp256k1.swift" */;
+-			productName = secp256k1;
+-		};
 		A65F0709297B5E8600C3C76E /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */;

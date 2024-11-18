@@ -1,5 +1,4 @@
 import Foundation
-import Logging
 import secp256k1
 import LibXMTP
 import CryptoSwift
