@@ -47,14 +47,18 @@ public enum EncodedContentCompression {
 		_ data: Data, using algorithm: compression_algorithm
 	) -> Data? {
 		let destinationBuffer = UnsafeMutablePointer<UInt8>.allocate(
-			capacity: data.count * 4)  // Allocate enough memory for decompressed data
+			capacity: data.count * 4  // Allocate enough memory for decompressed data
+		)
 		defer { destinationBuffer.deallocate() }
 
-		let decompressedSize = data.withUnsafeBytes { sourceBuffer in
-			compression_decode_buffer(
+		let decompressedSize = data.withUnsafeBytes { sourceBuffer -> Int in
+			guard let sourcePointer = sourceBuffer.baseAddress?.assumingMemoryBound(to: UInt8.self) else {
+				return 0 // Return 0 to indicate failure
+			}
+			return compression_decode_buffer(
 				destinationBuffer, data.count * 4,
-				sourceBuffer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-				data.count, nil, algorithm)
+				sourcePointer, data.count, nil, algorithm
+			)
 		}
 
 		guard decompressedSize > 0 else { return nil }
