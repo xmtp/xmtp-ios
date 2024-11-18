@@ -12,7 +12,7 @@ Pod::Spec.new do |spec|
   spec.license      	= "MIT"
   spec.author       	= { "XMTP" => "eng@xmtp.com" }
 
-	spec.platform      	= :ios, '14.0', :macos, '11.0'
+  spec.platform      	= :ios, '14.0', :macos, '11.0'
 
   spec.swift_version  = '5.3'
 
@@ -20,7 +20,6 @@ Pod::Spec.new do |spec|
   spec.source_files  	= "Sources/**/*.swift"
   spec.frameworks 		= "CryptoKit", "UIKit"
 
-  spec.dependency "GzipSwift"
   spec.dependency "Connect-Swift", "= 1.0.0"
   spec.dependency 'LibXMTP', '= 3.0.1'
   spec.dependency 'CryptoSwift', '= 1.8.3'

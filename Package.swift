@@ -18,7 +18,6 @@ let package = Package(
 	],
 	dependencies: [
 		.package(url: "https://github.com/21-DOT-DEV/swift-secp256k1", exact: "0.18.0"),
-		.package(url: "https://github.com/1024jp/GzipSwift", from: "6.1.0"),
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.0.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.4.3"),
 		.package(url: "https://github.com/xmtp/libxmtp-swift.git", exact: "3.0.1"),
@@ -29,7 +28,6 @@ let package = Package(
 			name: "XMTPiOS",
 			dependencies: [
 				.product(name: "secp256k1", package: "swift-secp256k1"),
-				.product(name: "Gzip", package: "GzipSwift"),
 				.product(name: "Connect", package: "connect-swift"),
 				.product(name: "LibXMTP", package: "libxmtp-swift"),
 				.product(name: "CryptoSwift", package: "CryptoSwift")
