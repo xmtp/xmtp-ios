@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "XMTP"
-  spec.version      = "3.0.5"
+  spec.version      = "3.0.6"
   spec.summary      = "XMTP SDK Cocoapod"
 
   spec.description  = <<-DESC
@@ -22,7 +22,7 @@ Pod::Spec.new do |spec|
 
   spec.dependency 'secp256k1Swift'
   spec.dependency "Connect-Swift", "= 1.0.0"
-  spec.dependency 'LibXMTP', '= 3.0.1'
+  spec.dependency 'LibXMTP', '= 3.0.3'
   spec.dependency 'CryptoSwift', '= 1.8.3'
   
   spec.ios.deployment_target = '14.0'
