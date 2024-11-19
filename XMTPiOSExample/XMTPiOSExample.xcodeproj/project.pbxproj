@@ -34,7 +34,7 @@
 		A6C0F3862AC1E549008C6AA7 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C0F3852AC1E549008C6AA7 /* Data.swift */; };
 		A6D192D0293A7B97006B49F2 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D192CF293A7B97006B49F2 /* ConversationListView.swift */; };
 		E513AEA32CE6AF2700BC31C3 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E513AEA22CE6AF2700BC31C3 /* CryptoSwift */; };
-		E58362592CEC42A3003D5D00 /* secp256k1Swift in Frameworks */ = {isa = PBXBuildFile; productRef = E58362582CEC42A3003D5D00 /* secp256k1Swift */; };
+		E583625C2CED1643003D5D00 /* CSecp256k1 in Frameworks */ = {isa = PBXBuildFile; productRef = E583625B2CED1643003D5D00 /* CSecp256k1 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -84,9 +84,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E58362592CEC42A3003D5D00 /* secp256k1Swift in Frameworks */,
 				E513AEA32CE6AF2700BC31C3 /* CryptoSwift in Frameworks */,
 				A6606A1A2B5EE80000E2ED4D /* XMTPiOS in Frameworks */,
+				E583625C2CED1643003D5D00 /* CSecp256k1 in Frameworks */,
 				A6C0F37B2AC1E321008C6AA7 /* Starscream in Frameworks */,
 				A65F070A297B5E8600C3C76E /* KeychainAccess in Frameworks */,
 			);
@@ -207,7 +207,7 @@
 				A6606A192B5EE80000E2ED4D /* XMTPiOS */,
 				E513AEA22CE6AF2700BC31C3 /* CryptoSwift */,
 				E58362542CEC0B94003D5D00 /* secp256k1 */,
-				E58362582CEC42A3003D5D00 /* secp256k1Swift */,
+				E583625B2CED1643003D5D00 /* CSecp256k1 */,
 			);
 			productName = XMTPiOSExample;
 			productReference = A628198F292DC825004B9117 /* XMTPiOSExample.app */;
@@ -241,7 +241,7 @@
 				A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				A6C0F3792AC1E321008C6AA7 /* XCRemoteSwiftPackageReference "Starscream" */,
 				E513AEA12CE6AF2700BC31C3 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
-				E58362572CEC42A3003D5D00 /* XCRemoteSwiftPackageReference "secp256k1" */,
+				E583625A2CED1643003D5D00 /* XCRemoteSwiftPackageReference "CSecp256k1.swift" */,
 			);
 			productRefGroup = A6281990292DC825004B9117 /* Products */;
 			projectDirPath = "";
@@ -556,12 +556,12 @@
 				minimumVersion = 1.8.3;
 			};
 		};
-		E58362572CEC42A3003D5D00 /* XCRemoteSwiftPackageReference "secp256k1" */ = {
+		E583625A2CED1643003D5D00 /* XCRemoteSwiftPackageReference "CSecp256k1.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/blocto/secp256k1.swift";
+			repositoryURL = "https://github.com/tesseract-one/CSecp256k1.swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.7.4;
+				minimumVersion = 0.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -590,10 +590,10 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = secp256k1;
 		};
-		E58362582CEC42A3003D5D00 /* secp256k1Swift */ = {
+		E583625B2CED1643003D5D00 /* CSecp256k1 */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E58362572CEC42A3003D5D00 /* XCRemoteSwiftPackageReference "secp256k1" */;
-			productName = secp256k1Swift;
+			package = E583625A2CED1643003D5D00 /* XCRemoteSwiftPackageReference "CSecp256k1.swift" */;
+			productName = CSecp256k1;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

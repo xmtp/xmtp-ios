@@ -1,5 +1,5 @@
 import Foundation
-import secp256k1Swift
+import CSecp256k1
 import LibXMTP
 import CryptoSwift
 
@@ -26,36 +26,44 @@ enum KeyUtilx {
 	static func recoverPublicKeyKeccak256(from data: Data, message: Data) throws -> Data {
 		return Data(try LibXMTP.recoverPublicKeyK256Keccak256(message: message, signature: data))
 	}
-
+	
 	static func sign(message: Data, with privateKey: Data, hashing: Bool) throws -> Data {
-		// Hash the message if required
-		let msgData = hashing ? message.sha3(.keccak256) : message
-
-		// Ensure the private key is valid
-		guard privateKey.count == 32 else {
-			throw KeyUtilError.privateKeyInvalid
+		guard let ctx = secp256k1_context_create(UInt32(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY)) else {
+			throw KeyUtilError.invalidContext
 		}
 
-		// Create a Signing.PrivateKey instance
-		guard let signingKey = try? secp256k1.Signing.PrivateKey(rawRepresentation: privateKey) else {
-			throw KeyUtilError.privateKeyInvalid
+		defer {
+			secp256k1_context_destroy(ctx)
 		}
-		
 
-		// Sign the message
-		guard let signature = try? signingKey.ecdsa.signature(for: msgData) else {
+		let msgData = hashing ? Util.keccak256(message) : message
+		let msg = (msgData as NSData).bytes.assumingMemoryBound(to: UInt8.self)
+		let privateKeyPtr = (privateKey as NSData).bytes.assumingMemoryBound(to: UInt8.self)
+		let signaturePtr = UnsafeMutablePointer<secp256k1_ecdsa_recoverable_signature>.allocate(capacity: 1)
+		defer {
+			signaturePtr.deallocate()
+		}
+		guard secp256k1_ecdsa_sign_recoverable(ctx, signaturePtr, msg, privateKeyPtr, nil, nil) == 1 else {
 			throw KeyUtilError.signatureFailure
 		}
 
-		// Obtain the compact signature and recovery ID
-		let compactSignature = try signature.compactRepresentation
-		let recoveryID: UInt8  = 0
+		let outputPtr = UnsafeMutablePointer<UInt8>.allocate(capacity: 64)
+		defer {
+			outputPtr.deallocate()
+		}
+		var recid: Int32 = 0
+		secp256k1_ecdsa_recoverable_signature_serialize_compact(ctx, outputPtr, &recid, signaturePtr)
 
-		// Combine the compact signature and recovery ID
-		var signatureWithRecid = Data(compactSignature)
-		signatureWithRecid.append(recoveryID)
+		let outputWithRecidPtr = UnsafeMutablePointer<UInt8>.allocate(capacity: 65)
+		defer {
+			outputWithRecidPtr.deallocate()
+		}
+		outputWithRecidPtr.assign(from: outputPtr, count: 64)
+		outputWithRecidPtr.advanced(by: 64).pointee = UInt8(recid)
 
-		return signatureWithRecid
+		let signature = Data(bytes: outputWithRecidPtr, count: 65)
+
+		return signature
 	}
 
 	static func generateAddress(from publicKey: Data) -> String {

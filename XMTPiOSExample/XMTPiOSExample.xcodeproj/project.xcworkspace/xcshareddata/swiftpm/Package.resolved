@@ -19,6 +19,15 @@
       }
     },
     {
+      "identity" : "csecp256k1.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tesseract-one/CSecp256k1.swift.git",
+      "state" : {
+        "revision" : "cfbd6f540d5084bc96a60af841121472fbe725a3",
+        "version" : "0.2.0"
+      }
+    },
+    {
       "identity" : "keychainaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
@@ -34,24 +43,6 @@
       "state" : {
         "revision" : "d44798db766bd82e93c4f49f9997b5369f927971",
         "version" : "3.0.3"
-      }
-    },
-    {
-      "identity" : "secp256k1",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/portto/secp256k1.git",
-      "state" : {
-        "revision" : "6864a2560066cedede330c4b344689432a7300f7",
-        "version" : "0.0.5"
-      }
-    },
-    {
-      "identity" : "secp256k1.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/blocto/secp256k1.swift",
-      "state" : {
-        "revision" : "23aa6bab1f60e513297d0d58a863418f68534e56",
-        "version" : "0.7.4"
       }
     },
     {
