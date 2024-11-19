@@ -17,7 +17,7 @@ let package = Package(
 		),
 	],
 	dependencies: [
-		.package(url: "https://github.com/Boilertalk/secp256k1.swift", from: "0.1.0"),
+		.package(url: "https://github.com/blocto/secp256k1.swift", from: "0.7.4"),
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.0.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.4.3"),
 		.package(url: "https://github.com/xmtp/libxmtp-swift.git", exact: "3.0.1"),
@@ -27,7 +27,7 @@ let package = Package(
 		.target(
 			name: "XMTPiOS",
 			dependencies: [
-				.product(name: "secp256k1", package: "secp256k1.swift"),
+				.product(name: "secp256k1Swift", package: "secp256k1.swift"),
 				.product(name: "Connect", package: "connect-swift"),
 				.product(name: "LibXMTP", package: "libxmtp-swift"),
 				.product(name: "CryptoSwift", package: "CryptoSwift")

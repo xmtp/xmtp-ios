@@ -37,12 +37,21 @@
       }
     },
     {
+      "identity" : "secp256k1",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/portto/secp256k1.git",
+      "state" : {
+        "revision" : "6864a2560066cedede330c4b344689432a7300f7",
+        "version" : "0.0.5"
+      }
+    },
+    {
       "identity" : "secp256k1.swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Boilertalk/secp256k1.swift",
+      "location" : "https://github.com/blocto/secp256k1.swift",
       "state" : {
-        "revision" : "cd187c632fb812fd93711a9f7e644adb7e5f97f0",
-        "version" : "0.1.7"
+        "revision" : "23aa6bab1f60e513297d0d58a863418f68534e56",
+        "version" : "0.7.4"
       }
     },
     {
