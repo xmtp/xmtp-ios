@@ -19,15 +19,6 @@
       }
     },
     {
-      "identity" : "gzip",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/nicklockwood/GZIP",
-      "state" : {
-        "revision" : "f710a37aa978a93b815a4f64bd504dc4c3256312",
-        "version" : "1.3.2"
-      }
-    },
-    {
       "identity" : "keychainaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
@@ -43,6 +34,15 @@
       "state" : {
         "revision" : "f495d4feaab40a0a6a48c1d5a99585de8107f5d2",
         "version" : "3.0.1"
+      }
+    },
+    {
+      "identity" : "secp256k1.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Boilertalk/secp256k1.swift",
+      "state" : {
+        "revision" : "cd187c632fb812fd93711a9f7e644adb7e5f97f0",
+        "version" : "0.1.7"
       }
     },
     {
@@ -124,15 +124,6 @@
       "state" : {
         "revision" : "ebc7251dd5b37f627c93698e4374084d98409633",
         "version" : "1.28.2"
-      }
-    },
-    {
-      "identity" : "swift-secp256k1",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/21-DOT-DEV/swift-secp256k1.git",
-      "state" : {
-        "revision" : "57ce9af6db14e0114af631ace25231a9d0ccccbd",
-        "version" : "0.18.0"
       }
     },
     {

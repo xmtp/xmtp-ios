@@ -34,7 +34,7 @@
 		A6C0F3862AC1E549008C6AA7 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6C0F3852AC1E549008C6AA7 /* Data.swift */; };
 		A6D192D0293A7B97006B49F2 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D192CF293A7B97006B49F2 /* ConversationListView.swift */; };
 		E513AEA32CE6AF2700BC31C3 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E513AEA22CE6AF2700BC31C3 /* CryptoSwift */; };
-		E58362512CEBC4A6003D5D00 /* GZIP in Frameworks */ = {isa = PBXBuildFile; productRef = E58362502CEBC4A6003D5D00 /* GZIP */; };
+		E58362552CEC0B94003D5D00 /* secp256k1 in Frameworks */ = {isa = PBXBuildFile; productRef = E58362542CEC0B94003D5D00 /* secp256k1 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -85,9 +85,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E513AEA32CE6AF2700BC31C3 /* CryptoSwift in Frameworks */,
+				E58362552CEC0B94003D5D00 /* secp256k1 in Frameworks */,
 				A6606A1A2B5EE80000E2ED4D /* XMTPiOS in Frameworks */,
 				A6C0F37B2AC1E321008C6AA7 /* Starscream in Frameworks */,
-				E58362512CEBC4A6003D5D00 /* GZIP in Frameworks */,
 				A65F070A297B5E8600C3C76E /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -206,7 +206,7 @@
 				A6C0F37A2AC1E321008C6AA7 /* Starscream */,
 				A6606A192B5EE80000E2ED4D /* XMTPiOS */,
 				E513AEA22CE6AF2700BC31C3 /* CryptoSwift */,
-				E58362502CEBC4A6003D5D00 /* GZIP */,
+				E58362542CEC0B94003D5D00 /* secp256k1 */,
 			);
 			productName = XMTPiOSExample;
 			productReference = A628198F292DC825004B9117 /* XMTPiOSExample.app */;
@@ -240,8 +240,7 @@
 				A65F0708297B5E8600C3C76E /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				A6C0F3792AC1E321008C6AA7 /* XCRemoteSwiftPackageReference "Starscream" */,
 				E513AEA12CE6AF2700BC31C3 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
-				E5BCC0952CEBA58F00E11814 /* XCRemoteSwiftPackageReference "swift-secp256k1" */,
-				E583624F2CEBC4A6003D5D00 /* XCRemoteSwiftPackageReference "GZIP" */,
+				E58362532CEBFD33003D5D00 /* XCRemoteSwiftPackageReference "secp256k1" */,
 			);
 			productRefGroup = A6281990292DC825004B9117 /* Products */;
 			projectDirPath = "";
@@ -556,20 +555,12 @@
 				minimumVersion = 1.8.3;
 			};
 		};
-		E583624F2CEBC4A6003D5D00 /* XCRemoteSwiftPackageReference "GZIP" */ = {
+		E58362532CEBFD33003D5D00 /* XCRemoteSwiftPackageReference "secp256k1" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nicklockwood/GZIP";
+			repositoryURL = "https://github.com/Boilertalk/secp256k1.swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.3.2;
-			};
-		};
-		E5BCC0952CEBA58F00E11814 /* XCRemoteSwiftPackageReference "swift-secp256k1" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/21-DOT-DEV/swift-secp256k1.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.18.0;
+				minimumVersion = 0.1.7;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -594,10 +585,9 @@
 			package = E513AEA12CE6AF2700BC31C3 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
-		E58362502CEBC4A6003D5D00 /* GZIP */ = {
+		E58362542CEC0B94003D5D00 /* secp256k1 */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E583624F2CEBC4A6003D5D00 /* XCRemoteSwiftPackageReference "GZIP" */;
-			productName = GZIP;
+			productName = secp256k1;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
