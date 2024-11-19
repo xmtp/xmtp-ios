@@ -24,4 +24,6 @@ Pod::Spec.new do |spec|
   spec.dependency "Connect-Swift", "= 1.0.0"
   spec.dependency 'LibXMTP', '= 3.0.1'
   spec.dependency 'CryptoSwift', '= 1.8.3'
+  
+  spec.ios.deployment_target = '14.0'
 end
