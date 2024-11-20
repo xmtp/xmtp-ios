@@ -27,8 +27,11 @@ public class FramesClient {
 		self.proxy = proxy ?? OpenFramesProxy()
 	}
 
-	public func signFrameAction(inputs: FrameActionInputs) async throws -> FramePostPayload {
-		let opaqueConversationIdentifier = try self.buildOpaqueIdentifier(inputs: inputs)
+	public func signFrameAction(inputs: FrameActionInputs) async throws
+		-> FramePostPayload
+	{
+		let opaqueConversationIdentifier = try self.buildOpaqueIdentifier(
+			inputs: inputs)
 		let frameUrl = inputs.frameUrl
 		let buttonIndex = inputs.buttonIndex
 		let inputText = inputs.inputText ?? ""
@@ -39,55 +42,55 @@ public class FramesClient {
 		var toSign = FrameActionBody()
 		toSign.frameURL = frameUrl
 		toSign.buttonIndex = buttonIndex
-		toSign.opaqueConversationIdentifier =  opaqueConversationIdentifier
+		toSign.opaqueConversationIdentifier = opaqueConversationIdentifier
 		toSign.timestamp = UInt64(timestamp)
 		toSign.inputText = inputText
 		toSign.unixTimestamp = UInt32(now)
 		toSign.state = state
 
-		let signedAction = try await self.buildSignedFrameAction(actionBodyInputs: toSign)
+		let signedAction = try await self.buildSignedFrameAction(
+			actionBodyInputs: toSign)
 
 		let untrustedData = FramePostUntrustedData(
-			url: frameUrl, timestamp: UInt64(now), buttonIndex: buttonIndex, inputText: inputText, state: state, walletAddress: self.xmtpClient.address, opaqueConversationIdentifier: opaqueConversationIdentifier, unixTimestamp: UInt32(now)
+			url: frameUrl, timestamp: UInt64(now), buttonIndex: buttonIndex,
+			inputText: inputText, state: state,
+			walletAddress: self.xmtpClient.address,
+			opaqueConversationIdentifier: opaqueConversationIdentifier,
+			unixTimestamp: UInt32(now)
 		)
 
-
-		let trustedData = FramePostTrustedData(messageBytes: signedAction.base64EncodedString())
+		let trustedData = FramePostTrustedData(
+			messageBytes: signedAction.base64EncodedString())
 
 		let payload = FramePostPayload(
-			clientProtocol: "xmtp@\(PROTOCOL_VERSION)", untrustedData: untrustedData, trustedData: trustedData
+			clientProtocol: "xmtp@\(PROTOCOL_VERSION)",
+			untrustedData: untrustedData, trustedData: trustedData
 		)
 
 		return payload
 	}
-	
-	private func signDigest(digest: Data) async throws -> Signature {
-		let key = try self.xmtpClient.keys.identityKey
-		let privateKey = try PrivateKey(key)
-		let signature = try await privateKey.sign(Data(digest))
-		return signature
+
+	private func signDigest(message: String) async throws -> Data {
+		return try self.xmtpClient.signWithInstallationKey(message: message)
 	}
-	
-	private func getPublicKeyBundle() async throws -> PublicKeyBundle {
-		let bundleBytes = try self.xmtpClient.publicKeyBundle;
-		return try PublicKeyBundle(bundleBytes);
-	  }
-	
-	private func buildSignedFrameAction(actionBodyInputs: FrameActionBody) async throws -> Data {
 
-		let digest = sha256(input: try actionBodyInputs.serializedData())
-		let signature = try await self.signDigest(digest: digest)
+	private func buildSignedFrameAction(actionBodyInputs: FrameActionBody)
+		async throws -> Data
+	{
+		let digest = sha256(input: try actionBodyInputs.serializedData()).toHex
+		let signature = try await self.signDigest(message: digest)
 
-		let publicKeyBundle = try await self.getPublicKeyBundle()
 		var frameAction = FrameAction()
 		frameAction.actionBody = try actionBodyInputs.serializedData()
-		frameAction.signature = signature
-		frameAction.signedPublicKeyBundle = try SignedPublicKeyBundle(publicKeyBundle)
-		
+		frameAction.installationSignature = signature
+		frameAction.installationID = self.xmtpClient.installationID.hexToData
+
 		return try frameAction.serializedData()
 	}
-	
-	private func buildOpaqueIdentifier(inputs: FrameActionInputs) throws -> String {
+
+	private func buildOpaqueIdentifier(inputs: FrameActionInputs) throws
+		-> String
+	{
 		switch inputs.conversationInputs {
 		case .group(let groupInputs):
 			let combined = groupInputs.groupId + groupInputs.groupSecret
@@ -97,7 +100,13 @@ public class FramesClient {
 			guard let conversationTopic = dmInputs.conversationTopic else {
 				throw FramesClientError.missingConversationTopic
 			}
-			guard let combined = (conversationTopic.lowercased() + dmInputs.participantAccountAddresses.map { $0.lowercased() }.sorted().joined()).data(using: .utf8) else {
+			guard
+				let combined =
+					(conversationTopic.lowercased()
+					+ dmInputs.participantAccountAddresses.map {
+						$0.lowercased()
+					}.sorted().joined()).data(using: .utf8)
+			else {
 				throw FramesClientError.missingConversationTopic
 			}
 			let digest = sha256(input: combined)

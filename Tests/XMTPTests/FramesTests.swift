@@ -19,8 +19,7 @@ final class FramesTests: XCTestCase {
 			account: bo,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
-				enableV3: true,
-				encryptionKey: key
+				dbEncryptionKey: key
 			)
 		)
 
