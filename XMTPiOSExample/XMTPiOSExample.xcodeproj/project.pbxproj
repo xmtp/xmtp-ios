@@ -183,7 +183,6 @@
 				A6C0F37A2AC1E321008C6AA7 /* Starscream */,
 				A6606A192B5EE80000E2ED4D /* XMTPiOS */,
 				E513AEA22CE6AF2700BC31C3 /* CryptoSwift */,
-				E58362542CEC0B94003D5D00 /* secp256k1 */,
 				E583625B2CED1643003D5D00 /* CSecp256k1 */,
 			);
 			productName = XMTPiOSExample;
@@ -557,10 +556,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E513AEA12CE6AF2700BC31C3 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
-		};
-		E58362542CEC0B94003D5D00 /* secp256k1 */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = secp256k1;
 		};
 		E583625B2CED1643003D5D00 /* CSecp256k1 */ = {
 			isa = XCSwiftPackageProductDependency;
