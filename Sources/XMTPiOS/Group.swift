@@ -99,7 +99,7 @@ public struct Group: Identifiable, Equatable, Hashable {
         try ffiGroup.superAdminList()
     }
 
-	public func permissionLevel() throws -> GroupPermissions {
+	public func permissionLevel() throws -> FfiGroupPermissionsOptions {
 		return try permissions().policyType()
 	}
 

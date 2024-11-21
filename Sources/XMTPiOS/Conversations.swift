@@ -143,7 +143,7 @@ public actor Conversations {
 	}
 
 	public func newGroup(with addresses: [String],
-						 permissions: GroupPermissions = .allMembers,
+						 permissions: FfiGroupPermissionsOptions = .allMembers,
 						 name: String = "",
 						 imageUrlSquare: String = ""
 	) async throws -> Group {
@@ -177,7 +177,10 @@ public actor Conversations {
 		let group = try await v3Client.conversations().createGroup(accountAddresses: addresses,
 																   opts: FfiCreateGroupOptions(permissions: permissions,
 																							   groupName: name,
-																							   groupImageUrlSquare: imageUrlSquare
+																							   groupImageUrlSquare: imageUrlSquare,
+																							   groupDescription: nil,
+																							   groupPinnedFrameUrl: nil,
+																							   customPermissionPolicySet: nil
 																   )).fromFFI(client: client)
 		try await client.contacts.allowGroups(groupIds: [group.id])
 		return group

@@ -130,7 +130,7 @@ class GroupTests: XCTestCase {
 
 	func testCanCreateAGroupWithAdminPermissions() async throws {
 		let fixtures = try await localFixtures()
-		let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address], permissions: GroupPermissions.adminOnly)
+		let bobGroup = try await fixtures.bobClient.conversations.newGroup(with: [fixtures.alice.address], permissions: FfiGroupPermissionsOptions.adminOnly)
 		try await fixtures.aliceClient.conversations.sync()
 		let aliceGroup = try await fixtures.aliceClient.conversations.groups().first!
 		XCTAssert(!bobGroup.id.isEmpty)
