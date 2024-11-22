@@ -20,8 +20,10 @@ let package = Package(
 		.package(url: "https://github.com/tesseract-one/CSecp256k1.swift.git", from: "0.2.0"),
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.0.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.4.3"),
-		.package(url: "https://github.com/xmtp/libxmtp-swift.git", exact: "3.0.5"),
-		.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", exact: "1.8.3")
+		.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", exact: "1.8.3"),
+		.package(url: "https://github.com/sqlcipher/sqlcipher", exact: "4.5.7"),
+		.package(url: "https://github.com/xmtp/libxmtp-swift.git", exact: "3.0.5")
+
 	],
 	targets: [
 		.target(
@@ -30,7 +32,8 @@ let package = Package(
 				.product(name: "CSecp256k1", package: "CSecp256k1.swift"),
 				.product(name: "Connect", package: "connect-swift"),
 				.product(name: "LibXMTP", package: "libxmtp-swift"),
-				.product(name: "CryptoSwift", package: "CryptoSwift")
+				.product(name: "CryptoSwift", package: "CryptoSwift"),
+				.product(name: "SQLCipher", package: "sqlcipher") 
 			]
 		),
 		.target(
