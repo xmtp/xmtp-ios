@@ -326,4 +326,139 @@ class ClientTests: XCTestCase {
 			states.last!.recoveryAddress.lowercased(),
 			fixtures.caro.walletAddress.lowercased())
 	}
+
+	func testAddAccounts() async throws {
+		let fixtures = try await fixtures()
+		let alix2Wallet = try PrivateKey.generate()
+		let alix3Wallet = try PrivateKey.generate()
+
+		try await fixtures.alixClient.addAccount(newAccount: alix2Wallet)
+		try await fixtures.alixClient.addAccount(newAccount: alix3Wallet)
+
+		let state = try await fixtures.alixClient.inboxState(
+			refreshFromNetwork: true)
+		XCTAssertEqual(state.installations.count, 1)
+		XCTAssertEqual(state.addresses.count, 3)
+		XCTAssertEqual(
+			state.recoveryAddress.lowercased(),
+			fixtures.alixClient.address.lowercased())
+		XCTAssertEqual(
+			state.addresses.sorted(),
+			[
+				alix2Wallet.address.lowercased(),
+				alix3Wallet.address.lowercased(),
+				fixtures.alixClient.address.lowercased(),
+			].sorted()
+		)
+	}
+
+	func testRemovingAccounts() async throws {
+		let fixtures = try await fixtures()
+		let alix2Wallet = try PrivateKey.generate()
+		let alix3Wallet = try PrivateKey.generate()
+
+		try await fixtures.alixClient.addAccount(newAccount: alix2Wallet)
+		try await fixtures.alixClient.addAccount(newAccount: alix3Wallet)
+
+		var state = try await fixtures.alixClient.inboxState(
+			refreshFromNetwork: true)
+		XCTAssertEqual(state.addresses.count, 3)
+		XCTAssertEqual(
+			state.recoveryAddress.lowercased(),
+			fixtures.alixClient.address.lowercased())
+
+		try await fixtures.alixClient.removeAccount(
+			recoveryAccount: fixtures.alix, addressToRemove: alix2Wallet.address
+		)
+
+		state = try await fixtures.alixClient.inboxState(
+			refreshFromNetwork: true)
+		XCTAssertEqual(state.addresses.count, 2)
+		XCTAssertEqual(
+			state.recoveryAddress.lowercased(),
+			fixtures.alixClient.address.lowercased())
+		XCTAssertEqual(
+			state.addresses.sorted(),
+			[
+				alix3Wallet.address.lowercased(),
+				fixtures.alixClient.address.lowercased(),
+			].sorted()
+		)
+		XCTAssertEqual(state.installations.count, 1)
+
+		// Cannot remove the recovery address
+		await assertThrowsAsyncError(
+			try await fixtures.alixClient.removeAccount(
+				recoveryAccount: alix3Wallet,
+				addressToRemove: fixtures.alixClient.address
+			))
+	}
+
+	func testSignatures() async throws {
+		let fixtures = try await fixtures()
+
+		// Signing with installation key
+		let signature = try fixtures.alixClient.signWithInstallationKey(
+			message: "Testing")
+		XCTAssertTrue(
+			try fixtures.alixClient.verifySignature(
+				message: "Testing", signature: signature))
+		XCTAssertFalse(
+			try fixtures.alixClient.verifySignature(
+				message: "Not Testing", signature: signature))
+
+		let alixInstallationId = fixtures.alixClient.installationID
+
+		XCTAssertTrue(
+			try fixtures.alixClient.verifySignatureWithInstallationId(
+				message: "Testing",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+		XCTAssertFalse(
+			try fixtures.alixClient.verifySignatureWithInstallationId(
+				message: "Not Testing",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+		XCTAssertFalse(
+			try fixtures.alixClient.verifySignatureWithInstallationId(
+				message: "Testing",
+				signature: signature,
+				installationId: fixtures.boClient.installationID
+			))
+		XCTAssertTrue(
+			try fixtures.boClient.verifySignatureWithInstallationId(
+				message: "Testing",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+
+		try fixtures.alixClient.deleteLocalDatabase()
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let options = ClientOptions.init(
+			api: .init(env: .local, isSecure: false),
+			dbEncryptionKey: key
+		)
+
+		// Creating a new client
+		let alixClient2 = try await Client.create(
+			account: fixtures.alix,
+			options: options
+		)
+
+		XCTAssertTrue(
+			try alixClient2.verifySignatureWithInstallationId(
+				message: "Testing",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+		XCTAssertFalse(
+			try alixClient2.verifySignatureWithInstallationId(
+				message: "Testing2",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+	}
+
 }
