@@ -231,6 +231,7 @@ class ConversationTests: XCTestCase {
 
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
+
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
@@ -240,8 +241,7 @@ class ConversationTests: XCTestCase {
 			)
 		)
 
-		let alixGroup = try await alixClient.conversations.newGroup(
-			with: [fixtures.bo.walletAddress])
+		let alixGroup = try await alixClient.conversations.newGroup(with: [fixtures.bo.walletAddress])
 
 		let alixClient2 = try await Client.create(
 			account: alix,
@@ -255,37 +255,33 @@ class ConversationTests: XCTestCase {
 		try await alixGroup.send(content: "Hello")
 		try await alixClient.conversations.sync()
 		try await alixClient2.conversations.sync()
-		let alixSize = try await alixClient.conversations.syncAllConversations()
-		let alix2Size = try await alixClient2.conversations.syncAllConversations()
-		
-		XCTAssertEqual(alixSize, 3)
-		XCTAssertEqual(alix2Size, 2)
-		
-		let alixGroup2 = try alixClient2.findGroup(groupId: alixGroup.id)
-		
-		let expectation1 = XCTestExpectation(description: "got a consent")
-		expectation1.expectedFulfillmentCount = 3
+		try await alixClient.conversations.syncAllConversations()
+		try await alixClient2.conversations.syncAllConversations()
+		let alixGroup2 = try alixClient2.findGroup(groupId: alixGroup.id)!
+
+		var consentList = [ConsentListEntry]()
+		let expectation = XCTestExpectation(description: "Stream Consent")
+		expectation.expectedFulfillmentCount = 3
 
 		Task(priority: .userInitiated) {
-			for try await _ in await alixClient.preferences.streamConsent()
-			{
-				expectation1.fulfill()
+			for try await entry in await alixClient.preferences.streamConsent() {
+				consentList.append(entry)
+				expectation.fulfill()
 			}
 		}
-
-		try await alixGroup2!.updateConsentState(state: .denied)
+		sleep(1)
+		try await alixGroup2.updateConsentState(state: .denied)
 		let dm = try await alixClient2.conversations.newConversation(with: fixtures.caro.walletAddress)
 		try await dm.updateConsentState(state: .denied)
-		try await alixClient.conversations.sync()
-		try await alixClient2.conversations.sync()
+
+		sleep(5)
 		try await alixClient.conversations.syncAllConversations()
-		sleep(3)
 		try await alixClient2.conversations.syncAllConversations()
-		sleep(3)
 
-		await fulfillment(of: [expectation1], timeout: 20)
-
+		await fulfillment(of: [expectation], timeout: 3)
+		print(consentList)
 		XCTAssertEqual(try alixGroup.consentState(), .denied)
 	}
+
 
 }

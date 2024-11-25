@@ -94,7 +94,7 @@ public actor PrivatePreferences {
 			let ffiStreamActor = FfiStreamActor()
 
 			let consentCallback = ConsentCallback(client: self.client) {
-				consent in
+				records in
 				guard !Task.isCancelled else {
 					continuation.finish()
 					Task {
@@ -102,7 +102,9 @@ public actor PrivatePreferences {
 					}
 					return
 				}
-				continuation.yield(consent)
+				for consent in records {
+					continuation.yield(consent.fromFfi)
+				}
 			}
 
 			let task = Task {
@@ -123,20 +125,18 @@ public actor PrivatePreferences {
 
 final class ConsentCallback: FfiConsentCallback {
 	let client: Client
-	let callback: (ConsentListEntry) -> Void
+	let callback: ([FfiConsent]) -> Void
 
-	init(client: Client, _ callback: @escaping (ConsentListEntry) -> Void) {
+	init(client: Client, _ callback: @escaping ([FfiConsent]) -> Void) {
 		self.client = client
 		self.callback = callback
 	}
 
-	func onConsentUpdate(consent: [LibXMTP.FfiConsent]) {
-		for record in consent {
-			callback(record.fromFfi)
-		}
+	func onConsentUpdate(consent: [FfiConsent]) {
+		callback(consent)
 	}
 
-	func onError(error: LibXMTP.FfiSubscribeError) {
+	func onError(error: FfiSubscribeError) {
 		print("Error ConsentCallback \(error)")
 	}
 }
