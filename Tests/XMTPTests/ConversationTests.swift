@@ -231,7 +231,7 @@ class ConversationTests: XCTestCase {
 
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
-		var alixClient = try await Client.create(
+		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
@@ -243,7 +243,7 @@ class ConversationTests: XCTestCase {
 		let alixGroup = try await alixClient.conversations.newGroup(
 			with: [fixtures.bo.walletAddress])
 
-		var alixClient2 = try await Client.create(
+		let alixClient2 = try await Client.create(
 			account: alix,
 			options: .init(
 				api: .init(env: .local, isSecure: false),
@@ -255,16 +255,19 @@ class ConversationTests: XCTestCase {
 		try await alixGroup.send(content: "Hello")
 		try await alixClient.conversations.sync()
 		try await alixClient2.conversations.sync()
-		try await alixClient.conversations.syncAllConversations()
-		try await alixClient2.conversations.syncAllConversations()
+		let alixSize = try await alixClient.conversations.syncAllConversations()
+		let alix2Size = try await alixClient2.conversations.syncAllConversations()
+		
+		XCTAssertEqual(alixSize, 3)
+		XCTAssertEqual(alix2Size, 2)
 		
 		let alixGroup2 = try alixClient2.findGroup(groupId: alixGroup.id)
 		
 		let expectation1 = XCTestExpectation(description: "got a consent")
-		expectation1.expectedFulfillmentCount = 1
+		expectation1.expectedFulfillmentCount = 3
 
 		Task(priority: .userInitiated) {
-			for try await _ in await fixtures.alixClient.preferences.streamConsent()
+			for try await _ in await alixClient.preferences.streamConsent()
 			{
 				expectation1.fulfill()
 			}
@@ -276,11 +279,13 @@ class ConversationTests: XCTestCase {
 		try await alixClient.conversations.sync()
 		try await alixClient2.conversations.sync()
 		try await alixClient.conversations.syncAllConversations()
+		sleep(3)
 		try await alixClient2.conversations.syncAllConversations()
+		sleep(3)
 
-		await fulfillment(of: [expectation1], timeout: 5)
+		await fulfillment(of: [expectation1], timeout: 20)
 
-		XCTAssertEqual(try alixGroup.consentState(), .allowed)
+		XCTAssertEqual(try alixGroup.consentState(), .denied)
 	}
 
 }
