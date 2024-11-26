@@ -45,6 +45,16 @@ extension FfiConsentState {
 	}
 }
 
+extension FfiConsentEntityType {
+	var fromFFI: EntryType {
+		switch self {
+		case .inboxId: return EntryType.inbox_id
+		case .address: return EntryType.address
+		case .conversationId: return EntryType.conversation_id
+		}
+	}
+}
+
 extension EntryType {
 	var toFFI: FfiConsentEntityType {
 		switch self {
@@ -55,10 +65,16 @@ extension EntryType {
 	}
 }
 
-extension ConsentListEntry {
+extension ConsentRecord {
 	var toFFI: FfiConsent {
 		FfiConsent(
 			entityType: entryType.toFFI, state: consentType.toFFI, entity: value
 		)
+	}
+}
+
+extension FfiConsent {
+	var fromFfi: ConsentRecord {
+		ConsentRecord(value: self.entity, entryType: self.entityType.fromFFI, consentType: self.state.fromFFI)
 	}
 }
