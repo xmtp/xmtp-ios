@@ -84,6 +84,7 @@ public class FramesClient {
 		frameAction.actionBody = try actionBodyInputs.serializedData()
 		frameAction.installationSignature = signature
 		frameAction.installationID = self.xmtpClient.installationID.hexToData
+		frameAction.inboxID = self.xmtpClient.inboxID
 
 		return try frameAction.serializedData()
 	}

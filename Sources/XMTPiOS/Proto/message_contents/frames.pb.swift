@@ -106,6 +106,9 @@ public struct Xmtp_MessageContents_FrameAction: @unchecked Sendable {
   /// The public installation id used to sign.
   public var installationID: Data = Data()
 
+  /// The inbox id of the installation used to sign.
+  public var inboxID: String = String()
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -206,6 +209,7 @@ extension Xmtp_MessageContents_FrameAction: SwiftProtobuf.Message, SwiftProtobuf
 	3: .standard(proto: "action_body"),
 	4: .standard(proto: "installation_signature"),
 	5: .standard(proto: "installation_id"),
+	6: .standard(proto: "inbox_id"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -219,6 +223,7 @@ extension Xmtp_MessageContents_FrameAction: SwiftProtobuf.Message, SwiftProtobuf
 	  case 3: try { try decoder.decodeSingularBytesField(value: &self.actionBody) }()
 	  case 4: try { try decoder.decodeSingularBytesField(value: &self.installationSignature) }()
 	  case 5: try { try decoder.decodeSingularBytesField(value: &self.installationID) }()
+	  case 6: try { try decoder.decodeSingularStringField(value: &self.inboxID) }()
 	  default: break
 	  }
 	}
@@ -244,6 +249,9 @@ extension Xmtp_MessageContents_FrameAction: SwiftProtobuf.Message, SwiftProtobuf
 	if !self.installationID.isEmpty {
 	  try visitor.visitSingularBytesField(value: self.installationID, fieldNumber: 5)
 	}
+	if !self.inboxID.isEmpty {
+	  try visitor.visitSingularStringField(value: self.inboxID, fieldNumber: 6)
+	}
 	try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -253,6 +261,7 @@ extension Xmtp_MessageContents_FrameAction: SwiftProtobuf.Message, SwiftProtobuf
 	if lhs.actionBody != rhs.actionBody {return false}
 	if lhs.installationSignature != rhs.installationSignature {return false}
 	if lhs.installationID != rhs.installationID {return false}
+	if lhs.inboxID != rhs.inboxID {return false}
 	if lhs.unknownFields != rhs.unknownFields {return false}
 	return true
   }

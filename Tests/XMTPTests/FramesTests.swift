@@ -11,7 +11,7 @@ import XCTest
 
 final class FramesTests: XCTestCase {
 	func testInstantiateFramesClient() async throws {
-		let frameUrl = "https://fc-polls-five.vercel.app/polls/01032f47-e976-42ee-9e3d-3aac1324f4b8"
+		let frameUrl = "https://fc-polls-five.vercel.app/polls/03710836-bc1d-4921-9e24-89d82015c53b"
 		
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let bo = try PrivateKey.generate()
