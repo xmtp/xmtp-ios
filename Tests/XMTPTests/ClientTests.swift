@@ -30,6 +30,30 @@ class ClientTests: XCTestCase {
 			)
 		)
 	}
+	
+	func testStaticCanMessage() async throws {
+		let fixtures = try await fixtures()
+		let notOnNetwork = try PrivateKey.generate()
+
+		let canMessageList = try await Client.canMessage(
+			accountAddresses: [
+				fixtures.alix.walletAddress,
+				notOnNetwork.address,
+				fixtures.bo.walletAddress
+			],
+			api: ClientOptions.Api(env: .local, isSecure: false)
+		)
+
+		let expectedResults: [String: Bool] = [
+			fixtures.alix.walletAddress.lowercased(): true,
+			notOnNetwork.address.lowercased(): false,
+			fixtures.bo.walletAddress.lowercased(): true
+		]
+
+		for (address, expected) in expectedResults {
+			XCTAssertEqual(canMessageList[address.lowercased()], expected, "Failed for address: \(address)")
+		}
+	}
 
 	func testCanDeleteDatabase() async throws {
 		let key = try Crypto.secureRandomBytes(count: 32)

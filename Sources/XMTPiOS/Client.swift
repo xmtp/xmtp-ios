@@ -283,6 +283,39 @@ public final class Client {
 		}
 		return inboxId
 	}
+	
+	public static func canMessage(
+		accountAddresses: [String],
+		api: ClientOptions.Api
+	) async throws -> [String: Bool] {
+		let address = "0x0000000000000000000000000000000000000000"
+		let inboxId = try await getOrCreateInboxId(api: api, address: address)
+
+		var directoryURL: URL = URL.documentsDirectory
+		let alias = "xmtp-\(api.env.rawValue)-\(inboxId).db3"
+		let dbURL = directoryURL.appendingPathComponent(alias).path
+
+		let ffiClient = try await LibXMTP.createClient(
+			logger: XMTPLogger(),
+			host: api.env.url,
+			isSecure: api.env.isSecure == true,
+			db: dbURL,
+			encryptionKey: nil,
+			inboxId: inboxId,
+			accountAddress: address,
+			nonce: 0,
+			legacySignedPrivateKeyProto: nil,
+			historySyncUrl: nil
+		)
+
+		let result = try await ffiClient.canMessage(accountAddresses: accountAddresses)
+		
+		try ffiClient.releaseDbConnection()
+		let fm = FileManager.default
+		try fm.removeItem(atPath: dbURL)
+
+		return result
+	}
 
 	init(
 		address: String, ffiClient: LibXMTP.FfiXmtpClient, dbPath: String,
