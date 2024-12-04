@@ -30,7 +30,7 @@ class ClientTests: XCTestCase {
 			)
 		)
 	}
-	
+
 	func testStaticCanMessage() async throws {
 		let fixtures = try await fixtures()
 		let notOnNetwork = try PrivateKey.generate()
@@ -39,7 +39,7 @@ class ClientTests: XCTestCase {
 			accountAddresses: [
 				fixtures.alix.walletAddress,
 				notOnNetwork.address,
-				fixtures.bo.walletAddress
+				fixtures.bo.walletAddress,
 			],
 			api: ClientOptions.Api(env: .local, isSecure: false)
 		)
@@ -47,11 +47,13 @@ class ClientTests: XCTestCase {
 		let expectedResults: [String: Bool] = [
 			fixtures.alix.walletAddress.lowercased(): true,
 			notOnNetwork.address.lowercased(): false,
-			fixtures.bo.walletAddress.lowercased(): true
+			fixtures.bo.walletAddress.lowercased(): true,
 		]
 
 		for (address, expected) in expectedResults {
-			XCTAssertEqual(canMessageList[address.lowercased()], expected, "Failed for address: \(address)")
+			XCTAssertEqual(
+				canMessageList[address.lowercased()], expected,
+				"Failed for address: \(address)")
 		}
 	}
 
@@ -484,7 +486,7 @@ class ClientTests: XCTestCase {
 				installationId: alixInstallationId
 			))
 	}
-	
+
 	func testCreatesADevClientPerformance() async throws {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let fakeWallet = try PrivateKey.generate()
@@ -530,13 +532,27 @@ class ClientTests: XCTestCase {
 		print("PERF: Built a client with inboxId in \(time3)s")
 
 		// Assert performance comparisons
-		XCTAssertTrue(time2 < time1, "Building a client should be faster than creating one.")
-		XCTAssertTrue(time3 < time1, "Building a client with inboxId should be faster than creating one.")
-		XCTAssertTrue(time3 < time2, "Building a client with inboxId should be faster than building one without.")
-		
+		XCTAssertTrue(
+			time2 < time1,
+			"Building a client should be faster than creating one.")
+		XCTAssertTrue(
+			time3 < time1,
+			"Building a client with inboxId should be faster than creating one."
+		)
+		XCTAssertTrue(
+			time3 < time2,
+			"Building a client with inboxId should be faster than building one without."
+		)
+
 		// Assert that inbox IDs match
-		XCTAssertEqual(client.inboxID, buildClient1.inboxID, "Inbox ID of the created client and first built client should match.")
-		XCTAssertEqual(client.inboxID, buildClient2.inboxID, "Inbox ID of the created client and second built client should match.")
+		XCTAssertEqual(
+			client.inboxID, buildClient1.inboxID,
+			"Inbox ID of the created client and first built client should match."
+		)
+		XCTAssertEqual(
+			client.inboxID, buildClient2.inboxID,
+			"Inbox ID of the created client and second built client should match."
+		)
 	}
 
 }
