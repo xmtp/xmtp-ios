@@ -204,7 +204,6 @@ public final class Client {
 		let dbURL = directoryURL.appendingPathComponent(alias).path
 
 		let ffiClient = try await LibXMTP.createClient(
-			logger: XMTPLogger(),
 			host: options.api.env.url,
 			isSecure: options.api.env.isSecure == true,
 			db: dbURL,
@@ -273,7 +272,6 @@ public final class Client {
 		do {
 			inboxId =
 				try await getInboxIdForAddress(
-					logger: XMTPLogger(),
 					host: api.env.url,
 					isSecure: api.env.isSecure == true,
 					accountAddress: address.lowercased()
@@ -299,7 +297,6 @@ public final class Client {
 		let dbURL = directoryURL.appendingPathComponent(alias).path
 
 		let ffiClient = try await LibXMTP.createClient(
-			logger: XMTPLogger(),
 			host: api.env.url,
 			isSecure: api.env.isSecure == true,
 			db: dbURL,
