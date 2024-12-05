@@ -212,7 +212,7 @@ public final class Client {
 			accountAddress: address,
 			nonce: 0,
 			legacySignedPrivateKeyProto: nil,
-			historySyncUrl: options.historySyncUrl
+			historySyncUrl: nil
 		)
 
 		try await options.preAuthenticateToInboxCallback?()
