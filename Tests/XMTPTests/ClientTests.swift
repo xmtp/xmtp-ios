@@ -31,6 +31,32 @@ class ClientTests: XCTestCase {
 		)
 	}
 
+	func testStaticCanMessage() async throws {
+		let fixtures = try await fixtures()
+		let notOnNetwork = try PrivateKey.generate()
+
+		let canMessageList = try await Client.canMessage(
+			accountAddresses: [
+				fixtures.alix.walletAddress,
+				notOnNetwork.address,
+				fixtures.bo.walletAddress,
+			],
+			api: ClientOptions.Api(env: .local, isSecure: false)
+		)
+
+		let expectedResults: [String: Bool] = [
+			fixtures.alix.walletAddress.lowercased(): true,
+			notOnNetwork.address.lowercased(): false,
+			fixtures.bo.walletAddress.lowercased(): true,
+		]
+
+		for (address, expected) in expectedResults {
+			XCTAssertEqual(
+				canMessageList[address.lowercased()], expected,
+				"Failed for address: \(address)")
+		}
+	}
+
 	func testCanDeleteDatabase() async throws {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let bo = try PrivateKey.generate()
@@ -326,4 +352,207 @@ class ClientTests: XCTestCase {
 			states.last!.recoveryAddress.lowercased(),
 			fixtures.caro.walletAddress.lowercased())
 	}
+
+	func testAddAccounts() async throws {
+		let fixtures = try await fixtures()
+		let alix2Wallet = try PrivateKey.generate()
+		let alix3Wallet = try PrivateKey.generate()
+
+		try await fixtures.alixClient.addAccount(newAccount: alix2Wallet)
+		try await fixtures.alixClient.addAccount(newAccount: alix3Wallet)
+
+		let state = try await fixtures.alixClient.inboxState(
+			refreshFromNetwork: true)
+		XCTAssertEqual(state.installations.count, 1)
+		XCTAssertEqual(state.addresses.count, 3)
+		XCTAssertEqual(
+			state.recoveryAddress.lowercased(),
+			fixtures.alixClient.address.lowercased())
+		XCTAssertEqual(
+			state.addresses.sorted(),
+			[
+				alix2Wallet.address.lowercased(),
+				alix3Wallet.address.lowercased(),
+				fixtures.alixClient.address.lowercased(),
+			].sorted()
+		)
+	}
+
+	func testRemovingAccounts() async throws {
+		let fixtures = try await fixtures()
+		let alix2Wallet = try PrivateKey.generate()
+		let alix3Wallet = try PrivateKey.generate()
+
+		try await fixtures.alixClient.addAccount(newAccount: alix2Wallet)
+		try await fixtures.alixClient.addAccount(newAccount: alix3Wallet)
+
+		var state = try await fixtures.alixClient.inboxState(
+			refreshFromNetwork: true)
+		XCTAssertEqual(state.addresses.count, 3)
+		XCTAssertEqual(
+			state.recoveryAddress.lowercased(),
+			fixtures.alixClient.address.lowercased())
+
+		try await fixtures.alixClient.removeAccount(
+			recoveryAccount: fixtures.alix, addressToRemove: alix2Wallet.address
+		)
+
+		state = try await fixtures.alixClient.inboxState(
+			refreshFromNetwork: true)
+		XCTAssertEqual(state.addresses.count, 2)
+		XCTAssertEqual(
+			state.recoveryAddress.lowercased(),
+			fixtures.alixClient.address.lowercased())
+		XCTAssertEqual(
+			state.addresses.sorted(),
+			[
+				alix3Wallet.address.lowercased(),
+				fixtures.alixClient.address.lowercased(),
+			].sorted()
+		)
+		XCTAssertEqual(state.installations.count, 1)
+
+		// Cannot remove the recovery address
+		await assertThrowsAsyncError(
+			try await fixtures.alixClient.removeAccount(
+				recoveryAccount: alix3Wallet,
+				addressToRemove: fixtures.alixClient.address
+			))
+	}
+
+	func testSignatures() async throws {
+		let fixtures = try await fixtures()
+
+		// Signing with installation key
+		let signature = try fixtures.alixClient.signWithInstallationKey(
+			message: "Testing")
+		XCTAssertTrue(
+			try fixtures.alixClient.verifySignature(
+				message: "Testing", signature: signature))
+		XCTAssertFalse(
+			try fixtures.alixClient.verifySignature(
+				message: "Not Testing", signature: signature))
+
+		let alixInstallationId = fixtures.alixClient.installationID
+
+		XCTAssertTrue(
+			try fixtures.alixClient.verifySignatureWithInstallationId(
+				message: "Testing",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+		XCTAssertFalse(
+			try fixtures.alixClient.verifySignatureWithInstallationId(
+				message: "Not Testing",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+		XCTAssertFalse(
+			try fixtures.alixClient.verifySignatureWithInstallationId(
+				message: "Testing",
+				signature: signature,
+				installationId: fixtures.boClient.installationID
+			))
+		XCTAssertTrue(
+			try fixtures.boClient.verifySignatureWithInstallationId(
+				message: "Testing",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+
+		try fixtures.alixClient.deleteLocalDatabase()
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let options = ClientOptions.init(
+			api: .init(env: .local, isSecure: false),
+			dbEncryptionKey: key
+		)
+
+		// Creating a new client
+		let alixClient2 = try await Client.create(
+			account: fixtures.alix,
+			options: options
+		)
+
+		XCTAssertTrue(
+			try alixClient2.verifySignatureWithInstallationId(
+				message: "Testing",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+		XCTAssertFalse(
+			try alixClient2.verifySignatureWithInstallationId(
+				message: "Testing2",
+				signature: signature,
+				installationId: alixInstallationId
+			))
+	}
+
+	func testCreatesADevClientPerformance() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let fakeWallet = try PrivateKey.generate()
+
+		// Measure time to create the client
+		let start = Date()
+		let client = try await Client.create(
+			account: fakeWallet,
+			options: ClientOptions(
+				api: ClientOptions.Api(env: .dev, isSecure: true),
+				dbEncryptionKey: key
+			)
+		)
+		let end = Date()
+		let time1 = end.timeIntervalSince(start)
+		print("PERF: Created a client in \(time1)s")
+
+		// Measure time to build a client
+		let start2 = Date()
+		let buildClient1 = try await Client.build(
+			address: fakeWallet.address,
+			options: ClientOptions(
+				api: ClientOptions.Api(env: .dev, isSecure: true),
+				dbEncryptionKey: key
+			)
+		)
+		let end2 = Date()
+		let time2 = end2.timeIntervalSince(start2)
+		print("PERF: Built a client in \(time2)s")
+
+		// Measure time to build a client with an inboxId
+		let start3 = Date()
+		let buildClient2 = try await Client.build(
+			address: fakeWallet.address,
+			options: ClientOptions(
+				api: ClientOptions.Api(env: .dev, isSecure: true),
+				dbEncryptionKey: key
+			),
+			inboxId: client.inboxID
+		)
+		let end3 = Date()
+		let time3 = end3.timeIntervalSince(start3)
+		print("PERF: Built a client with inboxId in \(time3)s")
+
+		// Assert performance comparisons
+		XCTAssertTrue(
+			time2 < time1,
+			"Building a client should be faster than creating one.")
+		XCTAssertTrue(
+			time3 < time1,
+			"Building a client with inboxId should be faster than creating one."
+		)
+		XCTAssertTrue(
+			time3 < time2,
+			"Building a client with inboxId should be faster than building one without."
+		)
+
+		// Assert that inbox IDs match
+		XCTAssertEqual(
+			client.inboxID, buildClient1.inboxID,
+			"Inbox ID of the created client and first built client should match."
+		)
+		XCTAssertEqual(
+			client.inboxID, buildClient2.inboxID,
+			"Inbox ID of the created client and second built client should match."
+		)
+	}
+
 }

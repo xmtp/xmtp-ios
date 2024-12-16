@@ -149,22 +149,29 @@ public final class Client {
 		)
 	}
 
-	public static func build(address: String, options: ClientOptions)
+	public static func build(
+		address: String, options: ClientOptions, inboxId: String? = nil
+	)
 		async throws -> Client
 	{
 		let accountAddress = address.lowercased()
-		let inboxId = try await getOrCreateInboxId(
-			api: options.api, address: accountAddress)
+		let resolvedInboxId: String
+		if let existingInboxId = inboxId {
+			resolvedInboxId = existingInboxId
+		} else {
+			resolvedInboxId = try await getOrCreateInboxId(
+				api: options.api, address: accountAddress)
+		}
 
 		return try await initializeClient(
 			accountAddress: accountAddress,
 			options: options,
 			signingKey: nil,
-			inboxId: inboxId
+			inboxId: resolvedInboxId
 		)
 	}
 
-	static func initFFiClient(
+	private static func initFFiClient(
 		accountAddress: String,
 		options: ClientOptions,
 		signingKey: SigningKey?,
@@ -197,7 +204,6 @@ public final class Client {
 		let dbURL = directoryURL.appendingPathComponent(alias).path
 
 		let ffiClient = try await LibXMTP.createClient(
-			logger: XMTPLogger(),
 			host: options.api.env.url,
 			isSecure: options.api.env.isSecure == true,
 			db: dbURL,
@@ -206,35 +212,15 @@ public final class Client {
 			accountAddress: address,
 			nonce: 0,
 			legacySignedPrivateKeyProto: nil,
-			historySyncUrl: options.historySyncUrl
+			historySyncUrl: nil
 		)
 
 		try await options.preAuthenticateToInboxCallback?()
 		if let signatureRequest = ffiClient.signatureRequest() {
 			if let signingKey = signingKey {
 				do {
-					if signingKey.type == WalletType.SCW {
-						guard let chainId = signingKey.chainId else {
-							throw ClientError.creationError(
-								"Chain id must be present to sign Smart Contract Wallet"
-							)
-						}
-						let signedData = try await signingKey.signSCW(
-							message: signatureRequest.signatureText())
-						try await signatureRequest.addScwSignature(
-							signatureBytes: signedData,
-							address: signingKey.address.lowercased(),
-							chainId: UInt64(chainId),
-							blockNumber: signingKey.blockNumber.flatMap {
-								$0 >= 0 ? UInt64($0) : nil
-							})
-
-					} else {
-						let signedData = try await signingKey.sign(
-							message: signatureRequest.signatureText())
-						try await signatureRequest.addEcdsaSignature(
-							signatureBytes: signedData.rawData)
-					}
+					try await handleSignature(
+						for: signatureRequest, signingKey: signingKey)
 					try await ffiClient.registerIdentity(
 						signatureRequest: signatureRequest)
 				} catch {
@@ -249,9 +235,34 @@ public final class Client {
 			}
 		}
 
-		print("LibXMTP \(getVersionInfo())")
-
 		return (ffiClient, dbURL)
+	}
+
+	private static func handleSignature(
+		for signatureRequest: FfiSignatureRequest,
+		signingKey: SigningKey
+	) async throws {
+		if signingKey.type == .SCW {
+			guard let chainId = signingKey.chainId else {
+				throw ClientError.creationError(
+					"Chain id must be present to sign Smart Contract Wallet")
+			}
+			let signedData = try await signingKey.signSCW(
+				message: signatureRequest.signatureText())
+			try await signatureRequest.addScwSignature(
+				signatureBytes: signedData,
+				address: signingKey.address.lowercased(),
+				chainId: UInt64(chainId),
+				blockNumber: signingKey.blockNumber.flatMap {
+					$0 >= 0 ? UInt64($0) : nil
+				}
+			)
+		} else {
+			let signedData = try await signingKey.sign(
+				message: signatureRequest.signatureText())
+			try await signatureRequest.addEcdsaSignature(
+				signatureBytes: signedData.rawData)
+		}
 	}
 
 	public static func getOrCreateInboxId(
@@ -261,7 +272,6 @@ public final class Client {
 		do {
 			inboxId =
 				try await getInboxIdForAddress(
-					logger: XMTPLogger(),
 					host: api.env.url,
 					isSecure: api.env.isSecure == true,
 					accountAddress: address.lowercased()
@@ -275,6 +285,39 @@ public final class Client {
 		return inboxId
 	}
 
+	public static func canMessage(
+		accountAddresses: [String],
+		api: ClientOptions.Api
+	) async throws -> [String: Bool] {
+		let address = "0x0000000000000000000000000000000000000000"
+		let inboxId = try await getOrCreateInboxId(api: api, address: address)
+
+		var directoryURL: URL = URL.documentsDirectory
+		let alias = "xmtp-\(api.env.rawValue)-\(inboxId).db3"
+		let dbURL = directoryURL.appendingPathComponent(alias).path
+
+		let ffiClient = try await LibXMTP.createClient(
+			host: api.env.url,
+			isSecure: api.env.isSecure == true,
+			db: dbURL,
+			encryptionKey: nil,
+			inboxId: inboxId,
+			accountAddress: address,
+			nonce: 0,
+			legacySignedPrivateKeyProto: nil,
+			historySyncUrl: nil
+		)
+
+		let result = try await ffiClient.canMessage(
+			accountAddresses: accountAddresses)
+
+		try ffiClient.releaseDbConnection()
+		let fm = FileManager.default
+		try fm.removeItem(atPath: dbURL)
+
+		return result
+	}
+
 	init(
 		address: String, ffiClient: LibXMTP.FfiXmtpClient, dbPath: String,
 		installationID: String, inboxID: String, environment: XMTPEnvironment
@@ -285,6 +328,52 @@ public final class Client {
 		self.installationID = installationID
 		self.inboxID = inboxID
 		self.environment = environment
+	}
+
+	public func addAccount(newAccount: SigningKey)
+		async throws
+	{
+		let signatureRequest = try await ffiClient.addWallet(
+			newWalletAddress: newAccount.address.lowercased())
+		do {
+			try await Client.handleSignature(
+				for: signatureRequest, signingKey: newAccount)
+			try await ffiClient.applySignatureRequest(
+				signatureRequest: signatureRequest)
+		} catch {
+			throw ClientError.creationError(
+				"Failed to sign the message: \(error.localizedDescription)")
+		}
+	}
+
+	public func removeAccount(
+		recoveryAccount: SigningKey, addressToRemove: String
+	) async throws {
+		let signatureRequest = try await ffiClient.revokeWallet(
+			walletAddress: addressToRemove.lowercased())
+		do {
+			try await Client.handleSignature(
+				for: signatureRequest, signingKey: recoveryAccount)
+			try await ffiClient.applySignatureRequest(
+				signatureRequest: signatureRequest)
+		} catch {
+			throw ClientError.creationError(
+				"Failed to sign the message: \(error.localizedDescription)")
+		}
+	}
+
+	public func revokeAllOtherInstallations(signingKey: SigningKey) async throws
+	{
+		let signatureRequest = try await ffiClient.revokeAllOtherInstallations()
+		do {
+			try await Client.handleSignature(
+				for: signatureRequest, signingKey: signingKey)
+			try await ffiClient.applySignatureRequest(
+				signatureRequest: signatureRequest)
+		} catch {
+			throw ClientError.creationError(
+				"Failed to sign the message: \(error.localizedDescription)")
+		}
 	}
 
 	public func canMessage(address: String) async throws -> Bool {
@@ -320,9 +409,33 @@ public final class Client {
 	public func inboxIdFromAddress(address: String) async throws -> String? {
 		return try await ffiClient.findInboxId(address: address.lowercased())
 	}
-	
+
 	public func signWithInstallationKey(message: String) throws -> Data {
 		return try ffiClient.signWithInstallationKey(text: message)
+	}
+
+	public func verifySignature(message: String, signature: Data) throws -> Bool
+	{
+		do {
+			try ffiClient.verifySignedWithInstallationKey(
+				signatureText: message, signatureBytes: signature)
+			return true
+		} catch {
+			return false
+		}
+	}
+
+	public func verifySignatureWithInstallationId(
+		message: String, signature: Data, installationId: String
+	) throws -> Bool {
+		do {
+			try ffiClient.verifySignedWithPublicKey(
+				signatureText: message, signatureBytes: signature,
+				publicKey: installationId.hexToData)
+			return true
+		} catch {
+			return false
+		}
 	}
 
 	public func findGroup(groupId: String) throws -> Group? {
@@ -398,26 +511,6 @@ public final class Client {
 
 	public func requestMessageHistorySync() async throws {
 		try await ffiClient.sendSyncRequest(kind: .messages)
-	}
-
-	public func syncConsent() async throws {
-		try await ffiClient.sendSyncRequest(kind: .consent)
-	}
-
-	public func revokeAllOtherInstallations(signingKey: SigningKey) async throws
-	{
-		let signatureRequest = try await ffiClient.revokeAllOtherInstallations()
-		do {
-			let signedData = try await signingKey.sign(
-				message: signatureRequest.signatureText())
-			try await signatureRequest.addEcdsaSignature(
-				signatureBytes: signedData.rawData)
-			try await ffiClient.applySignatureRequest(
-				signatureRequest: signatureRequest)
-		} catch {
-			throw ClientError.creationError(
-				"Failed to sign the message: \(error.localizedDescription)")
-		}
 	}
 
 	public func inboxState(refreshFromNetwork: Bool) async throws -> InboxState
