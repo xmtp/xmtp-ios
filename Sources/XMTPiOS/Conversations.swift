@@ -162,15 +162,19 @@ public actor Conversations {
 		if let limit {
 			options.limit = Int64(limit)
 		}
-		let conversations = try await ffiConversations.list(
+		let ffiConversations = try await ffiConversations.list(
 			opts: options)
 
 		let sortedConversations = try await sortConversations(
-			conversations, order: order)
+            ffiConversations, order: order)
+        
+        var conversations: [Conversation] = []
+        for sortedConversation in sortedConversations {
+            let conversation = try await sortedConversation.toConversation(client: client)
+            conversations.append(conversation)
+        }
 
-		return try sortedConversations.map {
-			try $0.toConversation(client: client)
-		}
+		return conversations
 	}
 
 	private func sortConversations(
@@ -427,7 +431,7 @@ public actor Conversations {
 		let conversation =
 			try await ffiConversations
 			.processStreamedWelcomeMessage(envelopeBytes: envelopeBytes)
-		return try conversation.toConversation(client: client)
+		return try await conversation.toConversation(client: client)
 	}
 
 	public func newConversation(

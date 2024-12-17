@@ -16,9 +16,9 @@ class ConversationTests: XCTestCase {
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
 			with: fixtures.caro.walletAddress)
 
-		let sameDm = try fixtures.boClient.findConversationByTopic(
+		let sameDm = try await fixtures.boClient.findConversationByTopic(
 			topic: dm.topic)
-		let sameGroup = try fixtures.boClient.findConversationByTopic(
+		let sameGroup = try await fixtures.boClient.findConversationByTopic(
 			topic: group.topic)
 
 		XCTAssertEqual(group.id, sameGroup?.id)
@@ -210,7 +210,7 @@ class ConversationTests: XCTestCase {
 		XCTAssertEqual(try dm.consentState(), .denied)
 
 		try await fixtures.boClient.conversations.sync()
-		let boDm = try fixtures.boClient.findConversation(conversationId: dm.id)
+		let boDm = try await fixtures.boClient.findConversation(conversationId: dm.id)
 
 		var alixClient2 = try await Client.create(
 			account: alix,
@@ -232,7 +232,7 @@ class ConversationTests: XCTestCase {
 		try await alixClient2.conversations.syncAllConversations()
 		sleep(2)
 
-		if let dm2 = try alixClient2.findConversation(conversationId: dm.id) {
+		if let dm2 = try await alixClient2.findConversation(conversationId: dm.id) {
 			XCTAssertEqual(try dm2.consentState(), .denied)
 
 			try await alixClient2.preferences.setConsentState(
