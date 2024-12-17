@@ -79,9 +79,8 @@ public actor Conversations {
 	public func sync() async throws {
 		try await ffiConversations.sync()
 	}
-	public func syncAllConversations() async throws -> UInt32 {
-        // TODO: add consent state here
-        return try await ffiConversations.syncAllConversations(consentState: nil)
+	public func syncAllConversations(consentState: ConsentState? = nil) async throws -> UInt32 {
+        return try await ffiConversations.syncAllConversations(consentState: consentState?.toFFI)
 	}
 
 	public func listGroups(
@@ -105,7 +104,7 @@ public actor Conversations {
 		let conversations = try await ffiConversations.listGroups(
 			opts: options)
 
-		let sortedConversations = try sortConversations(
+		let sortedConversations = try await sortConversations(
 			conversations, order: order)
 
 		return sortedConversations.map {
@@ -134,7 +133,7 @@ public actor Conversations {
 		let conversations = try await ffiConversations.listDms(
 			opts: options)
 
-		let sortedConversations = try sortConversations(
+		let sortedConversations = try await sortConversations(
 			conversations, order: order)
 
 		return sortedConversations.map {
@@ -163,7 +162,7 @@ public actor Conversations {
 		let conversations = try await ffiConversations.list(
 			opts: options)
 
-		let sortedConversations = try sortConversations(
+		let sortedConversations = try await sortConversations(
 			conversations, order: order)
 
 		return try sortedConversations.map {
@@ -174,12 +173,12 @@ public actor Conversations {
 	private func sortConversations(
 		_ conversations: [FfiConversation],
 		order: ConversationOrder
-	) throws -> [FfiConversation] {
+	) async throws -> [FfiConversation] {
 		switch order {
 		case .lastMessage:
 			let conversationWithTimestamp: [(FfiConversation, Int64?)] =
-				try conversations.map { conversation in
-					let message = try conversation.findMessages(
+				try await conversations.map { conversation in
+					let message = try await conversation.findMessages(
 						opts: FfiListMessagesOptions(
 							sentBeforeNs: nil,
 							sentAfterNs: nil,
@@ -212,7 +211,7 @@ public actor Conversations {
 					return
 				}
 				do {
-					let conversationType = try conversation.conversationType()
+					let conversationType = try await conversation.conversationType()
 					if conversationType == .dm {
 						continuation.yield(
 							Conversation.dm(
