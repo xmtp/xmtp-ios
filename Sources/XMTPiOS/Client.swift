@@ -204,8 +204,9 @@ public final class Client {
 		let dbURL = directoryURL.appendingPathComponent(alias).path
 
 		let ffiClient = try await LibXMTP.createClient(
-			host: options.api.env.url,
-			isSecure: options.api.env.isSecure == true,
+			api: connectToBackend(
+				host: options.api.env.url,
+				isSecure: options.api.env.isSecure == true),
 			db: dbURL,
 			encryptionKey: options.dbEncryptionKey,
 			inboxId: inboxId,
@@ -297,8 +298,9 @@ public final class Client {
 		let dbURL = directoryURL.appendingPathComponent(alias).path
 
 		let ffiClient = try await LibXMTP.createClient(
-			host: api.env.url,
-			isSecure: api.env.isSecure == true,
+			api: connectToBackend(
+				host: api.env.url,
+				isSecure: api.env.isSecure == true),
 			db: dbURL,
 			encryptionKey: nil,
 			inboxId: inboxId,
