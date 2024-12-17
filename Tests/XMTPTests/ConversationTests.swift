@@ -79,6 +79,34 @@ class ConversationTests: XCTestCase {
 		XCTAssertEqual(convoCountAllowed, 1)
 		XCTAssertEqual(convoCountDenied, 1)
 	}
+	
+	func testCanSyncAllConversationsFiltered() async throws {
+		let fixtures = try await fixtures()
+
+		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
+			with: fixtures.caro.walletAddress)
+		let group = try await fixtures.boClient.conversations.newGroup(with: [
+			fixtures.caro.walletAddress
+		])
+
+		let convoCount = try await fixtures.boClient.conversations
+			.syncAllConversations()
+		let convoCountConsent = try await fixtures.boClient.conversations
+			.syncAllConversations(consentState: .allowed)
+
+		XCTAssertEqual(convoCount, 2)
+		XCTAssertEqual(convoCountConsent, 2)
+
+		try await group.updateConsentState(state: .denied)
+
+		let convoCountAllowed = try await fixtures.boClient.conversations
+			.syncAllConversations(consentState: .allowed)
+		let convoCountDenied = try await fixtures.boClient.conversations
+			.syncAllConversations(consentState: .denied)
+
+		XCTAssertEqual(convoCountAllowed, 1)
+		XCTAssertEqual(convoCountDenied, 1)
+	}
 
 	func testCanListConversationsOrder() async throws {
 		let fixtures = try await fixtures()
