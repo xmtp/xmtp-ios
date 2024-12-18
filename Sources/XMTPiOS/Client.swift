@@ -138,7 +138,10 @@ public final class Client {
 		return client
 	}
 
-	public static func create(account: SigningKey, options: ClientOptions)
+	public static func create(
+		account: SigningKey, options: ClientOptions,
+		apiClient: XmtpApiClient? = nil
+	)
 		async throws -> Client
 	{
 		let accountAddress = account.address.lowercased()
@@ -149,7 +152,8 @@ public final class Client {
 			accountAddress: accountAddress,
 			options: options,
 			signingKey: account,
-			inboxId: inboxId
+			inboxId: inboxId,
+			apiClient: apiClient
 		)
 	}
 
@@ -214,9 +218,7 @@ public final class Client {
 		if let existingApiClient = apiClient {
 			xmtpApiClient = existingApiClient
 		} else {
-			xmtpApiClient = try await connectToBackend(
-				host: options.api.env.url,
-				isSecure: options.api.env.isSecure == true)
+			xmtpApiClient = try await connectToApiBackend(api: options.api)
 		}
 
 		let ffiClient = try await LibXMTP.createClient(
@@ -280,6 +282,14 @@ public final class Client {
 		}
 	}
 
+	public static func connectToApiBackend(
+		api: ClientOptions.Api
+	) async throws -> XmtpApiClient {
+		return try await connectToBackend(
+			host: api.env.url,
+			isSecure: api.env.isSecure == true)
+	}
+
 	public static func getOrCreateInboxId(
 		api: ClientOptions.Api, address: String
 	) async throws -> String {
@@ -312,9 +322,7 @@ public final class Client {
 		let dbURL = directoryURL.appendingPathComponent(alias).path
 
 		let ffiClient = try await LibXMTP.createClient(
-			api: connectToBackend(
-				host: api.env.url,
-				isSecure: api.env.isSecure == true),
+			api: connectToApiBackend(api: api),
 			db: dbURL,
 			encryptionKey: nil,
 			inboxId: inboxId,
