@@ -91,6 +91,7 @@ public final class Client {
 	public let dbPath: String
 	public let installationID: String
 	public let environment: XMTPEnvironment
+	public let apiClient: XmtpApiClient
 	private let ffiClient: LibXMTP.FfiXmtpClient
 
 	public lazy var conversations: Conversations = .init(
@@ -108,13 +109,15 @@ public final class Client {
 		accountAddress: String,
 		options: ClientOptions,
 		signingKey: SigningKey?,
-		inboxId: String
+		inboxId: String,
+		apiClient: XmtpApiClient? = nil
 	) async throws -> Client {
-		let (libxmtpClient, dbPath) = try await initFFiClient(
+		let (libxmtpClient, dbPath, apiClient) = try await initFFiClient(
 			accountAddress: accountAddress.lowercased(),
 			options: options,
 			signingKey: signingKey,
-			inboxId: inboxId
+			inboxId: inboxId,
+			apiClient: apiClient
 		)
 
 		let client = try Client(
@@ -123,7 +126,8 @@ public final class Client {
 			dbPath: dbPath,
 			installationID: libxmtpClient.installationId().toHex,
 			inboxID: libxmtpClient.inboxId(),
-			environment: options.api.env
+			environment: options.api.env,
+			apiClient: apiClient
 		)
 
 		// Register codecs
@@ -150,7 +154,8 @@ public final class Client {
 	}
 
 	public static func build(
-		address: String, options: ClientOptions, inboxId: String? = nil
+		address: String, options: ClientOptions, inboxId: String? = nil,
+		apiClient: XmtpApiClient? = nil
 	)
 		async throws -> Client
 	{
@@ -167,7 +172,8 @@ public final class Client {
 			accountAddress: accountAddress,
 			options: options,
 			signingKey: nil,
-			inboxId: resolvedInboxId
+			inboxId: resolvedInboxId,
+			apiClient: apiClient
 		)
 	}
 
@@ -175,8 +181,9 @@ public final class Client {
 		accountAddress: String,
 		options: ClientOptions,
 		signingKey: SigningKey?,
-		inboxId: String
-	) async throws -> (FfiXmtpClient, String) {
+		inboxId: String,
+		apiClient: XmtpApiClient? = nil
+	) async throws -> (FfiXmtpClient, String, XmtpApiClient) {
 		let address = accountAddress.lowercased()
 
 		let mlsDbDirectory = options.dbDirectory
@@ -203,10 +210,17 @@ public final class Client {
 		let alias = "xmtp-\(options.api.env.rawValue)-\(inboxId).db3"
 		let dbURL = directoryURL.appendingPathComponent(alias).path
 
-		let ffiClient = try await LibXMTP.createClient(
-			api: connectToBackend(
+		let xmtpApiClient: XmtpApiClient
+		if let existingApiClient = apiClient {
+			xmtpApiClient = existingApiClient
+		} else {
+			xmtpApiClient = try await connectToBackend(
 				host: options.api.env.url,
-				isSecure: options.api.env.isSecure == true),
+				isSecure: options.api.env.isSecure == true)
+		}
+
+		let ffiClient = try await LibXMTP.createClient(
+			api: xmtpApiClient,
 			db: dbURL,
 			encryptionKey: options.dbEncryptionKey,
 			inboxId: inboxId,
@@ -236,7 +250,7 @@ public final class Client {
 			}
 		}
 
-		return (ffiClient, dbURL)
+		return (ffiClient, dbURL, xmtpApiClient)
 	}
 
 	private static func handleSignature(
@@ -293,7 +307,7 @@ public final class Client {
 		let address = "0x0000000000000000000000000000000000000000"
 		let inboxId = try await getOrCreateInboxId(api: api, address: address)
 
-		var directoryURL: URL = URL.documentsDirectory
+		let directoryURL: URL = URL.documentsDirectory
 		let alias = "xmtp-\(api.env.rawValue)-\(inboxId).db3"
 		let dbURL = directoryURL.appendingPathComponent(alias).path
 
@@ -322,7 +336,8 @@ public final class Client {
 
 	init(
 		address: String, ffiClient: LibXMTP.FfiXmtpClient, dbPath: String,
-		installationID: String, inboxID: String, environment: XMTPEnvironment
+		installationID: String, inboxID: String, environment: XMTPEnvironment,
+		apiClient: XmtpApiClient
 	) throws {
 		self.address = address
 		self.ffiClient = ffiClient
@@ -330,6 +345,7 @@ public final class Client {
 		self.installationID = installationID
 		self.inboxID = inboxID
 		self.environment = environment
+		self.apiClient = apiClient
 	}
 
 	public func addAccount(newAccount: SigningKey)
@@ -450,7 +466,8 @@ public final class Client {
 		}
 	}
 
-	public func findConversation(conversationId: String) async throws -> Conversation?
+	public func findConversation(conversationId: String) async throws
+		-> Conversation?
 	{
 		do {
 			let conversation = try ffiClient.conversation(
@@ -461,7 +478,9 @@ public final class Client {
 		}
 	}
 
-	public func findConversationByTopic(topic: String) async throws -> Conversation? {
+	public func findConversationByTopic(topic: String) async throws
+		-> Conversation?
+	{
 		do {
 			let regexPattern = #"/xmtp/mls/1/g-(.*?)/proto"#
 			if let regex = try? NSRegularExpression(pattern: regexPattern) {
