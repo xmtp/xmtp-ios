@@ -544,7 +544,7 @@ class ClientTests: XCTestCase {
 		)
 		let end4 = Date()
 		let time4 = end4.timeIntervalSince(start4)
-		print("PERF: Built a client with inboxId in \(time4)s")
+		print("PERF: Built a client with inboxId and apiClient in \(time4)s")
 
 		// Assert performance comparisons
 		XCTAssertTrue(
