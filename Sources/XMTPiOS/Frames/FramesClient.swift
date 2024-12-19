@@ -54,7 +54,7 @@ public class FramesClient {
 		let untrustedData = FramePostUntrustedData(
 			url: frameUrl, timestamp: UInt64(now), buttonIndex: buttonIndex,
 			inputText: inputText, state: state,
-			walletAddress: self.xmtpClient.address,
+			walletAddress: xmtpClient.address,
 			opaqueConversationIdentifier: opaqueConversationIdentifier,
 			unixTimestamp: UInt32(now)
 		)
@@ -71,7 +71,7 @@ public class FramesClient {
 	}
 
 	private func signDigest(message: String) async throws -> Data {
-		return try self.xmtpClient.signWithInstallationKey(message: message)
+		return try xmtpClient.signWithInstallationKey(message: message)
 	}
 
 	private func buildSignedFrameAction(actionBodyInputs: FrameActionBody)
@@ -83,8 +83,8 @@ public class FramesClient {
 		var frameAction = FrameAction()
 		frameAction.actionBody = try actionBodyInputs.serializedData()
 		frameAction.installationSignature = signature
-		frameAction.installationID = self.xmtpClient.installationID.hexToData
-		frameAction.inboxID = self.xmtpClient.inboxID
+		frameAction.installationID = xmtpClient.installationID.hexToData
+		frameAction.inboxID = xmtpClient.inboxID
 
 		return try frameAction.serializedData()
 	}
