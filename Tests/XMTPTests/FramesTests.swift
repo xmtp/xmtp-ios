@@ -11,14 +11,14 @@ import XCTest
 
 final class FramesTests: XCTestCase {
 	func testInstantiateFramesClient() async throws {
-		let frameUrl = "https://fc-polls-five.vercel.app/polls/03710836-bc1d-4921-9e24-89d82015c53b"
+		let frameUrl = "https://fc-polls-five.vercel.app/polls/03710836-bc1d-4921-9e24-89d82015c53b?env=dev"
 		
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let bo = try PrivateKey.generate()
 		let client = try await Client.create(
 			account: bo,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .dev, isSecure: true),
 				dbEncryptionKey: key
 			)
 		)
