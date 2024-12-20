@@ -83,10 +83,6 @@ public actor PrivatePreferences {
 		).fromFFI
 	}
 
-	public func syncConsent() async throws {
-		try await ffiClient.sendSyncRequest(kind: .consent)
-	}
-
 	public func streamConsent()
 		-> AsyncThrowingStream<ConsentRecord, Error>
 	{
