@@ -44,6 +44,7 @@ class HistorySyncTests: XCTestCase {
 		let state = try await alixClient2.inboxState(refreshFromNetwork: true)
 		XCTAssertEqual(state.installations.count, 2)
 		
+		try await alixClient2.preferences.syncConsent()
 		try await alixClient.conversations.syncAllConversations()
 		sleep(2)
 		try await alixClient2.conversations.syncAllConversations()
