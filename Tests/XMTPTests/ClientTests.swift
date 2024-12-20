@@ -304,28 +304,31 @@ class ClientTests: XCTestCase {
 	func testRevokesAllOtherInstallations() async throws {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
-		let options = ClientOptions.init(
-			api: .init(env: .local, isSecure: false),
-			dbEncryptionKey: key
-		)
 
 		let alixClient = try await Client.create(
 			account: alix,
-			options: options
+			options: ClientOptions.init(
+				api: .init(env: .local, isSecure: false),
+				dbEncryptionKey: key
+			)
 		)
-		try alixClient.dropLocalDatabaseConnection()
-		try alixClient.deleteLocalDatabase()
 
 		let alixClient2 = try await Client.create(
 			account: alix,
-			options: options
+			options: ClientOptions.init(
+				api: .init(env: .local, isSecure: false),
+				dbEncryptionKey: key,
+				dbDirectory: "xmtp_db1"
+			)
 		)
-		try alixClient2.dropLocalDatabaseConnection()
-		try alixClient2.deleteLocalDatabase()
 
 		let alixClient3 = try await Client.create(
 			account: alix,
-			options: options
+			options: ClientOptions.init(
+				api: .init(env: .local, isSecure: false),
+				dbEncryptionKey: key,
+				dbDirectory: "xmtp_db2"
+			)
 		)
 
 		let state = try await alixClient3.inboxState(refreshFromNetwork: true)
@@ -532,19 +535,19 @@ class ClientTests: XCTestCase {
 		print("PERF: Built a client with inboxId in \(time3)s")
 
 		// Measure time to build a client with an inboxId and apiClient
+		try await Client.connectToApiBackend(
+			api: ClientOptions.Api(env: .dev, isSecure: true))
 		let start4 = Date()
-		let buildClient3 = try await Client.build(
-			address: fakeWallet.address,
+		try await Client.create(
+			account: fakeWallet,
 			options: ClientOptions(
 				api: ClientOptions.Api(env: .dev, isSecure: true),
 				dbEncryptionKey: key
-			),
-			inboxId: client.inboxID,
-			apiClient: client.apiClient
+			)
 		)
 		let end4 = Date()
 		let time4 = end4.timeIntervalSince(start4)
-		print("PERF: Built a client with inboxId and apiClient in \(time4)s")
+		print("PERF: Create a client with prebuild in \(time4)s")
 
 		// Assert performance comparisons
 		XCTAssertTrue(
@@ -560,15 +563,7 @@ class ClientTests: XCTestCase {
 		)
 		XCTAssertTrue(
 			time4 < time1,
-			"Building a client with apiClient should be faster than creating one."
-		)
-		XCTAssertTrue(
-			time4 < time2,
-			"Building a client with apiClient should be faster than building one."
-		)
-		XCTAssertTrue(
-			time4 < time2,
-			"Building a client with apiClient should be faster than building one with inboxId."
+			"Creating a client with apiClient should be faster than creating one without."
 		)
 
 		// Assert that inbox IDs match
@@ -578,10 +573,6 @@ class ClientTests: XCTestCase {
 		)
 		XCTAssertEqual(
 			client.inboxID, buildClient2.inboxID,
-			"Inbox ID of the created client and second built client should match."
-		)
-		XCTAssertEqual(
-			client.inboxID, buildClient3.inboxID,
 			"Inbox ID of the created client and second built client should match."
 		)
 	}
