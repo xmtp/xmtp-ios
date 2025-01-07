@@ -19,6 +19,24 @@ extension FfiConversation {
 	}
 }
 
+extension FfiConversationListItem {
+	func groupFromFFI(client: Client) -> Group {
+		Group(ffiGroup: self.conversation(), ffiLastMessage: self.lastMessage(), client: client)
+	}
+
+	func dmFromFFI(client: Client) -> Dm {
+		Dm(ffiConversation: self.conversation(), ffiLastMessage: self.lastMessage(), client: client)
+	}
+
+	func toConversation(client: Client) throws -> Conversation {
+		if try conversation().dmPeerInboxId().isEmpty {
+			return Conversation.group(self.groupFromFFI(client: client))
+		} else {
+			return Conversation.dm(self.dmFromFFI(client: client))
+		}
+	}
+}
+
 extension FfiConversationMember {
 	var fromFFI: Member {
 		Member(ffiGroupMember: self)
