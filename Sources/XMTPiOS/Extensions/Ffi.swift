@@ -21,18 +21,22 @@ extension FfiConversation {
 
 extension FfiConversationListItem {
 	func groupFromFFI(client: Client) -> Group {
-		Group(ffiGroup: self.conversation(), ffiLastMessage: self.lastMessage(), client: client)
+		Group(
+			ffiGroup: self.conversation(), ffiLastMessage: self.lastMessage(),
+			client: client)
 	}
 
 	func dmFromFFI(client: Client) -> Dm {
-		Dm(ffiConversation: self.conversation(), ffiLastMessage: self.lastMessage(), client: client)
+		Dm(
+			ffiConversation: self.conversation(),
+			ffiLastMessage: self.lastMessage(), client: client)
 	}
 
-	func toConversation(client: Client) throws -> Conversation {
-		if try conversation().dmPeerInboxId().isEmpty {
-			return Conversation.group(self.groupFromFFI(client: client))
-		} else {
+	func toConversation(client: Client) async throws -> Conversation {
+		if try await conversation().conversationType() == .dm {
 			return Conversation.dm(self.dmFromFFI(client: client))
+		} else {
+			return Conversation.group(self.groupFromFFI(client: client))
 		}
 	}
 }
@@ -93,6 +97,8 @@ extension ConsentRecord {
 
 extension FfiConsent {
 	var fromFfi: ConsentRecord {
-		ConsentRecord(value: self.entity, entryType: self.entityType.fromFFI, consentType: self.state.fromFFI)
+		ConsentRecord(
+			value: self.entity, entryType: self.entityType.fromFFI,
+			consentType: self.state.fromFFI)
 	}
 }

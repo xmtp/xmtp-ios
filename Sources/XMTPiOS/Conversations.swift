@@ -138,7 +138,7 @@ public actor Conversations {
 		createdAfter: Date? = nil, createdBefore: Date? = nil,
 		limit: Int? = nil,
 		consentState: ConsentState? = nil
-	) throws -> [Conversation] {
+	) async throws -> [Conversation] {
 		var options = FfiListConversationsOptions(
 			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
 			consentState: consentState?.toFFI, includeDuplicateDms: false)
@@ -155,9 +155,13 @@ public actor Conversations {
 		let ffiConversations = try ffiConversations.list(
 			opts: options)
 
-		return try ffiConversations.map {
-			try $0.toConversation(client: client)
+		var conversations: [Conversation] = []
+		for conversation in ffiConversations {
+			let conversation = try await conversation.toConversation(
+				client: client)
+			conversations.append(conversation)
 		}
+		return conversations
 	}
 
 	public func stream(type: ConversationType = .all) -> AsyncThrowingStream<

@@ -25,7 +25,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			return dm.id
 		}
 	}
-	
+
 	public func lastMessage() async throws -> DecodedMessage? {
 		switch self {
 		case let .group(group):
