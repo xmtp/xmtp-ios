@@ -375,15 +375,10 @@ public struct Group: Identifiable, Equatable, Hashable {
 							continuation.finish()
 							return
 						}
-						do {
-							if let message = Message.create(
-								client: self.client, ffiMessage: message)
-							{
-								continuation.yield(message)
-							}
-						} catch {
-							print("Error onMessage \(error)")
-							continuation.finish(throwing: error)
+						if let message = Message.create(
+							client: self.client, ffiMessage: message)
+						{
+							continuation.yield(message)
 						}
 					}
 				)
