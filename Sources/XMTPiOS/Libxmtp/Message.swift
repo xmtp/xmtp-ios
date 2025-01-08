@@ -83,13 +83,13 @@ public struct Message: Identifiable {
 		}
 	}
 
-	private var encodedContent: EncodedContent {
+	public var encodedContent: EncodedContent {
 		get throws {
 			try EncodedContent(serializedBytes: ffiMessage.content)
 		}
 	}
 
-	public static func create(ffiMessage: FfiMessage, client: Client)
+	public static func create(client: Client, ffiMessage: FfiMessage)
 		-> Message?
 	{
 		do {
