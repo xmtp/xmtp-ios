@@ -314,14 +314,12 @@ public final class Client {
 		return inboxId
 	}
 
-	public static func canMessage(
-		accountAddresses: [String],
-		api: ClientOptions.Api
-	) async throws -> [String: Bool] {
-		let address = "0x0000000000000000000000000000000000000000"
+	private static func prepareClient(
+		api: ClientOptions.Api,
+		address: String = "0x0000000000000000000000000000000000000000"
+	) async throws -> FfiXmtpClient {
 		let inboxId = try await getOrCreateInboxId(api: api, address: address)
-
-		let ffiClient = try await LibXMTP.createClient(
+		return try await LibXMTP.createClient(
 			api: connectToApiBackend(api: api),
 			db: nil,
 			encryptionKey: nil,
@@ -331,11 +329,25 @@ public final class Client {
 			legacySignedPrivateKeyProto: nil,
 			historySyncUrl: nil
 		)
+	}
 
-		let result = try await ffiClient.canMessage(
+	public static func canMessage(
+		accountAddresses: [String],
+		api: ClientOptions.Api
+	) async throws -> [String: Bool] {
+		let ffiClient = try await prepareClient(api: api)
+		return try await ffiClient.canMessage(
 			accountAddresses: accountAddresses)
+	}
 
-		return result
+	public static func inboxStatesForInboxIds(
+		inboxIds: [String],
+		api: ClientOptions.Api
+	) async throws -> [InboxState] {
+		let ffiClient = try await prepareClient(api: api)
+		let result = try await ffiClient.addressesFromInboxId(
+			refreshFromNetwork: true, inboxIds: inboxIds)
+		return result.map { InboxState(ffiInboxState: $0) }
 	}
 
 	init(
@@ -462,7 +474,8 @@ public final class Client {
 		do {
 			return Group(
 				ffiGroup: try ffiClient.conversation(
-					conversationId: groupId.hexToData), clientInboxId: self.inboxID)
+					conversationId: groupId.hexToData),
+				clientInboxId: self.inboxID)
 		} catch {
 			return nil
 		}
@@ -507,7 +520,8 @@ public final class Client {
 		do {
 			let conversation = try ffiClient.dmConversation(
 				targetInboxId: inboxId)
-			return Dm(ffiConversation: conversation, clientInboxId: self.inboxID)
+			return Dm(
+				ffiConversation: conversation, clientInboxId: self.inboxID)
 		} catch {
 			return nil
 		}
