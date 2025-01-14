@@ -408,6 +408,23 @@ public final class Client {
 		}
 	}
 
+	public func revokeInstallations(
+		signingKey: SigningKey, installationIds: [String]
+	) async throws {
+		let installations = installationIds.map { $0.hexToData }
+		let signatureRequest = try await ffiClient.revokeInstallations(
+			installationIds: installations)
+		do {
+			try await Client.handleSignature(
+				for: signatureRequest, signingKey: signingKey)
+			try await ffiClient.applySignatureRequest(
+				signatureRequest: signatureRequest)
+		} catch {
+			throw ClientError.creationError(
+				"Failed to sign the message: \(error.localizedDescription)")
+		}
+	}
+
 	public func canMessage(address: String) async throws -> Bool {
 		let canMessage = try await ffiClient.canMessage(accountAddresses: [
 			address
