@@ -256,14 +256,14 @@ public actor Conversations {
 		return newDm
 	}
 
-	public func newConversationWithInboxIds(
+	public func newConversationWithInboxId(
 		with peerInboxId: String
 	) async throws -> Conversation {
-		let dm = try await findOrCreateDmWithInboxIds(with: peerInboxId)
+		let dm = try await findOrCreateDmWithInboxId(with: peerInboxId)
 		return Conversation.dm(dm)
 	}
 
-	public func findOrCreateDmWithInboxIds(with peerInboxId: String)
+	public func findOrCreateDmWithInboxId(with peerInboxId: String)
 		async throws -> Dm
 	{
 		if peerInboxId.lowercased() == client.inboxID.lowercased() {
