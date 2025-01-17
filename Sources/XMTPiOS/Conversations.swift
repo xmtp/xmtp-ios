@@ -75,21 +75,21 @@ public actor Conversations {
 	public func sync() async throws {
 		try await ffiConversations.sync()
 	}
-	public func syncAllConversations(consentState: ConsentState? = nil)
+	public func syncAllConversations(consentStates: [ConsentState]? = nil)
 		async throws -> UInt32
 	{
 		return try await ffiConversations.syncAllConversations(
-			consentState: consentState?.toFFI)
+			consentStates: consentStates?.toFFI)
 	}
 
 	public func listGroups(
 		createdAfter: Date? = nil, createdBefore: Date? = nil,
 		limit: Int? = nil,
-		consentState: ConsentState? = nil
+		consentStates: [ConsentState]? = nil
 	) throws -> [Group] {
 		var options = FfiListConversationsOptions(
 			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
-			consentState: consentState?.toFFI, includeDuplicateDms: false)
+			consentStates: consentStates?.toFFI, includeDuplicateDms: false)
 		if let createdAfter {
 			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
 		}
@@ -111,11 +111,11 @@ public actor Conversations {
 	public func listDms(
 		createdAfter: Date? = nil, createdBefore: Date? = nil,
 		limit: Int? = nil,
-		consentState: ConsentState? = nil
+		consentStates: [ConsentState]? = nil
 	) throws -> [Dm] {
 		var options = FfiListConversationsOptions(
 			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
-			consentState: consentState?.toFFI, includeDuplicateDms: false)
+			consentStates: consentStates?.toFFI, includeDuplicateDms: false)
 		if let createdAfter {
 			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
 		}
@@ -137,11 +137,11 @@ public actor Conversations {
 	public func list(
 		createdAfter: Date? = nil, createdBefore: Date? = nil,
 		limit: Int? = nil,
-		consentState: ConsentState? = nil
+		consentStates: [ConsentState]? = nil
 	) async throws -> [Conversation] {
 		var options = FfiListConversationsOptions(
 			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
-			consentState: consentState?.toFFI, includeDuplicateDms: false)
+			consentStates: consentStates?.toFFI, includeDuplicateDms: false)
 		if let createdAfter {
 			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
 		}
@@ -255,7 +255,9 @@ public actor Conversations {
 		name: String = "",
 		imageUrlSquare: String = "",
 		description: String = "",
-		pinnedFrameUrl: String = ""
+		pinnedFrameUrl: String = "",
+		messageExpirationFromMs: Int64? = nil,
+		messageExpirationMs: Int64? = nil
 	) async throws -> Group {
 		return try await newGroupInternal(
 			with: addresses,
@@ -266,7 +268,9 @@ public actor Conversations {
 			imageUrlSquare: imageUrlSquare,
 			description: description,
 			pinnedFrameUrl: pinnedFrameUrl,
-			permissionPolicySet: nil
+			permissionPolicySet: nil,
+			messageExpirationFromMs: messageExpirationMs,
+			messageExpirationMs: messageExpirationMs
 		)
 	}
 
@@ -276,7 +280,9 @@ public actor Conversations {
 		name: String = "",
 		imageUrlSquare: String = "",
 		description: String = "",
-		pinnedFrameUrl: String = ""
+		pinnedFrameUrl: String = "",
+		messageExpirationFromMs: Int64? = nil,
+		messageExpirationMs: Int64? = nil
 	) async throws -> Group {
 		return try await newGroupInternal(
 			with: addresses,
@@ -286,18 +292,22 @@ public actor Conversations {
 			description: description,
 			pinnedFrameUrl: pinnedFrameUrl,
 			permissionPolicySet: PermissionPolicySet.toFfiPermissionPolicySet(
-				permissionPolicySet)
+				permissionPolicySet),
+			messageExpirationFromMs: messageExpirationMs,
+			messageExpirationMs: messageExpirationMs
 		)
 	}
 
 	private func newGroupInternal(
 		with addresses: [String],
-		permissions: FfiGroupPermissionsOptions = .allMembers,
+		permissions: FfiGroupPermissionsOptions = .default,
 		name: String = "",
 		imageUrlSquare: String = "",
 		description: String = "",
 		pinnedFrameUrl: String = "",
-		permissionPolicySet: FfiPermissionPolicySet? = nil
+		permissionPolicySet: FfiPermissionPolicySet? = nil,
+		messageExpirationFromMs: Int64? = nil,
+		messageExpirationMs: Int64? = nil
 	) async throws -> Group {
 		if addresses.first(where: {
 			$0.lowercased() == client.address.lowercased()
@@ -322,7 +332,9 @@ public actor Conversations {
 				groupImageUrlSquare: imageUrlSquare,
 				groupDescription: description,
 				groupPinnedFrameUrl: pinnedFrameUrl,
-				customPermissionPolicySet: permissionPolicySet
+				customPermissionPolicySet: permissionPolicySet,
+				messageExpirationFromMs: messageExpirationMs,
+				messageExpirationMs: messageExpirationMs
 			)
 		).groupFromFFI(client: client)
 		return group
