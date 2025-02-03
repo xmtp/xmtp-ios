@@ -214,7 +214,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 	
-	var client: Client {
+	public var client: Client {
 		switch self {
 		case let .group(group):
 			return group.client
@@ -222,4 +222,25 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			return dm.client
 		}
 	}
+    
+    public func messagesWithReactions(
+        limit: Int? = nil,
+        beforeNs: Int64? = nil,
+        afterNs: Int64? = nil,
+        direction: SortDirection? = .descending,
+        deliveryStatus: MessageDeliveryStatus = .all
+    ) async throws -> [Message] {
+        switch self {
+        case let .group(group):
+            return try await group.messagesWithReactions(
+                beforeNs: beforeNs, afterNs: afterNs, limit: limit,
+                direction: direction, deliveryStatus: deliveryStatus
+            )
+        case let .dm(dm):
+            return try await dm.messagesWithReactions(
+                beforeNs: beforeNs, afterNs: afterNs, limit: limit,
+                direction: direction, deliveryStatus: deliveryStatus
+            )
+        }
+    }
 }
