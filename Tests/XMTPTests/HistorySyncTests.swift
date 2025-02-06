@@ -106,7 +106,10 @@ class HistorySyncTests: XCTestCase {
 		let state = try await alixClient2.inboxState(refreshFromNetwork: true)
 		XCTAssertEqual(state.installations.count, 2)
 
-		try await group.send(content: "hi")
+        // If we move this line before alixClient2 create, we fail with the group
+		// not being found. history sync seems to get messages, but maybe
+		// not groups?
+        try await group.send(content: "hi")
 
 		try await alixClient.conversations.syncAllConversations()
 		sleep(2)
