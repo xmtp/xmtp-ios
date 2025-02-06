@@ -60,23 +60,22 @@ public struct ClientOptions {
         preAuthenticateToInboxCallback: PreEventCallback? = nil,
         dbEncryptionKey: Data,
         dbDirectory: String? = nil,
-        historySyncUrl: String? = nil
+        historySyncUrl: String? = nil,
+        useDefaultHistorySyncUrl: Bool = true
     ) {
         self.api = api
         self.codecs = codecs
         self.preAuthenticateToInboxCallback = preAuthenticateToInboxCallback
         self.dbEncryptionKey = dbEncryptionKey
         self.dbDirectory = dbDirectory
-        if historySyncUrl == nil {
+        if useDefaultHistorySyncUrl && historySyncUrl == nil {
             switch api.env {
             case .production:
-                self.historySyncUrl =
-                "https://message-history.production.ephemera.network/"
+                self.historySyncUrl = "https://message-history.production.ephemera.network/"
             case .local:
                 self.historySyncUrl = "http://localhost:5558"
             default:
-                self.historySyncUrl =
-                "https://message-history.dev.ephemera.network/"
+                self.historySyncUrl = "https://message-history.dev.ephemera.network/"
             }
         } else {
             self.historySyncUrl = historySyncUrl
