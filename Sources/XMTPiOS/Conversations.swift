@@ -247,8 +247,8 @@ public actor Conversations {
 		let dm =
 			try await ffiConversations
 			.findOrCreateDm(accountAddress: peerAddress.lowercased())
-			
-        return dm.dmFromFFI(client: client)
+
+		return dm.dmFromFFI(client: client)
 	}
 
 	public func newConversationWithInboxId(
@@ -268,7 +268,7 @@ public actor Conversations {
 		let dm =
 			try await ffiConversations
 			.findOrCreateDmByInboxId(inboxId: peerInboxId)
-        return dm.dmFromFFI(client: client)
+		return dm.dmFromFFI(client: client)
 
 	}
 
@@ -278,8 +278,7 @@ public actor Conversations {
 		name: String = "",
 		imageUrlSquare: String = "",
 		description: String = "",
-        messageDisappearingSettings: FfiMessageDisappearingSettings? = nil,
-		messageExpirationMs: Int64? = nil
+		messageDisappearingSettings: MessageDisappearingSettings? = nil
 	) async throws -> Group {
 		return try await newGroupInternal(
 			with: addresses,
@@ -290,7 +289,7 @@ public actor Conversations {
 			imageUrlSquare: imageUrlSquare,
 			description: description,
 			permissionPolicySet: nil,
-            messageDisappearingSettings: messageDisappearingSettings
+			messageDisappearingSettings: messageDisappearingSettings
 		)
 	}
 
@@ -300,7 +299,7 @@ public actor Conversations {
 		name: String = "",
 		imageUrlSquare: String = "",
 		description: String = "",
-        messageDisappearingSettings: FfiMessageDisappearingSettings? = nil
+		messageDisappearingSettings: MessageDisappearingSettings? = nil
 	) async throws -> Group {
 		return try await newGroupInternal(
 			with: addresses,
@@ -310,7 +309,7 @@ public actor Conversations {
 			description: description,
 			permissionPolicySet: PermissionPolicySet.toFfiPermissionPolicySet(
 				permissionPolicySet),
-            messageDisappearingSettings: messageDisappearingSettings
+			messageDisappearingSettings: messageDisappearingSettings
 		)
 	}
 
@@ -321,7 +320,7 @@ public actor Conversations {
 		imageUrlSquare: String = "",
 		description: String = "",
 		permissionPolicySet: FfiPermissionPolicySet? = nil,
-        messageDisappearingSettings: FfiMessageDisappearingSettings? = nil
+		messageDisappearingSettings: MessageDisappearingSettings? = nil
 	) async throws -> Group {
 		if addresses.first(where: {
 			$0.lowercased() == client.address.lowercased()
@@ -346,8 +345,13 @@ public actor Conversations {
 				groupImageUrlSquare: imageUrlSquare,
 				groupDescription: description,
 				customPermissionPolicySet: permissionPolicySet,
-                messageDisappearingSettings: messageDisappearingSettings
-            )
+				messageDisappearingSettings: FfiMessageDisappearingSettings(
+					fromNs: messageDisappearingSettings?
+						.disappearStartingAtNs ?? 0,
+					inNs: messageDisappearingSettings?
+						.disappearDurationInNs ?? 0
+				)
+			)
 		).groupFromFFI(client: client)
 		return group
 	}
@@ -358,7 +362,7 @@ public actor Conversations {
 		name: String = "",
 		imageUrlSquare: String = "",
 		description: String = "",
-        messageDisappearingSettings: FfiMessageDisappearingSettings? = nil
+		messageDisappearingSettings: MessageDisappearingSettings? = nil
 	) async throws -> Group {
 		return try await newGroupInternalWithInboxIds(
 			with: inboxIds,
@@ -369,7 +373,7 @@ public actor Conversations {
 			imageUrlSquare: imageUrlSquare,
 			description: description,
 			permissionPolicySet: nil,
-            messageDisappearingSettings: messageDisappearingSettings
+			messageDisappearingSettings: messageDisappearingSettings
 		)
 	}
 
@@ -379,7 +383,7 @@ public actor Conversations {
 		name: String = "",
 		imageUrlSquare: String = "",
 		description: String = "",
-        messageDisappearingSettings: FfiMessageDisappearingSettings? = nil
+		messageDisappearingSettings: MessageDisappearingSettings? = nil
 	) async throws -> Group {
 		return try await newGroupInternalWithInboxIds(
 			with: inboxIds,
@@ -389,7 +393,7 @@ public actor Conversations {
 			description: description,
 			permissionPolicySet: PermissionPolicySet.toFfiPermissionPolicySet(
 				permissionPolicySet),
-            messageDisappearingSettings: messageDisappearingSettings
+			messageDisappearingSettings: messageDisappearingSettings
 		)
 	}
 
@@ -400,7 +404,7 @@ public actor Conversations {
 		imageUrlSquare: String = "",
 		description: String = "",
 		permissionPolicySet: FfiPermissionPolicySet? = nil,
-        messageDisappearingSettings: FfiMessageDisappearingSettings? = nil
+		messageDisappearingSettings: MessageDisappearingSettings? = nil
 	) async throws -> Group {
 		if inboxIds.contains(where: {
 			$0.lowercased() == client.inboxID.lowercased()
@@ -415,7 +419,12 @@ public actor Conversations {
 				groupImageUrlSquare: imageUrlSquare,
 				groupDescription: description,
 				customPermissionPolicySet: permissionPolicySet,
-                messageDisappearingSettings: messageDisappearingSettings
+				messageDisappearingSettings: FfiMessageDisappearingSettings(
+					fromNs: messageDisappearingSettings?
+						.disappearStartingAtNs ?? 0,
+					inNs: messageDisappearingSettings?
+						.disappearDurationInNs ?? 0
+				)
 			)
 		).groupFromFFI(client: client)
 		return group

@@ -35,6 +35,16 @@ public struct Group: Identifiable, Equatable, Hashable {
 		Topic.groupMessage(id).description
 	}
 
+	public var messageDisappearingSettings: MessageDisappearingSettings? {
+		return try? {
+			guard try ffiGroup.isConversationMessageDisappearingEnabled() else {
+				return nil
+			}
+			return MessageDisappearingSettings.createFromFfi(
+				try ffiGroup.conversationMessageDisappearingSettings())
+		}()
+	}
+
 	func metadata() async throws -> FfiConversationMetadata {
 		return try await ffiGroup.groupMetadata()
 	}
@@ -238,6 +248,21 @@ public struct Group: Identifiable, Equatable, Hashable {
 			metadataField: FfiMetadataField.imageUrlSquare)
 	}
 
+	public func updateMessageDisappearingSettings(
+		_ messageDisappearingSettings: MessageDisappearingSettings?
+	) async throws {
+		if let settings = messageDisappearingSettings {
+			let ffiSettings = FfiMessageDisappearingSettings(
+				fromNs: settings.disappearStartingAtNs,
+				inNs: settings.disappearDurationInNs
+			)
+			try await ffiGroup.updateConversationMessageDisappearingSettings(
+				settings: ffiSettings)
+		} else {
+			try await ffiGroup.removeConversationMessageDisappearingSettings()
+		}
+	}
+
 	public func updateConsentState(state: ConsentState) async throws {
 		try ffiGroup.updateConsentState(state: state.toFFI)
 	}
@@ -425,64 +450,65 @@ public struct Group: Identifiable, Equatable, Hashable {
 			return Message.create(ffiMessage: ffiMessage)
 		}
 	}
-    
-    public func messagesWithReactions(
-        beforeNs: Int64? = nil,
-        afterNs: Int64? = nil,
-        limit: Int? = nil,
-        direction: SortDirection? = .descending,
-        deliveryStatus: MessageDeliveryStatus = .all
-    ) async throws -> [Message] {
-        var options = FfiListMessagesOptions(
-            sentBeforeNs: nil,
-            sentAfterNs: nil,
-            limit: nil,
-            deliveryStatus: nil,
-            direction: nil,
-            contentTypes: nil
-        )
 
-        if let beforeNs {
-            options.sentBeforeNs = beforeNs
-        }
+	public func messagesWithReactions(
+		beforeNs: Int64? = nil,
+		afterNs: Int64? = nil,
+		limit: Int? = nil,
+		direction: SortDirection? = .descending,
+		deliveryStatus: MessageDeliveryStatus = .all
+	) async throws -> [Message] {
+		var options = FfiListMessagesOptions(
+			sentBeforeNs: nil,
+			sentAfterNs: nil,
+			limit: nil,
+			deliveryStatus: nil,
+			direction: nil,
+			contentTypes: nil
+		)
 
-        if let afterNs {
-            options.sentAfterNs = afterNs
-        }
+		if let beforeNs {
+			options.sentBeforeNs = beforeNs
+		}
 
-        if let limit {
-            options.limit = Int64(limit)
-        }
+		if let afterNs {
+			options.sentAfterNs = afterNs
+		}
 
-        let status: FfiDeliveryStatus? = {
-            switch deliveryStatus {
-            case .published:
-                return FfiDeliveryStatus.published
-            case .unpublished:
-                return FfiDeliveryStatus.unpublished
-            case .failed:
-                return FfiDeliveryStatus.failed
-            default:
-                return nil
-            }
-        }()
+		if let limit {
+			options.limit = Int64(limit)
+		}
 
-        options.deliveryStatus = status
+		let status: FfiDeliveryStatus? = {
+			switch deliveryStatus {
+			case .published:
+				return FfiDeliveryStatus.published
+			case .unpublished:
+				return FfiDeliveryStatus.unpublished
+			case .failed:
+				return FfiDeliveryStatus.failed
+			default:
+				return nil
+			}
+		}()
 
-        let direction: FfiDirection? = {
-            switch direction {
-            case .ascending:
-                return FfiDirection.ascending
-            default:
-                return FfiDirection.descending
-            }
-        }()
+		options.deliveryStatus = status
 
-        options.direction = direction
-        
-        return try await ffiGroup.findMessagesWithReactions(opts: options).compactMap {
-            ffiMessageWithReactions in
-            return Message.create(ffiMessage: ffiMessageWithReactions)
-        }
-    }
+		let direction: FfiDirection? = {
+			switch direction {
+			case .ascending:
+				return FfiDirection.ascending
+			default:
+				return FfiDirection.descending
+			}
+		}()
+
+		options.direction = direction
+
+		return try await ffiGroup.findMessagesWithReactions(opts: options)
+			.compactMap {
+				ffiMessageWithReactions in
+				return Message.create(ffiMessage: ffiMessageWithReactions)
+			}
+	}
 }
