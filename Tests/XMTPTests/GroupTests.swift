@@ -1080,7 +1080,6 @@ class GroupTests: XCTestCase {
 		let alixGroup = try fixtures.alixClient.findGroup(
 			groupId: boGroup.id)
 
-		// Precompute values for assertions
 		let boGroupMessagesCount = try await boGroup.messages().count
 		let alixGroupMessagesCount = try await alixGroup?.messages().count
 		let boGroupSettings = boGroup.disappearingMessageSettings
@@ -1092,7 +1091,6 @@ class GroupTests: XCTestCase {
 
 		try await Task.sleep(nanoseconds: 5_000_000_000)  // Sleep for 5 seconds
 
-		// Precompute values again
 		let boGroupMessagesAfterSleep = try await boGroup.messages().count
 		let alixGroupMessagesAfterSleep = try await alixGroup?.messages().count
 
@@ -1122,7 +1120,6 @@ class GroupTests: XCTestCase {
 
 		try await Task.sleep(nanoseconds: 5_000_000_000)  // Sleep for 5 seconds
 
-		// Precompute values
 		let boGroupMessagesPersist = try await boGroup.messages().count
 		let alixGroupMessagesPersist = try await alixGroup?.messages().count
 
@@ -1156,7 +1153,6 @@ class GroupTests: XCTestCase {
 		_ = try await alixGroup?.send(content: "so will this")
 		try await boGroup.sync()
 
-		// Precompute values
 		let boGroupMessagesAfterNewSend = try await boGroup.messages().count
 		let alixGroupMessagesAfterNewSend = try await alixGroup?.messages()
 			.count
@@ -1166,7 +1162,6 @@ class GroupTests: XCTestCase {
 
 		try await Task.sleep(nanoseconds: 6_000_000_000)  // Sleep for 6 seconds to let messages disappear
 
-		// Precompute values
 		let boGroupMessagesFinal = try await boGroup.messages().count
 		let alixGroupMessagesFinal = try await alixGroup?.messages().count
 
