@@ -37,13 +37,13 @@ public struct Group: Identifiable, Equatable, Hashable {
 
 	public var disappearingMessageSettings: DisappearingMessageSettings? {
 		return try? {
-			guard try disappearingMessagesEnabled() else { return nil }
+			guard try isDisappearingMessagesEnabled() else { return nil }
 			return try ffiGroup.conversationMessageDisappearingSettings()
 				.map { DisappearingMessageSettings.createFromFfi($0) }
 		}()
 	}
 
-	public func disappearingMessagesEnabled() throws -> Bool {
+	public func isDisappearingMessagesEnabled() throws -> Bool {
 		return try ffiGroup.isConversationMessageDisappearingEnabled()
 	}
 

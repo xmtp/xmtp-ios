@@ -35,12 +35,12 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func disappearingMessagesEnabled() throws -> Bool {
+	public func isDisappearingMessagesEnabled() throws -> Bool {
 		switch self {
 		case let .group(group):
-			return try group.disappearingMessagesEnabled()
+			return try group.isDisappearingMessagesEnabled()
 		case let .dm(dm):
-			return try dm.disappearingMessagesEnabled()
+			return try dm.isDisappearingMessagesEnabled()
 		}
 	}
 
