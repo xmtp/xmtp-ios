@@ -1,5 +1,5 @@
 //
-//  MessageDisappearingSettings.swift
+//  DisappearingMessageSettings.swift
 //  XMTPiOS
 //
 //  Created by Naomi Plasterer on 2/9/25.
@@ -7,12 +7,12 @@
 
 import LibXMTP
 
-public struct MessageDisappearingSettings {
+public struct DisappearingMessageSettings {
 	public let disappearStartingAtNs: Int64
 	public let disappearDurationInNs: Int64
 
-	static func createFromFfi(_ ffiSettings: FfiMessageDisappearingSettings) -> MessageDisappearingSettings {
-		return MessageDisappearingSettings(
+	static func createFromFfi(_ ffiSettings: FfiMessageDisappearingSettings) -> DisappearingMessageSettings {
+		return DisappearingMessageSettings(
 			disappearStartingAtNs: ffiSettings.fromNs,
 			disappearDurationInNs: ffiSettings.inNs
 		)

@@ -15,15 +15,16 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		Topic.groupMessage(id).description
 	}
 
-	public var messageDisappearingSettings: MessageDisappearingSettings? {
+	public var disappearingMessageSettings: DisappearingMessageSettings? {
 		return try? {
-			guard try ffiConversation.isConversationMessageDisappearingEnabled()
-			else {
-				return nil
-			}
-			return MessageDisappearingSettings.createFromFfi(
-				try ffiConversation.conversationMessageDisappearingSettings())
+			guard try disappearingMessagesEnabled() else { return nil }
+			return try ffiConversation.conversationMessageDisappearingSettings()
+				.map { DisappearingMessageSettings.createFromFfi($0) }
 		}()
+	}
+
+	public func disappearingMessagesEnabled() throws -> Bool {
+		return try ffiConversation.isConversationMessageDisappearingEnabled()
 	}
 
 	func metadata() async throws -> FfiConversationMetadata {
@@ -81,10 +82,10 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		return try ffiConversation.consentState().fromFFI
 	}
 
-	public func updateMessageDisappearingSettings(
-		_ messageDisappearingSettings: MessageDisappearingSettings?
+	public func updateDisappearingMessageSettings(
+		_ disappearingMessageSettings: DisappearingMessageSettings?
 	) async throws {
-		if let settings = messageDisappearingSettings {
+		if let settings = disappearingMessageSettings {
 			let ffiSettings = FfiMessageDisappearingSettings(
 				fromNs: settings.disappearStartingAtNs,
 				inNs: settings.disappearDurationInNs
@@ -93,9 +94,12 @@ public struct Dm: Identifiable, Equatable, Hashable {
 				.updateConversationMessageDisappearingSettings(
 					settings: ffiSettings)
 		} else {
-			try await ffiConversation
-				.removeConversationMessageDisappearingSettings()
+			try await clearDisappearingMessageSettings()
 		}
+	}
+
+	public func clearDisappearingMessageSettings() async throws {
+		try await ffiConversation.removeConversationMessageDisappearingSettings()
 	}
 
 	public func processMessage(messageBytes: Data) async throws -> Message? {

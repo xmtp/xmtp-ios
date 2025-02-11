@@ -35,14 +35,16 @@ public struct Group: Identifiable, Equatable, Hashable {
 		Topic.groupMessage(id).description
 	}
 
-	public var messageDisappearingSettings: MessageDisappearingSettings? {
+	public var disappearingMessageSettings: DisappearingMessageSettings? {
 		return try? {
-			guard try ffiGroup.isConversationMessageDisappearingEnabled() else {
-				return nil
-			}
-			return MessageDisappearingSettings.createFromFfi(
-				try ffiGroup.conversationMessageDisappearingSettings())
+			guard try disappearingMessagesEnabled() else { return nil }
+			return try ffiGroup.conversationMessageDisappearingSettings()
+				.map { DisappearingMessageSettings.createFromFfi($0) }
 		}()
+	}
+
+	public func disappearingMessagesEnabled() throws -> Bool {
+		return try ffiGroup.isConversationMessageDisappearingEnabled()
 	}
 
 	func metadata() async throws -> FfiConversationMetadata {
@@ -248,10 +250,10 @@ public struct Group: Identifiable, Equatable, Hashable {
 			metadataField: FfiMetadataField.imageUrlSquare)
 	}
 
-	public func updateMessageDisappearingSettings(
-		_ messageDisappearingSettings: MessageDisappearingSettings?
+	public func updateDisappearingMessageSettings(
+		_ disappearingMessageSettings: DisappearingMessageSettings?
 	) async throws {
-		if let settings = messageDisappearingSettings {
+		if let settings = disappearingMessageSettings {
 			let ffiSettings = FfiMessageDisappearingSettings(
 				fromNs: settings.disappearStartingAtNs,
 				inNs: settings.disappearDurationInNs
@@ -259,8 +261,12 @@ public struct Group: Identifiable, Equatable, Hashable {
 			try await ffiGroup.updateConversationMessageDisappearingSettings(
 				settings: ffiSettings)
 		} else {
-			try await ffiGroup.removeConversationMessageDisappearingSettings()
+			try await clearDisappearingMessageSettings()
 		}
+	}
+
+	public func clearDisappearingMessageSettings() async throws {
+		try await ffiGroup.removeConversationMessageDisappearingSettings()
 	}
 
 	public func updateConsentState(state: ConsentState) async throws {

@@ -26,12 +26,12 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public var messageDisappearingSettings: MessageDisappearingSettings? {
+	public var messageDisappearingSettings: DisappearingMessageSettings? {
 		switch self {
 		case let .group(group):
 			return group.messageDisappearingSettings
 		case let .dm(dm):
-			return dm.messageDisappearingSettings
+			return dm.disappearingMessageSettings
 		}
 	}
 
@@ -81,11 +81,11 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 	}
 
 	public func updateMessageDisappearingSettings(
-		_ messageDisappearingSettings: MessageDisappearingSettings?
+		_ messageDisappearingSettings: DisappearingMessageSettings?
 	) async throws {
 		switch self {
 		case let .group(group):
-			try await group.updateMessageDisappearingSettings(
+			try await group.updateDisappearingMessageSettings(
 				messageDisappearingSettings)
 		case let .dm(dm):
 			try await dm.updateMessageDisappearingSettings(

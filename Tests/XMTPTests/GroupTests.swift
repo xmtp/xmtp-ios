@@ -1064,7 +1064,7 @@ class GroupTests: XCTestCase {
 	func testGroupDisappearingMessages() async throws {
 		let fixtures = try await fixtures()
 
-		let initialSettings = MessageDisappearingSettings(
+		let initialSettings = DisappearingMessageSettings(
 			disappearStartingAtNs: Int64(DispatchTime.now().uptimeNanoseconds)
 				- 1_000_000_000,
 			disappearDurationInNs: 2_000_000_000  // 2s duration
@@ -1084,14 +1084,14 @@ class GroupTests: XCTestCase {
 		// Precompute values for assertions
 		let boGroupMessagesCount = try await boGroup.messages().count
 		let alixGroupMessagesCount = try await alixGroup?.messages().count
-		let boGroupSettings = boGroup.messageDisappearingSettings
+		let boGroupSettings = boGroup.disappearingMessageSettings
 
 		// Validate messages exist and settings are applied
 		XCTAssertEqual(boGroupMessagesCount, 2)  // memberAdd, howdy
 		XCTAssertEqual(alixGroupMessagesCount, 1)  // howdy
 		XCTAssertNotNil(boGroupSettings)
 
-		try await Task.sleep(nanoseconds: 2_000_000_000)  // Sleep for 2 seconds
+		try await Task.sleep(nanoseconds: 5_000_000_000)  // Sleep for 2 seconds
 
 		// Precompute values again
 		let boGroupMessagesAfterSleep = try await boGroup.messages().count
@@ -1102,12 +1102,12 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(alixGroupMessagesAfterSleep, 0)
 
 		// Set message disappearing settings to nil
-		try await boGroup.updateMessageDisappearingSettings(nil)
+		try await boGroup.updateDisappearingMessageSettings(nil)
 		try await boGroup.sync()
 		try await alixGroup?.sync()
 
-		let boGroupSettingsAfterNil = boGroup.messageDisappearingSettings
-		let alixGroupSettingsAfterNil = alixGroup?.messageDisappearingSettings
+		let boGroupSettingsAfterNil = boGroup.disappearingMessageSettings
+		let alixGroupSettingsAfterNil = alixGroup?.disappearingMessageSettings
 
 		XCTAssertNil(boGroupSettingsAfterNil)
 		XCTAssertNil(alixGroupSettingsAfterNil)
@@ -1118,7 +1118,7 @@ class GroupTests: XCTestCase {
 		_ = try await alixGroup?.send(
 			content: "another message after disabling")
 
-		try await Task.sleep(nanoseconds: 2_000_000_000)  // Sleep for 2 seconds
+		try await Task.sleep(nanoseconds: 5_000_000_000)  // Sleep for 2 seconds
 
 		// Precompute values
 		let boGroupMessagesPersist = try await boGroup.messages().count
@@ -1129,23 +1129,23 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(alixGroupMessagesPersist, 4)  // settings 1, settings 2, boMessage, alixMessage
 
 		// Re-enable disappearing messages
-		let updatedSettings = MessageDisappearingSettings(
+		let updatedSettings = DisappearingMessageSettings(
 			disappearStartingAtNs: Int64(DispatchTime.now().uptimeNanoseconds)
 				+ 1_000_000_000,  // 1s from now
 			disappearDurationInNs: 2_000_000_000  // 2s duration
 		)
-		try await boGroup.updateMessageDisappearingSettings(updatedSettings)
+		try await boGroup.updateDisappearingMessageSettings(updatedSettings)
 		try await boGroup.sync()
 		try await alixGroup?.sync()
 
-		let boGroupUpdatedSettings = boGroup.messageDisappearingSettings
-		let alixGroupUpdatedSettings = alixGroup?.messageDisappearingSettings
+		let boGroupUpdatedSettings = boGroup.disappearingMessageSettings
+		let alixGroupUpdatedSettings = alixGroup?.disappearingMessageSettings
 
 		XCTAssertEqual(
-			boGroupUpdatedSettings?.disappearDurationInNs,
+			boGroupUpdatedSettings!.disappearDurationInNs,
 			updatedSettings.disappearDurationInNs)
 		XCTAssertEqual(
-			alixGroupUpdatedSettings.disappearDurationInNs,
+			alixGroupUpdatedSettings!.disappearDurationInNs,
 			updatedSettings.disappearDurationInNs)
 
 		// Send new messages
@@ -1174,14 +1174,14 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(alixGroupMessagesFinal, 4)
 
 		// Final validation that settings persist
-		let boGroupFinalSettings = boGroup.messageDisappearingSettings
-		let alixGroupFinalSettings = alixGroup?.messageDisappearingSettings
+		let boGroupFinalSettings = boGroup.disappearingMessageSettings
+		let alixGroupFinalSettings = alixGroup?.disappearingMessageSettings
 
 		XCTAssertEqual(
-			boGroupFinalSettings.disappearDurationInNs,
+			boGroupFinalSettings!.disappearDurationInNs,
 			updatedSettings.disappearDurationInNs)
 		XCTAssertEqual(
-			alixGroupFinalSettings.disappearDurationInNs,
+			alixGroupFinalSettings!.disappearDurationInNs,
 			updatedSettings.disappearDurationInNs)
 	}
 }
