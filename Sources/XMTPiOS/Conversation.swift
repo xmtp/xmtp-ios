@@ -26,12 +26,21 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public var messageDisappearingSettings: DisappearingMessageSettings? {
+	public var disappearingMessageSettings: DisappearingMessageSettings? {
 		switch self {
 		case let .group(group):
-			return group.messageDisappearingSettings
+			return group.disappearingMessageSettings
 		case let .dm(dm):
 			return dm.disappearingMessageSettings
+		}
+	}
+
+	public func disappearingMessagesEnabled() throws -> Bool {
+		switch self {
+		case let .group(group):
+			return try group.disappearingMessagesEnabled()
+		case let .dm(dm):
+			return try dm.disappearingMessagesEnabled()
 		}
 	}
 
@@ -80,16 +89,25 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func updateMessageDisappearingSettings(
-		_ messageDisappearingSettings: DisappearingMessageSettings?
+	public func updateDisappearingMessageSettings(
+		_ disappearingMessageSettings: DisappearingMessageSettings?
 	) async throws {
 		switch self {
 		case let .group(group):
 			try await group.updateDisappearingMessageSettings(
-				messageDisappearingSettings)
+				disappearingMessageSettings)
 		case let .dm(dm):
-			try await dm.updateMessageDisappearingSettings(
-				messageDisappearingSettings)
+			try await dm.updateDisappearingMessageSettings(
+				disappearingMessageSettings)
+		}
+	}
+
+	public func clearDisappearingMessageSettings() async throws {
+		switch self {
+		case let .group(group):
+			try await group.clearDisappearingMessageSettings()
+		case let .dm(dm):
+			try await dm.clearDisappearingMessageSettings()
 		}
 	}
 
