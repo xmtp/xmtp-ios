@@ -289,7 +289,7 @@ class DmTests: XCTestCase {
 
 		let initialSettings = DisappearingMessageSettings(
 			disappearStartingAtNs: 1_000_000_000,
-			disappearDurationInNs: 1_000_000_000  // 1s duration
+			retentionDurationInNs: 1_000_000_000  // 1s duration
 		)
 
 		// Create group with disappearing messages enabled
@@ -353,7 +353,7 @@ class DmTests: XCTestCase {
 		let updatedSettings = await DisappearingMessageSettings(
 			disappearStartingAtNs: try boDm.messages().first!.sentAtNs
 				+ 1_000_000_000,  // 1s from now
-			disappearDurationInNs: 1_000_000_000  // 2s duration
+			retentionDurationInNs: 1_000_000_000  // 2s duration
 		)
 		try await boDm.updateDisappearingMessageSettings(updatedSettings)
 		try await boDm.sync()
@@ -364,11 +364,11 @@ class DmTests: XCTestCase {
 		let alixGroupUpdatedSettings = alixDm?.disappearingMessageSettings
 
 		XCTAssertEqual(
-			boGroupUpdatedSettings!.disappearDurationInNs,
-			updatedSettings.disappearDurationInNs)
+			boGroupUpdatedSettings!.retentionDurationInNs,
+			updatedSettings.retentionDurationInNs)
 		XCTAssertEqual(
-			alixGroupUpdatedSettings!.disappearDurationInNs,
-			updatedSettings.disappearDurationInNs)
+			alixGroupUpdatedSettings!.retentionDurationInNs,
+			updatedSettings.retentionDurationInNs)
 
 		// Send new messages
 		_ = try await boDm.send(content: "this will disappear soon")
@@ -395,11 +395,11 @@ class DmTests: XCTestCase {
 		let alixGroupFinalSettings = alixDm?.disappearingMessageSettings
 
 		XCTAssertEqual(
-			boGroupFinalSettings!.disappearDurationInNs,
-			updatedSettings.disappearDurationInNs)
+			boGroupFinalSettings!.retentionDurationInNs,
+			updatedSettings.retentionDurationInNs)
 		XCTAssertEqual(
-			alixGroupFinalSettings!.disappearDurationInNs,
-			updatedSettings.disappearDurationInNs)
+			alixGroupFinalSettings!.retentionDurationInNs,
+			updatedSettings.retentionDurationInNs)
 		XCTAssert(try boDm.isDisappearingMessagesEnabled())
 		XCTAssert(try alixDm!.isDisappearingMessagesEnabled())
 	}

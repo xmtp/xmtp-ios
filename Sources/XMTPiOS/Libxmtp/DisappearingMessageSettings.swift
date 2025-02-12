@@ -9,12 +9,12 @@ import LibXMTP
 
 public struct DisappearingMessageSettings {
 	public let disappearStartingAtNs: Int64
-	public let disappearDurationInNs: Int64
+	public let retentionDurationInNs: Int64
 
 	static func createFromFfi(_ ffiSettings: FfiMessageDisappearingSettings) -> DisappearingMessageSettings {
 		return DisappearingMessageSettings(
 			disappearStartingAtNs: ffiSettings.fromNs,
-			disappearDurationInNs: ffiSettings.inNs
+			retentionDurationInNs: ffiSettings.inNs
 		)
 	}
 }

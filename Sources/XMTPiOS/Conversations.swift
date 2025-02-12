@@ -258,7 +258,7 @@ public actor Conversations {
 					messageDisappearingSettings: FfiMessageDisappearingSettings(
 						fromNs: disappearingMessageSettings?
 							.disappearStartingAtNs ?? 0,
-						inNs: disappearingMessageSettings?.disappearDurationInNs
+						inNs: disappearingMessageSettings?.retentionDurationInNs
 							?? 0)))
 
 		return dm.dmFromFFI(client: client)
@@ -292,7 +292,7 @@ public actor Conversations {
 					messageDisappearingSettings: FfiMessageDisappearingSettings(
 						fromNs: disappearingMessageSettings?
 							.disappearStartingAtNs ?? 0,
-						inNs: disappearingMessageSettings?.disappearDurationInNs
+						inNs: disappearingMessageSettings?.retentionDurationInNs
 							?? 0)))
 		return dm.dmFromFFI(client: client)
 
@@ -375,7 +375,7 @@ public actor Conversations {
 					fromNs: disappearingMessageSettings?
 						.disappearStartingAtNs ?? 0,
 					inNs: disappearingMessageSettings?
-						.disappearDurationInNs ?? 0
+						.retentionDurationInNs ?? 0
 				)
 			)
 		).groupFromFFI(client: client)
@@ -449,7 +449,7 @@ public actor Conversations {
 					fromNs: disappearingMessageSettings?
 						.disappearStartingAtNs ?? 0,
 					inNs: disappearingMessageSettings?
-						.disappearDurationInNs ?? 0
+						.retentionDurationInNs ?? 0
 				)
 			)
 		).groupFromFFI(client: client)

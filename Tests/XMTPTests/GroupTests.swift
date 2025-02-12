@@ -1066,7 +1066,7 @@ class GroupTests: XCTestCase {
 
 		let initialSettings = DisappearingMessageSettings(
 			disappearStartingAtNs: 1_000_000_000,
-			disappearDurationInNs: 1_000_000_000  // 1s duration
+			retentionDurationInNs: 1_000_000_000  // 1s duration
 		)
 
 		// Create group with disappearing messages enabled
@@ -1131,7 +1131,7 @@ class GroupTests: XCTestCase {
 		let updatedSettings = await DisappearingMessageSettings(
 			disappearStartingAtNs: try boGroup.messages().first!.sentAtNs
 				+ 1_000_000_000,  // 1s from now
-			disappearDurationInNs: 1_000_000_000  // 2s duration
+			retentionDurationInNs: 1_000_000_000  // 2s duration
 		)
 		try await boGroup.updateDisappearingMessageSettings(updatedSettings)
 		try await boGroup.sync()
@@ -1142,11 +1142,11 @@ class GroupTests: XCTestCase {
 		let alixGroupUpdatedSettings = alixGroup?.disappearingMessageSettings
 
 		XCTAssertEqual(
-			boGroupUpdatedSettings!.disappearDurationInNs,
-			updatedSettings.disappearDurationInNs)
+			boGroupUpdatedSettings!.retentionDurationInNs,
+			updatedSettings.retentionDurationInNs)
 		XCTAssertEqual(
-			alixGroupUpdatedSettings!.disappearDurationInNs,
-			updatedSettings.disappearDurationInNs)
+			alixGroupUpdatedSettings!.retentionDurationInNs,
+			updatedSettings.retentionDurationInNs)
 
 		// Send new messages
 		_ = try await boGroup.send(content: "this will disappear soon")
@@ -1174,11 +1174,11 @@ class GroupTests: XCTestCase {
 		let alixGroupFinalSettings = alixGroup?.disappearingMessageSettings
 
 		XCTAssertEqual(
-			boGroupFinalSettings!.disappearDurationInNs,
-			updatedSettings.disappearDurationInNs)
+			boGroupFinalSettings!.retentionDurationInNs,
+			updatedSettings.retentionDurationInNs)
 		XCTAssertEqual(
-			alixGroupFinalSettings!.disappearDurationInNs,
-			updatedSettings.disappearDurationInNs)
+			alixGroupFinalSettings!.retentionDurationInNs,
+			updatedSettings.retentionDurationInNs)
 		XCTAssert(try boGroup.isDisappearingMessagesEnabled())
 		XCTAssert(try alixGroup!.isDisappearingMessagesEnabled())
 	}

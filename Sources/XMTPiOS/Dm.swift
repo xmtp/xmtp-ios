@@ -88,7 +88,7 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		if let settings = disappearingMessageSettings {
 			let ffiSettings = FfiMessageDisappearingSettings(
 				fromNs: settings.disappearStartingAtNs,
-				inNs: settings.disappearDurationInNs
+				inNs: settings.retentionDurationInNs
 			)
 			try await ffiConversation
 				.updateConversationMessageDisappearingSettings(
