@@ -368,14 +368,16 @@ public final class Client {
 		message:
 			"This function is delicate and should be used with caution. Adding a wallet already associated with an inboxId will cause the wallet to loose access to that inbox. See: inboxIdFromAddress(address)"
 	)
-	public func addAccount(newAccount: SigningKey, changeInboxId: Bool = false)
+	public func addAccount(
+		newAccount: SigningKey, allowReassignInboxId: Bool = false
+	)
 		async throws
 	{
 		let inboxId: String? =
-			changeInboxId
+			allowReassignInboxId
 			? nil : try await inboxIdFromAddress(address: newAccount.address)
 
-		if changeInboxId || (inboxId?.isEmpty ?? true) {
+		if allowReassignInboxId || (inboxId?.isEmpty ?? true) {
 			let signatureRequest = try await ffiClient.addWallet(
 				newWalletAddress: newAccount.address.lowercased())
 
