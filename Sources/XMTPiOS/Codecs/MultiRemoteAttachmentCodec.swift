@@ -32,6 +32,10 @@ public struct MultiRemoteAttachment {
     }
     
     public let remoteAttachments: [RemoteAttachmentInfo]
+
+	public init(remoteAttachments: [RemoteAttachmentInfo]) {
+        self.remoteAttachments = remoteAttachments
+    }
     
     public struct RemoteAttachmentInfo {
         public let url: String
