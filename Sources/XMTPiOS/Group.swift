@@ -292,9 +292,16 @@ public struct Group: Identifiable, Equatable, Hashable {
 	}
 
 	public func send(encodedContent: EncodedContent) async throws -> String {
-		let messageId = try await ffiGroup.send(
-			contentBytes: encodedContent.serializedData())
-		return messageId.toHex
+		do {
+			let messageId = try await ffiGroup.send(
+				contentBytes: encodedContent.serializedData())
+            print("CAMERON message send succeeded with id: \(messageId.toHex)")
+
+			return messageId.toHex
+		} catch {
+			print("CAMERON Error sending message to group: \(error)")
+			throw error
+		}
 	}
 
 	public func encodeContent<T>(content: T, options: SendOptions?) async throws
