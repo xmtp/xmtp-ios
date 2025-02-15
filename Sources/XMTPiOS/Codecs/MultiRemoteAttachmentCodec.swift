@@ -161,7 +161,7 @@ public struct MultiRemoteAttachmentCodec: ContentCodec {
             nonce: remoteAttachment.nonce,
             payload: encryptedPayload,
             filename: remoteAttachment.filename,
-            contentLength: remoteAttachment.contentLength != nil ? UInt32(remoteAttachment.contentLength!) : nil
+            contentLength: remoteAttachment.contentLength.map(UInt32.init)
         )
     }
     
