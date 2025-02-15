@@ -96,30 +96,9 @@ class MultiRemoteAttachmentTests: XCTestCase {
         // Wrap them up in a single MultiRemoteAttachment
         let multiRemoteAttachment = MultiRemoteAttachment(remoteAttachments: remoteAttachmentInfos)
         
-        // Send it
-        //                        _ = try await alixConversation.send(
-        //                            content: multiRemoteAttachment,
-        //                            options: .init(contentType: ContentTypeMultiRemoteAttachment)
-        //                        )
         // Add debugging checks before sending
         let encodedContent = try MultiRemoteAttachmentCodec().encode(content: multiRemoteAttachment)
-//        let encodedContentTextCodec = try TextCodec().encode(content: "this is a text message")
-        
-        // Check the encoded content type
-        print("CAMERON- Encoded content type: \(encodedContent.type.id)")
-        
-        // Verify the encoded content has data
-        print("CAMERON- Encoded content data length: \(encodedContent.content.count) bytes")
-        
-        // Check the multiRemoteAttachment structure
-        print("CAMERON- Number of attachments: \(multiRemoteAttachment.remoteAttachments.count)")
-        for (index, attachment) in multiRemoteAttachment.remoteAttachments.enumerated() {
-            print("CAMERON- Attachment \(index + 1):")
-            print("CAMERON-   - URL: \(attachment.url)")
-            print("CAMERON-   - Filename: \(attachment.filename)")
-            print("CAMERON-   - Content Length: \(attachment.contentLength)")
-            print("CAMERON-   - Scheme: \(attachment.scheme)")
-        }
+
         
         // Example usage:
         let isRegistered1 = Client.codecRegistry.isRegistered(codec: AttachmentCodec())
@@ -130,7 +109,6 @@ class MultiRemoteAttachmentTests: XCTestCase {
         
         // Try sending with the debugged encoded content
         _ = try await alixConversation.send(encodedContent: encodedContent)
-//        _ = try await alixConversation.send(encodedContent: encodedContentTextCodec)
 
         // Fetch messages
         try await alixConversation.sync()

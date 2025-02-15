@@ -295,11 +295,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 		do {
 			let messageId = try await ffiGroup.send(
 				contentBytes: encodedContent.serializedData())
-            print("CAMERON message send succeeded with id: \(messageId.toHex)")
-
 			return messageId.toHex
 		} catch {
-			print("CAMERON Error sending message to group: \(error)")
 			throw error
 		}
 	}
