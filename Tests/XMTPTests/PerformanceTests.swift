@@ -7,6 +7,147 @@ import XMTPTestHelpers
 
 @available(iOS 15, *)
 class PerformanceTests: XCTestCase {
+	static var dm: Dm?
+	static var group: Group?
+
+	func test1_CreateDM() async throws {
+		let fixtures = try await fixtures(
+			clientOptions: ClientOptions.Api(
+				env: XMTPEnvironment.dev, isSecure: true))
+
+		measure {
+			let expectation = expectation(description: "Async create DM")
+			let startTime = CFAbsoluteTimeGetCurrent()
+
+			Task {
+				do {
+					PerformanceTests.dm = try await fixtures.alixClient
+						.conversations.findOrCreateDm(
+							with: fixtures.boClient.address)
+
+					let elapsedTime =
+						(CFAbsoluteTimeGetCurrent() - startTime) * 1000
+					print("test1_CreateDM execution time: \(elapsedTime) ms")
+					XCTAssertLessThanOrEqual(
+						elapsedTime, 500, "CreateDM took too long!")
+
+					expectation.fulfill()
+				} catch {
+					XCTFail("Failed to create DM: \(error)")
+				}
+			}
+			wait(for: [expectation], timeout: 10)
+		}
+
+		XCTAssertNotNil(PerformanceTests.dm)
+	}
+
+	func test2_SendGm() async throws {
+		let fixtures = try await fixtures(
+			clientOptions: ClientOptions.Api(
+				env: XMTPEnvironment.dev, isSecure: true))
+
+		guard let dm = PerformanceTests.dm else {
+			XCTFail("DM is nil")
+			return
+		}
+		let gmMessage = "gm-\(Int.random(in: 1...999999))"
+
+		measure {
+			let expectation = expectation(description: "Async send GM")
+			let startTime = CFAbsoluteTimeGetCurrent()
+
+			Task {
+				do {
+					_ = try await dm.send(content: gmMessage)
+
+					let elapsedTime =
+						(CFAbsoluteTimeGetCurrent() - startTime) * 1000
+					print("test2_SendGm execution time: \(elapsedTime) ms")
+					XCTAssertLessThanOrEqual(
+						elapsedTime, 500, "SendGM took too long!")
+
+					expectation.fulfill()
+				} catch {
+					XCTFail("Failed to send GM: \(error)")
+				}
+			}
+			wait(for: [expectation], timeout: 10)
+		}
+	}
+
+	func test3_CreateGroup() async throws {
+		let fixtures = try await fixtures(
+			clientOptions: ClientOptions.Api(
+				env: XMTPEnvironment.dev, isSecure: true))
+
+		measure {
+			let expectation = expectation(description: "Async create group")
+			let startTime = CFAbsoluteTimeGetCurrent()
+
+			Task {
+				do {
+					PerformanceTests.group = try await fixtures.alixClient
+						.conversations.newGroup(
+							with: [
+								fixtures.boClient.address,
+								fixtures.caroClient.address,
+								fixtures.davonClient.address,
+							]
+						)
+
+					let elapsedTime =
+						(CFAbsoluteTimeGetCurrent() - startTime) * 1000
+					print("test3_CreateGroup execution time: \(elapsedTime) ms")
+					XCTAssertLessThanOrEqual(
+						elapsedTime, 500, "CreateGroup took too long!")
+
+					expectation.fulfill()
+				} catch {
+					XCTFail("Failed to create group: \(error)")
+				}
+			}
+			wait(for: [expectation], timeout: 10)
+		}
+
+		XCTAssertNotNil(PerformanceTests.group)
+	}
+
+	func test4_SendGmInGroup() async throws {
+		let fixtures = try await fixtures(
+			clientOptions: ClientOptions.Api(
+				env: XMTPEnvironment.dev, isSecure: true))
+
+		guard let group = PerformanceTests.group else {
+			XCTFail("Group is nil")
+			return
+		}
+		let groupMessage = "gm-\(Int.random(in: 1...999999))"
+
+		measure {
+			let expectation = expectation(description: "Async send GM in group")
+			let startTime = CFAbsoluteTimeGetCurrent()
+
+			Task {
+				do {
+					_ = try await group.send(content: groupMessage)
+
+					let elapsedTime =
+						(CFAbsoluteTimeGetCurrent() - startTime) * 1000
+					print(
+						"test4_SendGmInGroup execution time: \(elapsedTime) ms")
+					XCTAssertLessThanOrEqual(
+						elapsedTime, 500, "SendGmInGroup took too long!")
+
+					expectation.fulfill()
+				} catch {
+					XCTFail("Failed to send GM in group: \(error)")
+				}
+			}
+			wait(for: [expectation], timeout: 10)
+		}
+	}
+
 	func testCreatesADevClientPerformance() async throws {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let fakeWallet = try PrivateKey.generate()

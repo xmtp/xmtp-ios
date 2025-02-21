@@ -16,9 +16,9 @@ class ConversationTests: XCTestCase {
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
 			with: fixtures.caro.walletAddress)
 
-		let sameDm = try await fixtures.boClient.findConversationByTopic(
+		let sameDm = try await fixtures.boClient.conversations.findConversationByTopic(
 			topic: dm.topic)
-		let sameGroup = try await fixtures.boClient.findConversationByTopic(
+		let sameGroup = try await fixtures.boClient.conversations.findConversationByTopic(
 			topic: group.topic)
 
 		XCTAssertEqual(group.id, sameGroup?.id)
@@ -236,11 +236,11 @@ class ConversationTests: XCTestCase {
 		_ = try await fixtures.caroClient.conversations.syncAllConversations()
 		_ = try await fixtures.boClient.conversations.syncAllConversations()
 
-		let boGroup = try fixtures.boClient.findGroup(groupId: alixGroup.id)!
-		let caroGroup = try fixtures.caroClient.findGroup(
+		let boGroup = try await fixtures.boClient.conversations.findGroup(groupId: alixGroup.id)!
+		let caroGroup = try await fixtures.caroClient.conversations.findGroup(
 			groupId: alixGroup.id)!
-		let boGroup2 = try fixtures.boClient.findGroup(groupId: caroGroup2.id)!
-		let alixGroup2 = try fixtures.alixClient.findGroup(
+		let boGroup2 = try await fixtures.boClient.conversations.findGroup(groupId: caroGroup2.id)!
+		let alixGroup2 = try await fixtures.alixClient.conversations.findGroup(
 			groupId: caroGroup2.id)!
 
 		// Start listening for messages
