@@ -230,11 +230,6 @@ public final class Client {
 			inboxId: recoveredInboxId
 		)
 
-		// Register codecs
-		for codec in clientOptions.codecs {
-			register(codec: codec)
-		}
-
 		return try Client(
 			address: accountAddress,
 			ffiClient: ffiClient,
