@@ -20,13 +20,6 @@ class ConversationTests: XCTestCase {
 			topic: dm.topic)
 		let sameGroup = try await fixtures.boClient.conversations.findConversationByTopic(
 			topic: group.topic)
-		
-		switch sameGroup {
-		case .dm(let dm):
-			try dm.peerInboxId
-		case .group(let group):
-			try group.groupName()
-		}
 
 		XCTAssertEqual(group.id, sameGroup?.id)
 		XCTAssertEqual(dm.id, sameDm?.id)
