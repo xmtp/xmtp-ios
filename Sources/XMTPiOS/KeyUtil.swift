@@ -28,26 +28,40 @@ enum KeyUtilx {
 
 		var pubKey = secp256k1_pubkey()
 		let status = data.withUnsafeBytes { privKeyPointer -> Int32 in
-			return secp256k1_ec_pubkey_create(
-				ctx, &pubKey,
-				privKeyPointer.baseAddress!.assumingMemoryBound(to: UInt8.self))
+			guard
+				let privKeyBaseAddress = privKeyPointer.baseAddress?
+					.assumingMemoryBound(to: UInt8.self)
+			else {
+				return 0  // Indicate failure if memory binding fails
+			}
+			return secp256k1_ec_pubkey_create(ctx, &pubKey, privKeyBaseAddress)
 		}
 
 		guard status == 1 else { throw KeyUtilError.privateKeyInvalid }  // Failed to create public key
 
-		// Serialize public key (compressed format 33 bytes or uncompressed 65 bytes)
+		// Serialize public key (uncompressed 65 bytes or compressed 33 bytes)
 		var output = Data(repeating: 0, count: 65)
 		var outputLength = output.count
 
-		output.withUnsafeMutableBytes { outputPointer in
-			secp256k1_ec_pubkey_serialize(
+		let result = output.withUnsafeMutableBytes { outputPointer -> Int32 in
+			guard
+				let outputBaseAddress = outputPointer.baseAddress?
+					.assumingMemoryBound(to: UInt8.self)
+			else {
+				return 0  // Indicate failure if memory binding fails
+			}
+			return secp256k1_ec_pubkey_serialize(
 				ctx,
-				outputPointer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+				outputBaseAddress,
 				&outputLength,
 				&pubKey,
-				UInt32(SECP256K1_EC_UNCOMPRESSED) // Change to `SECP256K1_EC_COMPRESSED` for 33 bytes
+				UInt32(SECP256K1_EC_UNCOMPRESSED)  // Use `SECP256K1_EC_COMPRESSED` for 33 bytes
 			)
 		}
+
+		guard result == 1 else {
+			throw KeyUtilError.parseError
+		}  // Ensure serialization succeeded
 
 		return output.prefix(outputLength)
 	}
