@@ -33,7 +33,7 @@ public struct PublicIdentity {
 	}
 
 	public var identifier: String {
-		return ffiPrivate.identifier
+		return ffiPrivate.identifier.lowercased()
 	}
 
 	public var relyingPartner: String? {
