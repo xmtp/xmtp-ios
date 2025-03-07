@@ -55,7 +55,7 @@ class ReactionTests: XCTestCase {
     func testCanUseReactionCodec() async throws {
         let fixtures = try await fixtures()
         let conversation = try await fixtures.alixClient.conversations
-            .newConversation(with: fixtures.boClient.address)
+			.newConversation(with: fixtures.boClient.inboxID)
         
         Client.register(codec: ReactionCodec())
         
@@ -136,7 +136,7 @@ class ReactionTests: XCTestCase {
         
         let fixtures = try await fixtures()
         let conversation = try await fixtures.alixClient.conversations
-            .newConversation(with: fixtures.boClient.address)
+			.newConversation(with: fixtures.boClient.inboxID)
         
         _ = try await conversation.send(text: "hey alice 2 bob")
         
@@ -179,7 +179,7 @@ class ReactionTests: XCTestCase {
         
         let fixtures = try await fixtures()
         let conversation = try await fixtures.alixClient.conversations
-            .newConversation(with: fixtures.boClient.address)
+			.newConversation(with: fixtures.boClient.inboxID)
         
         // Send initial message
         _ = try await conversation.send(text: "hey alice 2 bob")

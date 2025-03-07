@@ -47,7 +47,7 @@ class MultiRemoteAttachmentTests: XCTestCase {
         
         // Create a conversation
         let alixConversation = try await alixClient.conversations
-            .newConversation(with: boClient.address)
+			.newConversation(with: boClient.inboxID)
         
         // Create some dummy attachments to send
         let attachment1 = Attachment(

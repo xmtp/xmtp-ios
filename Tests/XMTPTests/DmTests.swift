@@ -11,7 +11,7 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.caro.walletAddress)
+			with: fixtures.caroClient.inboxID)
 
 		let caroDm = try await fixtures.boClient.conversations.findDmByInboxId(
 			inboxId: fixtures.caroClient.inboxID)
@@ -26,12 +26,10 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.caro.walletAddress)
+			with: fixtures.caroClient.inboxID)
 
-		let caroDm = try await fixtures.boClient.conversations.findDmByAddress(
-			address: fixtures.caroClient.address)
-		let alixDm = try await fixtures.boClient.conversations.findDmByAddress(
-			address: fixtures.alixClient.address)
+		let caroDm = try await fixtures.boClient.conversations.findDmByIdentity(publicIdentity: fixtures.caro.identity)
+		let alixDm = try await fixtures.boClient.conversations.findDmByIdentity(publicIdentity: fixtures.alix.identity)
 
 		XCTAssertNil(alixDm)
 		XCTAssertEqual(caroDm?.id, dm.id)
@@ -41,22 +39,22 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let convo1 = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress)
+			with: fixtures.alixClient.inboxID)
 		try await fixtures.alixClient.conversations.sync()
 		let sameConvo1 = try await fixtures.alixClient.conversations
-			.findOrCreateDm(with: fixtures.bo.walletAddress)
+			.findOrCreateDm(with: fixtures.boClient.inboxID)
 		XCTAssertEqual(convo1.id, sameConvo1.id)
 	}
 
-	func testCanCreateADmWithInboxId() async throws {
+	func testCanCreateADmWithIdentity() async throws {
 		let fixtures = try await fixtures()
 
 		let convo1 = try await fixtures.boClient.conversations
-			.findOrCreateDmWithInboxId(
-				with: fixtures.alixClient.inboxID)
+			.findOrCreateDmWithIdentity(
+				with: fixtures.alix.identity)
 		try await fixtures.alixClient.conversations.sync()
 		let sameConvo1 = try await fixtures.alixClient.conversations
-			.findOrCreateDmWithInboxId(with: fixtures.boClient.inboxID)
+			.newConversationWithIdentity(with: fixtures.bo.identity)
 		XCTAssertEqual(convo1.id, sameConvo1.id)
 	}
 
@@ -64,7 +62,7 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress)
+			with: fixtures.alixClient.inboxID)
 		let members = try await dm.members
 		XCTAssertEqual(members.count, 2)
 
@@ -77,7 +75,7 @@ class DmTests: XCTestCase {
 
 		await assertThrowsAsyncError(
 			try await fixtures.alixClient.conversations.findOrCreateDm(
-				with: fixtures.alix.address)
+				with: fixtures.alixClient.inboxID)
 		)
 	}
 
@@ -86,8 +84,8 @@ class DmTests: XCTestCase {
 		let nonRegistered = try PrivateKey.generate()
 
 		await assertThrowsAsyncError(
-			try await fixtures.alixClient.conversations.findOrCreateDm(
-				with: nonRegistered.address)
+			try await fixtures.alixClient.conversations.findOrCreateDmWithIdentity(
+				with: nonRegistered.identity)
 		)
 	}
 
@@ -95,7 +93,7 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress)
+			with: fixtures.alixClient.inboxID)
 		_ = try await dm.send(content: "howdy")
 		_ = try await dm.send(content: "gm")
 		try await dm.sync()
@@ -110,11 +108,11 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.caro.walletAddress)
+			with: fixtures.caroClient.inboxID)
 		let dm2 = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress)
+			with: fixtures.alixClient.inboxID)
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caro.walletAddress
+			fixtures.caroClient.inboxID
 		])
 
 		let convoCount = try await fixtures.boClient.conversations
@@ -143,11 +141,11 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.caro.walletAddress)
+			with: fixtures.caroClient.inboxID)
 		let dm2 = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress)
+			with: fixtures.alixClient.inboxID)
 		let group2 = try await fixtures.boClient.conversations.newGroup(
-			with: [fixtures.caro.walletAddress])
+			with: [fixtures.caroClient.inboxID])
 
 		_ = try await dm.send(content: "Howdy")
 		_ = try await dm2.send(content: "Howdy")
@@ -164,7 +162,7 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress)
+			with: fixtures.alixClient.inboxID)
 		_ = try await dm.send(content: "howdy")
 		let messageId = try await dm.send(content: "gm")
 		try await dm.sync()
@@ -189,7 +187,7 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress)
+			with: fixtures.alixClient.inboxID)
 		try await fixtures.alixClient.conversations.sync()
 
 		let expectation1 = XCTestExpectation(description: "got a message")
@@ -221,10 +219,10 @@ class DmTests: XCTestCase {
 		}
 
 		_ = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.alix.address
+			fixtures.alixClient.inboxID
 		])
 		_ = try await fixtures.caroClient.conversations.findOrCreateDm(
-			with: fixtures.alix.address)
+			with: fixtures.alixClient.inboxID)
 
 		await fulfillment(of: [expectation1], timeout: 3)
 	}
@@ -233,7 +231,7 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress)
+			with: fixtures.alixClient.inboxID)
 		try await fixtures.alixClient.conversations.sync()
 
 		let expectation1 = XCTestExpectation(description: "got a message")
@@ -249,7 +247,7 @@ class DmTests: XCTestCase {
 
 		_ = try await dm.send(content: "hi")
 		let caroDm = try await fixtures.caroClient.conversations.findOrCreateDm(
-			with: fixtures.alixClient.address)
+			with: fixtures.alixClient.inboxID)
 		_ = try await caroDm.send(content: "hi")
 
 		await fulfillment(of: [expectation1], timeout: 3)
@@ -259,7 +257,7 @@ class DmTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress)
+			with: fixtures.alixClient.inboxID)
 
 		let isDm = try await fixtures.boClient.preferences
 			.conversationState(conversationId: dm.id)
@@ -294,7 +292,7 @@ class DmTests: XCTestCase {
 
 		// Create group with disappearing messages enabled
 		let boDm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.alix.walletAddress,
+			with: fixtures.alixClient.inboxID,
 			disappearingMessageSettings: initialSettings
 		)
 		_ = try await boDm.send(content: "howdy")
