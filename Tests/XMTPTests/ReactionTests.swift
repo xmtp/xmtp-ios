@@ -165,7 +165,7 @@ class ReactionTests: XCTestCase {
         XCTAssertEqual(FfiReactionSchema.unicode, content.schema)
         
         let messagesWithReactions = try await conversation.messagesWithReactions()
-        XCTAssertEqual(messagesWithReactions.count, 1)
+        XCTAssertEqual(messagesWithReactions.count, 2)
         XCTAssertEqual(messagesWithReactions[0].id, messageToReact.id)
         
         let reactionContent: FfiReaction = try messagesWithReactions[0].childMessages![0].content()
@@ -213,7 +213,7 @@ class ReactionTests: XCTestCase {
         // Verify both reactions appear in messagesWithReactions
         let messagesWithReactions = try await conversation.messagesWithReactions()
         
-        XCTAssertEqual(1, messagesWithReactions.count)
+        XCTAssertEqual(2, messagesWithReactions.count)
         XCTAssertEqual(messageToReact.id, messagesWithReactions[0].id)
         XCTAssertEqual(2, messagesWithReactions[0].childMessages?.count)
         

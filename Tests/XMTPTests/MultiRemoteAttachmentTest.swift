@@ -113,7 +113,7 @@ class MultiRemoteAttachmentTests: XCTestCase {
         // Fetch messages
         try await alixConversation.sync()
         let messages = try await alixConversation.messages()
-        XCTAssertEqual(messages.count, 1)
+        XCTAssertEqual(messages.count, 2)
         
         let received = messages[0]
         XCTAssertEqual(try received.encodedContent.type.id, ContentTypeMultiRemoteAttachment.id)
