@@ -44,7 +44,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func lastMessage() async throws -> Message? {
+	public func lastMessage() async throws -> DecodedMessage? {
 		switch self {
 		case let .group(group):
 			return try await group.lastMessage()
@@ -120,7 +120,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func processMessage(messageBytes: Data) async throws -> Message? {
+	public func processMessage(messageBytes: Data) async throws -> DecodedMessage? {
 		switch self {
 		case let .group(group):
 			return try await group.processMessage(messageBytes: messageBytes)
@@ -224,7 +224,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func streamMessages() -> AsyncThrowingStream<Message, Error> {
+	public func streamMessages() -> AsyncThrowingStream<DecodedMessage, Error> {
 		switch self {
 		case let .group(group):
 			return group.streamMessages()
@@ -239,7 +239,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		afterNs: Int64? = nil,
 		direction: SortDirection? = .descending,
 		deliveryStatus: MessageDeliveryStatus = .all
-	) async throws -> [Message] {
+	) async throws -> [DecodedMessage] {
 		switch self {
 		case let .group(group):
 			return try await group.messages(
@@ -269,7 +269,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		afterNs: Int64? = nil,
 		direction: SortDirection? = .descending,
 		deliveryStatus: MessageDeliveryStatus = .all
-	) async throws -> [Message] {
+	) async throws -> [DecodedMessage] {
 		switch self {
 		case let .group(group):
 			return try await group.messagesWithReactions(
