@@ -244,12 +244,12 @@ class GroupTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let _ = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.caro.walletAddress)
+			with: fixtures.caroClient.inboxID)
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caro.walletAddress
+			fixtures.caroClient.inboxID
 		])
 		let _ = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caro.walletAddress
+			fixtures.caroClient.inboxID
 		])
 
 		let convoCount = try await fixtures.boClient.conversations
@@ -278,11 +278,11 @@ class GroupTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.caro.walletAddress)
+			with: fixtures.caroClient.inboxID)
 		let group1 = try await fixtures.boClient.conversations.newGroup(
-			with: [fixtures.caro.walletAddress])
+			with: [fixtures.caroClient.inboxID])
 		let group2 = try await fixtures.boClient.conversations.newGroup(
-			with: [fixtures.caro.walletAddress])
+			with: [fixtures.caroClient.inboxID])
 
 		_ = try await dm.send(content: "Howdy")
 		_ = try await group2.send(content: "Howdy")
@@ -414,10 +414,7 @@ class GroupTests: XCTestCase {
 				fixtures.caroClient.inboxID,
 			].sorted(), members)
 
-		try await group.removeMembersByIdentity(identities: [
-			PublicIdentity(
-				kind: .ethereum, identifier: fixtures.caroClient.inboxID)
-		])
+		try await group.removeMembersByIdentity(identities: [fixtures.caro.identity])
 
 		try await group.sync()
 
@@ -520,16 +517,6 @@ class GroupTests: XCTestCase {
 		XCTAssertEqual(alixAddress, whoAddedbo)
 	}
 
-	func testCannotStartGroupWithSelf() async throws {
-		let fixtures = try await fixtures()
-
-		await assertThrowsAsyncError(
-			try await fixtures.alixClient.conversations.newGroup(with: [
-				fixtures.alixClient.inboxID
-			])
-		)
-	}
-
 	func testCanStartEmptyGroup() async throws {
 		let fixtures = try await fixtures()
 		let group = try await fixtures.alixClient.conversations.newGroup(
@@ -557,7 +544,7 @@ class GroupTests: XCTestCase {
 	func testGroupStartsWithAllowedState() async throws {
 		let fixtures = try await fixtures()
 		let boGroup = try await fixtures.boClient.conversations.newGroup(
-			with: [fixtures.alix.walletAddress])
+			with: [fixtures.alixClient.inboxID])
 
 		_ = try await boGroup.send(content: "howdy")
 		_ = try await boGroup.send(content: "gm")
@@ -1074,7 +1061,7 @@ class GroupTests: XCTestCase {
 
 		// Create group with disappearing messages enabled
 		let boGroup = try await fixtures.boClient.conversations.newGroup(
-			with: [fixtures.alix.walletAddress],
+			with: [fixtures.alixClient.inboxID],
 			disappearingMessageSettings: initialSettings
 		)
 		_ = try await boGroup.send(content: "howdy")
