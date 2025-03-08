@@ -70,7 +70,7 @@ class DmTests: XCTestCase {
 		XCTAssertEqual(peer, fixtures.alixClient.inboxID)
 	}
 
-	func testCannotStartGroupWithSelf() async throws {
+	func testCannotStartDmWithSelf() async throws {
 		let fixtures = try await fixtures()
 
 		await assertThrowsAsyncError(
@@ -78,8 +78,23 @@ class DmTests: XCTestCase {
 				with: fixtures.alixClient.inboxID)
 		)
 	}
+	
+	func testCannotStartDmWithAddressWhenExpectingInboxId() async throws {
+		let fixtures = try await fixtures()
 
-	func testCannotStartGroupWithNonRegisteredIdentity() async throws {
+		do {
+			_ = try await fixtures.boClient.conversations.newConversation(with: fixtures.alix.walletAddress)
+			XCTFail("Did not throw error")
+		} catch {
+			if case let ClientError.invalidInboxId(message) = error {
+				XCTAssertEqual(message.lowercased(), fixtures.alix.walletAddress.lowercased())
+			} else {
+				XCTFail("Did not throw correct error")
+			}
+		}
+	}
+
+	func testCannotStartDmWithNonRegisteredIdentity() async throws {
 		let fixtures = try await fixtures()
 		let nonRegistered = try PrivateKey.generate()
 
