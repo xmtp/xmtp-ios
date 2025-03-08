@@ -642,12 +642,29 @@ public final class Client {
 			otherwise use `addIdentity()` instead.
 			"""
 	)
-	public func ffiAddIdentity(identityToAdd: PublicIdentity) async throws
+	public func ffiAddIdentity(
+		identityToAdd: PublicIdentity, allowReassignInboxId: Bool = false
+	) async throws
 		-> SignatureRequest
 	{
-		let ffiSigReq = try await ffiClient.addIdentity(
-			newIdentity: identityToAdd.ffiPrivate)
-		return SignatureRequest(ffiSignatureRequest: ffiSigReq)
+		let inboxId: InboxId? =
+			await !allowReassignInboxId
+			? try inboxIdFromIdentity(
+				identity: PublicIdentity(
+					kind: identityToAdd.kind,
+					identifier: identityToAdd.identifier
+				)
+			) : nil
+
+		if allowReassignInboxId || (inboxId?.isEmpty ?? true) {
+			let ffiSigReq = try await ffiClient.addIdentity(
+				newIdentity: identityToAdd.ffiPrivate)
+			return SignatureRequest(ffiSignatureRequest: ffiSigReq)
+		} else {
+			throw ClientError.creationError(
+				"This wallet is already associated with inbox \(inboxId ?? "Unknown")"
+			)
+		}
 	}
 
 	@available(
