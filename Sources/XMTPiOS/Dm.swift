@@ -106,7 +106,7 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		let message =
 			try await ffiConversation.processStreamedConversationMessage(
 				envelopeBytes: messageBytes)
-		return Message.create(ffiMessage: message)
+		return DecodedMessage.create(ffiMessage: message)
 	}
 
 	public func send<T>(content: T, options: SendOptions? = nil) async throws

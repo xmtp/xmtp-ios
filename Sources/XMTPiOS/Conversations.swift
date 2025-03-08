@@ -30,7 +30,7 @@ public enum ConversationError: Error, CustomStringConvertible, LocalizedError {
 	}
 }
 
-public enum ConversationType {
+public enum ConversationFilterType {
 	case all, groups, dms
 }
 
@@ -248,7 +248,7 @@ public actor Conversations {
 		return conversations
 	}
 
-	public func stream(type: ConversationType = .all) -> AsyncThrowingStream<
+	public func stream(type: ConversationFilterType = .all) -> AsyncThrowingStream<
 		Conversation, Error
 	> {
 		AsyncThrowingStream { continuation in
@@ -517,7 +517,7 @@ public actor Conversations {
 		return group
 	}
 
-	public func streamAllMessages(type: ConversationType = .all)
+	public func streamAllMessages(type: ConversationFilterType = .all)
 		-> AsyncThrowingStream<DecodedMessage, Error>
 	{
 		AsyncThrowingStream { continuation in
