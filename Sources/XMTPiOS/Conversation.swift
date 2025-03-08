@@ -13,7 +13,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		hasher.combine(topic)
 	}
 
-	public enum ConversationType {
+	public enum XMTPConversationType {
 		case group, dm
 	}
 
@@ -163,7 +163,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public var type: ConversationType {
+	public var type: XMTPConversationType {
 		switch self {
 		case .group:
 			return .group
