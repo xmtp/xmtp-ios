@@ -364,7 +364,7 @@ public actor Conversations {
 		if peerInboxId == client.inboxID {
 			throw ConversationError.memberCannotBeSelf
 		}
-
+		try validateInboxId(peerInboxId)
 		let dm =
 			try await ffiConversations
 			.findOrCreateDmByInboxId(
@@ -498,6 +498,7 @@ public actor Conversations {
 		permissionPolicySet: FfiPermissionPolicySet? = nil,
 		disappearingMessageSettings: DisappearingMessageSettings? = nil
 	) async throws -> Group {
+		try validateInboxIds(inboxIds)
 		let group = try await ffiConversations.createGroupWithInboxIds(
 			inboxIds: inboxIds,
 			opts: FfiCreateGroupOptions(

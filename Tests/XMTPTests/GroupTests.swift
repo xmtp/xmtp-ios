@@ -335,6 +335,45 @@ class GroupTests: XCTestCase {
 			groupChangedMessage.addedInboxes.map(\.inboxID),
 			[fixtures.caroClient.inboxID])
 	}
+	
+	func testCannotStartGroupOrAddMembersWithAddressWhenExpectingInboxId() async throws {
+		let fixtures = try await fixtures()
+
+		do {
+			_ = try await fixtures.boClient.conversations.newGroup(with: [fixtures.alix.walletAddress])
+			XCTFail("Did not throw error")
+		} catch {
+			if case let ClientError.invalidInboxId(message) = error {
+				XCTAssertEqual(message.lowercased(), fixtures.alix.walletAddress.lowercased())
+			} else {
+				XCTFail("Did not throw correct error")
+			}
+		}
+
+		let group = try await fixtures.boClient.conversations.newGroup(with: [fixtures.alixClient.inboxID])
+
+		do {
+			_ = try await group.addMembers(inboxIds: [fixtures.caro.walletAddress])
+			XCTFail("Did not throw error")
+		} catch {
+			if case let ClientError.invalidInboxId(message) = error {
+				XCTAssertEqual(message.lowercased(), fixtures.caro.walletAddress.lowercased())
+			} else {
+				XCTFail("Did not throw correct error")
+			}
+		}
+
+		do {
+			_ = try await group.removeMembers(inboxIds: [fixtures.alix.walletAddress])
+			XCTFail("Did not throw error")
+		} catch {
+			if case let ClientError.invalidInboxId(message) = error {
+				XCTAssertEqual(message.lowercased(), fixtures.alix.walletAddress.lowercased())
+			} else {
+				XCTFail("Did not throw correct error")
+			}
+		}
+	}
 
 	func testCanAddGroupMembersByIdentity() async throws {
 		let fixtures = try await fixtures()
