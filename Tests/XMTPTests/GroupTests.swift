@@ -317,7 +317,9 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.alixClient.conversations.newGroup(
 			with: [fixtures.boClient.inboxID])
 
-		try await group.addMembers(inboxIds: [fixtures.caroClient.inboxID])
+		let result = try await group.addMembers(inboxIds: [fixtures.caroClient.inboxID])
+
+		XCTAssertEqual(result.addedMembers.first, fixtures.caroClient.inboxID)
 
 		try await group.sync()
 		let members = try await group.members.map(\.inboxId).sorted()
@@ -381,10 +383,12 @@ class GroupTests: XCTestCase {
 		let group = try await fixtures.alixClient.conversations.newGroup(
 			with: [fixtures.boClient.inboxID])
 
-		try await group.addMembersByIdentity(identities: [
+		let result = try await group.addMembersByIdentity(identities: [
 			PublicIdentity(
 				kind: .ethereum, identifier: fixtures.caro.walletAddress)
 		])
+		
+		XCTAssertEqual(result.addedMembers.first, fixtures.caroClient.inboxID)
 
 		try await group.sync()
 		let members = try await group.members.map(\.inboxId).sorted()

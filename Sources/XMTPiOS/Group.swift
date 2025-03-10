@@ -142,9 +142,10 @@ public struct Group: Identifiable, Equatable, Hashable {
 		Date(millisecondsSinceEpoch: ffiGroup.createdAtNs())
 	}
 
-	public func addMembers(inboxIds: [InboxId]) async throws {
+	public func addMembers(inboxIds: [InboxId]) async throws -> GroupMembershipResult {
 		try validateInboxIds(inboxIds)
-		try await ffiGroup.addMembersByInboxId(inboxIds: inboxIds)
+		let result = try await ffiGroup.addMembersByInboxId(inboxIds: inboxIds)
+		return GroupMembershipResult(ffiGroupMembershipResult: result)
 	}
 
 	public func removeMembers(inboxIds: [InboxId]) async throws {
@@ -152,10 +153,11 @@ public struct Group: Identifiable, Equatable, Hashable {
 		try await ffiGroup.removeMembersByInboxId(inboxIds: inboxIds)
 	}
 
-	public func addMembersByIdentity(identities: [PublicIdentity]) async throws
+	public func addMembersByIdentity(identities: [PublicIdentity]) async throws -> GroupMembershipResult
 	{
-		try await ffiGroup.addMembers(
+		let result = try await ffiGroup.addMembers(
 			accountIdentifiers: identities.map { $0.ffiPrivate })
+		return GroupMembershipResult(ffiGroupMembershipResult: result)
 	}
 
 	public func removeMembersByIdentity(identities: [PublicIdentity])
