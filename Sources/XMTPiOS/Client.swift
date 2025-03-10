@@ -280,8 +280,8 @@ public final class Client {
 		return (ffiClient, dbURL)
 	}
 
-	private func handleSignature(
-		signatureRequest: FfiSignatureRequest, signingKey: SigningKey
+	private static func handleSignature(
+		for signatureRequest: FfiSignatureRequest, signingKey: SigningKey
 	) async throws {
 		let signedData = try await signingKey.sign(
 			signatureRequest.signatureText())
