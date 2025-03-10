@@ -414,7 +414,9 @@ public final class Client {
 
 		if allowReassignInboxId || (inboxId?.isEmpty ?? true) {
 			let signatureRequest = try await ffiAddIdentity(
-				identityToAdd: newAccount.identity)
+				identityToAdd: newAccount.identity,
+                allowReassignInboxId: allowReassignInboxId
+            )
 			do {
 				try await Client.handleSignature(
 					for: signatureRequest.ffiSignatureRequest,
@@ -642,9 +644,9 @@ public final class Client {
 			otherwise use `addIdentity()` instead.
 			"""
 	)
-	public func ffiAddIdentity(
-		identityToAdd: PublicIdentity, allowReassignInboxId: Bool = false
-	) async throws
+    public func ffiAddIdentity(
+        identityToAdd: PublicIdentity, allowReassignInboxId: Bool = false
+    ) async throws
 		-> SignatureRequest
 	{
 		let inboxId: InboxId? =
