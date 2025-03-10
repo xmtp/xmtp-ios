@@ -16,11 +16,10 @@ public enum IdentityKind {
 public struct PublicIdentity {
 	let ffiPrivate: FfiIdentifier
 
-	public init(kind: IdentityKind, identifier: String, relyingPartner: String? = nil) {
+	public init(kind: IdentityKind, identifier: String) {
 		self.ffiPrivate = FfiIdentifier(
 			identifier: identifier,
-			identifierKind: kind.toFfiPublicIdentifierKind(),
-			relyingPartner: relyingPartner
+			identifierKind: kind.toFfiPublicIdentifierKind()
 		)
 	}
 
@@ -34,10 +33,6 @@ public struct PublicIdentity {
 
 	public var identifier: String {
 		return ffiPrivate.identifier.lowercased()
-	}
-
-	public var relyingPartner: String? {
-		return ffiPrivate.relyingPartner
 	}
 }
 
