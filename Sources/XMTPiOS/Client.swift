@@ -482,11 +482,11 @@ public final class Client {
 		}
 	}
 
-	public func canMessage(identities: PublicIdentity) async throws -> Bool {
+	public func canMessage(identity: PublicIdentity) async throws -> Bool {
 		let canMessage = try await canMessage(identities: [
-			identities
+			identity
 		])
-		return canMessage[identities.identifier] ?? false
+		return canMessage[identity.identifier] ?? false
 	}
 
 	func canMessage(identities: [PublicIdentity]) async throws -> [String: Bool]
