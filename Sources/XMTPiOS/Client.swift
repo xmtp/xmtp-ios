@@ -362,10 +362,10 @@ public final class Client {
 	}
 
 	public static func canMessage(
-		identities: [PublicIdentity], api: ClientOptions.Api
+		accountIdentities: [PublicIdentity], api: ClientOptions.Api
 	) async throws -> [String: Bool] {
 		let ffiClient = try await prepareClient(api: api)
-		let ffiIdentifiers = identities.map { $0.ffiPrivate }
+		let ffiIdentifiers = accountIdentities.map { $0.ffiPrivate }
 		let result = try await ffiClient.canMessage(
 			accountIdentifiers: ffiIdentifiers)
 
@@ -489,7 +489,7 @@ public final class Client {
 		return canMessage[identity.identifier] ?? false
 	}
 
-	func canMessage(identities: [PublicIdentity]) async throws -> [String: Bool]
+	public func canMessage(identities: [PublicIdentity]) async throws -> [String: Bool]
 	{
 		let ffiIdentifiers = identities.map { $0.ffiPrivate }
 		let result = try await ffiClient.canMessage(
