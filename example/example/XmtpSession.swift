@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import XMTPiOS
 
 // The user's authenticated session with XMTP.
@@ -14,17 +15,17 @@ class XmtpSession {
     }
     
     private(set) var state: State = .loading
-    var address: String? {
-        client?.address
-    }
     var inboxId: String? {
         client?.inboxID
     }
     private(set) var conversations: [Conversation] = []
     
     private var client: Client?
+    private var db: Db
     
-    init() {
+    init(db: Db) {
+        self.db = db
+
         // TODO: check for saved credentials from the keychain
         state = .loggedOut
     }
@@ -50,7 +51,6 @@ class XmtpSession {
         print("account: \(try! account.jsonString())")
         
         client = try? await Client.create(account: account, options: ClientOptions(dbEncryptionKey: dbKey))
-        print("address: \((client?.address) ?? "?")")
         print("inboxID: \((client?.inboxID) ?? "?")")
         
         // TODO: save credentials in the keychain
@@ -58,12 +58,32 @@ class XmtpSession {
     
     func refreshConversations() async throws {
         _ = try await client?.conversations.syncAllConversations()
-        conversations = (try? await client?.conversations.list()) ?? []
+        let conversations = (try? await client?.conversations.list()) ?? []  // TODO: paging etc.
+        for conversation in conversations {
+            try await conversation.sync()
+            _ = try await db.upsertConversation(conversation)
+        }
+        try await db.save() // TODO: consider doing this elsewhere or allowing autosave to take care of it?
+    }
+    
+    func refreshConversation(conversationId: String) async throws {
+        guard let c = try await client?.conversations.findConversation(conversationId: conversationId) else {
+            return // TODO: consider logging failure instead
+        }
+        _ = try await c.sync()
+        _ = try await db.upsertConversation(c)
+        let messages = try await c.messages(limit: 10); // TODO: paging etc.
+        for message in messages {
+            _ = try await db.upsertMessage(message)
+        }
+        try await db.save()
     }
     
     func clear() async throws {
         // TODO: clear saved credentials
         client = nil
+        try await db.erase()
         state = .loggedOut
     }
 }
+

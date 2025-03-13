@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import XMTPiOS
 
 // Screen displayed by default when the user has logged in.
@@ -8,8 +9,8 @@ import XMTPiOS
 //  - "Settings" (allowing you to log out etc)
 // And it displays the "Add" button for creating new chats.
 struct HomeView: View {
-    @Environment(\.session) private var session
-    @Environment(\.router) private var router
+    @Environment(XmtpSession.self) private var session
+    @Environment(Router.self) private var router
     var body: some View {
         @Bindable var router = router
         TabView {
@@ -42,19 +43,13 @@ struct HomeView: View {
 // This refreshes the list when it appears.
 // It also supports pull-to-refresh.
 private struct ConversationList: View {
-    @Environment(\.session) private var session
+    @Environment(XmtpSession.self) private var session
+    @Query private var conversations: [Db.Conversation]
     var body: some View {
-        List(session.conversations) { conversation in
-            switch conversation {
-            case .group(let group):
-                NavigationLink(value: Route.group(group)) {
-                    GroupConversationItem(group: group)
+        List(conversations) { c in
+            NavigationLink(value: Route.conversation(conversationId: c.conversationId)) {
+                    ConversationItem(conversation: c)
                 }
-            case .dm(let dm):
-                NavigationLink(value: Route.dm(dm)) {
-                    DmConversationItem(dm: dm)
-                }
-            }
         }
         .onAppear {
             Task {
@@ -69,28 +64,18 @@ private struct ConversationList: View {
     }
 }
 
-// Show a group chat item in the conversation list.
-private struct GroupConversationItem: View {
-    var group: XMTPiOS.Group
+// Show an item in the conversation list.
+private struct ConversationItem: View {
+    var conversation: Db.Conversation
     var body: some View {
         // TODO: something prettier
-        Text("Group: \((try? group.groupName()) ?? group.id)")
-    }
-}
-
-// Show a DM item in the conversation list.
-private struct DmConversationItem: View {
-    var dm: Dm
-    var body: some View {
-        // TODO: something prettier
-        Text("DM: \((try? dm.peerInboxId) ?? dm.id)")
-            .lineLimit(1)
+        Text("\(conversation.name ?? conversation.conversationId)")
     }
 }
 
 // Allow the user to logout (and change TBD other settings)
 private struct SettingsView: View {
-    @Environment(\.session) var session
+    @Environment(XmtpSession.self) private var session
     var body: some View {
         VStack {
             // TODO: more complete settings view

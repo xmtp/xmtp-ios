@@ -30,8 +30,7 @@ class Router {
 
 // Navigable destinations for logged-in sessions.
 enum Route: Hashable, Identifiable, View {
-    case group(XMTPiOS.Group)
-    case dm(Dm)
+    case conversation(conversationId: String)
     case createConversation
     case user(inboxId: String)
     
@@ -41,10 +40,8 @@ enum Route: Hashable, Identifiable, View {
     
     static func == (lhs: Route, rhs: Route) -> Bool {
         switch (lhs, rhs) {
-        case (.group(let lGroup), .group(let rGroup)):
-            lGroup.id == rGroup.id
-        case (.dm(let l), .dm(let r)):
-            l.id == r.id
+        case (.conversation(let lId), .conversation(let rId)):
+            lId == rId
         case (.createConversation, .createConversation):
             true
         case (.user(let lInboxId), .user(let rInboxId)):
@@ -56,10 +53,8 @@ enum Route: Hashable, Identifiable, View {
     
     var id: String {
         switch self {
-        case .group(let group):
-            "group:\(group.id)"
-        case .dm(let dm):
-            "dm:\(dm.id)"
+        case .conversation(let conversationId):
+            "conversation:\(conversationId)"
         case .createConversation:
             "create-conversation"
         case .user(let inboxId):
@@ -73,10 +68,8 @@ enum Route: Hashable, Identifiable, View {
     //   .navigationDestination(for: Route.self) { $0 }
     var body: some View {
         switch self {
-        case .group(let group):
-            GroupDetailsView(group: group)
-        case .dm(let dm):
-            DmDetailsView(dm: dm)
+        case .conversation(let conversationId):
+            ConversationView(conversationId: conversationId)
         case .createConversation:
             CreateConversationView()
         case .user(let inboxId):

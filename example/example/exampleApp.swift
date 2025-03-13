@@ -1,19 +1,24 @@
 import SwiftUI
+import SwiftData
 import XMTPiOS
-
-// We "inject" these dependencies via environment values.
-extension EnvironmentValues {
-    @Entry var session = XmtpSession()  // The current user's session.
-    @Entry var router = Router()  // The current navigation path (only used after login).
-}
 
 // Initially, the App handles getting the user logged-in.
 //
 // But after login, the `Router` in the `HomeView` takes over navigation.
 @main
 struct exampleApp: App {
-    @State var session = XmtpSession()
-    @State var router = Router()
+    let dbContainer: ModelContainer
+    let db: Db
+    let session: XmtpSession
+    let router: Router
+
+    init() {
+        // Initialize the Database and other dependencies.
+        dbContainer =  try! ModelContainer(for: Db.schema)
+        db = Db(modelContainer: dbContainer)        
+        session = XmtpSession(db: db)
+        router = Router()
+    }
     var body: some Scene {
         WindowGroup {
             switch session.state {
@@ -21,22 +26,25 @@ struct exampleApp: App {
                 ProgressView()
             case .loggedOut:
                 LoginView()
-                    .environment(\.session, session)
+                    .environment(session)
+                    .environment(router)
             case .loggedIn:
                 HomeView()
-                    .environment(\.session, session)
-                    .environment(\.router, router)
+                    .environment(session)
+                    .environment(router)
             }
         }
+        .modelContainer(dbContainer)
     }
 }
 
 // Present the login options for the user.
 private struct LoginView: View {
-    @Environment(\.session) var session
+    @Environment(XmtpSession.self) var session
     @State var isLoggingIn = false
     var body: some View {
-        // TODO: more login methods
+        
+        // TODO: support more login methods
         Button("Login (random account)") {
             isLoggingIn = true
             Task {
