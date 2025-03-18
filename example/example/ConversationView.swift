@@ -14,13 +14,16 @@ struct ConversationView: View {
     }
     var body: some View {
         VStack(spacing: 0) {
-            // Messages
-            List(messages) { message in
-                MessageView(conversation: conversation.first!, message: message)
+            ScrollViewReader { proxy in
+                List(messages) { message in
+                    MessageView(conversation: conversation.first!, message: message)
+                        .id(message.messageId)
+                }
+                .onChange(of: messages) { update in
+                    proxy.scrollTo(update.last?.messageId ?? "")
+                }
             }
-            HStack {
-                Text("TODO: support sending msg")
-            }
+            MessageComposerView(conversationId: conversationId)
         }
         .onAppear {
             Task {
@@ -54,4 +57,44 @@ struct MessageView: View {
             Text(message.sentAt.description)
         }
     }
+}
+
+struct MessageComposerView: View {
+    @Environment(XmtpSession.self) private var session
+    @State private var message: String = ""
+    @State private var isSending = false
+    @FocusState var isFocused
+    let conversationId: String
+    var body: some View {
+        HStack {
+            TextField("Message", text: $message)
+                .focused($isFocused)
+                .disabled(isSending)
+                .padding(4)
+                .onSubmit {
+                    Task {
+                        defer {
+                            isSending = false
+                        }
+                        isSending = true
+    //                    try await session.send(message, to: conversationId) // etc
+                        if (try await session.sendMessage(message, to: conversationId)) {
+                            try await session.refreshConversation(conversationId: conversationId)
+                            message = ""
+                            isFocused = true
+                        }
+                    }
+                }
+                .textInputAutocapitalization(.never)
+                .disableAutocorrection(true)
+                .textFieldStyle(.roundedBorder)
+                .onAppear {
+                    isFocused = true
+                }
+                .submitLabel(.send)
+        }
+        .padding(4)
+    }
+    
+    
 }

@@ -1,16 +1,18 @@
 import SwiftData
 import XMTPiOS
 import Foundation
+import OSLog
 
 /// Define the database schema and perform operations against it.
 actor Db {
-    
-    // This schema is defined in the series of @Model classes below.
-    static let schema = Schema([
+    private static let logger = Logger.forClass(Db.self)
+    static let models: [any PersistentModel.Type] = [
         Db.Conversation.self,
         Db.Message.self,
         Db.User.self
-    ])
+    ]
+    // This schema is defined in the series of @Model classes below.
+    static let schema = Schema(models)
     
     @Model
     class User {
@@ -37,21 +39,25 @@ actor Db {
         
         // TODO: consider storing dm/group type if we need it
 
-        var memberInboxIds: [String]
+        var serializedMemberInboxIds: String
+        var memberInboxIds: [InboxId] {
+            serializedMemberInboxIds.split(separator: ",").map { String($0) }
+        }
         
         // TODO: wrestle with SwiftData to get this working:
         // @Relationship(deleteRule: .cascade, inverse: \DbMessage.conversation) var messages: [DbMessage]
 
         init(conversationId: String,
              name: String? = nil,
-             memberInboxIds: [String] = []
+             memberInboxIds: [InboxId] = []
     //         messages: [DbMessage] = []
         ) {
             self.conversationId = conversationId
-            self.memberInboxIds = memberInboxIds
+            self.serializedMemberInboxIds = memberInboxIds.joined(separator: ",")
     //        self.messages = messages
         }
     }
+
     
     @Model
     class Message {
@@ -95,14 +101,21 @@ actor Db {
     }
 
     func erase() throws {
-        try container.erase()
+        Self.logger.debug("erase")
+        for model in Self.models {
+            Self.logger.trace("delete \(String(describing: model))")
+            try ctx.delete(model: model)
+        }
+        try ctx.save()
     }
 
     func save() throws {
+        Self.logger.debug("save")
         try ctx.save()
     }
 
     func upsertConversation(_ conversation: XMTPiOS.Conversation) async throws -> Db.Conversation {
+        Self.logger.trace("upsertConversation \(conversation.id)")
         let members = try await conversation.members()
         var memberInboxIds: [String] = []
         for member in members {
@@ -123,6 +136,7 @@ actor Db {
     }
     
     func upsertUser(_ member: Member) async throws -> Db.User {
+        Self.logger.trace("upsertUser \(member.inboxId)")
         // TODO: find-then-update for proper upsert behavior
 
         let u = Db.User(
@@ -134,6 +148,7 @@ actor Db {
     }
     
     func upsertMessage(_ message: DecodedMessage) async throws -> Db.Message {
+        Self.logger.trace("upsertMessage \(message.id)")
         let text = try message.body // TODO: other content types
         let m = Db.Message(
             messageId: message.id,
@@ -147,21 +162,25 @@ actor Db {
     }
 
     func fetchConversation(_ conversationId: String) async throws -> Db.Conversation? {
+        Self.logger.trace("fetchConversation \(conversationId)")
         let request = FetchDescriptor(predicate: Db.Conversation.with(conversationId))
         return try ctx.fetch(request).first
     }
 
     func fetchMessage(_ messageId: String) async throws -> Db.Message? {
+        Self.logger.trace("fetchMessage \(messageId)")
         let request = FetchDescriptor(predicate: Db.Message.with(messageId: messageId))
         return try ctx.fetch(request).first
     }
 
     func fetchMessages(_ conversationId: String) async throws -> [Db.Message] {
+        Self.logger.trace("fetchMessages \(conversationId)")
         let request = FetchDescriptor(predicate: Db.Message.with(conversationId: conversationId))
         return try ctx.fetch(request)
     }
 
     func fetchUser(_ inboxId: String) async throws -> Db.User? {
+        Self.logger.trace("fetchUser \(inboxId)")
         let request = FetchDescriptor(predicate: Db.User.with(inboxId))
         return try ctx.fetch(request).first
     }
