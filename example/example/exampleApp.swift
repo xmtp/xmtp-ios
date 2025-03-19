@@ -8,18 +8,10 @@ import OSLog
 // But after login, the `Router` in the `HomeView` takes over navigation.
 @main
 struct exampleApp: App {
-    let dbContainer: ModelContainer
-    let db: Db
-    let session: XmtpSession
-    let router: Router
+    let session = XmtpSession()
+    let names = NameResolver()
+    let router = Router()
 
-    init() {
-        // Initialize the Database and other dependencies.
-        dbContainer =  try! ModelContainer(for: Db.schema)
-        db = Db(modelContainer: dbContainer)        
-        session = XmtpSession(db: db)
-        router = Router()
-    }
     var body: some Scene {
         WindowGroup {
             switch session.state {
@@ -29,13 +21,14 @@ struct exampleApp: App {
                 LoginView()
                     .environment(session)
                     .environment(router)
+                    .environment(names)
             case .loggedIn:
                 HomeView()
                     .environment(session)
                     .environment(router)
+                    .environment(names)
             }
         }
-        .modelContainer(dbContainer)
     }
 }
 

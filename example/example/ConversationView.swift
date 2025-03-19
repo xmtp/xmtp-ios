@@ -1,61 +1,66 @@
 import SwiftUI
-import SwiftData
 import XMTPiOS
 
 // Display the conversation.
 struct ConversationView: View {
     @Environment(XmtpSession.self) private var session
     let conversationId: String
-    @Query var conversation: [Db.Conversation] // .first
-    @Query var messages: [Db.Message]
-    init(conversationId: String) {
-        self.conversationId = conversationId
-        _conversation = Query(filter: Db.Conversation.with(conversationId))
-    }
     var body: some View {
         VStack(spacing: 0) {
+            let messages = (session.conversationMessages[conversationId].value ?? [DecodedMessage]()).reversed()
             ScrollViewReader { proxy in
-                List(messages) { message in
-                    MessageView(conversation: conversation.first!, message: message)
-                        .id(message.messageId)
+                List(messages, id: \.id) { message in
+                    MessageView(conversationId: conversationId, message: message)
+                        .id(message.id)
                 }
-                .onChange(of: messages) { update in
-                    proxy.scrollTo(update.last?.messageId ?? "")
+                .listRowSpacing(16)
+                .onChange(of: messages.last?.id) { _, lastId in
+                    proxy.scrollTo(lastId ?? "")
                 }
             }
             MessageComposerView(conversationId: conversationId)
-        }
-        .onAppear {
-            Task {
-                try await session.refreshConversation(conversationId: conversationId)
-            }
         }
         .refreshable {
             Task {
                 try await session.refreshConversation(conversationId: conversationId)
             }
         }
-        .navigationTitle(conversation.first?.name ?? "")
+        .navigationTitle(session.conversations[conversationId].value?.name ?? "")
     }
 }
 
 struct MessageView: View {
+    let conversationId: String
+    let message: DecodedMessage
     @Environment(XmtpSession.self) private var session
-    let conversation: Db.Conversation
-    let message: Db.Message
-    @Query var sender: [Db.User] // .first
-    init(conversation: Db.Conversation, message: Db.Message) {
-        self.conversation = conversation
-        self.message = message
-        _sender = Query(filter: Db.User.with(message.senderInboxId))
-    }
     var body: some View {
-        VStack(spacing: 0) {
-            Text(message.senderInboxId == session.inboxId ? "Me" : "Someone Else")
-            Text(sender.first?.serializedIdentities.joined(separator: ", ") ?? "")
-            Text(message.text ?? "(no text)")
-            Text(message.sentAt.description)
+        let isMe = message.senderInboxId == session.inboxId
+        VStack(alignment: isMe ? .trailing : .leading) {
+            HStack {
+                if (isMe) {
+                    Spacer()
+                }
+                InboxNameText(inboxId: message.senderInboxId)
+                    .foregroundColor(.secondary)
+                    .font(.caption2)
+                if (!isMe) {
+                    Spacer()
+                }
+            }
+            Text((try? message.body) ?? "")
+                .foregroundColor(.primary)
+                .font(.body)
+                .padding(.vertical)
+            Spacer()
+            HStack {
+                Spacer()
+                Text(message.sentAt.description)
+                    .foregroundColor(.secondary)
+                    .font(.caption2)
+            }
         }
+        .padding(.top, 6)
+        .padding(.bottom, 4)
     }
 }
 
@@ -77,11 +82,8 @@ struct MessageComposerView: View {
                             isSending = false
                         }
                         isSending = true
-    //                    try await session.send(message, to: conversationId) // etc
                         if (try await session.sendMessage(message, to: conversationId)) {
-                            try await session.refreshConversation(conversationId: conversationId)
                             message = ""
-                            isFocused = true
                         }
                     }
                 }

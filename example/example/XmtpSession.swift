@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 import XMTPiOS
 import OSLog
 
@@ -20,16 +19,33 @@ class XmtpSession {
     var inboxId: String? {
         client?.inboxID
     }
-    private(set) var conversations: [Conversation] = []
+    private(set) var conversationIds: [String] = []
+    let conversations = ObservableCache<Conversation>(defaultValue: nil)
+    let conversationMembers = ObservableCache<[Member]>(defaultValue: [])
+    let conversationMessages = ObservableCache<[DecodedMessage]>(defaultValue: [])
+    let inboxes = ObservableCache<InboxState>(defaultValue: nil)
     
     private var client: Client?
-    private var db: Db
     
-    init(db: Db) {
-        self.db = db
-
+    init() {
         // TODO: check for saved credentials from the keychain
         state = .loggedOut
+        conversations.loader = { conversationId in
+            try await self.client!.conversations.findConversation(conversationId: conversationId)!
+        }
+        conversationMembers.loader = { conversationId in
+            let c = try await self.client!.conversations.findConversation(conversationId: conversationId)!
+            return try await c.members()
+        }
+        conversationMessages.loader = { conversationId in
+            let c = try await self.client!.conversations.findConversation(conversationId: conversationId)!
+            return try await c.messages(limit: 10) // TODO paging etc.
+        }
+        inboxes.loader = { inboxId in
+            try await self.client!.inboxStatesForInboxIds(
+                refreshFromNetwork: true, // TODO: consider false sometimes?
+                inboxIds: [inboxId]).first! // there's only one.
+        }
     }
     
     func login() async throws {
@@ -40,7 +56,7 @@ class XmtpSession {
             Self.logger.info("login \(self.client == nil ? "failed" : "succeeded")")
             state = client == nil ? .loggedOut : .loggedIn
         }
-        try await db.erase()
+        
         // TODO: accept as params
         // TODO: use real account
         let account = try PrivateKey.generate()
@@ -64,11 +80,7 @@ class XmtpSession {
         Self.logger.debug("refreshConversations")
         _ = try await client?.conversations.syncAllConversations()
         let conversations = (try? await client?.conversations.list()) ?? []  // TODO: paging etc.
-        for conversation in conversations {
-            try await conversation.sync()
-            _ = try await db.upsertConversation(conversation)
-        }
-        try await db.save() // TODO: consider doing this elsewhere or allowing autosave to take care of it?
+        self.conversationIds = conversations.map { $0.id }
     }
     
     func refreshConversation(conversationId: String) async throws {
@@ -76,32 +88,44 @@ class XmtpSession {
         guard let c = try await client?.conversations.findConversation(conversationId: conversationId) else {
             return // TODO: consider logging failure instead
         }
-        _ = try await c.sync()
-        _ = try await db.upsertConversation(c)
-        let messages = try await c.messages(limit: 10); // TODO: paging etc.
-        for message in messages {
-            _ = try await db.upsertMessage(message)
-        }
-        try await db.save()
+        try await c.sync()
+        _ = await [
+            try conversations.reload(conversationId).result.get(),
+            try conversationMessages.reload(conversationId).result.get(),
+            try conversationMembers.reload(conversationId).result.get()
+        ] as [Any?]
     }
-    
+
     func sendMessage(_ message: String, to conversationId: String) async throws -> Bool {
         Self.logger.debug("sendMessage \(message) to \(conversationId)")
         guard let c = try await client?.conversations.findConversation(conversationId: conversationId) else {
             return false // TODO: consider logging failure instead
         }
-        guard let sentId = try? await c.send(text: message) else {
+        guard let _ = try? await c.send(text: message) else {
             return false
         }
+        _ = conversationMessages.reload(conversationId) // TODO: consider try/awaiting the roundtrip here
         return true
     }
-    
+
     func clear() async throws {
         Self.logger.debug("clear")
+        conversationIds = []
+        conversations.clear()
+        conversationMembers.clear()
+        conversationMessages.clear()
+        inboxes.clear()
         // TODO: clear saved credentials
         client = nil
-        try await db.erase()
         state = .loggedOut
     }
 }
 
+extension Conversation {
+    var name: String? {
+        if case .group(let g) = self {
+            return try? g.name()
+        }
+        return nil
+    }
+}
