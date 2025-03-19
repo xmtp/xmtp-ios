@@ -7,7 +7,7 @@ import XMTPiOS
 // This has two tabs:
 //  - "Chats" (listing conversations that can be explored)
 //  - "Settings" (allowing you to log out etc)
-// And it displays the "Add" button for creating new chats.
+// And it displays the button for creating new chats.
 struct HomeView: View {
     @Environment(XmtpSession.self) private var session
     @Environment(Router.self) private var router
@@ -21,8 +21,10 @@ struct HomeView: View {
                         // This lets us link to a Route from NavigationLinks elsewhere.
                         .navigationDestination(for: Route.self) { $0 }
                         .toolbar {
-                            Button("Add") {
+                            Button {
                                 router.push(route: .createConversation)
+                            } label: {
+                                Image(systemName: "plus")
                             }
                         }
                 }
@@ -44,12 +46,11 @@ struct HomeView: View {
 // It also supports pull-to-refresh.
 private struct ConversationList: View {
     @Environment(XmtpSession.self) private var session
-    @Query private var conversations: [Db.Conversation]
     var body: some View {
-        List(conversations) { c in
-            NavigationLink(value: Route.conversation(conversationId: c.conversationId)) {
-                    ConversationItem(conversation: c)
-                }
+        List(session.conversationIds, id: \.self) { cId in
+            NavigationLink(value: Route.conversation(conversationId: cId)) {
+                ConversationItem(conversationId: cId)
+            }
         }
         .onAppear {
             Task {
@@ -66,10 +67,19 @@ private struct ConversationList: View {
 
 // Show an item in the conversation list.
 private struct ConversationItem: View {
-    var conversation: Db.Conversation
+    @Environment(XmtpSession.self) private var session
+    var conversationId: String
     var body: some View {
-        // TODO: something prettier
-        Text("\(conversation.name ?? conversation.conversationId)")
+        VStack(alignment: .leading, spacing: 3) {
+            // TODO: something prettier
+            Text(session.conversations[conversationId].value?.name ?? "Untitled")
+                .foregroundColor(.primary)
+                .lineLimit(1)
+                .font(.headline)
+            Text("\(session.conversationMembers[conversationId].value?.count ?? 0) members")
+                .foregroundColor(.secondary)
+                .font(.subheadline)
+        }
     }
 }
 
@@ -77,9 +87,12 @@ private struct ConversationItem: View {
 private struct SettingsView: View {
     @Environment(XmtpSession.self) private var session
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 3) {
             // TODO: more complete settings view
             Text(session.inboxId ?? "")
+                .foregroundColor(.primary)
+                .lineLimit(1)
+                .font(.headline)
             Button("Logout") {
                 Task {
                     try await session.clear()
