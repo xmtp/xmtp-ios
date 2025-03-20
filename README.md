@@ -14,9 +14,18 @@ To learn more about XMTP and get answers to frequently asked questions, see the 
 
 ## Example app built with `xmtp-ios`
 
-Use the [XMTP iOS quickstart app](https://github.com/xmtp/xmtp-ios/tree/main/example) as a tool to start building an app with XMTP. This basic messaging app has an intentionally unopinionated UI to help make it easier for you to build with.
+Use the [XMTP iOS Example app](https://github.com/xmtp/xmtp-ios/tree/main/XMTPiOSExample) as a tool to start building an app with XMTP. This basic messaging app has an intentionally unopinionated UI to help make it easier for you to build with.
 
-To learn about example app push notifications, see [Enable the quickstart app to send push notifications](library/src/main/java/org/xmtp/ios/library/push/README.md).
+<!-- 
+Commenting out until push notification example is updated
+To learn about example app push notifications, see [Enable the quickstart app to send push notifications](library/src/main/java/org/xmtp/ios/library/push/README.md). -->
+
+In order to run the Example app:
+
+1. Using Xcode, open `xmtp-ios/XMTPiOSExample/XMTPiOSExample.xcodeproj`
+2. Select simulator target in Xcode
+3. Product -> Run 
+4. After the app starts on your simulator, click generate wallet. Ethereum address can be copied out of console logs. 
 
 ## Reference docs
 
