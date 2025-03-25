@@ -32,3 +32,9 @@ services:
     image: postgres:13
     environment:
       POSTGRES_PASSWORD: xmtp
+
+  history-server:
+    image: ghcr.io/xmtp/message-history-server:main
+    platform: linux/amd64
+    ports:
+      - 5558:5558
