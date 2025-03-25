@@ -24,10 +24,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Docker
-        run: brew install qemu docker colima docker-compose
+        run: brew install docker colima docker-compose
       
-      - name: Start Colima using QEMU driver
-        run: colima start --vm-type=qemu
+      - name: Start Colima
+        run: colima start --vm-type=vz
         
       - name: Start Docker containers
         run: ./dev/up
