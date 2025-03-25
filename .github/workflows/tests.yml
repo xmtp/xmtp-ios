@@ -31,12 +31,6 @@ jobs:
         
       - name: Start Docker containers
         run: ./dev/up
-
-      - name: Wait for Services
-        run: sleep 5s  # Give DB and Node services time to start
-
-      - name: Verify Running Containers
-        run: docker ps  # Debugging: Ensure required services are running
         
         # retries are added due to test failures with dependencies
       - name: Run tests
