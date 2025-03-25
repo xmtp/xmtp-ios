@@ -26,8 +26,8 @@ jobs:
       - name: Set up Docker
         run: brew install qemu docker colima docker-compose
       
-      - name: Start Colima
-        run: colima start
+      - name: Start Colima using QEMU driver
+        run: colima start --vm-driver=qemu
         
       - name: Start Docker containers
         run: ./dev/up
