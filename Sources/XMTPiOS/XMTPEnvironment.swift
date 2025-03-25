@@ -9,18 +9,20 @@ import Foundation
 
 /// Contains hosts an `ApiClient` can connect to
 public enum XMTPEnvironment: String, Sendable {
-	case dev = "grpc.dev.xmtp.network:443",
-	     production = "grpc.production.xmtp.network:443",
-	     local = "localhost:5556"
+	case dev = "grpc.dev.xmtp.network:443"
+	case production = "grpc.production.xmtp.network:443"
+	case local = "localhost:5556"
+
+	// Optional override for the local environment
+	public static var customLocalAddress: String?
 
 	var url: String {
 		switch self {
-		case .dev:
-			return "https://\(rawValue)"
-		case .production:
+		case .dev, .production:
 			return "https://\(rawValue)"
 		case .local:
-			return "http://\(rawValue)"
+			let address = XMTPEnvironment.customLocalAddress ?? rawValue
+			return "http://\(address)"
 		}
 	}
 
