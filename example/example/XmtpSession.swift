@@ -1,6 +1,7 @@
 import SwiftUI
 import XMTPiOS
 import OSLog
+import web3swift
 
 // The user's authenticated session with XMTP.
 //
@@ -34,10 +35,16 @@ class XmtpSession {
             try await self.client!.conversations.findConversation(conversationId: conversationId)!
         }
         conversationMembers.loader = { conversationId in
+            if self.client == nil {
+                return []
+            }
             let c = try await self.client!.conversations.findConversation(conversationId: conversationId)!
             return try await c.members()
         }
         conversationMessages.loader = { conversationId in
+            if self.client == nil {
+                return []
+            }
             let c = try await self.client!.conversations.findConversation(conversationId: conversationId)!
             return try await c.messages(limit: 10) // TODO paging etc.
         }
@@ -115,7 +122,7 @@ class XmtpSession {
         conversationMembers.clear()
         conversationMessages.clear()
         inboxes.clear()
-        // TODO: clear saved credentials
+        // TODO: clear saved credentials etc
         client = nil
         state = .loggedOut
     }

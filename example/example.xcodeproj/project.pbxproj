@@ -7,11 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		025887152D8A7CCC005BBEB2 /* XMTPiOS in Frameworks */ = {isa = PBXBuildFile; productRef = 025887142D8A7CCC005BBEB2 /* XMTPiOS */; };
-		025887402D8A7E43005BBEB2 /* XMTPiOS in Frameworks */ = {isa = PBXBuildFile; productRef = 0258873F2D8A7E43005BBEB2 /* XMTPiOS */; };
-		02B239CC2D8A7ED9007AA4A0 /* XMTPiOS in Frameworks */ = {isa = PBXBuildFile; productRef = 02B239CB2D8A7ED9007AA4A0 /* XMTPiOS */; };
-		02B239CF2D8A7EF1007AA4A0 /* CoinbaseWalletSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 02B239CE2D8A7EF1007AA4A0 /* CoinbaseWalletSDK */; };
-		02DE6EE82D7C0DDF002FE4CD /* XMTPiOS in Frameworks */ = {isa = PBXBuildFile; productRef = 02DE6EE72D7C0DDF002FE4CD /* XMTPiOS */; };
+		02359B752D8BF430001F7605 /* web3swift in Frameworks */ = {isa = PBXBuildFile; productRef = 02359B742D8BF430001F7605 /* web3swift */; };
+		025481C22D8BF5E900FF6343 /* XMTPiOS in Frameworks */ = {isa = PBXBuildFile; productRef = 025481C12D8BF5E900FF6343 /* XMTPiOS */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,11 +28,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				025887402D8A7E43005BBEB2 /* XMTPiOS in Frameworks */,
-				02DE6EE82D7C0DDF002FE4CD /* XMTPiOS in Frameworks */,
-				025887152D8A7CCC005BBEB2 /* XMTPiOS in Frameworks */,
-				02B239CC2D8A7ED9007AA4A0 /* XMTPiOS in Frameworks */,
-				02B239CF2D8A7EF1007AA4A0 /* CoinbaseWalletSDK in Frameworks */,
+				02359B752D8BF430001F7605 /* web3swift in Frameworks */,
+				025481C22D8BF5E900FF6343 /* XMTPiOS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,11 +72,8 @@
 			);
 			name = example;
 			packageProductDependencies = (
-				02DE6EE72D7C0DDF002FE4CD /* XMTPiOS */,
-				025887142D8A7CCC005BBEB2 /* XMTPiOS */,
-				0258873F2D8A7E43005BBEB2 /* XMTPiOS */,
-				02B239CB2D8A7ED9007AA4A0 /* XMTPiOS */,
-				02B239CE2D8A7EF1007AA4A0 /* CoinbaseWalletSDK */,
+				02359B742D8BF430001F7605 /* web3swift */,
+				025481C12D8BF5E900FF6343 /* XMTPiOS */,
 			);
 			productName = example;
 			productReference = 02DE6ECE2D7BD2E7002FE4CD /* example.app */;
@@ -113,8 +104,8 @@
 			mainGroup = 02DE6EC52D7BD2E7002FE4CD;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				02B239CA2D8A7ED9007AA4A0 /* XCRemoteSwiftPackageReference "xmtp-ios" */,
-				02B239CD2D8A7EF1007AA4A0 /* XCRemoteSwiftPackageReference "wallet-mobile-sdk" */,
+				02359B732D8BF430001F7605 /* XCRemoteSwiftPackageReference "web3swift" */,
+				025481C02D8BF5E900FF6343 /* XCLocalSwiftPackageReference "../../xmtp-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 02DE6ECF2D7BD2E7002FE4CD /* Products */;
@@ -347,45 +338,31 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		02B239CA2D8A7ED9007AA4A0 /* XCRemoteSwiftPackageReference "xmtp-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/xmtp/xmtp-ios";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		025481C02D8BF5E900FF6343 /* XCLocalSwiftPackageReference "../../xmtp-ios" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../xmtp-ios";
 		};
-		02B239CD2D8A7EF1007AA4A0 /* XCRemoteSwiftPackageReference "wallet-mobile-sdk" */ = {
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		02359B732D8BF430001F7605 /* XCRemoteSwiftPackageReference "web3swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/coinbase/wallet-mobile-sdk";
+			repositoryURL = "https://github.com/web3swift-team/web3swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.2;
+				minimumVersion = 3.3.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		025887142D8A7CCC005BBEB2 /* XMTPiOS */ = {
+		02359B742D8BF430001F7605 /* web3swift */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = XMTPiOS;
+			package = 02359B732D8BF430001F7605 /* XCRemoteSwiftPackageReference "web3swift" */;
+			productName = web3swift;
 		};
-		0258873F2D8A7E43005BBEB2 /* XMTPiOS */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = XMTPiOS;
-		};
-		02B239CB2D8A7ED9007AA4A0 /* XMTPiOS */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 02B239CA2D8A7ED9007AA4A0 /* XCRemoteSwiftPackageReference "xmtp-ios" */;
-			productName = XMTPiOS;
-		};
-		02B239CE2D8A7EF1007AA4A0 /* CoinbaseWalletSDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 02B239CD2D8A7EF1007AA4A0 /* XCRemoteSwiftPackageReference "wallet-mobile-sdk" */;
-			productName = CoinbaseWalletSDK;
-		};
-		02DE6EE72D7C0DDF002FE4CD /* XMTPiOS */ = {
+		025481C12D8BF5E900FF6343 /* XMTPiOS */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = XMTPiOS;
 		};

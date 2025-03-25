@@ -1,16 +1,25 @@
 import SwiftUI
 import XMTPiOS
+import web3swift
+import Web3Core
 
 // A name resolver for XMTP identities.
 //
 // By default this returns `0x1234...1234` for the identifier.
-// TODO: resolve ENS and TBD other names
+// This uses `EnsResolver` for Ethereum addresses.
+//
+// TODO: support other name resolvers.
 @Observable
 class NameResolver {
     let ethereum = ObservableCache<String>(defaultValue: { identifier in
         return "\(identifier.prefix(6))...\(identifier.suffix(4))"
     })
+
     
+    // Note: replace this with your own RPC provider URL.
+    private let ensResolver = EnsResolver(
+        rpcUrlString: "https://eth-mainnet.g.alchemy.com/v2/WV-bLot1hKjjCfpPq603Ro-jViFzwYX8")
+
     init() {
         ethereum.loader = self.resolveEthereumName
     }
@@ -31,22 +40,16 @@ class NameResolver {
     }
     
     func resolveEthereumName(_ identifier: String) async throws -> String {
-        print("resolving ethereum name for \(identifier)")
-        
-        // TODO: resolve the ENS name for this address
-        // TODO: reverse("\(identifier).addr.reverse") -> name
-        // TODO: ref https://github.com/wevm/viem/blob/main/src/actions/ens/getEnsName.ts
+        if let name = try? await ensResolver.resolveName(forAddress: identifier) {
+            return name
+        }
         return "\(identifier.prefix(6))...\(identifier.suffix(4))"
     }
 }
 
 extension PublicIdentity {
     var abbreviated: String {
-        switch kind {
-        case .ethereum:
-            return "\(identifier.prefix(6))...\(identifier.suffix(4))"
-        default:
-            return "\(identifier.prefix(6))...\(identifier.suffix(4))"
-        }
+        "\(identifier.prefix(6))...\(identifier.suffix(4))"
     }
 }
+

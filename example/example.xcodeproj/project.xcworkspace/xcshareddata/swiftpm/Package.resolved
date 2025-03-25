@@ -1,6 +1,15 @@
 {
-  "originHash" : "1e58fb2991163a33d4e23aaa016be1f784fe764c69c3eb04fff7b72c308475e6",
+  "originHash" : "b0e2265cd299a76158aecd92f65691f082440fb697cd38b4000c0c07fdfe3d27",
   "pins" : [
+    {
+      "identity" : "bigint",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/attaswift/BigInt.git",
+      "state" : {
+        "revision" : "793a7fac0bfc318e85994bf6900652e827aef33e",
+        "version" : "5.4.1"
+      }
+    },
     {
       "identity" : "connect-swift",
       "kind" : "remoteSourceControl",
@@ -20,21 +29,21 @@
       }
     },
     {
-      "identity" : "csecp256k1.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tesseract-one/CSecp256k1.swift.git",
-      "state" : {
-        "revision" : "cfbd6f540d5084bc96a60af841121472fbe725a3",
-        "version" : "0.2.0"
-      }
-    },
-    {
       "identity" : "libxmtp-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/xmtp/libxmtp-swift.git",
       "state" : {
-        "revision" : "bc1e1097f252a54ebaa81e52af9490f85ee3a30a",
-        "version" : "4.0.0"
+        "revision" : "9a901ea9ac39cb9a1fd0e0a1455b5f68fda627f8",
+        "version" : "4.0.1"
+      }
+    },
+    {
+      "identity" : "secp256k1.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/GigaBitcoin/secp256k1.swift",
+      "state" : {
+        "revision" : "48fb20fce4ca3aad89180448a127d5bc16f0e44c",
+        "version" : "0.10.0"
       }
     },
     {
@@ -101,21 +110,12 @@
       }
     },
     {
-      "identity" : "wallet-mobile-sdk",
+      "identity" : "web3swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/coinbase/wallet-mobile-sdk",
+      "location" : "https://github.com/web3swift-team/web3swift",
       "state" : {
-        "revision" : "4293df51d3500b8e876ca4bf0d7548adf097569a",
-        "version" : "1.1.2"
-      }
-    },
-    {
-      "identity" : "xmtp-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/xmtp/xmtp-ios",
-      "state" : {
-        "revision" : "d175621b76a544a258cb7e5d53bc29dc8e9396bb",
-        "version" : "4.0.0"
+        "revision" : "119d179305788687e80083671698b3f08c970e7f",
+        "version" : "3.3.0"
       }
     }
   ],
