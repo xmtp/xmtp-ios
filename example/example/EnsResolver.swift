@@ -16,10 +16,10 @@ class EnsResolver {
     // ref: https://docs.ens.domains/learn/deployments
     private let resolverAddress = "0xce01f8eee7E479C928F8919abD53E553a36CeF67".lowercased()
 
-
     // This works with any mainnet RPC provider
     //  e.g. `https://eth-mainnet.g.alchemy.com/v2/...`
     convenience init(rpcUrlString: String) {
+        // swiftlint:disable:next force_unwrapping
         self.init(rpcUrl: URL(string: rpcUrlString)!)
     }
 
@@ -83,7 +83,7 @@ class EnsResolver {
         //     "name":"addr",
         //     "inputs":[{"type":"bytes32","name":"name"}],
         //     "outputs": [{"type":"address","name":""}]
-        let encodedAddrCall = Data(hex: "3b3b57de") + namehash(name.lowercased())!
+        let encodedAddrCall = Data(hex: "3b3b57de") + (namehash(name.lowercased()) ?? Data())
 
         // This performs extremely lightweight ABI encoding of the expected input/output.
         //  ref: universalResolverResolveAbi
@@ -133,16 +133,16 @@ class EnsResolver {
         if (value.isEmpty) {
             return Data()
         }
-        var bytes = Data(count: value.data(using: .utf8)!.count + 2)
+        var bytes = Data(count: value.data(using: .utf8)?.count ?? 0 + 2)
         var offset = 0
         let list = value.split(separator: ".")
         for i in 0..<list.count {
-            var encoded = String(list[i]).data(using: .utf8)!
+            var encoded = String(list[i]).data(using: .utf8) ?? Data()
             // if the length is > 255, make the encoded label value a labelhash
             // this is compatible with the universal resolver
             if (encoded.count > 255) {
                 let encodedHash = "[\(encoded.sha3(.keccak256).toHexString())]"
-                encoded = encodedHash.data(using: .utf8)!
+                encoded = encodedHash.data(using: .utf8) ?? Data()
             }
             bytes[offset] = UInt8(encoded.count)
             bytes.replaceSubrange(offset + 1..<offset + 1 + encoded.count, with: encoded)
@@ -242,7 +242,7 @@ private struct EthereumRPCRequest: Encodable {
     }
 
     public var encoded: Data {
-        try! JSONEncoder().encode(self)
+        (try? JSONEncoder().encode(self)) ?? Data()
     }
 }
 

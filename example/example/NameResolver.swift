@@ -13,7 +13,6 @@ class NameResolver {
         return "\(identifier.prefix(6))...\(identifier.suffix(4))"
     })
 
-
     // Note: replace this with your own RPC provider URL.
     private let ensResolver = EnsResolver(
         rpcUrlString: "https://eth-mainnet.g.alchemy.com/v2/WV-bLot1hKjjCfpPq603Ro-jViFzwYX8")
@@ -23,17 +22,17 @@ class NameResolver {
     }
 
     subscript(_ identity: PublicIdentity?) -> ObservableItem<String> {
-        if identity == nil {
+        guard let ident = identity else {
             return ObservableItem(identifier: "") // nil-ish
         }
         // For ethereum identifiers, try to resolve it.
-        if case .ethereum = identity!.kind {
-            return ethereum[identity!.identifier]
+        if case .ethereum = ident.kind {
+            return ethereum[ident.identifier]
         }
         // For unknown identifier types, just show the abbreviated edition.
         return ObservableItem(
-            identifier: identity!.identifier,
-            defaultValue: identity!.abbreviated
+            identifier: ident.identifier,
+            defaultValue: ident.abbreviated
         )
     }
 
@@ -50,4 +49,3 @@ extension PublicIdentity {
         "\(identifier.prefix(6))...\(identifier.suffix(4))"
     }
 }
-
