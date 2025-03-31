@@ -1,7 +1,5 @@
 import SwiftUI
 import XMTPiOS
-import web3swift
-import Web3Core
 
 // A name resolver for XMTP identities.
 //
@@ -15,7 +13,7 @@ class NameResolver {
         return "\(identifier.prefix(6))...\(identifier.suffix(4))"
     })
 
-    
+
     // Note: replace this with your own RPC provider URL.
     private let ensResolver = EnsResolver(
         rpcUrlString: "https://eth-mainnet.g.alchemy.com/v2/WV-bLot1hKjjCfpPq603Ro-jViFzwYX8")
@@ -23,7 +21,7 @@ class NameResolver {
     init() {
         ethereum.loader = self.resolveEthereumName
     }
-    
+
     subscript(_ identity: PublicIdentity?) -> ObservableItem<String> {
         if identity == nil {
             return ObservableItem(identifier: "") // nil-ish
@@ -38,7 +36,7 @@ class NameResolver {
             defaultValue: identity!.abbreviated
         )
     }
-    
+
     func resolveEthereumName(_ identifier: String) async throws -> String {
         if let name = try? await ensResolver.resolveName(forAddress: identifier) {
             return name

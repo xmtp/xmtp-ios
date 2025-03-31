@@ -1,7 +1,6 @@
 import SwiftUI
 import XMTPiOS
 import OSLog
-import web3swift
 
 // The user's authenticated session with XMTP.
 //
@@ -15,7 +14,7 @@ class XmtpSession {
         case loggedOut
         case loggedIn
     }
-    
+
     private(set) var state: State = .loading
     var inboxId: String? {
         client?.inboxID
@@ -25,9 +24,9 @@ class XmtpSession {
     let conversationMembers = ObservableCache<[Member]>(defaultValue: [])
     let conversationMessages = ObservableCache<[DecodedMessage]>(defaultValue: [])
     let inboxes = ObservableCache<InboxState>(defaultValue: nil)
-    
+
     private var client: Client?
-    
+
     init() {
         // TODO: check for saved credentials from the keychain
         state = .loggedOut
@@ -54,7 +53,7 @@ class XmtpSession {
                 inboxIds: [inboxId]).first! // there's only one.
         }
     }
-    
+
     func login() async throws {
         Self.logger.debug("login")
         guard state == .loggedOut else { return }
@@ -63,33 +62,33 @@ class XmtpSession {
             Self.logger.info("login \(self.client == nil ? "failed" : "succeeded")")
             state = client == nil ? .loggedOut : .loggedIn
         }
-        
+
         // TODO: accept as params
         // TODO: use real account
         let account = try PrivateKey.generate()
         let dbKey = Data((0 ..< 32)
             .map { _ in UInt8.random(in: UInt8.min ... UInt8.max) })
-        
+
         // To re-use a randomly generated account during dev,
         // copy these from the logs of the first run:
         //        let account = PrivateKey(jsonString: "...")
         //        let dbKey = Data(base64Encoded: "...")
         Self.logger.trace("dbKey: \(dbKey.base64EncodedString())")
         Self.logger.trace("account: \(try! account.jsonString())")
-        
+
         client = try await Client.create(account: account, options: ClientOptions(dbEncryptionKey: dbKey))
         Self.logger.trace("inboxID: \((self.client?.inboxID) ?? "?")")
-        
+
         // TODO: save credentials in the keychain
     }
-    
+
     func refreshConversations() async throws {
         Self.logger.debug("refreshConversations")
         _ = try await client?.conversations.syncAllConversations()
         let conversations = (try? await client?.conversations.list()) ?? []  // TODO: paging etc.
         self.conversationIds = conversations.map { $0.id }
     }
-    
+
     func refreshConversation(conversationId: String) async throws {
         Self.logger.debug("refreshConversation \(conversationId)")
         guard let c = try await client?.conversations.findConversation(conversationId: conversationId) else {
