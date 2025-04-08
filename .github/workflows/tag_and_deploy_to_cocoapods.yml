@@ -2,11 +2,6 @@ name: tag_and_deploy_to_cocoapods
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to deploy from'
-        required: true
-        default: 'main'
 
 jobs:
   build:
@@ -15,7 +10,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.inputs.branch }}
         fetch-depth: 0
     
     - name: Install Cocoapods
