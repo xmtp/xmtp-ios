@@ -36,7 +36,7 @@ jobs:
     
     - name: Update podspec with new version
       run: |
-        sed -i '' "s/spec.version *= *'$SPEC_VERSION'/spec.version = '$UPDATED_VERSION'/" XMTP.podspec
+        sed -i '' "s/spec\.version *= *\"$SPEC_VERSION\"/spec.version = \"$UPDATED_VERSION\"/" XMTP.podspec
         echo "Updated podspec with version: $UPDATED_VERSION"
     
     - name: Create and push tag
