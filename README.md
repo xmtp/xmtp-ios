@@ -93,7 +93,8 @@ You can save your encryptionKey for the local database and build the client via 
 // Create the client with a `SigningKey` from your app
 let options = ClientOptions(api: ClientOptions.Api(env: .production, isSecure: true), dbEncryptionKey: encryptionKey, appContext: context)
 let client = try Client().build(address: account.address, options: options)
-``
+```
+
 ### Configure the client
 
 You can configure the client with these parameters of `Client.create`:
