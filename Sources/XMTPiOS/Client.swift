@@ -158,7 +158,7 @@ public final class Client {
 				}
 			} else {
 				throw ClientError.creationError(
-					"No v3 keys found, you must pass a SigningKey in order to enable alpha MLS features"
+					"No signing key found, you must pass a SigningKey in order to create an MLS client"
 				)
 			}
 		}
