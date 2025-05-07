@@ -157,6 +157,12 @@ public final class Client {
 					)
 				}
 			} else {
+				// add log messages here for logging 1) dbDirectory, 2) number of files in dbDirectory, 3) dbPath
+				os_log("custom dbDirectory: %{public}@", log: OSLog.default, type: .info, options.dbDirectory ?? "nil")
+				os_log("dbPath: %{public}@", log: OSLog.default, type: .info, dbPath)
+				let dbPathDirectory = URL(fileURLWithPath: dbPath).deletingLastPathComponent().path
+				os_log("dbPath Directory: %{public}@", log: OSLog.default, type: .info, dbPathDirectory)
+        		os_log("Number of files in dbDirectory: %{public}@", log: OSLog.default, type: .info, "\(getNumberOfFilesInDirectory(directory: dbPathDirectory))")
 				throw ClientError.creationError(
 					"No signing key found, you must pass a SigningKey in order to create an MLS client"
 				)
@@ -887,5 +893,53 @@ extension Client {
 		}
 		
 		return deletedCount
-	}
+    }
+    
+    private static func getNumberOfFilesInDirectory(directory: String?) -> Int {
+        guard let directory = directory else {
+            os_log("Directory is nil", log: OSLog.default, type: .error)
+            return 0
+        }
+        
+        let fileManager = FileManager.default
+        let directoryURL = URL(fileURLWithPath: directory, isDirectory: true)
+        
+        // Check if directory exists
+        if !fileManager.fileExists(atPath: directory) {
+            os_log("Directory does not exist: %{public}@", log: OSLog.default, type: .error, directory)
+            return 0
+        }
+        
+        do {
+            let contents = try fileManager.contentsOfDirectory(
+                at: directoryURL,
+                includingPropertiesForKeys: [.isRegularFileKey],
+                options: []
+            )
+            
+            // Log the contents found
+            os_log("Found %{public}d items in directory", log: OSLog.default, type: .debug, contents.count)
+            
+            // Count only regular files, not directories
+            var fileCount = 0
+            for url in contents {
+                do {
+                    let resourceValues = try url.resourceValues(forKeys: [.isRegularFileKey])
+                    if resourceValues.isRegularFile == true {
+                        fileCount += 1
+                        os_log("Regular file found: %{public}@", log: OSLog.default, type: .debug, url.lastPathComponent)
+                    } else {
+                        os_log("Non-regular file found: %{public}@", log: OSLog.default, type: .debug, url.lastPathComponent)
+                    }
+                } catch {
+                    os_log("Error checking file type: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+                }
+            }
+            
+            return fileCount
+        } catch {
+            os_log("Error reading directory: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+            return 0
+        }
+    }
 }
