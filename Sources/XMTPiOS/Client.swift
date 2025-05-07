@@ -158,11 +158,11 @@ public final class Client {
 				}
 			} else {
 				// add log messages here for logging 1) dbDirectory, 2) number of files in dbDirectory, 3) dbPath
-				os_log("custom dbDirectory: %{public}@", log: OSLog.default, type: .info, options.dbDirectory ?? "nil")
-				os_log("dbPath: %{public}@", log: OSLog.default, type: .info, dbPath)
 				let dbPathDirectory = URL(fileURLWithPath: dbPath).deletingLastPathComponent().path
-				os_log("dbPath Directory: %{public}@", log: OSLog.default, type: .info, dbPathDirectory)
-        		os_log("Number of files in dbDirectory: %{public}@", log: OSLog.default, type: .info, "\(getNumberOfFilesInDirectory(directory: dbPathDirectory))")
+				XMTPLogger.database.error("custom dbDirectory: \(options.dbDirectory ?? "nil")")
+				XMTPLogger.database.error("dbPath: \(dbPath)")
+				XMTPLogger.database.error("dbPath Directory: \(dbPathDirectory)")
+				XMTPLogger.database.error("Number of files in dbDirectory: \(getNumberOfFilesInDirectory(directory: dbPathDirectory))")
 				throw ClientError.creationError(
 					"No signing key found, you must pass a SigningKey in order to create an MLS client"
 				)
@@ -897,7 +897,7 @@ extension Client {
     
     private static func getNumberOfFilesInDirectory(directory: String?) -> Int {
         guard let directory = directory else {
-            os_log("Directory is nil", log: OSLog.default, type: .error)
+            XMTPLogger.database.error("Directory is nil")
             return 0
         }
         
@@ -906,7 +906,7 @@ extension Client {
         
         // Check if directory exists
         if !fileManager.fileExists(atPath: directory) {
-            os_log("Directory does not exist: %{public}@", log: OSLog.default, type: .error, directory)
+            XMTPLogger.database.error("Directory does not exist: \(directory)")
             return 0
         }
         
@@ -918,7 +918,7 @@ extension Client {
             )
             
             // Log the contents found
-            os_log("Found %{public}d items in directory", log: OSLog.default, type: .debug, contents.count)
+            XMTPLogger.database.debug("Found \(contents.count) items in directory")
             
             // Count only regular files, not directories
             var fileCount = 0
@@ -927,18 +927,18 @@ extension Client {
                     let resourceValues = try url.resourceValues(forKeys: [.isRegularFileKey])
                     if resourceValues.isRegularFile == true {
                         fileCount += 1
-                        os_log("Regular file found: %{public}@", log: OSLog.default, type: .debug, url.lastPathComponent)
+                        XMTPLogger.database.debug("Regular file found: \(url.lastPathComponent)")
                     } else {
-                        os_log("Non-regular file found: %{public}@", log: OSLog.default, type: .debug, url.lastPathComponent)
+                        XMTPLogger.database.debug("Non-regular file found: \(url.lastPathComponent)")
                     }
                 } catch {
-                    os_log("Error checking file type: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+                    XMTPLogger.database.error("Error checking file type: \(error.localizedDescription)")
                 }
             }
             
             return fileCount
         } catch {
-            os_log("Error reading directory: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+            XMTPLogger.database.error("Error reading directory: \(error.localizedDescription)")
             return 0
         }
     }
