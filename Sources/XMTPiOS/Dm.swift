@@ -368,4 +368,21 @@ public struct Dm: Identifiable, Equatable, Hashable {
 			return DecodedMessage.create(ffiMessage: ffiMessageWithReactions)
 		}
 	}
+
+    public func getHmacKeys() throws
+    -> Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse {
+        var hmacKeysResponse = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse()
+        let keys = try ffiConversation.getHmacKeys()
+        for key in keys {
+            var hmacKeys = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeys()
+            var hmacKeyData = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeyData()
+            hmacKeyData.hmacKey = key.key
+            hmacKeyData.thirtyDayPeriodsSinceEpoch = Int32(key.epoch)
+            hmacKeys.values.append(hmacKeyData)
+            hmacKeysResponse.hmacKeys[
+                Topic.groupMessage(ffiConversation.id().toHex).description] = hmacKeys
+        }
+        return hmacKeysResponse
+    }
+	
 }
