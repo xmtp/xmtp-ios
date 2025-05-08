@@ -305,10 +305,10 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-    public func getPushTopics() throws -> [String] {
+    public func getPushTopics() async throws -> [String] {
         switch self {
         case let .group(group):
-            return try await group.getPushTopics()
+            return try group.getPushTopics()
         case let .dm(dm):
             return try await dm.getPushTopics()
         }
