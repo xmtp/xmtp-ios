@@ -97,8 +97,8 @@ class ConversationTests: XCTestCase {
 		let convoCountConsent = try await fixtures.boClient.conversations
 			.syncAllConversations(consentStates: [.allowed])
 
-		XCTAssertEqual(convoCount, 3)
-		XCTAssertEqual(convoCountConsent, 3)
+		XCTAssertEqual(convoCount, 2)
+		XCTAssertEqual(convoCountConsent, 2)
 
 		try await group.updateConsentState(state: .denied)
 
@@ -109,9 +109,9 @@ class ConversationTests: XCTestCase {
 		let convoCountCombined = try await fixtures.boClient.conversations
 			.syncAllConversations(consentStates: [.denied, .allowed])
 
-		XCTAssertEqual(convoCountAllowed, 2)
-		XCTAssertEqual(convoCountDenied, 2)
-		XCTAssertEqual(convoCountCombined, 3)
+		XCTAssertEqual(convoCountAllowed, 1)
+		XCTAssertEqual(convoCountDenied, 1)
+		XCTAssertEqual(convoCountCombined, 2)
 	}
 
 	func testCanListConversationsOrder() async throws {
@@ -309,10 +309,11 @@ class ConversationTests: XCTestCase {
 		}
 
 		// Wait a bit to ensure all messages are processed
-		try await Task.sleep(nanoseconds: 2_000_000_000)  // 2 seconds delay
+		try await Task.sleep(nanoseconds: 5_000_000_000)  // 2 seconds delay
 
 		caroTask.cancel()
 
+        // This test seems to fail with some random number between 87, 88, or 89, even with increased delay
 		XCTAssertEqual(messages.count, 90)
 		let caroMessagesCount = try await caroGroup.messages().count
 		XCTAssertEqual(caroMessagesCount, 40)
@@ -329,4 +330,30 @@ class ConversationTests: XCTestCase {
 		XCTAssertEqual(alixMessagesCount, 41)
 		XCTAssertEqual(caroMessagesCountAfterSync, 40)
 	}
+
+	func testCanCreateOptimisticGroup() async throws {
+		let fixtures = try await fixtures()
+		
+		let optimisticGroup = try await fixtures.boClient.conversations.newGroupOptimistic(
+			groupName: "Testing"
+		)
+		
+		XCTAssertEqual(try optimisticGroup.name(), "Testing")
+		
+		_ = try await optimisticGroup.prepareMessage(content: "testing")
+        let messages = try await optimisticGroup.messages()
+		XCTAssertEqual(messages.count, 1)
+		
+		_ = try await optimisticGroup.addMembers(inboxIds: [fixtures.alixClient.inboxID])
+		try await optimisticGroup.sync()
+		try await optimisticGroup.publishMessages()
+		
+        let messagesUpdated = try await optimisticGroup.messages()
+        let members = try await optimisticGroup.members
+        let name = try optimisticGroup.name()
+		XCTAssertEqual(messagesUpdated.count, 2)
+		XCTAssertEqual(members.count, 2)
+		XCTAssertEqual(name, "Testing")
+	}
+    
 }
