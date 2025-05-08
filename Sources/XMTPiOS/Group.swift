@@ -552,6 +552,10 @@ public struct Group: Identifiable, Equatable, Hashable {
         return hmacKeysResponse
     }
     
+    public func getPushTopics() throws -> [String] {
+        return [topic]
+    }
+    
     public func getDebugInformation() async throws -> ConversationDebugInfo {
         return ConversationDebugInfo(ffiConversationDebugInfo: try await ffiGroup.conversationDebugInfo())
     }

@@ -385,8 +385,14 @@ public struct Dm: Identifiable, Equatable, Hashable {
         return hmacKeysResponse
     }
     
+    public func getPushTopics() async throws -> [String] {
+        var duplicates = try await ffiConversation.findDuplicateDms()
+        var topicIds = duplicates.map { $0.id().toHex }
+        topicIds.append(id)
+        return topicIds.map { Topic.groupMessage($0).description }
+    }
+    
     public func getDebugInformation() async throws -> ConversationDebugInfo {
         return ConversationDebugInfo(ffiConversationDebugInfo: try await ffiConversation.conversationDebugInfo())
     }
-	
 }
