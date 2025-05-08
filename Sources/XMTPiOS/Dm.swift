@@ -7,6 +7,21 @@ public struct Dm: Identifiable, Equatable, Hashable {
 	var client: Client
 	let streamHolder = StreamHolder()
 
+    public enum ConversationError: Error, CustomStringConvertible, LocalizedError {
+        case missingPeerInboxId
+        
+        public var description: String {
+            switch self {
+            case .missingPeerInboxId:
+                return "ConversationError.missingPeerInboxId: The direct message is missing a peer inbox ID"
+            }
+        }
+        
+        public var errorDescription: String? {
+            return description
+        }
+    }
+    
 	public var id: String {
 		ffiConversation.id().toHex
 	}
@@ -65,10 +80,13 @@ public struct Dm: Identifiable, Equatable, Hashable {
 	}
 
 	public var peerInboxId: InboxId {
-		get throws {
-			try ffiConversation.dmPeerInboxId()
-		}
-	}
+        get throws {
+            guard let inboxId = ffiConversation.dmPeerInboxId() else {
+                throw ConversationError.missingPeerInboxId
+            }
+            return inboxId
+        }
+    }
 
 	public var createdAt: Date {
 		Date(millisecondsSinceEpoch: ffiConversation.createdAtNs())
