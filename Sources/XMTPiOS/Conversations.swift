@@ -518,6 +518,31 @@ public actor Conversations {
 		return group
 	}
 
+	public func newGroupOptimistic(
+		permissions: GroupPermissionPreconfiguration = .allMembers,
+		groupName: String = "",
+		groupImageUrlSquare: String = "",
+		groupDescription: String = "",
+		disappearingMessageSettings: DisappearingMessageSettings? = nil
+	) throws -> Group {
+		let ffiOpts = FfiCreateGroupOptions(
+            permissions: GroupPermissionPreconfiguration.toFfiGroupPermissionOptions(option: permissions),
+			groupName: groupName,
+			groupImageUrlSquare: groupImageUrlSquare,
+			groupDescription: groupDescription,
+			customPermissionPolicySet: nil,
+			messageDisappearingSettings: disappearingMessageSettings.map { settings in
+				FfiMessageDisappearingSettings(
+					fromNs: settings.disappearStartingAtNs,
+					inNs: settings.retentionDurationInNs
+				)
+			}
+		)
+		
+		let ffiGroup = try ffiConversations.createGroupOptimistic(opts: ffiOpts)
+		return Group(ffiGroup: ffiGroup, client: client)
+	}
+
 	public func streamAllMessages(type: ConversationFilterType = .all, consentStates: [ConsentState] = [])
 		-> AsyncThrowingStream<DecodedMessage, Error>
 	{
