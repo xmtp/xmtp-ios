@@ -304,4 +304,13 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			return try dm.getHmacKeys()
 		}
 	}
+
+	public func getDebugInformation() async throws -> ConversationDebugInfo  {
+		switch self {
+		case let .group(group):
+			return try await group.getDebugInformation()
+		case let .dm(dm):
+			return try await dm.getDebugInformation()
+		}
+	}
 }
