@@ -543,7 +543,7 @@ public actor Conversations {
 		return Group(ffiGroup: ffiGroup, client: client)
 	}
 
-	public func streamAllMessages(type: ConversationFilterType = .all, consentStates: [ConsentState] = [])
+	public func streamAllMessages(type: ConversationFilterType = .all, consentStates: [ConsentState]? = nil)
 		-> AsyncThrowingStream<DecodedMessage, Error>
 	{
 		AsyncThrowingStream { continuation in
@@ -569,17 +569,17 @@ public actor Conversations {
 				case .groups:
 					stream = await ffiConversations.streamAllGroupMessages(
 						messageCallback: messageCallback,
-                        consentStates: consentStates.toFFI
+                        consentStates: consentStates?.toFFI
 					)
 				case .dms:
 					stream = await ffiConversations.streamAllDmMessages(
 						messageCallback: messageCallback,
-                        consentStates: consentStates.toFFI
+                        consentStates: consentStates?.toFFI
 					)
 				case .all:
 					stream = await ffiConversations.streamAllMessages(
 						messageCallback: messageCallback,
-                        consentStates: consentStates.toFFI
+                        consentStates: consentStates?.toFFI
 					)
 				}
 				await ffiStreamActor.setFfiStream(stream)
