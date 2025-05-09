@@ -627,5 +627,18 @@ public actor Conversations {
 
 		return hmacKeysResponse
 	}
+    
+    public func allPushTopics() async throws -> [String] {
+        let options = FfiListConversationsOptions(
+            createdAfterNs: nil,
+            createdBeforeNs: nil,
+            limit: nil,
+            consentStates: nil,
+            includeDuplicateDms: true
+        )
+        
+        let conversations = try ffiConversations.list(opts: options)
+        return conversations.map { Topic.groupMessage($0.conversation().id().toHex).description }
+    }
 
 }

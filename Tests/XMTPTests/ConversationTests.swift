@@ -413,4 +413,72 @@ class ConversationTests: XCTestCase {
 		// Verify we only received messages from allowed conversations
 		XCTAssertEqual(allMessages.count, 2)
 	}
+
+	func testReturnsAllTopics() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let opts = ClientOptions(
+			api: ClientOptions.Api(env: .local, isSecure: false),
+			dbEncryptionKey: key)
+		
+		// Create a new private key for Eri
+		let eriWallet = try PrivateKey.generate()
+		
+		// Create first client for Eri
+		let eriClient = try await Client.create(
+			account: eriWallet, 
+			options: opts)
+		
+		let fixtures = try await fixtures()
+		
+		// Create first DM
+		let dm1 = try await eriClient.conversations.findOrCreateDm(
+			with: fixtures.boClient.inboxID)
+		
+		// Create a group
+		_ = try await fixtures.boClient.conversations.newGroup(
+			with: [eriClient.inboxID])
+		
+		// Create a second client with the same key
+		let dbPath = FileManager.default.temporaryDirectory.appendingPathComponent(
+			UUID().uuidString).path
+		var opts2 = opts
+        opts2.dbDirectory = dbPath
+		
+		let eriClient2 = try await Client.create(
+			account: eriWallet, 
+			options: opts2)
+		
+		// Create a second DM using the second client
+		_ = try await eriClient2.conversations.findOrCreateDm(
+			with: fixtures.boClient.inboxID)
+		
+		// Sync all the clients
+		_ = try await fixtures.boClient.conversations.syncAllConversations()
+		_ = try await eriClient2.conversations.syncAllConversations()
+		_ = try await eriClient.conversations.syncAllConversations()
+		
+		// Get all the topics and HMAC keys
+        let allTopics = try await eriClient.conversations.allPushTopics()
+		let conversations = try await eriClient.conversations.list()
+		let allHmacKeys = try await eriClient.conversations.getHmacKeys()
+		let dmHmacKeys = try dm1.getHmacKeys()
+		let dmTopics = try await dm1.getPushTopics()
+		
+		// Assertions
+		XCTAssertEqual(allTopics.count, 3)
+		XCTAssertEqual(conversations.count, 2)
+		
+		let hmacTopics = allHmacKeys.hmacKeys.keys
+		for topic in allTopics {
+			XCTAssertTrue(hmacTopics.contains(topic))
+		}
+		
+		XCTAssertEqual(dmTopics.count, 2)
+		XCTAssertTrue(Set(allTopics).isSuperset(of: Set(dmTopics)))
+		
+		let dmHmacTopics = dmHmacKeys.hmacKeys.keys
+		for topic in dmTopics {
+			XCTAssertTrue(dmHmacTopics.contains(topic))
+		}
+	}
 }
