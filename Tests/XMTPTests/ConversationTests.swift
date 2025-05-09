@@ -355,5 +355,62 @@ class ConversationTests: XCTestCase {
 		XCTAssertEqual(members.count, 2)
 		XCTAssertEqual(name, "Testing")
 	}
-    
+
+	func testCanStreamAllMessagesFilterConsent() async throws {
+		let fixtures = try await fixtures()
+		
+		// Create groups and conversations
+		let group = try await fixtures.boClient.conversations.newGroup(with: [
+			fixtures.caroClient.inboxID
+		])
+		let conversation = try await fixtures.boClient.conversations.findOrCreateDm(
+			with: fixtures.caroClient.inboxID)
+		let blockedGroup = try await fixtures.boClient.conversations.newGroup(with: [
+			fixtures.alixClient.inboxID
+		])
+		let blockedConversation = try await fixtures.boClient.conversations.findOrCreateDm(
+			with: fixtures.alixClient.inboxID)
+		
+		// Block some conversations
+		try await blockedGroup.updateConsentState(state: .denied)
+		try await blockedConversation.updateConsentState(state: .denied)
+		try await fixtures.boClient.conversations.sync()
+		
+		// Collect messages
+		var allMessages: [DecodedMessage] = []
+		let expectation = XCTestExpectation(description: "received allowed messages")
+		expectation.expectedFulfillmentCount = 2
+		
+		// Start streaming
+		let streamTask = Task {
+			for try await message in await fixtures.boClient.conversations.streamAllMessages(
+				consentStates: [.allowed]
+			) {
+				allMessages.append(message)
+				expectation.fulfill()
+				
+				if allMessages.count >= 2 {
+					break
+				}
+			}
+		}
+		
+		// Wait a bit before sending messages
+		try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 second
+		
+		// Send messages to all conversations
+		_ = try await group.send(content: "hi")
+		_ = try await conversation.send(content: "hi")
+		_ = try await blockedGroup.send(content: "hi")
+		_ = try await blockedConversation.send(content: "hi")
+		
+		// Wait for expectation to be fulfilled or timeout
+		await fulfillment(of: [expectation], timeout: 3)
+		
+		// Cancel streaming task
+		streamTask.cancel()
+		
+		// Verify we only received messages from allowed conversations
+		XCTAssertEqual(allMessages.count, 2)
+	}
 }
