@@ -54,7 +54,7 @@ public enum XMTPEnvironment: String, Sendable {
 		case .production:
 			return "https://message-history.production.ephemera.network"
 		case .local:
-			return "http://10.0.2.2:5558"
+			return "http://localhost:5558"
 		case .dev:
 			return "https://message-history.dev.ephemera.network"
 		}
