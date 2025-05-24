@@ -12,7 +12,7 @@ public class XMTPDebugInformation {
     private let client: Client
     private let ffiClient: FfiXmtpClient
     
-    public init(client: Client, ffiClient: FfiXmtpClient, ) {
+    public init(client: Client, ffiClient: FfiXmtpClient) {
         self.client = client
         self.ffiClient = ffiClient
     }
