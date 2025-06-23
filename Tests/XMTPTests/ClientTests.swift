@@ -1088,4 +1088,48 @@ class ClientTests: XCTestCase {
 		let remainingIds = state.installations.map { $0.id }
 		XCTAssertFalse(remainingIds.contains(toRevokeId))
 	}
+
+	func testStaticRevokeAllInstalltions() async throws {
+		let key = try Crypto.secureRandomBytes(count: 32)
+		let wallet = try PrivateKey.generate()
+
+		var clients: [Client] = []
+
+		for i in 0..<5 {
+			let client = try await Client.create(
+				account: wallet,
+				options: ClientOptions(
+					api: .init(env: .local, isSecure: false),
+					dbEncryptionKey: key,
+					dbDirectory: "xmtp_db_\(i)"
+				)
+			)
+			clients.append(client)
+		}
+
+		var states = try await Client.inboxStatesForInboxIds(
+			inboxIds: [
+				clients.last!.inboxID
+			],
+			api: ClientOptions.Api(env: .local, isSecure: false)
+		)
+		XCTAssertEqual(states.first!.installations.count, 5)
+
+		let toRevokeIds = states.first!.installations.map { $0.id }
+
+		try await Client.revokeInstallations(
+			api: .init(env: .local, isSecure: false),
+			signingKey: wallet,
+			inboxId: clients.first!.inboxID,
+			installationIds: toRevokeIds
+		)
+
+		states = try await Client.inboxStatesForInboxIds(
+			inboxIds: [
+				clients.last!.inboxID
+			],
+			api: ClientOptions.Api(env: .local, isSecure: false)
+		)
+		XCTAssertEqual(states.first!.installations.count, 0)
+	}
 }
