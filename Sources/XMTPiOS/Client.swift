@@ -334,19 +334,21 @@ public final class Client {
 		}
 	}
 
-	public static func connectToApiBackend(api: ClientOptions.Api) async throws
-		-> XmtpApiClient
-	{
+	public static func connectToApiBackend(api: ClientOptions.Api) async throws -> XmtpApiClient {
 		let cacheKey = api.env.url
 
-		if let cachedClient = await apiCache.getClient(forKey: cacheKey) {
-			return cachedClient
+		// Check for an existing connected client
+		if let cached = await apiCache.getClient(forKey: cacheKey), try await LibXMTP.isConnected(cached) {
+			return cached
 		}
 
-		let apiClient = try await connectToBackend(
-			host: api.env.url, isSecure: api.isSecure)
-		await apiCache.setClient(apiClient, forKey: cacheKey)
-		return apiClient
+		// Either not cached or not connected; create new client
+		let newClient = try await connectToBackend(
+			host: api.env.url,
+			isSecure: api.isSecure
+		)
+		await apiCache.setClient(newClient, forKey: cacheKey)
+		return newClient
 	}
 
 	public static func getOrCreateInboxId(
@@ -476,9 +478,9 @@ public final class Client {
 		inboxIds: [InboxId],
 		api: ClientOptions.Api
 	) async throws -> [InboxState] {
-		let ffiClient = try await prepareClient(api: api)
-		let result = try await ffiClient.addressesFromInboxId(
-			refreshFromNetwork: true, inboxIds: inboxIds)
+		let apiClient = try await connectToApiBackend(api: api)
+		let result = try await LibXMTP.inboxStatesFromInboxId(
+			apiClient: apiClient, inboxIds: inboxIds)
 		return result.map { InboxState(ffiInboxState: $0) }
 	}
 
