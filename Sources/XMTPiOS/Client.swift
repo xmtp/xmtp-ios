@@ -334,11 +334,15 @@ public final class Client {
 		}
 	}
 
-	public static func connectToApiBackend(api: ClientOptions.Api) async throws -> XmtpApiClient {
+	public static func connectToApiBackend(api: ClientOptions.Api) async throws
+		-> XmtpApiClient
+	{
 		let cacheKey = api.env.url
 
 		// Check for an existing connected client
-		if let cached = await apiCache.getClient(forKey: cacheKey), try await LibXMTP.isConnected(cached) {
+		if let cached = await apiCache.getClient(forKey: cacheKey),
+			try await LibXMTP.isConnected(api: cached)
+		{
 			return cached
 		}
 
@@ -479,8 +483,8 @@ public final class Client {
 		api: ClientOptions.Api
 	) async throws -> [InboxState] {
 		let apiClient = try await connectToApiBackend(api: api)
-		let result = try await LibXMTP.inboxStatesFromInboxId(
-			apiClient: apiClient, inboxIds: inboxIds)
+		let result = try await LibXMTP.inboxStateFromInboxIds(
+			api: apiClient, inboxIds: inboxIds)
 		return result.map { InboxState(ffiInboxState: $0) }
 	}
 
