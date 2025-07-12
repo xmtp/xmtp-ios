@@ -490,6 +490,36 @@ class GroupTests: XCTestCase {
 		XCTAssert(
 			!(cannotMessage[notOnNetwork.walletAddress.lowercased()] ?? true))
 	}
+	
+	func test_CanExhaustConnectionPoolQuickly() async throws {
+	  var clients: [Client] = []
+	  var failedAt: Int? = nil
+
+	  let key = try Crypto.secureRandomBytes(count: 32)
+	  let clientOptions = ClientOptions(
+		api: ClientOptions.Api(env: .local, isSecure: false),
+		dbEncryptionKey: key
+	  )
+
+	  for i in 1...100 {
+		do {
+		  let key = try PrivateKey.generate()
+		  let client = try await Client.create(account: key, options: clientOptions)
+		  clients.append(client)
+		  print("✅ Created client \(i)")
+		} catch {
+		  print("❌ Failed at client \(i): \(error)")
+		  failedAt = i
+		  break
+		}
+	  }
+
+	  if let failedAt = failedAt {
+		print("💥 Pool exhaustion happened at client \(failedAt)")
+	  } else {
+		print("✅ All clients created without error")
+	  }
+	}
 
 	func testIsActive() async throws {
 		let fixtures = try await fixtures()
