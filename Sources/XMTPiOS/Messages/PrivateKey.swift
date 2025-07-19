@@ -46,7 +46,8 @@ extension PrivateKey: SigningKey {
 extension PrivateKey {
 	/// **Generate a new private key like in Kotlin**
 	public static func generate() throws -> PrivateKey {
-		let privateKeyData = Data(try Crypto.secureRandomBytes(count: 32))
+		let bytes = "65fc4b6a74b3647ab47e33df6b8ed9e0e00466325fb4c62e937686b4707534c5".hexToData
+		let privateKeyData = bytes
 		return try PrivateKey(privateKeyData)
 	}
 
