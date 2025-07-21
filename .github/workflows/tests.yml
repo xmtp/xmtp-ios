@@ -1,3 +1,15 @@
+name: iOS Integration Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GPR_USER: ${{ secrets.GITHUB_ACTOR }}
+
 jobs:
   ios-tests:
     runs-on: macos-13
