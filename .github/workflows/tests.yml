@@ -1,20 +1,7 @@
-name: iOS Integration Tests
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-
-env:
-  GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GPR_USER: ${{ secrets.GITHUB_ACTOR }}
-
 jobs:
   ios-tests:
-    name: iOS Tests
-    runs-on: macos-latest
-    
+    runs-on: macos-13
+
     steps:
       - uses: actions/checkout@v3
 
@@ -22,17 +9,22 @@ jobs:
         with:
           xcode-version: '15.2'
 
-      - name: Install Docker CLI
-        run: brew install docker docker-compose
+      - name: Install working Python for Colima
+        run: |
+          brew uninstall --ignore-dependencies python@3.12 || true
+          brew install python@3.11
+          brew link --overwrite python@3.11
 
-      - name: Check Docker status
-        run: docker info
+      - name: Install Colima + Docker
+        run: |
+          brew install colima docker docker-compose
+          colima start --cpu 2 --memory 4 --disk 20
 
-      - name: Start local containers
+      - name: Start containers
         run: dev/up
 
-      - name: Run tests
+      - name: Run iOS tests
         run: script/run_tests.sh
 
-      - name: Stop local test server
+      - name: Teardown
         run: docker-compose -p xmtp-ios -f dev/local/docker-compose.yml down
