@@ -2,7 +2,7 @@ name: Deploy docs content to GitHub Pages
 
 on:
   push:
-    branches: ["main", "docs", "update_swift_rust"]
+    branches: ["main", "docs", "update_swift_rust", "bennycode/fix-docs"]
   workflow_dispatch:
 
 permissions:
