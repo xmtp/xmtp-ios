@@ -2,7 +2,7 @@ name: Deploy docs content to GitHub Pages
 
 on:
   push:
-    branches: ["main", "docs", "update_swift_rust", "bennycode/fix-docs"]
+    branches: ["main", "docs", "update_swift_rust"]
   workflow_dispatch:
 
 permissions:
@@ -55,7 +55,7 @@ jobs:
           bundle add jazzy
 
       - name: Generate documentation
-        run: bundle exec jazzy --output ./docs --theme=fullwidth
+        run: bundle exec jazzy --output ./docs --theme=fullwidth --module=XMTPiOS
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
