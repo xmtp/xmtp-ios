@@ -21,11 +21,19 @@ jobs:
         with:
           xcode-version: '15.2'
 
-      - name: Install working Python for Colima
+      - name: Setup working Python for Colima
         run: |
           brew uninstall --ignore-dependencies python@3.12 || true
+
+          # Remove conflicting files
+          rm -f /usr/local/bin/2to3-3.11
+          rm -f /usr/local/bin/idle3.11
+          rm -f /usr/local/bin/pydoc3.11
+          rm -f /usr/local/bin/python3.11
+          rm -f /usr/local/bin/python3.11-config
+
           brew install python@3.11
-          brew link --overwrite python@3.11
+          brew link --overwrite --force python@3.11
 
       - name: Install Colima + Docker
         run: |
