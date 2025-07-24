@@ -350,7 +350,7 @@ public final class Client {
 		// Either not cached or not connected; create new client
 		let newClient = try await connectToBackend(
 			host: api.env.url,
-			isSecure: api.isSecure
+			isSecure: api.isSecure, appVersion: nil
 		)
 		await apiCache.setClient(newClient, forKey: cacheKey)
 		return newClient
