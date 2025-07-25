@@ -514,4 +514,158 @@ class DmTests: XCTestCase {
 		try fixtures.cleanUpDatabases()
 	}
 
+    // The following typescript code is run using node-sdk against local to prime this test address with 1200 DMs:
+    //    for (let i = 0; i < 1200; i++) {
+    //        const key = generateEncryptionKeyHex();
+    //        const signer = createSigner(key);
+    //        const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
+    //        const client = await Client.create(signer, {
+    //          dbEncryptionKey: encryptionKey,
+    //          env: XMTP_ENV as XmtpEnv,
+    //          loggingLevel: LogLevel.error,
+    //        });
+    //        const conversation = await client.conversations.newDmWithIdentifier({
+    //          identifier: "0xf4bdf6e634a9b6679a5f8218b1c44a94bc80429f",
+    //          identifierKind: IdentifierKind.Ethereum,
+    //        });
+    //        await conversation.send("Hello, world!");
+    //        console.log("\"" + client.accountIdentifier?.identifier + "\",");
+    //      }
+    func testFunctionsWhileSyncing1200Dms() async throws {
+        // ────────── 1.  SETUP ──────────
+        let key = Data([
+            0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0,
+            0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
+            0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11,
+            0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99
+        ])
+        let privateKeyData = Data(
+            hex: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde7"
+        )
+        let wallet = try PrivateKey(privateKeyData)
+        print("CAMERON my address: \(wallet.walletAddress)")
+
+        let primary = try await Client.create(
+            account: wallet,
+            options: ClientOptions(
+                api: .init(env: .local, isSecure: false),
+                dbEncryptionKey: key,
+                dbDirectory: "xmtp_primary2"
+            )
+        )
+
+        let identity = PublicIdentity(kind: .ethereum,
+                                      identifier: "0x115f1cce7612ca4ddb98ec3de92782be9773869a")
+        let canMessage = try await primary.canMessage(identity: identity)
+        XCTAssertTrue(canMessage,
+                      "should be able to message identity: \(identity.identifier)")
+
+        // ────────── 2.  LAUNCH BACKGROUND SYNC ──────────
+        let syncTask = Task<(UInt32, Double), Error> {
+            let start = CFAbsoluteTimeGetCurrent()
+            let count = try await primary.conversations.syncAllConversations()
+            return (count, CFAbsoluteTimeGetCurrent() - start)
+        }
+
+        // ────────── 3.  HAMMER READS UNTIL CANCELLED ──────────
+        let hammerTask = Task<([String], [Double], [Double], [Double], [Double]), Error> {
+            var timings: [String] = []
+            var listTimes: [Double] = []
+            var messagesTimes: [Double] = []
+            var findTimes: [Double] = []
+            var updateTimes: [Double] = []
+            var i = 0
+
+            do {
+                while !Task.isCancelled {
+                    i += 1
+
+                    // READ: conversations.list()
+                    let listStart = CFAbsoluteTimeGetCurrent()
+                    let conversations = try await primary.conversations.list()
+                    let listTime = CFAbsoluteTimeGetCurrent() - listStart
+                    if conversations.isEmpty {
+                        continue
+                    }
+                    listTimes.append(listTime)
+                    timings.append("list() #\(i) ▸ \(String(format: "%.3f", listTime)) s (\(conversations.count) convos)")
+
+                    // READ: conversation.messages()
+                    let convo = conversations.randomElement()
+                    if convo != nil {
+                        let msgStart = CFAbsoluteTimeGetCurrent()
+                        let msgs = try await convo?.messages()
+                        let msgTime = CFAbsoluteTimeGetCurrent() - msgStart
+                        messagesTimes.append(msgTime)
+                        timings.append("messages() #\(i) ▸ \(String(format: "%.3f", msgTime)) s (\(msgs?.count ?? 0) msgs)")
+                    }
+                    
+                    // READ: conversations.findConversation()
+                    let findStart = CFAbsoluteTimeGetCurrent()
+                    let conversation = try await primary.conversations.findConversation(conversationId: convo!.id)
+                    let findTime = CFAbsoluteTimeGetCurrent() - findStart
+                    findTimes.append(findTime)
+                    timings.append("findConversation() #\(i) ▸ \(String(format: "%.3f", findTime)) s (\(conversation?.id ?? "<nil>"))")
+
+                    // update consent
+                    let updateStart = CFAbsoluteTimeGetCurrent()
+                    let updatedConsent = try await conversation?.updateConsentState(state: .allowed)
+                    let updateTime = CFAbsoluteTimeGetCurrent() - updateStart
+                    updateTimes.append(updateTime)
+                    timings.append("updateConsent() #\(i) ▸ \(String(format: "%.3f", updateTime)) s")
+
+                    // ── yield to give syncTask CPU time ──
+                    if Task.isCancelled { break }
+                    try await Task.sleep(nanoseconds: 200_000_000)
+                }
+            } catch is CancellationError {
+                // ignore – we just want to return what we collected so far
+            }
+
+            return (timings, listTimes, messagesTimes, findTimes, updateTimes)
+        }
+
+
+        // ────────── 4.  WAIT FOR SYNC TO FINISH ──────────
+        let (syncedCount, syncElapsed) = try await syncTask.value
+
+        // ────────── 5.  STOP THE HAMMER & COLLECT RESULTS ──────────
+        hammerTask.cancel()
+        let (timingResults, listTimes, messagesTimes, findTimes, updateTimes) = try await hammerTask.value
+
+        // ────────── 6.  REPORT ──────────
+        print("\n=== CAMERON TIMING RESULTS ===")
+        timingResults.forEach { print($0) }
+        print("syncAllConversations() ▸ \(String(format: "%.3f", syncElapsed)) s " +
+              "for \(syncedCount) convos")
+
+        print("\n=== TIMING STATISTICS ===")
+        if !listTimes.isEmpty {
+            let avgList = listTimes.reduce(0, +) / Double(listTimes.count)
+            let maxList = listTimes.max() ?? 0
+            print("list() ▸ avg: \(String(format: "%.3f", avgList))s, max: \(String(format: "%.3f", maxList))s (\(listTimes.count) calls)")
+        }
+
+        if !messagesTimes.isEmpty {
+            let avgMessages = messagesTimes.reduce(0, +) / Double(messagesTimes.count)
+            let maxMessages = messagesTimes.max() ?? 0
+            print("messages() ▸ avg: \(String(format: "%.3f", avgMessages))s, max: \(String(format: "%.3f", maxMessages))s (\(messagesTimes.count) calls)")
+        }
+
+        if !findTimes.isEmpty {
+            let avgFind = findTimes.reduce(0, +) / Double(findTimes.count)
+            let maxFind = findTimes.max() ?? 0
+            print("findConversation() ▸ avg: \(String(format: "%.3f", avgFind))s, max: \(String(format: "%.3f", maxFind))s (\(findTimes.count) calls)")
+        }
+
+        if !updateTimes.isEmpty {
+            let avgUpdate = updateTimes.reduce(0, +) / Double(updateTimes.count)
+            let maxUpdate = updateTimes.max() ?? 0
+            print("updateConsent() ▸ avg: \(String(format: "%.3f", avgUpdate))s, max: \(String(format: "%.3f", maxUpdate))s (\(updateTimes.count) calls)")
+        }
+        print("=== END ===")
+        print("CAMERON my address: \(wallet.walletAddress)")
+    }
+
+
 }
