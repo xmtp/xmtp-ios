@@ -293,8 +293,13 @@ public final class Client {
 				dbURL = legacyDbURL
 			}
 		}
+		let syncClient = try await connectToBackend(
+			host: options.api.env.url,
+			isSecure: options.api.isSecure, appVersion: nil
+		)
 		let ffiClient = try await LibXMTP.createClient(
 			api: connectToApiBackend(api: options.api),
+			syncApi: syncClient,
 			db: dbURL,
 			encryptionKey: options.dbEncryptionKey,
 			inboxId: inboxId,
@@ -455,6 +460,10 @@ public final class Client {
 			api: api, publicIdentity: identity)
 		return try await LibXMTP.createClient(
 			api: connectToApiBackend(api: api),
+			syncApi: try await connectToBackend(
+				host: api.env.url,
+				isSecure: api.isSecure, appVersion: nil
+			),
 			db: nil,
 			encryptionKey: nil,
 			inboxId: inboxId,

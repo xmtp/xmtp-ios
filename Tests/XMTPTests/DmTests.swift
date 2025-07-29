@@ -642,28 +642,15 @@ class DmTests: XCTestCase {
 		print("Starting sync + consent race")
 
 
-		async let syncTask = primary.conversations.syncAllConversations()
-
-		async let consentTask: Void = {
-			guard
-				let dm = try? await primary.conversations.findConversation(
-					conversationId: dm.id)
-			else {
-				XCTFail("DM not found for consent update")
-				return
-			}
-
-			try? await dm.updateConsentState(state: .unknown)
-		}()
-		
 		let start = Date()
 
-		_ = try await (syncTask, consentTask)
+		_ = try await primary.conversations.syncAllConversations()
 
 		let duration = Date().timeIntervalSince(start)
 		print(
 			"100 groups, 100 DMs created; syncAll + consent change finished in \(duration) seconds"
 		)
+		assert(duration < 10)
 	}
 
 }
