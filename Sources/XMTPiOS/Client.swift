@@ -310,10 +310,8 @@ public final class Client {
 			}
 		}
 
-		let deviceSyncMode =
-			if !options.deviceSyncEnabled { FfiSyncWorkerMode.disabled } else {
-				FfiSyncWorkerMode.enabled
-			}
+		let deviceSyncMode: FfiSyncWorkerMode =
+			!options.deviceSyncEnabled ? .disabled : .enabled
 
 		let ffiClient = try await LibXMTP.createClient(
 			api: connectToApiBackend(api: options.api),
