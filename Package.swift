@@ -21,7 +21,7 @@ let package = Package(
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.0.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.4.3"),
 		.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", exact: "1.8.3"),
-		.package(url: "https://github.com/xmtp/libxmtp-swift.git", exact: "4.4.0-dev.256c8fc")
+		.package(url: "https://github.com/xmtp/libxmtp-swift.git", revision: "03af8b10781cacd9a07486eee88a9b49506e56bd")
 	],
 	targets: [
 		.target(
