@@ -642,16 +642,16 @@ class DmTests: XCTestCase {
 			//			try peer.deleteLocalDatabase()
 		}
 
-		let inboxId = primary.inboxID
+		let inboxId = secondary.inboxID
 		// Create 100 group conversations (each with 2 fresh members)
-		for _ in 0..<184 {
-			_ = try await secondary.conversations.newGroup(with: [inboxId]
+		for _ in 0..<200 {
+			_ = try await primary.conversations.newGroup(with: [inboxId]
 			)
 		}
 
 		print("Starting sync + consent race")
 
-
+		primary.debugInformation.clearAllStatistics()
 		let start = Date()
 
 		Task(priority: .userInitiated) {
@@ -663,6 +663,8 @@ class DmTests: XCTestCase {
 		_ = try await primary.conversations.syncAllConversations()
 
 		let duration = Date().timeIntervalSince(start)
+		let aggregateStats2 = primary.debugInformation.aggregateStatistics
+		print("Aggregate Stats Create:\n\(aggregateStats2)")
 		print(
 			"100 groups, 100 DMs created; syncAll + consent change finished in \(duration) seconds"
 		)
