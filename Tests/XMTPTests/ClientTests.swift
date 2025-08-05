@@ -875,7 +875,7 @@ class ClientTests: XCTestCase {
 
 		let identityStats2 = alix.debugInformation.identityStatistics
 		XCTAssertEqual(0, identityStats2.publishIdentityUpdate)
-		XCTAssertEqual(2, identityStats2.getIdentityUpdatesV2)
+		XCTAssertEqual(0, identityStats2.getIdentityUpdatesV2)
 		XCTAssertEqual(0, identityStats2.getInboxIds)
 		XCTAssertEqual(0, identityStats2.verifySmartContractWalletSignature)
 
