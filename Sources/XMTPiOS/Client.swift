@@ -741,6 +741,23 @@ public final class Client {
 			refreshFromNetwork: refreshFromNetwork, inboxIds: inboxIds
 		).map { InboxState(ffiInboxState: $0) }
 	}
+	
+	public func createArchive(
+		path: String,
+		encryptionKey: Data,
+		opts: ArchiveOptions = ArchiveOptions()
+	) async throws {
+		try await ffiClient.createArchive(path: path, opts: opts.toFfi(), encryptionKey: encryptionKey)
+	}
+
+	public func importArchive(path: String, encryptionKey: Data) async throws {
+		try await ffiClient.importArchive(path: path, encryptionKey: encryptionKey)
+	}
+
+	public func archiveMetadata(path: String, encryptionKey: Data) async throws -> ArchiveMetadata {
+		let ffiMetadata = try await ffiClient.archiveMetadata(path: path, encryptionKey: encryptionKey)
+		return ArchiveMetadata(ffiMetadata)
+	}
 
 	@available(
 		*,
