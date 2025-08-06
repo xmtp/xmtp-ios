@@ -8,13 +8,13 @@
 import LibXMTP
 
 public struct ArchiveOptions {
-	public var startNs: UInt64?
-	public var endNs: UInt64?
+	public var startNs: Int64?
+	public var endNs: Int64?
 	public var archiveElements: [ArchiveElement]
 
 	public init(
-		startNs: UInt64? = nil,
-		endNs: UInt64? = nil,
+		startNs: Int64? = nil,
+		endNs: Int64? = nil,
 		archiveElements: [ArchiveElement] = [.messages, .consent]
 	) {
 		self.startNs = startNs
@@ -44,7 +44,9 @@ public enum ArchiveElement {
 		}
 	}
 
-	public static func fromFfi(_ element: FfiBackupElementSelection) -> ArchiveElement {
+	public static func fromFfi(_ element: FfiBackupElementSelection)
+		-> ArchiveElement
+	{
 		switch element {
 		case .messages:
 			return .messages
@@ -53,7 +55,6 @@ public enum ArchiveElement {
 		}
 	}
 }
-
 
 public struct ArchiveMetadata {
 	private let ffi: FfiBackupMetadata
@@ -70,15 +71,15 @@ public struct ArchiveMetadata {
 		return ffi.elements.map { ArchiveElement.fromFfi($0) }
 	}
 
-	public var exportedAtNs: UInt64 {
+	public var exportedAtNs: Int64 {
 		return ffi.exportedAtNs
 	}
 
-	public var startNs: UInt64? {
+	public var startNs: Int64? {
 		return ffi.startNs
 	}
 
-	public var endNs: UInt64? {
+	public var endNs: Int64? {
 		return ffi.endNs
 	}
 }
