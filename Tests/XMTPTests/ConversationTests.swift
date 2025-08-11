@@ -225,6 +225,33 @@ class ConversationTests: XCTestCase {
 		}
 		try fixtures.cleanUpDatabases()
 	}
+    
+    func testMessagesDontDisappear() async throws {
+            let fixtures = try await fixtures()
+            
+            let alixGroup = try await fixtures.alixClient.conversations.newGroup(
+                with: [
+                    fixtures.boClient.inboxID,
+                ])
+            
+            _ = try await fixtures.alixClient.conversations.syncAllConversations()
+            
+            _ = try await alixGroup.send(content: "hello world")
+
+            let alixMessages = try await alixGroup.messages()
+            XCTAssertEqual(alixMessages.count, 2)
+            
+            // If you remove this sleep it passes
+            try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 seconds
+            
+            try await alixGroup.sync()
+            
+            let messages_2 = try await alixGroup.messages()
+            // FAILS ON NEXT LINE WITH ONLY 1 MESSAGE
+            XCTAssertEqual(messages_2.count, 2)
+            
+            try fixtures.cleanUpDatabases()
+        }
 
 	func testStreamsAndMessages() async throws {
 		var messages: [String] = []
