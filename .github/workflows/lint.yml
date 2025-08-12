@@ -13,6 +13,6 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '14'
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - run: swiftlint Sources/ example/
       - run: pod lib lint --allow-warnings
