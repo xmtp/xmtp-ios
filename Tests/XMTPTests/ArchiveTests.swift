@@ -33,12 +33,12 @@ class ArchiveTests: XCTestCase {
 		let group = try await alixClient.conversations.newGroup(with: [
 			fixtures.boClient.inboxID
 		])
-		try await group.send(content: "hi")
+        _ = try await group.send(content: "hi")
 
-		try await alixClient.conversations.syncAllConversations()
-		try await fixtures.boClient.conversations.syncAllConversations()
+        _ = try await alixClient.conversations.syncAllConversations()
+        _ = try await fixtures.boClient.conversations.syncAllConversations()
 
-		let boGroup = try await fixtures.boClient.conversations.findGroup(
+		let boGroup = try fixtures.boClient.conversations.findGroup(
 			groupId: group.id)!
 		try await alixClient.createArchive(
 			path: allPath, encryptionKey: encryptionKey)
@@ -70,18 +70,18 @@ class ArchiveTests: XCTestCase {
 
 		try await alixClient2.importArchive(
 			path: allPath, encryptionKey: encryptionKey)
-		try await alixClient.conversations.syncAllConversations()
+        _ = try await alixClient.conversations.syncAllConversations()
 		sleep(2)
-		try await alixClient2.conversations.syncAllConversations()
+        _ = try await alixClient2.conversations.syncAllConversations()
 		sleep(2)
 		try await alixClient.preferences.sync()
 		sleep(2)
 		try await alixClient2.preferences.sync()
 		sleep(2)
-		try await boGroup.send(content: "hey")
-		try await fixtures.boClient.conversations.syncAllConversations()
+        _ = try await boGroup.send(content: "hey")
+        _ = try await fixtures.boClient.conversations.syncAllConversations()
 		sleep(2)
-		try await alixClient2.conversations.syncAllConversations()
+        _ = try await alixClient2.conversations.syncAllConversations()
 
 		let convos = try await alixClient2.conversations.list()
 		XCTAssertEqual(convos.count, 1)
@@ -112,18 +112,16 @@ class ArchiveTests: XCTestCase {
 
 		let allPath = "xmtp_test1/testAll.zstd"
 
+        // 1. Alix creates a dm with Bo, sends a message, and then creates an archive
 		let dm = try await alixClient.conversations.findOrCreateDm(
 			with: fixtures.boClient.inboxID)
-		try await dm.send(content: "hi")
-		try await alixClient.conversations.syncAllConversations()
-		try await fixtures.boClient.conversations.syncAllConversations()
-
-		let boDm = try fixtures.boClient.conversations.findDmByInboxId(
-			inboxId: alixClient.inboxID)!
+		_ = try await dm.send(content: "hi")
+		_ = try await alixClient.conversations.syncAllConversations()
 
 		try await alixClient.createArchive(
 			path: allPath, encryptionKey: encryptionKey)
 
+        // 2. Alix creates a second installation and imports our archive
 		let alixClient2 = try await Client.create(
 			account: alix,
 			options: .init(
@@ -135,7 +133,7 @@ class ArchiveTests: XCTestCase {
 
 		try await alixClient2.importArchive(
 			path: allPath, encryptionKey: encryptionKey)
-		try await alixClient2.conversations.syncAllConversations()
+		_ = try await alixClient2.conversations.syncAllConversations()
 
 		let convos = try await alixClient2.conversations.list()
 		XCTAssertEqual(convos.count, 1)
@@ -143,24 +141,30 @@ class ArchiveTests: XCTestCase {
 		let isInactive = try convos.first!.isActive()
 		XCTAssertFalse(isInactive)
 
-		let dm2 = try await alixClient.conversations.findOrCreateDm(
+        // While our dm with Bo from archive is still in an inactive state, Alix installation 2 creates a duplicate DM with Bo
+		let dm2 = try await alixClient2.conversations.findOrCreateDm(
 			with: fixtures.boClient.inboxID)
 		let isActive = try dm2.isActive()
 		XCTAssertTrue(isActive)
+        
+        // Two here because we have not stitched yet
+        let convos2 = try await alixClient2.conversations.list()
+        XCTAssertEqual(convos2.count, 2)
 
-		try await boDm.send(content: "hey")
-		try await dm2.send(content: "hey")
-		try await fixtures.boClient.conversations.syncAllConversations()
+        // We send one message in our duplicate dm from alix installation 2
+		_ = try await dm2.send(content: "hey")
+        // Bo calls sync all which will add alix installation 2 to the original DM groupid with bo and lix installation 1
+		_ = try await fixtures.boClient.conversations.syncAllConversations()
 		sleep(2)
-		try await alixClient2.conversations.syncAllConversations()
+        // Alix calls sync All which will see the original DM and stitch it with our duplicate active, and our inactive group
+		_ = try await alixClient2.conversations.syncAllConversations()
 
-		let convos2 = try await alixClient2.conversations.list()
-		XCTAssertEqual(convos2.count, 1)
+        // After syncing we only have one conversation
+		let convos3 = try await alixClient2.conversations.list()
+		XCTAssertEqual(convos3.count, 1)
 
 		let dm2MessagesCount = try await dm2.messages().count
-		let boDmMessagesCount = try await boDm.messages().count
-		XCTAssertEqual(dm2MessagesCount, 4)
-		XCTAssertEqual(boDmMessagesCount, 4)
+		XCTAssertEqual(dm2MessagesCount, 3)
 	}
 
 	func testImportArchiveWorksEvenOnFullDatabase() async throws {
@@ -174,13 +178,13 @@ class ArchiveTests: XCTestCase {
 		let dm = try await fixtures.alixClient.conversations.findOrCreateDm(
 			with: fixtures.boClient.inboxID)
 
-		try await group.send(content: "First")
-		try await dm.send(content: "hi")
+        _ = try await group.send(content: "First")
+        _ = try await dm.send(content: "hi")
 
-		try await fixtures.alixClient.conversations.syncAllConversations()
-		try await fixtures.boClient.conversations.syncAllConversations()
+        _ = try await fixtures.alixClient.conversations.syncAllConversations()
+        _ = try await fixtures.boClient.conversations.syncAllConversations()
 
-		let boGroup = try await fixtures.boClient.conversations.findGroup(
+        let boGroup = try fixtures.boClient.conversations.findGroup(
 			groupId: group.id)!
 
 		let groupMessagesCount1 = try await group.messages().count
@@ -197,14 +201,14 @@ class ArchiveTests: XCTestCase {
 
 		try await fixtures.alixClient.createArchive(
 			path: allPath, encryptionKey: encryptionKey)
-		try await group.send(content: "Second")
+        _ = try await group.send(content: "Second")
 		try await fixtures.alixClient.importArchive(
 			path: allPath, encryptionKey: encryptionKey)
-		try await group.send(content: "Third")
-		try await dm.send(content: "hi")
+        _ = try await group.send(content: "Third")
+        _ = try await dm.send(content: "hi")
 
-		try await fixtures.alixClient.conversations.syncAllConversations()
-		try await fixtures.boClient.conversations.syncAllConversations()
+        _ = try await fixtures.alixClient.conversations.syncAllConversations()
+        _ = try await fixtures.boClient.conversations.syncAllConversations()
 
 		let groupMessagesCount2 = try await group.messages().count
 		let boGroupMessagesCount2 = try await boGroup.messages().count
