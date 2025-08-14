@@ -96,12 +96,12 @@ public struct MultiRemoteAttachmentCodec: ContentCodec {
     
     public func encode(content: MultiRemoteAttachment) throws -> EncodedContent {
         let ffiMultiRemoteAttachment = FfiMultiRemoteAttachment(attachments: content.remoteAttachments.map { FfiRemoteAttachmentInfo(
-            secret: $0.secret,
+            url: $0.url,
             contentDigest: $0.contentDigest,
+            secret: $0.secret,
+            salt: $0.salt,
             nonce: $0.nonce,
             scheme: $0.scheme,
-            url: $0.url,
-            salt: $0.salt,
             contentLength: $0.contentLength,
             filename: $0.filename
         )})
