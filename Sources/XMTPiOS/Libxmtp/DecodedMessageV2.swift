@@ -57,8 +57,7 @@ public struct DecodedMessageV2: Identifiable {
 
     public var fallback: String {
         get throws {
-            let fallbackText = ffiMessage.fallback_text()
-            if !fallbackText.isEmpty {
+            if let fallbackText = ffiMessage.fallbackText(), !fallbackText.isEmpty {
                 return fallbackText
             }
             switch ffiMessage.content() {
@@ -438,12 +437,15 @@ public struct DecodedMessageV2: Identifiable {
         encoded.fallback = ffiContent.fallback ?? ""
         encoded.content = ffiContent.content
         if let compression = ffiContent.compression {
+            // Map Int32 compression values to the enum
+            // Assuming 0 = deflate, 1 = gzip based on the proto definition
             switch compression {
-            case .gzip:
-                encoded.compression = .gzip
-            case .deflate:
+            case 0:
                 encoded.compression = .deflate
+            case 1:
+                encoded.compression = .gzip
             default:
+                // Unknown compression value, leave it unset
                 break
             }
         }
