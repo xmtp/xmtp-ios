@@ -47,7 +47,7 @@ public struct ConsentRecord: Codable, Hashable {
 
 /// Provides access to contact bundles.
 public actor PrivatePreferences {
-	var client: Client
+	unowned var client: Client
 	var ffiClient: FfiXmtpClient
 
 	init(client: Client, ffiClient: FfiXmtpClient) {
