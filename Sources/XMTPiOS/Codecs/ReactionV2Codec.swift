@@ -17,11 +17,11 @@ public struct ReactionV2Codec: ContentCodec {
     public init() {}
 
     public func encode(content: FfiReactionPayload) throws -> EncodedContent {
-        return try EncodedContent(serializedBytes: encodeReaction(reaction: content))
+        return try EncodedContent(serializedBytes: LibXMTP.encodeReaction(reaction: content))
     }
 
     public func decode(content: EncodedContent) throws -> FfiReactionPayload {
-        try decodeReaction(bytes: content.serializedBytes())
+        try LibXMTP.decodeReaction(bytes: content.serializedBytes())
     }
 
     public func fallback(content: FfiReactionPayload) throws -> String? {
