@@ -19,7 +19,7 @@ public struct ReactionV2Codec: ContentCodec {
     public func encode(content: FfiReactionPayload) throws -> EncodedContent {
         return try EncodedContent(serializedBytes: encodeReaction(reaction: content))
     }
- 
+
     public func decode(content: EncodedContent) throws -> FfiReactionPayload {
         try decodeReaction(bytes: content.serializedBytes())
     }
@@ -29,7 +29,7 @@ public struct ReactionV2Codec: ContentCodec {
         case .added:
             return "Reacted \"\(content.content)\" to an earlier message"
         case .removed:
-            return "Removed \"\(content.content)\" from an earlier message"            
+            return "Removed \"\(content.content)\" from an earlier message"
         case .unknown:
             return nil
         }
