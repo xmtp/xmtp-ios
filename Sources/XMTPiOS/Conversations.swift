@@ -123,7 +123,7 @@ actor FfiStreamActor {
 
 /// Handles listing and creating Conversations.
 public class Conversations {
-	var client: Client
+	unowned var client: Client
 	var ffiConversations: FfiConversations
 	var ffiClient: FfiXmtpClient
 
