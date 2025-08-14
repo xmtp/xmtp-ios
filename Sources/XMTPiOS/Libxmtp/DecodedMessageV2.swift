@@ -3,26 +3,26 @@ import LibXMTP
 
 public struct DecodedMessageV2: Identifiable {
     private let ffiMessage: FfiDecodedMessage
-    
+
     public var id: String {
         ffiMessage.id().toHex
     }
-    
+
     // Note: conversationId is not directly available in FfiDecodedMessage
     // It would need to be passed in or derived from context
-    
+
     public var senderInboxId: InboxId {
         ffiMessage.senderInboxId()
     }
-    
+
     public var sentAt: Date {
         Date(timeIntervalSince1970: TimeInterval(ffiMessage.sentAtNs()) / 1_000_000_000)
     }
-    
+
     public var sentAtNs: Int64 {
         ffiMessage.sentAtNs()
     }
-    
+
     public var deliveryStatus: MessageDeliveryStatus {
         switch ffiMessage.deliveryStatus() {
         case .unpublished:
@@ -33,18 +33,18 @@ public struct DecodedMessageV2: Identifiable {
             return .failed
         }
     }
-    
+
     // Topic generation requires conversationId which is not available in FfiDecodedMessage
     public var topic: String {
         "" // Would need to be passed in or derived from context
     }
-    
+
     public var reactions: [DecodedMessageV2]? {
         let reactionMessages = ffiMessage.reactions()
         guard !reactionMessages.isEmpty else { return nil }
         return reactionMessages.compactMap { DecodedMessageV2(ffiMessage: $0) }
     }
-    
+
     public func content<T>() throws -> T {
         let decodedContent = try mapContent(ffiMessage.content())
         guard let result = decodedContent as? T else {
@@ -54,7 +54,7 @@ public struct DecodedMessageV2: Identifiable {
         }
         return result
     }
-    
+
     public var fallback: String {
         get throws {
             let fallbackText = ffiMessage.fallback_text()
@@ -71,7 +71,7 @@ public struct DecodedMessageV2: Identifiable {
             }
         }
     }
-    
+
     public var body: String {
         get throws {
             do {
@@ -81,7 +81,7 @@ public struct DecodedMessageV2: Identifiable {
             }
         }
     }
-    
+
     public var contentTypeId: ContentTypeID {
         let ffiContentType = ffiMessage.contentTypeId()
         return ContentTypeID(
@@ -91,33 +91,33 @@ public struct DecodedMessageV2: Identifiable {
             versionMinor: Int(ffiContentType.versionMinor)
         )
     }
-    
+
     public init?(ffiMessage: FfiDecodedMessage) {
         self.ffiMessage = ffiMessage
     }
-    
+
     public static func create(ffiMessage: FfiDecodedMessage) -> DecodedMessageV2? {
         return DecodedMessageV2(ffiMessage: ffiMessage)
     }
-    
+
     private func mapContent(_ content: FfiDecodedMessageContent) throws -> Any {
         switch content {
         case .text(let textContent):
             return textContent.content
-            
+
         case .reply(let enrichedReply):
             return try mapReply(enrichedReply)
-            
+
         case .reaction(let reactionPayload):
             return mapReaction(reactionPayload)
-            
+
         case .attachment(let ffiAttachment):
             return Attachment(
                 filename: ffiAttachment.filename ?? "",
                 mimeType: ffiAttachment.mimeType,
                 data: ffiAttachment.content
             )
-            
+
         case .remoteAttachment(let ffiAttachment):
             return try RemoteAttachment(
                 url: ffiAttachment.url,
@@ -129,7 +129,7 @@ public struct DecodedMessageV2: Identifiable {
                 contentLength: Int(ffiAttachment.contentLength ?? 0),
                 filename: ffiAttachment.filename
             )
-            
+
         case .multiRemoteAttachment(let multiAttachment):
             return MultiRemoteAttachment(
                 remoteAttachments: multiAttachment.attachments.map { info in
@@ -145,7 +145,7 @@ public struct DecodedMessageV2: Identifiable {
                     )
                 }
             )
-            
+
         case .transactionReference(let txRef):
             return TransactionReference(
                 namespace: txRef.namespace,
@@ -162,7 +162,7 @@ public struct DecodedMessageV2: Identifiable {
                     )
                 }
             )
-            
+
         case .groupUpdated(let groupUpdated):
             var updated = GroupUpdated()
             updated.initiatedByInboxID = groupUpdated.initiatedByInboxId
@@ -184,7 +184,7 @@ public struct DecodedMessageV2: Identifiable {
                 return fieldChange
             }
             return updated
-            
+
         case .groupMembershipChanges(let changes):
             return GroupMembershipChanges(
                 membersAdded: changes.membersAdded.map { member in
@@ -216,38 +216,38 @@ public struct DecodedMessageV2: Identifiable {
                     )
                 }
             )
-            
+
         case .readReceipt(_):
             return ReadReceipt()
-            
+
         case .custom(let ffiEncodedContent):
             let encoded = try mapFfiEncodedContent(ffiEncodedContent)
             let codec = Client.codecRegistry.find(for: encoded.type)
             return try codec.decode(content: encoded)
         }
     }
-    
+
     private func mapReply(_ enrichedReply: FfiEnrichedReply) throws -> Reply {
         guard let bodyContent = enrichedReply.content else {
             throw DecodedMessageError.decodeError("Missing reply content")
         }
-        
+
         let content = try mapMessageBody(bodyContent)
         let contentType = determineContentType(from: bodyContent)
-        
+
         var reply = Reply(
             reference: enrichedReply.inReplyTo?.id().toHex ?? "",
             content: content,
             contentType: contentType
         )
-        
+
         if let inReplyToMessage = enrichedReply.inReplyTo {
             reply.inReplyTo = DecodedMessageV2(ffiMessage: inReplyToMessage)
         }
-        
+
         return reply
     }
-    
+
     private func mapMessageBody(_ body: FfiDecodedMessageBody) throws -> Any {
         switch body {
         case .text(let textContent):
@@ -362,7 +362,7 @@ public struct DecodedMessageV2: Identifiable {
             return try codec.decode(content: encoded)
         }
     }
-    
+
     private func determineContentType(from body: FfiDecodedMessageBody) -> ContentTypeID {
         switch body {
         case .text:
@@ -397,7 +397,7 @@ public struct DecodedMessageV2: Identifiable {
             }
         }
     }
-    
+
     private func mapReaction(_ reactionPayload: FfiReactionPayload) -> Reaction {
         return Reaction(
             reference: reactionPayload.reference,
@@ -406,7 +406,7 @@ public struct DecodedMessageV2: Identifiable {
             schema: mapReactionSchema(reactionPayload.schema)
         )
     }
-    
+
     private func mapReactionSchema(_ schema: FfiReactionSchema) -> ReactionSchema {
         switch schema {
         case .unicode:
@@ -419,11 +419,11 @@ public struct DecodedMessageV2: Identifiable {
             return .unknown
         }
     }
-    
+
     private func mapRemoteAttachmentScheme(_ scheme: String) -> RemoteAttachment.Scheme {
         return RemoteAttachment.Scheme(rawValue: scheme) ?? .https
     }
-    
+
     private func mapFfiEncodedContent(_ ffiContent: FfiEncodedContent) throws -> EncodedContent {
         var encoded = EncodedContent()
         if let typeId = ffiContent.typeId {
@@ -457,31 +457,31 @@ public struct GroupMembershipChanges {
         public let accountAddress: String
         public let installationIds: [Data]
         public let initiatedByAccountAddress: String
-        
+
         public init(accountAddress: String, installationIds: [Data], initiatedByAccountAddress: String) {
             self.accountAddress = accountAddress
             self.installationIds = installationIds
             self.initiatedByAccountAddress = initiatedByAccountAddress
         }
     }
-    
+
     public struct InstallationChange {
         public let accountAddress: String
         public let installationIds: [Data]
         public let initiatedByAccountAddress: String
-        
+
         public init(accountAddress: String, installationIds: [Data], initiatedByAccountAddress: String) {
             self.accountAddress = accountAddress
             self.installationIds = installationIds
             self.initiatedByAccountAddress = initiatedByAccountAddress
         }
     }
-    
+
     public let membersAdded: [MemberChange]
     public let membersRemoved: [MemberChange]
     public let installationsAdded: [InstallationChange]
     public let installationsRemoved: [InstallationChange]
-    
+
     public init(
         membersAdded: [MemberChange],
         membersRemoved: [MemberChange],

@@ -21,7 +21,7 @@ public struct Reply {
 		self.contentType = contentType
 		self.inReplyTo = nil
 	}
-	
+
 	public init(reference: String, content: Any, contentType: ContentTypeID, inReplyTo: DecodedMessageV2?) {
 		self.reference = reference
 		self.content = content
