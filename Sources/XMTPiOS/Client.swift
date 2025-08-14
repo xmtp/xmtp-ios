@@ -154,23 +154,23 @@ struct ApiCacheKey {
 }
 
 actor ApiClientCache {
-	private var apiClientCache: [String: XmtpApiClient] = [:]
-	private var syncApiClientCache: [String: XmtpApiClient] = [:]
+    private var apiClientCache: NSMapTable<NSString, XmtpApiClient> = .weakToWeakObjects()
+	private var syncApiClientCache: NSMapTable<NSString, XmtpApiClient> = .weakToWeakObjects()
 
 	func getClient(forKey key: String) -> XmtpApiClient? {
-		apiClientCache[key]
+		apiClientCache.object(forKey: key as NSString)
 	}
 
 	func setClient(_ client: XmtpApiClient, forKey key: String) {
-		apiClientCache[key] = client
+        apiClientCache.setObject(client, forKey: key as NSString)
 	}
 
 	func getSyncClient(forKey key: String) -> XmtpApiClient? {
-		syncApiClientCache[key]
+		syncApiClientCache.object(forKey: key as NSString)
 	}
 
 	func setSyncClient(_ client: XmtpApiClient, forKey key: String) {
-		syncApiClientCache[key] = client
+        syncApiClientCache.setObject(client, forKey: key as NSString)
 	}
 }
 

@@ -8,7 +8,7 @@
 import Foundation
 
 public class XMTPDebugInformation {
-	private let client: Client
+	private unowned let client: Client
 	private let ffiClient: FfiXmtpClient
 
 	public init(client: Client, ffiClient: FfiXmtpClient) {
