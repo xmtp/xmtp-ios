@@ -7,9 +7,10 @@ public struct DecodedMessageV2: Identifiable {
     public var id: String {
         ffiMessage.id().toHex
     }
-
-    // Note: conversationId is not directly available in FfiDecodedMessage
-    // It would need to be passed in or derived from context
+    
+    public var conversationId: String {
+        ffiMessage.conversationId().toHex
+    }
 
     public var senderInboxId: InboxId {
         ffiMessage.senderInboxId()
@@ -34,9 +35,9 @@ public struct DecodedMessageV2: Identifiable {
         }
     }
 
-    // Topic generation requires conversationId which is not available in FfiDecodedMessage
+
     public var topic: String {
-        "" // Would need to be passed in or derived from context
+        Topic.groupMessage(conversationId).description
     }
 
     public var reactions: [DecodedMessageV2]? {
