@@ -111,110 +111,22 @@ public struct DecodedMessageV2: Identifiable {
             return mapReaction(reactionPayload)
 
         case .attachment(let ffiAttachment):
-            return Attachment(
-                filename: ffiAttachment.filename ?? "",
-                mimeType: ffiAttachment.mimeType,
-                data: ffiAttachment.content
-            )
+            return mapAttachment(ffiAttachment)
 
         case .remoteAttachment(let ffiAttachment):
-            return try RemoteAttachment(
-                url: ffiAttachment.url,
-                contentDigest: ffiAttachment.contentDigest,
-                secret: ffiAttachment.secret,
-                salt: ffiAttachment.salt,
-                nonce: ffiAttachment.nonce,
-                scheme: mapRemoteAttachmentScheme(ffiAttachment.scheme),
-                contentLength: Int(ffiAttachment.contentLength ?? 0),
-                filename: ffiAttachment.filename
-            )
+            return try mapRemoteAttachment(ffiAttachment)
 
         case .multiRemoteAttachment(let multiAttachment):
-            return MultiRemoteAttachment(
-                remoteAttachments: multiAttachment.attachments.map { info in
-                    MultiRemoteAttachment.RemoteAttachmentInfo(
-                        url: info.url,
-                        filename: info.filename ?? "",
-                        contentLength: info.contentLength ?? 0,
-                        contentDigest: info.contentDigest,
-                        nonce: info.nonce,
-                        scheme: info.scheme,
-                        salt: info.salt,
-                        secret: info.secret
-                    )
-                }
-            )
+            return mapMultiRemoteAttachment(multiAttachment)
 
         case .transactionReference(let txRef):
-            return TransactionReference(
-                namespace: txRef.namespace,
-                networkId: txRef.networkId,
-                reference: txRef.reference,
-                metadata: txRef.metadata.map { metadata in
-                    TransactionReference.Metadata(
-                        transactionType: metadata.transactionType,
-                        currency: metadata.currency,
-                        amount: metadata.amount,
-                        decimals: metadata.decimals,
-                        fromAddress: metadata.fromAddress,
-                        toAddress: metadata.toAddress
-                    )
-                }
-            )
+            return mapTransactionReference(txRef)
 
         case .groupUpdated(let groupUpdated):
-            var updated = GroupUpdated()
-            updated.initiatedByInboxID = groupUpdated.initiatedByInboxId
-            updated.addedInboxes = groupUpdated.addedInboxes.map { inbox in
-                var inboxEntry = GroupUpdated.Inbox()
-                inboxEntry.inboxID = inbox.inboxId
-                return inboxEntry
-            }
-            updated.removedInboxes = groupUpdated.removedInboxes.map { inbox in
-                var inboxEntry = GroupUpdated.Inbox()
-                inboxEntry.inboxID = inbox.inboxId
-                return inboxEntry
-            }
-            updated.metadataFieldChanges = groupUpdated.metadataFieldChanges.map { change in
-                var fieldChange = GroupUpdated.MetadataFieldChange()
-                fieldChange.fieldName = change.fieldName
-                fieldChange.oldValue = change.oldValue ?? ""
-                fieldChange.newValue = change.newValue ?? ""
-                return fieldChange
-            }
-            return updated
+            return mapGroupUpdated(groupUpdated)
 
         case .groupMembershipChanges(let changes):
-            return GroupMembershipChanges(
-                membersAdded: changes.membersAdded.map { member in
-                    GroupMembershipChanges.MemberChange(
-                        accountAddress: member.accountAddress,
-                        installationIds: member.installationIds,
-                        initiatedByAccountAddress: member.initiatedByAccountAddress
-                    )
-                },
-                membersRemoved: changes.membersRemoved.map { member in
-                    GroupMembershipChanges.MemberChange(
-                        accountAddress: member.accountAddress,
-                        installationIds: member.installationIds,
-                        initiatedByAccountAddress: member.initiatedByAccountAddress
-                    )
-                },
-                installationsAdded: changes.installationsAdded.map { installation in
-                    GroupMembershipChanges.InstallationChange(
-                        accountAddress: installation.accountAddress,
-                        installationIds: installation.installationIds,
-                        initiatedByAccountAddress: installation.initiatedByAccountAddress
-                    )
-                },
-                installationsRemoved: changes.installationsRemoved.map { installation in
-                    GroupMembershipChanges.InstallationChange(
-                        accountAddress: installation.accountAddress,
-                        installationIds: installation.installationIds,
-                        initiatedByAccountAddress: installation.initiatedByAccountAddress
-                    )
-                }
-            )
+            return mapGroupMembershipChanges(changes)
 
         case .readReceipt(_):
             return ReadReceipt()
@@ -224,6 +136,39 @@ public struct DecodedMessageV2: Identifiable {
             let codec = Client.codecRegistry.find(for: encoded.type)
             return try codec.decode(content: encoded)
         }
+    }
+
+    private func mapGroupMembershipChanges(_ changes: FfiGroupMembershipChanges) -> GroupMembershipChanges {
+        return GroupMembershipChanges(
+            membersAdded: changes.membersAdded.map { member in
+                GroupMembershipChanges.MemberChange(
+                    accountAddress: member.accountAddress,
+                    installationIds: member.installationIds,
+                    initiatedByAccountAddress: member.initiatedByAccountAddress
+                )
+            },
+            membersRemoved: changes.membersRemoved.map { member in
+                GroupMembershipChanges.MemberChange(
+                    accountAddress: member.accountAddress,
+                    installationIds: member.installationIds,
+                    initiatedByAccountAddress: member.initiatedByAccountAddress
+                )
+            },
+            installationsAdded: changes.installationsAdded.map { installation in
+                GroupMembershipChanges.InstallationChange(
+                    accountAddress: installation.accountAddress,
+                    installationIds: installation.installationIds,
+                    initiatedByAccountAddress: installation.initiatedByAccountAddress
+                )
+            },
+            installationsRemoved: changes.installationsRemoved.map { installation in
+                GroupMembershipChanges.InstallationChange(
+                    accountAddress: installation.accountAddress,
+                    installationIds: installation.installationIds,
+                    initiatedByAccountAddress: installation.initiatedByAccountAddress
+                )
+            }
+        )
     }
 
     private func mapReply(_ enrichedReply: FfiEnrichedReply) throws -> Reply {
@@ -254,105 +199,17 @@ public struct DecodedMessageV2: Identifiable {
         case .reaction(let reactionPayload):
             return mapReaction(reactionPayload)
         case .attachment(let ffiAttachment):
-            return Attachment(
-                filename: ffiAttachment.filename ?? "",
-                mimeType: ffiAttachment.mimeType,
-                data: ffiAttachment.content
-            )
+            return mapAttachment(ffiAttachment)
         case .remoteAttachment(let ffiAttachment):
-            return try RemoteAttachment(
-                url: ffiAttachment.url,
-                contentDigest: ffiAttachment.contentDigest,
-                secret: ffiAttachment.secret,
-                salt: ffiAttachment.salt,
-                nonce: ffiAttachment.nonce,
-                scheme: mapRemoteAttachmentScheme(ffiAttachment.scheme),
-                contentLength: Int(ffiAttachment.contentLength ?? 0),
-                filename: ffiAttachment.filename
-            )
+            return try mapRemoteAttachment(ffiAttachment)
         case .multiRemoteAttachment(let multiAttachment):
-            return MultiRemoteAttachment(
-                remoteAttachments: multiAttachment.attachments.map { info in
-                    MultiRemoteAttachment.RemoteAttachmentInfo(
-                        url: info.url,
-                        filename: info.filename ?? "",
-                        contentLength: info.contentLength ?? 0,
-                        contentDigest: info.contentDigest,
-                        nonce: info.nonce,
-                        scheme: info.scheme,
-                        salt: info.salt,
-                        secret: info.secret
-                    )
-                }
-            )
+            return mapMultiRemoteAttachment(multiAttachment)
         case .transactionReference(let txRef):
-            return TransactionReference(
-                namespace: txRef.namespace,
-                networkId: txRef.networkId,
-                reference: txRef.reference,
-                metadata: txRef.metadata.map { metadata in
-                    TransactionReference.Metadata(
-                        transactionType: metadata.transactionType,
-                        currency: metadata.currency,
-                        amount: metadata.amount,
-                        decimals: metadata.decimals,
-                        fromAddress: metadata.fromAddress,
-                        toAddress: metadata.toAddress
-                    )
-                }
-            )
+            return mapTransactionReference(txRef)
         case .groupUpdated(let groupUpdated):
-            var updated = GroupUpdated()
-            updated.initiatedByInboxID = groupUpdated.initiatedByInboxId
-            updated.addedInboxes = groupUpdated.addedInboxes.map { inbox in
-                var inboxEntry = GroupUpdated.Inbox()
-                inboxEntry.inboxID = inbox.inboxId
-                return inboxEntry
-            }
-            updated.removedInboxes = groupUpdated.removedInboxes.map { inbox in
-                var inboxEntry = GroupUpdated.Inbox()
-                inboxEntry.inboxID = inbox.inboxId
-                return inboxEntry
-            }
-            updated.metadataFieldChanges = groupUpdated.metadataFieldChanges.map { change in
-                var fieldChange = GroupUpdated.MetadataFieldChange()
-                fieldChange.fieldName = change.fieldName
-                fieldChange.oldValue = change.oldValue ?? ""
-                fieldChange.newValue = change.newValue ?? ""
-                return fieldChange
-            }
-            return updated
+            return mapGroupUpdated(groupUpdated)
         case .groupMembershipChanges(let changes):
-            return GroupMembershipChanges(
-                membersAdded: changes.membersAdded.map { member in
-                    GroupMembershipChanges.MemberChange(
-                        accountAddress: member.accountAddress,
-                        installationIds: member.installationIds,
-                        initiatedByAccountAddress: member.initiatedByAccountAddress
-                    )
-                },
-                membersRemoved: changes.membersRemoved.map { member in
-                    GroupMembershipChanges.MemberChange(
-                        accountAddress: member.accountAddress,
-                        installationIds: member.installationIds,
-                        initiatedByAccountAddress: member.initiatedByAccountAddress
-                    )
-                },
-                installationsAdded: changes.installationsAdded.map { installation in
-                    GroupMembershipChanges.InstallationChange(
-                        accountAddress: installation.accountAddress,
-                        installationIds: installation.installationIds,
-                        initiatedByAccountAddress: installation.initiatedByAccountAddress
-                    )
-                },
-                installationsRemoved: changes.installationsRemoved.map { installation in
-                    GroupMembershipChanges.InstallationChange(
-                        accountAddress: installation.accountAddress,
-                        installationIds: installation.installationIds,
-                        initiatedByAccountAddress: installation.initiatedByAccountAddress
-                    )
-                }
-            )
+            return mapGroupMembershipChanges(changes)
         case .readReceipt(_):
             return ReadReceipt()
         case .custom(let ffiEncodedContent):
@@ -423,6 +280,85 @@ public struct DecodedMessageV2: Identifiable {
         return RemoteAttachment.Scheme(rawValue: scheme) ?? .https
     }
 
+    private func mapAttachment(_ ffiAttachment: FfiAttachment) -> Attachment {
+        return Attachment(
+            filename: ffiAttachment.filename ?? "",
+            mimeType: ffiAttachment.mimeType,
+            data: ffiAttachment.content
+        )
+    }
+    
+    private func mapRemoteAttachment(_ ffiAttachment: FfiRemoteAttachment) throws -> RemoteAttachment {
+        return try RemoteAttachment(
+            url: ffiAttachment.url,
+            contentDigest: ffiAttachment.contentDigest,
+            secret: ffiAttachment.secret,
+            salt: ffiAttachment.salt,
+            nonce: ffiAttachment.nonce,
+            scheme: mapRemoteAttachmentScheme(ffiAttachment.scheme),
+            contentLength: Int(ffiAttachment.contentLength ?? 0),
+            filename: ffiAttachment.filename
+        )
+    }
+    
+    private func mapMultiRemoteAttachment(_ multiAttachment: FfiMultiRemoteAttachment) -> MultiRemoteAttachment {
+        return MultiRemoteAttachment(
+            remoteAttachments: multiAttachment.attachments.map { info in
+                MultiRemoteAttachment.RemoteAttachmentInfo(
+                    url: info.url,
+                    filename: info.filename ?? "",
+                    contentLength: info.contentLength ?? 0,
+                    contentDigest: info.contentDigest,
+                    nonce: info.nonce,
+                    scheme: info.scheme,
+                    salt: info.salt,
+                    secret: info.secret
+                )
+            }
+        )
+    }
+    
+    private func mapTransactionReference(_ txRef: FfiTransactionReference) -> TransactionReference {
+        return TransactionReference(
+            namespace: txRef.namespace,
+            networkId: txRef.networkId,
+            reference: txRef.reference,
+            metadata: txRef.metadata.map { metadata in
+                TransactionReference.Metadata(
+                    transactionType: metadata.transactionType,
+                    currency: metadata.currency,
+                    amount: metadata.amount,
+                    decimals: metadata.decimals,
+                    fromAddress: metadata.fromAddress,
+                    toAddress: metadata.toAddress
+                )
+            }
+        )
+    }
+    
+    private func mapGroupUpdated(_ groupUpdated: FfiGroupUpdated) -> GroupUpdated {
+        var updated = GroupUpdated()
+        updated.initiatedByInboxID = groupUpdated.initiatedByInboxId
+        updated.addedInboxes = groupUpdated.addedInboxes.map { inbox in
+            var inboxEntry = GroupUpdated.Inbox()
+            inboxEntry.inboxID = inbox.inboxId
+            return inboxEntry
+        }
+        updated.removedInboxes = groupUpdated.removedInboxes.map { inbox in
+            var inboxEntry = GroupUpdated.Inbox()
+            inboxEntry.inboxID = inbox.inboxId
+            return inboxEntry
+        }
+        updated.metadataFieldChanges = groupUpdated.metadataFieldChanges.map { change in
+            var fieldChange = GroupUpdated.MetadataFieldChange()
+            fieldChange.fieldName = change.fieldName
+            fieldChange.oldValue = change.oldValue ?? ""
+            fieldChange.newValue = change.newValue ?? ""
+            return fieldChange
+        }
+        return updated
+    }
+    
     private func mapFfiEncodedContent(_ ffiContent: FfiEncodedContent) throws -> EncodedContent {
         var encoded = EncodedContent()
         if let typeId = ffiContent.typeId {
