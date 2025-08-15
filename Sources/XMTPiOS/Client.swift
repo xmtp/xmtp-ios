@@ -88,23 +88,23 @@ public struct ClientOptions {
 }
 
 actor ApiClientCache {
-	private var apiClientCache: [String: XmtpApiClient] = [:]
+    private var apiClientCache: [String: XmtpApiClient] = [:]
 	private var syncApiClientCache: [String: XmtpApiClient] = [:]
 
 	func getClient(forKey key: String) -> XmtpApiClient? {
-		return apiClientCache[key]
+        return apiClientCache[key]
 	}
 
 	func setClient(_ client: XmtpApiClient, forKey key: String) {
-		apiClientCache[key] = client
+        apiClientCache[key] = client
 	}
 
 	func getSyncClient(forKey key: String) -> XmtpApiClient? {
-		return syncApiClientCache[key]
+        return syncApiClientCache[key]
 	}
 
 	func setSyncClient(_ client: XmtpApiClient, forKey key: String) {
-		syncApiClientCache[key] = client
+        syncApiClientCache[key] = client
 	}
 }
 
