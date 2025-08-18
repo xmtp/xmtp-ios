@@ -128,7 +128,7 @@ public final class Client {
 		client: self, ffiClient: ffiClient)
 
 	public lazy var debugInformation: XMTPDebugInformation = .init(
-		client: self, ffiClient: ffiClient)
+        historySyncUrl: environment.getHistorySyncUrl(), ffiClient: ffiClient)
 
 	static var codecRegistry = CodecRegistry()
 
