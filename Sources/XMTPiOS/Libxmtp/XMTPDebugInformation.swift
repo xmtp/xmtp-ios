@@ -8,11 +8,11 @@
 import Foundation
 
 public class XMTPDebugInformation {
-	private unowned let client: Client
+	private let historySyncUrl: String
 	private let ffiClient: FfiXmtpClient
 
-	public init(client: Client, ffiClient: FfiXmtpClient) {
-		self.client = client
+	public init(historySyncUrl: String, ffiClient: FfiXmtpClient) {
+		self.historySyncUrl = historySyncUrl
 		self.ffiClient = ffiClient
 	}
 
@@ -31,12 +31,7 @@ public class XMTPDebugInformation {
 	public func clearAllStatistics() {
 		ffiClient.clearAllStatistics()
 	}
-
-	@available(*, deprecated, message: "uploadDebugInformation has been removed from libxmtp")
-	public func uploadDebugInformation(serverUrl _: String? = nil) async throws -> String {
-		// uploadDebugArchive has been removed from FFI
-		throw ClientError.creationError("uploadDebugInformation is no longer available")
-	}
+	
 }
 
 public class ApiStats {
