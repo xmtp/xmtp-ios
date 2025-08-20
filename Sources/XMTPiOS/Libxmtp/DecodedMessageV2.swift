@@ -126,50 +126,17 @@ public struct DecodedMessageV2: Identifiable {
         case .groupUpdated(let groupUpdated):
             return mapGroupUpdated(groupUpdated)
 
-        case .groupMembershipChanges(let changes):
-            return mapGroupMembershipChanges(changes)
-
         case .readReceipt(_):
             return ReadReceipt()
+        
+        case .walletSendCalls(let walletSend):
+            return walletSend
 
         case .custom(let ffiEncodedContent):
             let encoded = try mapFfiEncodedContent(ffiEncodedContent)
             let codec = Client.codecRegistry.find(for: encoded.type)
             return try codec.decode(content: encoded)
         }
-    }
-
-    private func mapGroupMembershipChanges(_ changes: FfiGroupMembershipChanges) -> GroupMembershipChanges {
-        return GroupMembershipChanges(
-            membersAdded: changes.membersAdded.map { member in
-                GroupMembershipChanges.MemberChange(
-                    accountAddress: member.accountAddress,
-                    installationIds: member.installationIds,
-                    initiatedByAccountAddress: member.initiatedByAccountAddress
-                )
-            },
-            membersRemoved: changes.membersRemoved.map { member in
-                GroupMembershipChanges.MemberChange(
-                    accountAddress: member.accountAddress,
-                    installationIds: member.installationIds,
-                    initiatedByAccountAddress: member.initiatedByAccountAddress
-                )
-            },
-            installationsAdded: changes.installationsAdded.map { installation in
-                GroupMembershipChanges.InstallationChange(
-                    accountAddress: installation.accountAddress,
-                    installationIds: installation.installationIds,
-                    initiatedByAccountAddress: installation.initiatedByAccountAddress
-                )
-            },
-            installationsRemoved: changes.installationsRemoved.map { installation in
-                GroupMembershipChanges.InstallationChange(
-                    accountAddress: installation.accountAddress,
-                    installationIds: installation.installationIds,
-                    initiatedByAccountAddress: installation.initiatedByAccountAddress
-                )
-            }
-        )
     }
 
     private func mapReply(_ enrichedReply: FfiEnrichedReply) throws -> Reply {
@@ -209,8 +176,8 @@ public struct DecodedMessageV2: Identifiable {
             return mapTransactionReference(txRef)
         case .groupUpdated(let groupUpdated):
             return mapGroupUpdated(groupUpdated)
-        case .groupMembershipChanges(let changes):
-            return mapGroupMembershipChanges(changes)
+        case .walletSendCalls(let walletSend):
+            return walletSend
         case .readReceipt(_):
             return ReadReceipt()
         case .custom(let ffiEncodedContent):
@@ -236,10 +203,15 @@ public struct DecodedMessageV2: Identifiable {
             return ContentTypeTransactionReference
         case .groupUpdated:
             return ContentTypeGroupUpdated
-        case .groupMembershipChanges:
-            return ContentTypeGroupMembershipChanges
         case .readReceipt:
             return ContentTypeReadReceipt
+        case .walletSendCalls:
+            return ContentTypeID(
+                authorityID: "xmtp.org",
+                typeID: "walletSendCalls",
+                versionMajor: 1,
+                versionMinor: 0
+            )
         case .custom(let ffiEncodedContent):
             if let typeId = ffiEncodedContent.typeId {
                 return ContentTypeID(
@@ -389,55 +361,3 @@ public struct DecodedMessageV2: Identifiable {
         return encoded
     }
 }
-
-// I included this for completeness in Rust, but I think it's unused except for really old groups.
-public struct GroupMembershipChanges {
-    public struct MemberChange {
-        public let accountAddress: String
-        public let installationIds: [Data]
-        public let initiatedByAccountAddress: String
-
-        public init(accountAddress: String, installationIds: [Data], initiatedByAccountAddress: String) {
-            self.accountAddress = accountAddress
-            self.installationIds = installationIds
-            self.initiatedByAccountAddress = initiatedByAccountAddress
-        }
-    }
-
-    public struct InstallationChange {
-        public let accountAddress: String
-        public let installationIds: [Data]
-        public let initiatedByAccountAddress: String
-
-        public init(accountAddress: String, installationIds: [Data], initiatedByAccountAddress: String) {
-            self.accountAddress = accountAddress
-            self.installationIds = installationIds
-            self.initiatedByAccountAddress = initiatedByAccountAddress
-        }
-    }
-
-    public let membersAdded: [MemberChange]
-    public let membersRemoved: [MemberChange]
-    public let installationsAdded: [InstallationChange]
-    public let installationsRemoved: [InstallationChange]
-
-    public init(
-        membersAdded: [MemberChange],
-        membersRemoved: [MemberChange],
-        installationsAdded: [InstallationChange],
-        installationsRemoved: [InstallationChange]
-    ) {
-        self.membersAdded = membersAdded
-        self.membersRemoved = membersRemoved
-        self.installationsAdded = installationsAdded
-        self.installationsRemoved = installationsRemoved
-    }
-}
-
-// MARK: - ContentTypeGroupMembershipChanges constant
-public let ContentTypeGroupMembershipChanges = ContentTypeID(
-    authorityID: "xmtp.org",
-    typeID: "group_membership_changes",
-    versionMajor: 1,
-    versionMinor: 0
-)
