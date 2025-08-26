@@ -8,8 +8,6 @@ import XMTPTestHelpers
 @available(iOS 16, *)
 class MessagesV2Tests: XCTestCase {
 	
-	// MARK: - Comparison Test
-	
 	func testFindMessagesV2ComparedToFindMessages() async throws {
 		// Register codecs
 		Client.register(codec: ReactionCodec())
@@ -115,8 +113,6 @@ class MessagesV2Tests: XCTestCase {
 		try fixtures.cleanUpDatabases()
 	}
 	
-	// MARK: - Refactored Basic Tests
-	
 	func testBasicMessageRetrievalInBothConversationTypes() async throws {
 		let fixtures = try await fixtures()
 		
@@ -165,8 +161,6 @@ class MessagesV2Tests: XCTestCase {
 		try fixtures.cleanUpDatabases()
 	}
 	
-	// MARK: - Refactored Pagination Tests
-	
 	func testPaginationParameters() async throws {
 		let fixtures = try await fixtures()
 		let group = try await fixtures.alixClient.conversations.newGroup(with: [fixtures.boClient.inboxID])
@@ -205,8 +199,6 @@ class MessagesV2Tests: XCTestCase {
 		
 		try fixtures.cleanUpDatabases()
 	}
-	
-	// MARK: - Refactored Content Type Tests
 	
 	func testAllContentTypesAndReactions() async throws {
 		// Register codecs
@@ -292,8 +284,6 @@ class MessagesV2Tests: XCTestCase {
 		
 		try fixtures.cleanUpDatabases()
 	}
-	
-	// MARK: - Refactored Edge Cases
 	
 	func testEdgeCasesAndDeliveryStatus() async throws {
 		let fixtures = try await fixtures()
