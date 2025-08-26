@@ -7,7 +7,7 @@ public struct DecodedMessageV2: Identifiable {
     public var id: String {
         ffiMessage.id().toHex
     }
-    
+
     public var conversationId: String {
         ffiMessage.conversationId().toHex
     }
@@ -34,7 +34,6 @@ public struct DecodedMessageV2: Identifiable {
             return .failed
         }
     }
-
 
     public var topic: String {
         Topic.groupMessage(conversationId).description
@@ -128,7 +127,7 @@ public struct DecodedMessageV2: Identifiable {
 
         case .readReceipt(_):
             return ReadReceipt()
-        
+
         case .walletSendCalls(let walletSend):
             return walletSend
 
@@ -260,7 +259,7 @@ public struct DecodedMessageV2: Identifiable {
             data: ffiAttachment.content
         )
     }
-    
+
     private func mapRemoteAttachment(_ ffiAttachment: FfiRemoteAttachment) throws -> RemoteAttachment {
         return try RemoteAttachment(
             url: ffiAttachment.url,
@@ -269,11 +268,11 @@ public struct DecodedMessageV2: Identifiable {
             salt: ffiAttachment.salt,
             nonce: ffiAttachment.nonce,
             scheme: mapRemoteAttachmentScheme(ffiAttachment.scheme),
-            contentLength: Int(ffiAttachment.contentLength ?? 0),
+            contentLength: Int(ffiAttachment.contentLength),
             filename: ffiAttachment.filename
         )
     }
-    
+
     private func mapMultiRemoteAttachment(_ multiAttachment: FfiMultiRemoteAttachment) -> MultiRemoteAttachment {
         return MultiRemoteAttachment(
             remoteAttachments: multiAttachment.attachments.map { info in
@@ -290,7 +289,7 @@ public struct DecodedMessageV2: Identifiable {
             }
         )
     }
-    
+
     private func mapTransactionReference(_ txRef: FfiTransactionReference) -> TransactionReference {
         return TransactionReference(
             namespace: txRef.namespace,
@@ -308,7 +307,7 @@ public struct DecodedMessageV2: Identifiable {
             }
         )
     }
-    
+
     private func mapGroupUpdated(_ groupUpdated: FfiGroupUpdated) -> GroupUpdated {
         var updated = GroupUpdated()
         updated.initiatedByInboxID = groupUpdated.initiatedByInboxId
@@ -331,7 +330,7 @@ public struct DecodedMessageV2: Identifiable {
         }
         return updated
     }
-    
+
     private func mapFfiEncodedContent(_ ffiContent: FfiEncodedContent) throws -> EncodedContent {
         var encoded = EncodedContent()
         if let typeId = ffiContent.typeId {
