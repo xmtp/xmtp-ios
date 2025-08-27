@@ -359,4 +359,13 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			return try dm.isActive()
 		}
 	}
+    
+    public func getLastReadTimes() throws -> Dictionary<String, Int64> {
+        switch self {
+            case let .group(group):
+            return try group.getLastReadTimes()
+        case let .dm(dm):
+            return try dm.getLastReadTimes()
+        }
+    }
 }
