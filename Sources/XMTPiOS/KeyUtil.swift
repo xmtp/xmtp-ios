@@ -1,4 +1,4 @@
-import CSecp256k1
+import secp256k1
 import CryptoSwift
 import Foundation
 import LibXMTP
