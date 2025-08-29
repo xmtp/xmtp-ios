@@ -21,7 +21,6 @@ Pod::Spec.new do |spec|
   spec.source_files  	= "Sources/**/*.swift"
   spec.frameworks 		= "CryptoKit", "UIKit"
 
-  spec.dependency 'CSecp256k1', '~> 0.2'
   spec.dependency "Connect-Swift", "= 1.0.0"
   spec.dependency 'LibXMTP', '= 4.5.0-dev.4d117dc'
   spec.dependency 'CryptoSwift', '= 1.8.3'
