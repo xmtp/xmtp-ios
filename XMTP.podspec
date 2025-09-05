@@ -27,7 +27,7 @@ Pod::Spec.new do |spec|
   spec.dependency "Connect-Swift", "= 1.0.0"
   spec.dependency 'CryptoSwift', '= 1.8.3'
   spec.dependency 'SQLCipher', '= 4.5.7'
-  spec.dependency 'LibXMTP', '= 4.4.0'
+  spec.dependency 'LibXMTP', '= 4.4.0-dev'
   # No vendoring here; LibXMTP pod provides the FFI binary
   
   spec.ios.deployment_target = '14.0'

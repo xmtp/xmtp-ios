@@ -38,6 +38,8 @@ jobs:
       run: |
         sed -i '' "s/spec\.version *= *\"$SPEC_VERSION\"/spec.version = \"$UPDATED_VERSION\"/" XMTP.podspec
         sed -i '' "s/spec\.version *= *\"$SPEC_VERSION\"/spec.version = \"$UPDATED_VERSION\"/" LibXMTP.podspec
+        # Align XMTP's dependency on LibXMTP to the same UPDATED_VERSION
+        sed -i '' "s/spec\.dependency 'LibXMTP', *= *'[^']*'/spec.dependency 'LibXMTP', '= $UPDATED_VERSION'/" XMTP.podspec
         echo "Updated podspec with version: $UPDATED_VERSION"
     
     - name: Create and push tag
