@@ -51,12 +51,6 @@ jobs:
       run: |
         set -eo pipefail
         pod lib lint XMTP.podspec --allow-warnings
-        for i in 1 2 3 4 5; do
-          if pod trunk push XMTP.podspec --allow-warnings --verbose; then
-            break
-          fi
-          echo "CocoaPods trunk push failed (attempt $i). Retrying in 60s..."
-          sleep 60
-        done
+        pod trunk push XMTP.podspec --allow-warnings --verbose
       env:
         COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
