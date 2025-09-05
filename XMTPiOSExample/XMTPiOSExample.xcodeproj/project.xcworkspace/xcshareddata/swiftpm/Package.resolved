@@ -37,15 +37,6 @@
       }
     },
     {
-      "identity" : "libxmtp-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/xmtp/libxmtp-swift.git",
-      "state" : {
-        "revision" : "6bbb0aacd82070cdef041e808402836c768e2f0e",
-        "version" : "4.4.0"
-      }
-    },
-    {
       "identity" : "starscream",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/daltoniam/Starscream",
