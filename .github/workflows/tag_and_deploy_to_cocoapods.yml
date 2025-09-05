@@ -51,7 +51,7 @@ jobs:
     - name: Deploy to Cocoapods
       run: |
         set -eo pipefail
-        pod lib lint LibXMTP.podspec --allow-warnings
+        pod spec lint LibXMTP.podspec --allow-warnings
         pod trunk push LibXMTP.podspec --allow-warnings
         # Lint XMTP against the local LibXMTP spec to avoid CDN propagation timing
         pod lib lint XMTP.podspec --include-podspecs=LibXMTP.podspec --allow-warnings
