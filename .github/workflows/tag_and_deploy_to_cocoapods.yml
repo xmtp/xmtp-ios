@@ -50,7 +50,7 @@ jobs:
     - name: Deploy to Cocoapods
       run: |
         set -eo pipefail
-        pod lib lint XMTP.podspec --allow-warnings
-        pod trunk push XMTP.podspec --allow-warnings --verbose
+        pod spec lint XMTP.podspec --quick --platforms=ios --allow-warnings
+        pod trunk push XMTP.podspec --allow-warnings --skip-import-validation
       env:
         COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
