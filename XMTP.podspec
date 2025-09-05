@@ -18,17 +18,28 @@ Pod::Spec.new do |spec|
   spec.swift_version  = '5.3'
 
   spec.source       	= { :git => "https://github.com/xmtp/xmtp-ios.git", :tag => "#{spec.version}" }
-  # Exclude LibXMTP sources; they are provided by the LibXMTP pod
   spec.source_files  	= "Sources/**/*.swift"
-  spec.exclude_files 	= "Sources/LibXMTP/**/*"
   spec.frameworks 		= "CryptoKit", "UIKit", "CoreFoundation", "SystemConfiguration"
 
   spec.dependency 'CSecp256k1', '~> 0.2'
   spec.dependency "Connect-Swift", "= 1.0.0"
   spec.dependency 'CryptoSwift', '= 1.8.3'
   spec.dependency 'SQLCipher', '= 4.5.7'
-  spec.dependency 'LibXMTP', '= 4.4.0-dev'
-  # No vendoring here; LibXMTP pod provides the FFI binary
+  # Fetch the FFI binary at install time (no git-lfs needed)
+  spec.prepare_command = <<-CMD
+    set -euo pipefail
+    ZIP_URL="https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.4.0.a9d19aa/LibXMTPSwiftFFI.zip"
+    for i in 1 2 3; do
+      if curl -L "$ZIP_URL" -o LibXMTPSwiftFFI.zip; then
+        break
+      fi
+      echo "Retrying download... ($i)" && sleep 5
+    done
+    rm -rf LibXMTPSwiftFFI.xcframework
+    unzip -o LibXMTPSwiftFFI.zip 'LibXMTPSwiftFFI.xcframework/*' -d . >/dev/null
+    rm -f LibXMTPSwiftFFI.zip
+  CMD
+  spec.vendored_frameworks = 'LibXMTPSwiftFFI.xcframework'
   
   spec.ios.deployment_target = '14.0'
 end

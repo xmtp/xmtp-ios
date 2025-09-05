@@ -1,5 +1,4 @@
 import Foundation
-import LibXMTP
 
 /// Represents a secp256k1 private key.  ``PrivateKey`` conforms to ``SigningKey`` so you can use it
 /// to create a ``Client``.

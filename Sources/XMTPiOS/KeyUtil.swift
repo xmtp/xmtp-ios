@@ -1,7 +1,6 @@
 import CSecp256k1
 import CryptoSwift
 import Foundation
-import LibXMTP
 
 enum KeyUtilError: Error {
 	case invalidContext

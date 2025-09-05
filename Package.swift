@@ -29,16 +29,11 @@ let package = Package(
 			checksum: "a4bcf78ced5f4dd80c161a17a498bac508a30b59f72dfba9c5318020528ccc0e"
 		),
 		.target(
-			name: "LibXMTP",
-			dependencies: ["LibXMTPSwiftFFI"],
-			path: "Sources/LibXMTP"
-		),
-		.target(
 			name: "XMTPiOS",
 			dependencies: [
 				.product(name: "CSecp256k1", package: "CSecp256k1.swift"),
 				.product(name: "Connect", package: "connect-swift"),
-				"LibXMTP",
+				"LibXMTPSwiftFFI",
 				.product(name: "CryptoSwift", package: "CryptoSwift"),
 			]
 		),

@@ -37,9 +37,6 @@ jobs:
     - name: Update podspec with new version
       run: |
         sed -i '' "s/spec\.version *= *\"$SPEC_VERSION\"/spec.version = \"$UPDATED_VERSION\"/" XMTP.podspec
-        sed -i '' "s/spec\.version *= *\"$SPEC_VERSION\"/spec.version = \"$UPDATED_VERSION\"/" LibXMTP.podspec
-        # Align XMTP's dependency on LibXMTP to the same UPDATED_VERSION
-        sed -i '' "s/spec\.dependency 'LibXMTP', *= *'[^']*'/spec.dependency 'LibXMTP', '= $UPDATED_VERSION'/" XMTP.podspec
         echo "Updated podspec with version: $UPDATED_VERSION"
     
     - name: Create and push tag
@@ -53,16 +50,7 @@ jobs:
     - name: Deploy to Cocoapods
       run: |
         set -eo pipefail
-        pod spec lint LibXMTP.podspec --allow-warnings
-        pod trunk push LibXMTP.podspec --allow-warnings
-        # Lint XMTP against the local LibXMTP spec to avoid CDN propagation timing
-        pod lib lint XMTP.podspec --include-podspecs=LibXMTP.podspec --allow-warnings
-        # Push XMTP; retry to tolerate CDN propagation delays for LibXMTP
-        for i in 1 2 3 4 5; do
-          if pod trunk push XMTP.podspec --allow-warnings; then
-            break
-          fi
-          echo "Retrying pod trunk push for XMTP in 30s (attempt $i)" && sleep 30
-        done
+        pod lib lint XMTP.podspec --allow-warnings
+        pod trunk push XMTP.podspec --allow-warnings
       env:
         COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import LibXMTP
 
 public let ContentTypeReactionV2 = ContentTypeID(authorityID: "xmtp.org", typeID: "reaction", versionMajor: 2, versionMinor: 0)
 
