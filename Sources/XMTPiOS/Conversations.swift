@@ -292,9 +292,6 @@ public class Conversations {
             if let limit {
                 options.limit = Int64(limit)
             }
-            if let limit {
-                options.limit = Int64(limit)
-            }
             let ffiConversations = try ffiConversations.list(
                 opts: options
             )
