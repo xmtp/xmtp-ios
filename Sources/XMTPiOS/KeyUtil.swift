@@ -22,14 +22,14 @@ enum SignatureError: Error, CustomStringConvertible {
 
 enum KeyUtilx {
 	static func generatePublicKey(from data: Data) throws -> Data {
-        try LibXMTP.secpGeneratePublicKey(privateKey32: data)
+        try LibXMTP.ethereumGeneratePublicKey(privateKey32: data)
 	}
     
     static func sign(message: Data, with privateKey: Data, hashing: Bool) throws -> Data {
-        try LibXMTP.secpSignRecoverable(msg: message, privateKey32: privateKey, hashing: hashing)
+        try LibXMTP.ethereumSignRecoverable(msg: message, privateKey32: privateKey, hashing: hashing)
       }
-      static func generateAddress(from publicKey: Data) -> String {
-          LibXMTP.ethereumAddressFromPubkey(pubkey: publicKey)
+      static func generateAddress(from publicKey: Data) throws -> String {
+          try LibXMTP.ethereumAddressFromPubkey(pubkey: publicKey)
       }
       static func ethHash(_ message: String) throws -> Data {
           try LibXMTP.ethereumHashPersonal(message: message)

@@ -22,7 +22,7 @@ Pod::Spec.new do |spec|
   spec.frameworks 		= "CryptoKit", "UIKit"
 
   spec.dependency "Connect-Swift", "= 1.0.0"
-  spec.dependency 'LibXMTP', '= 4.5.0-dev.4d117dc'
+  spec.dependency 'LibXMTP', '= 4.5.0-dev.c78b650'
   spec.dependency 'CryptoSwift', '= 1.8.3'
   spec.dependency 'SQLCipher', '= 4.5.7'
   
