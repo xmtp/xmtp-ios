@@ -25,13 +25,12 @@ let package = Package(
 	targets: [
 		.binaryTarget(
 			name: "LibXMTPSwiftFFI",
-			url: "https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.4.0.a9d19aa/LibXMTPSwiftFFI.zip",
-			checksum: "a4bcf78ced5f4dd80c161a17a498bac508a30b59f72dfba9c5318020528ccc0e"
+			url: "https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.5.0-rc1.e5c3c75/LibXMTPSwiftFFI.zip",
+			checksum: "4dce1d93cfb02250add40fa6b33a839736057a32d497d1a56c7a5482456a2978"
 		),
 		.target(
 			name: "XMTPiOS",
 			dependencies: [
-				.product(name: "CSecp256k1", package: "CSecp256k1.swift"),
 				.product(name: "Connect", package: "connect-swift"),
 				"LibXMTPSwiftFFI",
 				.product(name: "CryptoSwift", package: "CryptoSwift"),

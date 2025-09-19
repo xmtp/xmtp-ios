@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "XMTP"
-  spec.version      = "4.4.0-dev"
+  spec.version      = "4.5.0-rc1"
 
   spec.summary      = "XMTP SDK Cocoapod"
 
@@ -17,7 +17,7 @@ Pod::Spec.new do |spec|
 
   spec.swift_version  = '5.3'
 
-  # Use a single release archive containing Sources/** and LibXMTPSwiftFFI.xcframework
+  # Release archive contains libxmtp uniffi bindings Sources/** and LibXMTPSwiftFFI.xcframework
   spec.source       	= { :http => "https://github.com/xmtp/xmtp-ios/releases/download/#{spec.version}/XMTP-#{spec.version}.zip", :type => :zip }
   spec.source_files  	= "Sources/**/*.swift"
   spec.frameworks 		= "CryptoKit", "UIKit", "CoreFoundation", "SystemConfiguration"
@@ -26,7 +26,6 @@ Pod::Spec.new do |spec|
   spec.dependency "Connect-Swift", "= 1.0.0"
   spec.dependency 'CryptoSwift', '= 1.8.3'
   spec.dependency 'SQLCipher', '= 4.5.7'
-  # No prepare_command; the archive already contains the vendored framework
   spec.vendored_frameworks = 'LibXMTPSwiftFFI.xcframework'
   
   spec.ios.deployment_target = '14.0'

@@ -69,6 +69,7 @@ extension PrivateKey {
 /// **Compute wallet address from PublicKey like in Kotlin**
 extension PublicKey {
 	var walletAddress: String {
-		KeyUtilx.generateAddress(from: secp256K1Uncompressed.bytes).lowercased()
+        // Force unwrap here since we throw if address is invalid when we init the public key
+        try! KeyUtilx.generateAddress(from: secp256K1Uncompressed.bytes).lowercased()
 	}
 }

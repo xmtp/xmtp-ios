@@ -51,7 +51,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			return try await dm.lastMessage()
 		}
 	}
-    
+
     public func commitLogForkStatus() -> CommitLogForkStatus {
         switch self {
         case let .group(group):
@@ -188,6 +188,24 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			return dm.createdAt
 		}
 	}
+    
+    public var createdAtNs: Int64 {
+        switch self {
+        case let .group(group):
+            return group.createdAtNs
+        case let .dm(dm):
+            return dm.createdAtNs
+        }
+    }
+    
+    public var lastActivityAtNs: Int64 {
+        switch self {
+        case let .group(group):
+            return group.lastActivityAtNs
+        case let .dm(dm):
+            return dm.lastActivityAtNs
+        }
+    }
 
 	@discardableResult public func send<T>(
 		content: T, options: SendOptions? = nil, fallback _: String? = nil
@@ -261,7 +279,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			)
 		}
 	}
-    
+
     // Returns null if conversation is not paused, otherwise the min version required to unpause this conversation
     public func pausedForVersion() async throws -> String? {
         switch self {
@@ -271,8 +289,6 @@ public enum Conversation: Identifiable, Equatable, Hashable {
             return try dm.pausedForVersion()
         }
     }
-    
-    
 
 	public var client: Client {
 		switch self {
@@ -298,6 +314,27 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			)
 		case let .dm(dm):
 			return try await dm.messagesWithReactions(
+				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
+				direction: direction, deliveryStatus: deliveryStatus
+			)
+		}
+	}
+
+	public func enrichedMessages(
+		limit: Int? = nil,
+		beforeNs: Int64? = nil,
+		afterNs: Int64? = nil,
+		direction: SortDirection? = .descending,
+		deliveryStatus: MessageDeliveryStatus = .all
+	) async throws -> [DecodedMessageV2] {
+		switch self {
+		case let .group(group):
+			return try await group.enrichedMessages(
+				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
+				direction: direction, deliveryStatus: deliveryStatus
+			)
+		case let .dm(dm):
+			return try await dm.enrichedMessages(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
 				direction: direction, deliveryStatus: deliveryStatus
 			)
@@ -330,7 +367,7 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			return try await dm.getDebugInformation()
 		}
 	}
-	
+
 	public func isActive() throws -> Bool {
 		switch self {
 		case let .group(group):
@@ -339,4 +376,15 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			return try dm.isActive()
 		}
 	}
+
+    // Returns a dictionary where the keys are inbox IDs and the values
+    // are the timestamp in nanoseconds of their last read receipt
+    public func getLastReadTimes() throws -> [String: Int64] {
+        switch self {
+            case let .group(group):
+            return try group.getLastReadTimes()
+        case let .dm(dm):
+            return try dm.getLastReadTimes()
+        }
+    }
 }

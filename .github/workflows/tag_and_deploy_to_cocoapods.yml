@@ -50,7 +50,7 @@ jobs:
     - name: Build release archive (Sources + LibXMTPSwiftFFI.xcframework)
       run: |
         set -euo pipefail
-        ZIP_URL="https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.4.0.a9d19aa/LibXMTPSwiftFFI.zip"
+        ZIP_URL="https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.5.0-rc1.e5c3c75/LibXMTPSwiftFFI.zip"
         curl -L "$ZIP_URL" -o LibXMTPSwiftFFI.zip
         rm -rf LibXMTPSwiftFFI.xcframework
         unzip -qo LibXMTPSwiftFFI.zip 'LibXMTPSwiftFFI.xcframework/*' -d .
