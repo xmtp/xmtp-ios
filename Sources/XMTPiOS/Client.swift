@@ -242,8 +242,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Creating an FfiClient without signing or registering will create a broken experience. 
+			This function is delicate and should be used with caution.
+			Creating an FfiClient without signing or registering will create a broken experience.
 			Use `create()` instead.
 			"""
 	)
@@ -457,8 +457,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `revokeInstallations()` instead.
 			"""
 	)
@@ -478,8 +478,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `revokeInstallations()` instead.
 			"""
 	)
@@ -781,8 +781,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `addAccount()`, `removeAccount()`, or `revoke()` instead.
 			"""
 	)
@@ -797,8 +797,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `revokeInstallations()` instead.
 			"""
 	)
@@ -814,8 +814,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `revokeAllOtherInstallations()` instead.
 			"""
 	)
@@ -830,8 +830,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `removeIdentity()` instead.
 			"""
 	)
@@ -847,8 +847,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the create and register flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the create and register flow independently;
 			otherwise use `addIdentity()` instead.
 			"""
 	)
@@ -881,8 +881,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `create()` instead.
 			"""
 	)
@@ -897,8 +897,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the create and register flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the create and register flow independently;
 			otherwise use `create()` instead.
 			"""
 	)
