@@ -1,5 +1,5 @@
 {
-  "originHash" : "315cd607981566bf90ef6f86b6d8ce921b7e750d120a36d40a0dab749db8fe84",
+  "originHash" : "ffeddc712a76b6dd580a5c33050be5c4caa142977f7606a10e8240fcd2106e0d",
   "pins" : [
     {
       "identity" : "bigint",
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/xmtp/libxmtp-swift.git",
       "state" : {
-        "revision" : "2c3ec2626dd34b2f814cba018636c7fdd202f16f",
-        "version" : "4.0.3"
+        "revision" : "e9893f6449cf3b3b8d91c059a7372d099cc75d35",
+        "version" : "4.2.0-dev.4ba3b55"
       }
     },
     {
