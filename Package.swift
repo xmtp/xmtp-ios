@@ -17,7 +17,6 @@ let package = Package(
 		),
 	],
 	dependencies: [
-		.package(url: "https://github.com/tesseract-one/CSecp256k1.swift.git", from: "0.2.0"),
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.0.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.4.3"),
 		.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", "1.8.4" ..< "2.0.0")

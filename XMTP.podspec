@@ -20,9 +20,8 @@ Pod::Spec.new do |spec|
   # Release archive contains libxmtp uniffi bindings Sources/** and LibXMTPSwiftFFI.xcframework
   spec.source       	= { :http => "https://github.com/xmtp/xmtp-ios/releases/download/#{spec.version}/XMTP-#{spec.version}.zip", :type => :zip }
   spec.source_files  	= "Sources/**/*.swift"
-  spec.frameworks 		= "CryptoKit", "UIKit", "CoreFoundation", "SystemConfiguration"
+  spec.frameworks 		= "CryptoKit", "UIKit"
 
-  spec.dependency 'CSecp256k1', '~> 0.2'
   spec.dependency "Connect-Swift", "= 1.0.0"
   spec.dependency 'CryptoSwift', '= 1.8.3'
   spec.dependency 'SQLCipher', '= 4.5.7'

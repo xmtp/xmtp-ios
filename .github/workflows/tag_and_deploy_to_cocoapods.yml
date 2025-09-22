@@ -47,10 +47,16 @@ jobs:
         git push origin "$UPDATED_VERSION"
         echo "Created and pushed tag: $UPDATED_VERSION"
 
+    - name: Extract LibXMTPSwiftFFI URL from Package.swift
+      id: extract_url
+      run: |
+        ZIP_URL=$(grep -A 2 'name: "LibXMTPSwiftFFI"' Package.swift | grep 'url:' | sed -n 's/.*url: *"\([^"]*\)".*/\1/p')
+        echo "ZIP_URL=$ZIP_URL" >> $GITHUB_ENV
+        echo "Extracted URL: $ZIP_URL"
+
     - name: Build release archive (Sources + LibXMTPSwiftFFI.xcframework)
       run: |
         set -euo pipefail
-        ZIP_URL="https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.5.0-rc1.e5c3c75/LibXMTPSwiftFFI.zip"
         curl -L "$ZIP_URL" -o LibXMTPSwiftFFI.zip
         rm -rf LibXMTPSwiftFFI.xcframework
         unzip -qo LibXMTPSwiftFFI.zip 'LibXMTPSwiftFFI.xcframework/*' -d .
