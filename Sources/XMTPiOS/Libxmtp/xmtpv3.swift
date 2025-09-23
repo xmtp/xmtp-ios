@@ -4288,6 +4288,8 @@ public protocol FfiXmtpClientProtocol: AnyObject, Sendable {
     
     func dbReconnect() async throws 
     
+    func deleteMessage(messageId: Data) throws  -> UInt32
+    
     func dmConversation(targetInboxId: String) throws  -> FfiConversation
     
     func findInboxId(identifier: FfiIdentifier) async throws  -> String?
@@ -4618,6 +4620,14 @@ open func dbReconnect()async throws   {
             liftFunc: { $0 },
             errorHandler: FfiConverterTypeGenericError_lift
         )
+}
+    
+open func deleteMessage(messageId: Data)throws  -> UInt32  {
+    return try  FfiConverterUInt32.lift(try rustCallWithError(FfiConverterTypeGenericError_lift) {
+    uniffi_xmtpv3_fn_method_ffixmtpclient_delete_message(self.uniffiClonePointer(),
+        FfiConverterData.lower(messageId),$0
+    )
+})
 }
     
 open func dmConversation(targetInboxId: String)throws  -> FfiConversation  {
@@ -13892,6 +13902,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_ffixmtpclient_db_reconnect() != 6707) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_xmtpv3_checksum_method_ffixmtpclient_delete_message() != 34289) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_ffixmtpclient_dm_conversation() != 23917) {
