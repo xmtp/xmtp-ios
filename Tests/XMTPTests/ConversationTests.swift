@@ -556,4 +556,19 @@ class ConversationTests: XCTestCase {
 		
 		try fixtures.cleanUpDatabases()
 	}
+    
+    func testDeleteMessage() async throws {
+        let fixtures = try await fixtures()
+        
+        let dm = try await fixtures.boClient.conversations.findOrCreateDm(
+            with: fixtures.caroClient.inboxID)
+        
+        let msgID = try await dm.send(content: "This will be deleted")
+        
+        var originalNumberOfMessages = try await dm.messages().count
+        try fixtures.boClient.conversations.deleteMessageLocally(messageId: msgID)
+        
+        let newMessageCount = try await dm.messages().count
+        XCTAssertEqual(newMessageCount, originalNumberOfMessages - 1)
+    }
 }
