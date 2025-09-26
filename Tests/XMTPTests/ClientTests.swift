@@ -10,7 +10,7 @@ class ClientTests: XCTestCase {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let clientOptions = ClientOptions(
 			api: ClientOptions.Api(
-				env: XMTPEnvironment.local, isSecure: false,
+				env: XMTPEnvironment.local, isSecure: XMTPEnvironment.local.isSecure,
 				appVersion: "Testing/0.0.0"
 			),
 			dbEncryptionKey: key
@@ -29,7 +29,7 @@ class ClientTests: XCTestCase {
 		let client = try await Client.create(
 			account: bo,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -46,7 +46,7 @@ class ClientTests: XCTestCase {
 				notOnNetwork.identity,
 				fixtures.bo.identity,
 			],
-			api: ClientOptions.Api(env: .local, isSecure: false)
+			api: ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure)
 		)
 
 		let expectedResults: [String: Bool] = [
@@ -72,15 +72,15 @@ class ClientTests: XCTestCase {
 				fixtures.alixClient.inboxID,
 				fixtures.boClient.inboxID,
 			],
-			api: ClientOptions.Api(env: .local, isSecure: false)
+			api: ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure)
 		)
 
 		XCTAssertEqual(
-			inboxStates.first!.recoveryIdentity.identifier,
+			inboxStates.first?.recoveryIdentity.identifier,
 			fixtures.alix.walletAddress.lowercased()
 		)
 		XCTAssertEqual(
-			inboxStates.last!.recoveryIdentity.identifier,
+			inboxStates.last?.recoveryIdentity.identifier,
 			fixtures.bo.walletAddress.lowercased()
 		)
 		try fixtures.cleanUpDatabases()
@@ -94,7 +94,7 @@ class ClientTests: XCTestCase {
 		var boClient = try await Client.create(
 			account: bo,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -102,7 +102,7 @@ class ClientTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -119,7 +119,7 @@ class ClientTests: XCTestCase {
 		boClient = try await Client.create(
 			account: bo,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -136,7 +136,7 @@ class ClientTests: XCTestCase {
 		let boClient = try await Client.create(
 			account: bo,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -144,7 +144,7 @@ class ClientTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -158,7 +158,7 @@ class ClientTests: XCTestCase {
 		try boClient.dropLocalDatabaseConnection()
 
 		try await assertThrowsAsyncError(
-			boClient.conversations.listGroups()
+			await boClient.conversations.listGroups()
 		)
 
 		try await boClient.reconnectLocalDatabase()
@@ -198,7 +198,7 @@ class ClientTests: XCTestCase {
 		}
 
 		let opts = ClientOptions(
-			api: ClientOptions.Api(env: .local, isSecure: false),
+			api: ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			preAuthenticateToInboxCallback: preAuthenticateToInboxCallback,
 			dbEncryptionKey: key
 		)
@@ -217,7 +217,7 @@ class ClientTests: XCTestCase {
 		let client = try await Client.create(
 			account: bo,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db"
 			)
@@ -226,7 +226,7 @@ class ClientTests: XCTestCase {
 		let bundleClient = try await Client.build(
 			publicIdentity: bo.identity,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db"
 			)
@@ -237,10 +237,10 @@ class ClientTests: XCTestCase {
 		XCTAssert(!client.installationID.isEmpty)
 
 		try await assertThrowsAsyncError(
-			_ = Client.build(
+			_ = await Client.build(
 				publicIdentity: bo.identity,
 				options: .init(
-					api: .init(env: .local, isSecure: false),
+					api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 					dbEncryptionKey: key,
 					dbDirectory: nil
 				)
@@ -257,7 +257,7 @@ class ClientTests: XCTestCase {
 		let boClient = try await Client.create(
 			account: bo,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db"
 			)
@@ -266,22 +266,22 @@ class ClientTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db"
 			)
 		)
 
 		_ = try await boClient.conversations.newGroup(with: [
-			alixClient.inboxID,
+			alixClient.inboxID
 		])
 
 		let key2 = try Crypto.secureRandomBytes(count: 32)
 		try await assertThrowsAsyncError(
-			Client.create(
+			await Client.create(
 				account: bo,
 				options: .init(
-					api: .init(env: .local, isSecure: false),
+					api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 					dbEncryptionKey: key2,
 					dbDirectory: "xmtp_db"
 				)
@@ -298,7 +298,7 @@ class ClientTests: XCTestCase {
 		let boClient = try await Client.create(
 			account: bo,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -306,7 +306,7 @@ class ClientTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -322,7 +322,7 @@ class ClientTests: XCTestCase {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 		let options = ClientOptions(
-			api: .init(env: .local, isSecure: false),
+			api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			dbEncryptionKey: key
 		)
 
@@ -356,7 +356,7 @@ class ClientTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -364,7 +364,7 @@ class ClientTests: XCTestCase {
 		let alixClient2 = try await Client.create(
 			account: alix,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db1"
 			)
@@ -373,7 +373,7 @@ class ClientTests: XCTestCase {
 		let alixClient3 = try await Client.create(
 			account: alix,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db2"
 			)
@@ -402,7 +402,7 @@ class ClientTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -410,7 +410,7 @@ class ClientTests: XCTestCase {
 		let alixClient2 = try await Client.create(
 			account: alix,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db1"
 			)
@@ -419,7 +419,7 @@ class ClientTests: XCTestCase {
 		let alixClient3 = try await Client.create(
 			account: alix,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db2"
 			)
@@ -447,11 +447,11 @@ class ClientTests: XCTestCase {
 			inboxIds: [fixtures.boClient.inboxID, fixtures.caroClient.inboxID]
 		)
 		XCTAssertEqual(
-			states.first!.recoveryIdentity.identifier,
+			states.first?.recoveryIdentity.identifier,
 			fixtures.bo.walletAddress.lowercased()
 		)
 		XCTAssertEqual(
-			states.last!.recoveryIdentity.identifier,
+			states.last?.recoveryIdentity.identifier,
 			fixtures.caro.walletAddress.lowercased()
 		)
 		try fixtures.cleanUpDatabases()
@@ -489,7 +489,7 @@ class ClientTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		try await assertThrowsAsyncError(
-			fixtures.alixClient.addAccount(newAccount: fixtures.bo)
+			await fixtures.alixClient.addAccount(newAccount: fixtures.bo)
 		)
 
 		XCTAssert(fixtures.boClient.inboxID != fixtures.alixClient.inboxID)
@@ -550,7 +550,7 @@ class ClientTests: XCTestCase {
 
 		// Cannot remove the recovery address
 		try await assertThrowsAsyncError(
-			fixtures.alixClient.removeAccount(
+			await fixtures.alixClient.removeAccount(
 				recoveryAccount: alix3Wallet,
 				identityToRemove: fixtures.alix.identity
 			)
@@ -610,7 +610,7 @@ class ClientTests: XCTestCase {
 		try fixtures.alixClient.deleteLocalDatabase()
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let options = ClientOptions(
-			api: .init(env: .local, isSecure: false),
+			api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			dbEncryptionKey: key
 		)
 
@@ -641,7 +641,7 @@ class ClientTests: XCTestCase {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 		let options = ClientOptions(
-			api: .init(env: .local, isSecure: false),
+			api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			dbEncryptionKey: key
 		)
 
@@ -652,15 +652,17 @@ class ClientTests: XCTestCase {
 			identity: alix.identity, clientOptions: options
 		)
 		let sigRequest = client.ffiSignatureRequest()
-		try await sigRequest!.addEcdsaSignature(
-			signatureBytes: alix.sign(sigRequest!.signatureText())
-				.rawData
+		let signatureText = try await sigRequest?.signatureText()
+		let signature = try await alix.sign(XCTUnwrap(signatureText))
+		let addResult = try await sigRequest?.addEcdsaSignature(
+			signatureBytes: signature.rawData
 		)
-		try await client.ffiRegisterIdentity(signatureRequest: sigRequest!)
+		try XCTUnwrap(addResult)
+		try await client.ffiRegisterIdentity(signatureRequest: XCTUnwrap(sigRequest))
 		let state = try await client.inboxState(refreshFromNetwork: true)
 			.identities
 		let canMessage = try await client.canMessage(identities: state)[
-			state.first!.identifier
+			XCTUnwrap(state.first?.identifier)
 		]
 
 		XCTAssertTrue(canMessage == true)
@@ -673,7 +675,7 @@ class ClientTests: XCTestCase {
 		let boWallet = try PrivateKey.generate()
 
 		let options = ClientOptions(
-			api: .init(env: .local, isSecure: false),
+			api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			dbEncryptionKey: key
 		)
 
@@ -735,7 +737,7 @@ class ClientTests: XCTestCase {
 		let alix = try await Client.create(
 			account: alixWallet,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: dbDirPath
 			)
@@ -744,7 +746,7 @@ class ClientTests: XCTestCase {
 		let alix2 = try await Client.create(
 			account: alixWallet,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: dbDirPath2
 			)
@@ -753,7 +755,7 @@ class ClientTests: XCTestCase {
 		let alix3 = try await Client.create(
 			account: alixWallet,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: dbDirPath3
 			)
@@ -763,7 +765,7 @@ class ClientTests: XCTestCase {
 		XCTAssertEqual(inboxState.installations.count, 3)
 
 		let sigRequest = try await alix.ffiRevokeInstallations(ids: [
-			alix2.installationID.hexToData,
+			alix2.installationID.hexToData
 		])
 		let signedMessage = try await alixWallet.sign(
 			sigRequest.signatureText()
@@ -826,7 +828,7 @@ class ClientTests: XCTestCase {
 		let client = try await Client.create(
 			account: fakeWallet,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -893,7 +895,7 @@ class ClientTests: XCTestCase {
 		let alix = try await Client.create(
 			account: alixWallet,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -909,7 +911,7 @@ class ClientTests: XCTestCase {
 		// Create a group and send a message
 		let group = try await alix.conversations.newGroup(with: [])
 		_ = try await group.send(content: "hi")
-		try await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
+		try await Task.sleep(nanoseconds: 2_000_000_000)  // 2 seconds
 
 		let aggregateStats2 = alix.debugInformation.aggregateStatistics
 		print("Aggregate Stats Create:\n\(aggregateStats2)")
@@ -939,7 +941,7 @@ class ClientTests: XCTestCase {
 		let alix = try await Client.create(
 			account: alixWallet,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key
 			)
 		)
@@ -951,7 +953,7 @@ class ClientTests: XCTestCase {
 
 	func testCanSeeKeyPackageStatus() async throws {
 		let fixtures = try await fixtures()
-		let api = ClientOptions.Api(env: .local, isSecure: true)
+		let api = ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure)
 
 		try await Client.connectToApiBackend(api: api)
 
@@ -985,7 +987,7 @@ class ClientTests: XCTestCase {
 			if let notBefore = thisKPStatus.lifetime?.notBefore {
 				notBeforeDate =
 					Date(timeIntervalSince1970: TimeInterval(notBefore))
-						.description
+					.description
 			} else {
 				notBeforeDate = "null"
 			}
@@ -994,7 +996,7 @@ class ClientTests: XCTestCase {
 			if let notAfter = thisKPStatus.lifetime?.notAfter {
 				notAfterDate =
 					Date(timeIntervalSince1970: TimeInterval(notAfter))
-						.description
+					.description
 			} else {
 				notAfterDate = "null"
 			}
@@ -1004,7 +1006,7 @@ class ClientTests: XCTestCase {
 			print("error code: \(thisKPStatus.validationError ?? "none")")
 
 			if let notBefore = thisKPStatus.lifetime?.notBefore,
-			   let notAfter = thisKPStatus.lifetime?.notAfter
+				let notAfter = thisKPStatus.lifetime?.notAfter
 			{
 				let expectedDuration = UInt64(3600 * 24 * 28 * 3 + 3600)
 				XCTAssertEqual(notAfter - notBefore, expectedDuration)
@@ -1017,7 +1019,7 @@ class ClientTests: XCTestCase {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let wallet = try PrivateKey.generate()
 		let options = ClientOptions(
-			api: .init(env: .local, isSecure: false),
+			api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			dbEncryptionKey: key
 		)
 
@@ -1037,7 +1039,7 @@ class ClientTests: XCTestCase {
 		)
 		XCTAssertEqual(client.inboxID, builtClient.inboxID)
 
-		let fixtures = try await fixtures() // Assuming this provides alixClient and boClient
+		let fixtures = try await fixtures()  // Assuming this provides alixClient and boClient
 
 		let group = try await builtClient.conversations.newGroup(
 			with: [fixtures.alixClient.inboxID]
@@ -1067,11 +1069,11 @@ class ClientTests: XCTestCase {
 
 		var clients: [Client] = []
 
-		for i in 0 ..< 10 {
+		for i in 0..<10 {
 			let client = try await Client.create(
 				account: wallet,
 				options: ClientOptions(
-					api: .init(env: .local, isSecure: false),
+					api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 					dbEncryptionKey: key,
 					dbDirectory: "xmtp_db_\(i)"
 				)
@@ -1084,10 +1086,10 @@ class ClientTests: XCTestCase {
 
 		// Attempt to create a 6th installation, should throw
 		try await assertThrowsAsyncError(
-			_ = Client.create(
+			_ = await Client.create(
 				account: wallet,
 				options: ClientOptions(
-					api: .init(env: .local, isSecure: false),
+					api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 					dbEncryptionKey: key,
 					dbDirectory: "xmtp_db_10"
 				)
@@ -1098,14 +1100,14 @@ class ClientTests: XCTestCase {
 		let boClient = try await Client.create(
 			account: boWallet,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: Crypto.secureRandomBytes(count: 32),
 				dbDirectory: "xmtp_bo"
 			)
 		)
 
 		let group = try await boClient.conversations.newGroup(with: [
-			clients[2].inboxID,
+			clients[2].inboxID
 		])
 		let members = try await group.members
 		let alixMember = members.first { $0.inboxId == clients[0].inboxID }
@@ -1113,7 +1115,7 @@ class ClientTests: XCTestCase {
 
 		let inboxState = try await boClient.inboxStatesForInboxIds(
 			refreshFromNetwork: true,
-			inboxIds: [alixMember!.inboxId]
+			inboxIds: [XCTUnwrap(alixMember?.inboxId)]
 		)
 		XCTAssertEqual(inboxState.first?.installations.count, 10)
 
@@ -1130,7 +1132,7 @@ class ClientTests: XCTestCase {
 		let sixthClient = try await Client.create(
 			account: wallet,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db_11"
 			)
@@ -1150,11 +1152,11 @@ class ClientTests: XCTestCase {
 
 		var clients: [Client] = []
 
-		for i in 0 ..< 5 {
+		for i in 0..<5 {
 			let client = try await Client.create(
 				account: wallet,
 				options: ClientOptions(
-					api: .init(env: .local, isSecure: false),
+					api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 					dbEncryptionKey: key,
 					dbDirectory: "xmtp_db_\(i)"
 				)
@@ -1162,22 +1164,23 @@ class ClientTests: XCTestCase {
 			clients.append(client)
 		}
 
-		var state = try await clients.last!.inboxState(refreshFromNetwork: true)
-		XCTAssertEqual(state.installations.count, 5)
+		var state = try await clients.last?.inboxState(refreshFromNetwork: true)
+		XCTAssertEqual(state?.installations.count, 5)
 
 		let toRevokeId = clients[1].installationID
 
 		try await Client.revokeInstallations(
-			api: .init(env: .local, isSecure: false),
+			api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			signingKey: wallet,
-			inboxId: clients.first!.inboxID,
+			inboxId: XCTUnwrap(clients.first?.inboxID),
 			installationIds: [toRevokeId]
 		)
 
-		state = try await clients.last!.inboxState(refreshFromNetwork: true)
-		XCTAssertEqual(state.installations.count, 4)
+		let lastClientState = try await clients.last?.inboxState(refreshFromNetwork: true)
+		let unwrappedState = try XCTUnwrap(lastClientState)
+		XCTAssertEqual(unwrappedState.installations.count, 4)
 
-		let remainingIds = state.installations.map(\.id)
+		let remainingIds = unwrappedState.installations.map(\.id)
 		XCTAssertFalse(remainingIds.contains(toRevokeId))
 	}
 
@@ -1187,11 +1190,11 @@ class ClientTests: XCTestCase {
 
 		var clients: [Client] = []
 
-		for i in 0 ..< 5 {
+		for i in 0..<5 {
 			let client = try await Client.create(
 				account: wallet,
 				options: ClientOptions(
-					api: .init(env: .local, isSecure: false),
+					api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 					dbEncryptionKey: key,
 					dbDirectory: "xmtp_db_\(i)"
 				)
@@ -1201,28 +1204,28 @@ class ClientTests: XCTestCase {
 
 		var states = try await Client.inboxStatesForInboxIds(
 			inboxIds: [
-				clients.last!.inboxID,
+				XCTUnwrap(clients.last?.inboxID)
 			],
-			api: ClientOptions.Api(env: .local, isSecure: false)
+			api: ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure)
 		)
-		XCTAssertEqual(states.first!.installations.count, 5)
+		XCTAssertEqual(states.first?.installations.count, 5)
 
-		let toRevokeIds = states.first!.installations.map(\.id)
+		let toRevokeIds = try XCTUnwrap(states.first?.installations.map(\.id))
 
 		try await Client.revokeInstallations(
-			api: .init(env: .local, isSecure: false),
+			api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			signingKey: wallet,
-			inboxId: clients.first!.inboxID,
+			inboxId: XCTUnwrap(clients.first?.inboxID),
 			installationIds: toRevokeIds
 		)
 
 		states = try await Client.inboxStatesForInboxIds(
 			inboxIds: [
-				clients.last!.inboxID,
+				XCTUnwrap(clients.last?.inboxID)
 			],
-			api: ClientOptions.Api(env: .local, isSecure: false)
+			api: ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure)
 		)
-		XCTAssertEqual(states.first!.installations.count, 0)
+		XCTAssertEqual(states.first?.installations.count, 0)
 	}
 
 	func testStaticRevokeInstallationsManually() async throws {
@@ -1249,7 +1252,7 @@ class ClientTests: XCTestCase {
 		let alix = try await Client.create(
 			account: alixWallet,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: dbDirPath
 			)
@@ -1258,7 +1261,7 @@ class ClientTests: XCTestCase {
 		let alix2 = try await Client.create(
 			account: alixWallet,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: dbDirPath2
 			)
@@ -1267,7 +1270,7 @@ class ClientTests: XCTestCase {
 		let alix3 = try await Client.create(
 			account: alixWallet,
 			options: ClientOptions(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: dbDirPath3
 			)
@@ -1277,11 +1280,11 @@ class ClientTests: XCTestCase {
 		XCTAssertEqual(inboxState.installations.count, 3)
 
 		let sigRequest = try await Client.ffiRevokeInstallations(
-			api: .init(env: .local, isSecure: false),
+			api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			publicIdentity: alixWallet.identity,
 			inboxId: alix.inboxID,
 			installationIds: [
-				alix2.installationID,
+				alix2.installationID
 			]
 		)
 		let signedMessage = try await alixWallet.sign(
@@ -1290,7 +1293,7 @@ class ClientTests: XCTestCase {
 
 		try await sigRequest.addEcdsaSignature(signatureBytes: signedMessage)
 		try await Client.ffiApplySignatureRequest(
-			api: .init(env: .local, isSecure: false),
+			api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			signatureRequest: sigRequest
 		)
 
