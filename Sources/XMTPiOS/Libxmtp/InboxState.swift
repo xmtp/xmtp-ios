@@ -37,5 +37,4 @@ public struct InboxState {
 	public var creationSignatureKind: SignatureKind? {
 		ffiInboxState.creationSignatureKind
 	}
-
 }

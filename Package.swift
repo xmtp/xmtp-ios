@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
 	name: "XMTPiOS",
-	platforms: [.iOS(.v14), .macOS(.v11)],
+	platforms: [.iOS(.v14), .macOS(.v12)],
 	products: [
 		.library(
 			name: "XMTPiOS",
@@ -19,13 +19,13 @@ let package = Package(
 	dependencies: [
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.0.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.4.3"),
-		.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", "1.8.4"..<"2.0.0"),
+		.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", "1.8.4" ..< "2.0.0"),
 	],
 	targets: [
 		.binaryTarget(
 			name: "LibXMTPSwiftFFI",
 			url:
-				"https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.5.5.34eed53/LibXMTPSwiftFFI.zip",
+			"https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.5.5.34eed53/LibXMTPSwiftFFI.zip",
 			checksum: "b647c95ddf30c1ece5d916f3591aa83055c473b89c2058319e71d35517bfa843"
 		),
 		.target(

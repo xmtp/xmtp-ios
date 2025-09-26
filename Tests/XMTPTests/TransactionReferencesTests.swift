@@ -12,8 +12,8 @@ final class TransactionReferenceTests: XCTestCase {
 		let alixClient = fixtures.alixClient
 		let boInboxId = fixtures.boClient.inboxID
 
-		let alixConversation = try await alixClient!.conversations
-			.newConversation(with: boInboxId)
+		let conversation = try await alixClient?.conversations.newConversation(with: boInboxId)
+		let alixConversation = try XCTUnwrap(conversation)
 
 		let txRef = TransactionReference(
 			namespace: "eip155",
