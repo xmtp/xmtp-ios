@@ -87,23 +87,23 @@ public struct ClientOptions {
 }
 
 actor ApiClientCache {
-	private var apiClientCache: [String: XmtpApiClient] = [:]
+    private var apiClientCache: [String: XmtpApiClient] = [:]
 	private var syncApiClientCache: [String: XmtpApiClient] = [:]
 
 	func getClient(forKey key: String) -> XmtpApiClient? {
-		return apiClientCache[key]
+        return apiClientCache[key]
 	}
 
 	func setClient(_ client: XmtpApiClient, forKey key: String) {
-		apiClientCache[key] = client
+        apiClientCache[key] = client
 	}
 
 	func getSyncClient(forKey key: String) -> XmtpApiClient? {
-		return syncApiClientCache[key]
+        return syncApiClientCache[key]
 	}
 
 	func setSyncClient(_ client: XmtpApiClient, forKey key: String) {
-		syncApiClientCache[key] = client
+        syncApiClientCache[key] = client
 	}
 }
 
@@ -127,7 +127,7 @@ public final class Client {
 		client: self, ffiClient: ffiClient)
 
 	public lazy var debugInformation: XMTPDebugInformation = .init(
-		client: self, ffiClient: ffiClient)
+        historySyncUrl: environment.getHistorySyncUrl(), ffiClient: ffiClient)
 
 	static var codecRegistry = CodecRegistry()
 
