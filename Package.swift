@@ -19,12 +19,14 @@ let package = Package(
 	dependencies: [
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.0.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.4.3"),
-		.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", "1.8.4" ..< "2.0.0")
+		.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", "1.8.4" ..< "2.0.0"),
+		.package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.61.0"),
 	],
 	targets: [
 		.binaryTarget(
 			name: "LibXMTPSwiftFFI",
-			url: "https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.5.0-dev.681ca87/LibXMTPSwiftFFI.zip",
+			url:
+			"https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.5.0-dev.681ca87/LibXMTPSwiftFFI.zip",
 			checksum: "64f6fdd7c211a75fd33e60b1f7301b642cbdcf3c075c8c9346e021590aaddcaf"
 		),
 		.target(
@@ -33,15 +35,24 @@ let package = Package(
 				.product(name: "Connect", package: "connect-swift"),
 				"LibXMTPSwiftFFI",
 				.product(name: "CryptoSwift", package: "CryptoSwift"),
+			],
+			plugins: [
+				.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
 			]
 		),
 		.target(
 			name: "XMTPTestHelpers",
-			dependencies: ["XMTPiOS"]
+			dependencies: ["XMTPiOS"],
+			plugins: [
+				.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
+			]
 		),
 		.testTarget(
 			name: "XMTPTests",
-			dependencies: ["XMTPiOS", "XMTPTestHelpers"]
+			dependencies: ["XMTPiOS", "XMTPTestHelpers"],
+			plugins: [
+				.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
+			]
 		),
 	]
 )
