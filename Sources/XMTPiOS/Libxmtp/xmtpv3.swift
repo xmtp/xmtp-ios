@@ -843,6 +843,8 @@ public protocol FfiConversationProtocol: AnyObject, Sendable {
     
     func conversationType()  -> FfiConversationType
     
+    func countMessages(opts: FfiListMessagesOptions) throws  -> Int64
+    
     func createdAtNs()  -> Int64
     
     func dmPeerInboxId()  -> String?
@@ -1096,6 +1098,14 @@ open func conversationMessageDisappearingSettings()throws  -> FfiMessageDisappea
 open func conversationType() -> FfiConversationType  {
     return try!  FfiConverterTypeFfiConversationType_lift(try! rustCall() {
     uniffi_xmtpv3_fn_method_fficonversation_conversation_type(self.uniffiClonePointer(),$0
+    )
+})
+}
+    
+open func countMessages(opts: FfiListMessagesOptions)throws  -> Int64  {
+    return try  FfiConverterInt64.lift(try rustCallWithError(FfiConverterTypeGenericError_lift) {
+    uniffi_xmtpv3_fn_method_fficonversation_count_messages(self.uniffiClonePointer(),
+        FfiConverterTypeFfiListMessagesOptions_lower(opts),$0
     )
 })
 }
@@ -13551,6 +13561,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_fficonversation_conversation_type() != 43322) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_xmtpv3_checksum_method_fficonversation_count_messages() != 14036) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_fficonversation_created_at_ns() != 17973) {
