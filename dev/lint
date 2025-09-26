@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -euo
+
+swiftlint . "$@"
+swiftlint --config Tests/.swiftlint.yml Tests "$@"
