@@ -28,8 +28,10 @@ class ReadReceiptTests: XCTestCase {
 		XCTAssertEqual("readReceipt", contentType)
 
 		let convos = try await fixtures.alixClient.conversations.list()
-		let contentType2: String = try await convos.first!.lastMessage()!
-			.encodedContent.type.typeID
+		let lastMessage = try await convos.first?.lastMessage()
+		let contentType2: String = try XCTUnwrap(
+			lastMessage?.encodedContent.type.typeID
+		)
 		XCTAssertEqual("text", contentType2)
 	}
 }

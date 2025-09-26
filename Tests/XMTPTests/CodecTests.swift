@@ -48,7 +48,7 @@ class CodecTests: XCTestCase {
 
 		let expectedContent = 3.14
 
-		let alixClient = fixtures.alixClient!
+		let alixClient = try XCTUnwrap(fixtures.alixClient)
 		let alixConversation = try await alixClient.conversations
 			.newConversation(with: fixtures.boClient.inboxID)
 
@@ -78,7 +78,7 @@ class CodecTests: XCTestCase {
 	func testFallsBackToFallbackContentWhenCannotDecode() async throws {
 		let fixtures = try await fixtures()
 
-		let alixClient = fixtures.alixClient!
+		let alixClient = try XCTUnwrap(fixtures.alixClient)
 		let alixConversation = try await alixClient.conversations
 			.newConversation(with: fixtures.boClient.inboxID)
 

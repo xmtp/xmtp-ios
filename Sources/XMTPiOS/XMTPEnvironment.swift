@@ -7,19 +7,24 @@
 
 import Foundation
 
+public func getLocalAddressFromEnvironment() -> String? {
+	ProcessInfo.processInfo.environment["XMTP_NODE_ADDRESS"]
+}
+
+func getHistorySyncUrlFromEnvironment() -> String? {
+	ProcessInfo.processInfo.environment["XMTP_HISTORY_SERVER_ADDRESS"]
+}
+
 /// Contains hosts an `ApiClient` can connect to
 public enum XMTPEnvironment: String, Sendable {
 	case dev = "grpc.dev.xmtp.network"
 	case production = "grpc.production.xmtp.network"
 	case local = "localhost"
 
-	// Optional override for the local environment
-	public static var customLocalAddress: String?
-
 	var address: String {
 		switch self {
 		case .local:
-			return XMTPEnvironment.customLocalAddress ?? rawValue
+			return getLocalAddressFromEnvironment() ?? rawValue
 		default:
 			return rawValue
 		}
@@ -41,6 +46,9 @@ public enum XMTPEnvironment: String, Sendable {
 		case .dev, .production:
 			return "https://\(address):443"
 		case .local:
+			if address.starts(with: "http://") || address.starts(with: "https://") {
+				return address
+			}
 			return "http://\(address):5556"
 		}
 	}
@@ -54,7 +62,7 @@ public enum XMTPEnvironment: String, Sendable {
 		case .production:
 			return "https://message-history.production.ephemera.network"
 		case .local:
-			return "http://localhost:5558"
+			return getHistorySyncUrlFromEnvironment() ?? "http://localhost:5558"
 		case .dev:
 			return "https://message-history.dev.ephemera.network"
 		}
