@@ -441,7 +441,7 @@ class EnrichedMessagesTests: XCTestCase {
 			}
 			XCTAssertEqual(remoteContent.contentDigest, "digest123")
 			// Content length might be 0 if not properly encoded
-			if remoteContent.contentLength != nil, remoteContent.contentLength! > 0 {
+			if remoteContent.contentLength != nil, try XCTUnwrap(remoteContent.contentLength) > 0 {
 				XCTAssertEqual(remoteContent.contentLength, 100)
 			}
 

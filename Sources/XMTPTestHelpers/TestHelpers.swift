@@ -49,7 +49,7 @@
 			caro = try PrivateKey.generate()
 			davon = try PrivateKey.generate()
 
-			let key = Data((0 ..< 32).map { _ in UInt8.random(in: 0 ... 255) })
+			let key = Data((0..<32).map { _ in UInt8.random(in: 0...255) })
 			let clientOptions = ClientOptions(
 				api: clientOptions,
 				dbEncryptionKey: key
@@ -76,12 +76,13 @@
 		}
 	}
 
-	public extension XCTestCase {
+	extension XCTestCase {
 		@available(iOS 15, *)
-		func fixtures(
-			clientOptions: ClientOptions.Api = ClientOptions.Api(
-				env: XMTPEnvironment.local, isSecure: false
-			)
+		public func fixtures(
+			clientOptions: ClientOptions.Api = {
+				return ClientOptions.Api(
+					env: XMTPEnvironment.local, isSecure: XMTPEnvironment.local.isSecure)
+			}()
 		) async throws -> Fixtures {
 			try await Fixtures(clientOptions: clientOptions)
 		}
