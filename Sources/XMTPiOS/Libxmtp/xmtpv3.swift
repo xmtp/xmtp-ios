@@ -851,7 +851,11 @@ public protocol FfiConversationProtocol: AnyObject, Sendable {
     
     func findMessages(opts: FfiListMessagesOptions) async throws  -> [FfiMessage]
     
+    func findMessagesSpawnBlocking(opts: FfiListMessagesOptions) async throws  -> [FfiMessage]
+    
     func findMessagesV2(opts: FfiListMessagesOptions) throws  -> [FfiDecodedMessage]
+    
+    func findMessagesV2Async(opts: FfiListMessagesOptions) async throws  -> [FfiDecodedMessage]
     
     func findMessagesWithReactions(opts: FfiListMessagesOptions) throws  -> [FfiMessageWithReactions]
     
@@ -1148,12 +1152,46 @@ open func findMessages(opts: FfiListMessagesOptions)async throws  -> [FfiMessage
         )
 }
     
+open func findMessagesSpawnBlocking(opts: FfiListMessagesOptions)async throws  -> [FfiMessage]  {
+    return
+        try  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_xmtpv3_fn_method_fficonversation_find_messages_spawn_blocking(
+                    self.uniffiClonePointer(),
+                    FfiConverterTypeFfiListMessagesOptions_lower(opts)
+                )
+            },
+            pollFunc: ffi_xmtpv3_rust_future_poll_rust_buffer,
+            completeFunc: ffi_xmtpv3_rust_future_complete_rust_buffer,
+            freeFunc: ffi_xmtpv3_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterSequenceTypeFfiMessage.lift,
+            errorHandler: FfiConverterTypeGenericError_lift
+        )
+}
+    
 open func findMessagesV2(opts: FfiListMessagesOptions)throws  -> [FfiDecodedMessage]  {
     return try  FfiConverterSequenceTypeFfiDecodedMessage.lift(try rustCallWithError(FfiConverterTypeGenericError_lift) {
     uniffi_xmtpv3_fn_method_fficonversation_find_messages_v2(self.uniffiClonePointer(),
         FfiConverterTypeFfiListMessagesOptions_lower(opts),$0
     )
 })
+}
+    
+open func findMessagesV2Async(opts: FfiListMessagesOptions)async throws  -> [FfiDecodedMessage]  {
+    return
+        try  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_xmtpv3_fn_method_fficonversation_find_messages_v2_async(
+                    self.uniffiClonePointer(),
+                    FfiConverterTypeFfiListMessagesOptions_lower(opts)
+                )
+            },
+            pollFunc: ffi_xmtpv3_rust_future_poll_rust_buffer,
+            completeFunc: ffi_xmtpv3_rust_future_complete_rust_buffer,
+            freeFunc: ffi_xmtpv3_rust_future_free_rust_buffer,
+            liftFunc: FfiConverterSequenceTypeFfiDecodedMessage.lift,
+            errorHandler: FfiConverterTypeGenericError_lift
+        )
 }
     
 open func findMessagesWithReactions(opts: FfiListMessagesOptions)throws  -> [FfiMessageWithReactions]  {
@@ -3701,7 +3739,7 @@ public protocol FfiSignatureRequestProtocol: AnyObject, Sendable {
     func isReady() async  -> Bool
     
     /**
-     * missing signatures that are from [MemberKind::Address]
+     * missing signatures that are from `MemberKind::Address`
      */
     func missingAddressSignatures() async throws  -> [String]
     
@@ -3830,7 +3868,7 @@ open func isReady()async  -> Bool  {
 }
     
     /**
-     * missing signatures that are from [MemberKind::Address]
+     * missing signatures that are from `MemberKind::Address`
      */
 open func missingAddressSignatures()async throws  -> [String]  {
     return
@@ -13321,6 +13359,36 @@ public func exitDebugWriter()throws   {try rustCallWithError(FfiConverterTypeGen
     )
 }
 }
+public func ffiPing()async  -> UInt64  {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_xmtpv3_fn_func_ffi_ping(
+                )
+            },
+            pollFunc: ffi_xmtpv3_rust_future_poll_u64,
+            completeFunc: ffi_xmtpv3_rust_future_complete_u64,
+            freeFunc: ffi_xmtpv3_rust_future_free_u64,
+            liftFunc: FfiConverterUInt64.lift,
+            errorHandler: nil
+            
+        )
+}
+public func ffiSleepMs(ms: UInt64)async   {
+    return
+        try!  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_xmtpv3_fn_func_ffi_sleep_ms(FfiConverterUInt64.lower(ms)
+                )
+            },
+            pollFunc: ffi_xmtpv3_rust_future_poll_void,
+            completeFunc: ffi_xmtpv3_rust_future_complete_void,
+            freeFunc: ffi_xmtpv3_rust_future_free_void,
+            liftFunc: { $0 },
+            errorHandler: nil
+            
+        )
+}
 public func generateInboxId(accountIdentifier: FfiIdentifier, nonce: UInt64)throws  -> String  {
     return try  FfiConverterString.lift(try rustCallWithError(FfiConverterTypeGenericError_lift) {
     uniffi_xmtpv3_fn_func_generate_inbox_id(
@@ -13486,6 +13554,12 @@ private let initializationResult: InitializationResult = {
     if (uniffi_xmtpv3_checksum_func_exit_debug_writer() != 31716) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_xmtpv3_checksum_func_ffi_ping() != 50933) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_xmtpv3_checksum_func_ffi_sleep_ms() != 11537) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_xmtpv3_checksum_func_generate_inbox_id() != 35602) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -13555,7 +13629,13 @@ private let initializationResult: InitializationResult = {
     if (uniffi_xmtpv3_checksum_method_fficonversation_find_messages() != 19931) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_xmtpv3_checksum_method_fficonversation_find_messages_spawn_blocking() != 20745) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_xmtpv3_checksum_method_fficonversation_find_messages_v2() != 4772) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_xmtpv3_checksum_method_fficonversation_find_messages_v2_async() != 58146) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_fficonversation_find_messages_with_reactions() != 46761) {
@@ -13831,7 +13911,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_xmtpv3_checksum_method_ffisignaturerequest_is_ready() != 65051) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_xmtpv3_checksum_method_ffisignaturerequest_missing_address_signatures() != 34688) {
+    if (uniffi_xmtpv3_checksum_method_ffisignaturerequest_missing_address_signatures() != 55383) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_ffisignaturerequest_signature_text() != 60472) {
