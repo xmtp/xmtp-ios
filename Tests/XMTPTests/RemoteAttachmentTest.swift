@@ -81,11 +81,11 @@ class RemoteAttachmentTests: XCTestCase {
 
 		// We only allow https:// urls for remote attachments, but it didn't seem worthwhile to spin up a local web server
 		// for this, so we use the TestFetcher to swap the protocols
-		let fakeHTTPSFileURL = URL(
+		let fakeHTTPSFileURL = try XCTUnwrap(URL(
 			string: tempFileURL.absoluteString.replacingOccurrences(
 				of: "file://", with: "https://"
 			)
-		)!
+		))
 		var content = try RemoteAttachment(
 			url: fakeHTTPSFileURL.absoluteString,
 			encryptedEncodedContent: encryptedEncodedContent
@@ -171,11 +171,11 @@ class RemoteAttachmentTests: XCTestCase {
 			UUID().uuidString
 		)
 		try encryptedEncodedContent.payload.write(to: tempFileURL)
-		let fakeHTTPSFileURL = URL(
+		let fakeHTTPSFileURL = try XCTUnwrap(URL(
 			string: tempFileURL.absoluteString.replacingOccurrences(
 				of: "file://", with: "https://"
 			)
-		)!
+		))
 		var remoteAttachment = try RemoteAttachment(
 			url: fakeHTTPSFileURL.absoluteString,
 			encryptedEncodedContent: encryptedEncodedContent

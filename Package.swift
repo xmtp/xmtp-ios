@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
 	name: "XMTPiOS",
-	platforms: [.iOS(.v14), .macOS(.v11)],
+	platforms: [.iOS(.v14), .macOS(.v12)],
 	products: [
 		.library(
 			name: "XMTPiOS",
@@ -35,24 +35,15 @@ let package = Package(
 				.product(name: "Connect", package: "connect-swift"),
 				"LibXMTPSwiftFFI",
 				.product(name: "CryptoSwift", package: "CryptoSwift"),
-			],
-			plugins: [
-				.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
 			]
 		),
 		.target(
 			name: "XMTPTestHelpers",
-			dependencies: ["XMTPiOS"],
-			plugins: [
-				.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
-			]
+			dependencies: ["XMTPiOS"]
 		),
 		.testTarget(
 			name: "XMTPTests",
-			dependencies: ["XMTPiOS", "XMTPTestHelpers"],
-			plugins: [
-				.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
-			]
+			dependencies: ["XMTPiOS", "XMTPTestHelpers"]
 		),
 	]
 )
