@@ -274,7 +274,8 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		afterNs: Int64? = nil,
 		limit: Int? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(
 			sentBeforeNs: nil,
@@ -282,7 +283,8 @@ public struct Dm: Identifiable, Equatable, Hashable {
 			limit: nil,
 			deliveryStatus: nil,
 			direction: nil,
-			contentTypes: nil
+			contentTypes: nil,
+			excludeContentTypes: nil
 		)
 
 		if let beforeNs {
@@ -322,11 +324,11 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		}()
 
 		options.direction = direction
+		options.excludeContentTypes = excludeContentTypes
 
-		return try await ffiConversation.findMessages(opts: options).compactMap
-		{
+		return try await ffiConversation.findMessages(opts: options).compactMap {
 			ffiMessage in
-			return DecodedMessage.create(ffiMessage: ffiMessage)
+			DecodedMessage.create(ffiMessage: ffiMessage)
 		}
 	}
 
@@ -335,7 +337,8 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		afterNs: Int64? = nil,
 		limit: Int? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(
 			sentBeforeNs: nil,
@@ -343,7 +346,8 @@ public struct Dm: Identifiable, Equatable, Hashable {
 			limit: nil,
 			deliveryStatus: nil,
 			direction: nil,
-			contentTypes: nil
+			contentTypes: nil,
+			excludeContentTypes: nil
 		)
 
 		if let beforeNs {
@@ -370,33 +374,40 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		}()
 
 		options.direction = direction
+		options.excludeContentTypes = excludeContentTypes
 
 		return try ffiConversation.findMessagesWithReactions(
 			opts: options
 		).compactMap {
 			ffiMessageWithReactions in
-			return DecodedMessage.create(ffiMessage: ffiMessageWithReactions)
+			DecodedMessage.create(ffiMessage: ffiMessageWithReactions)
 		}
 	}
-    
-    // Count the number of messages in the conversation according to the provided filters
-    public func countMessages(beforeNs: Int64? = nil, afterNs: Int64? = nil, deliveryStatus: MessageDeliveryStatus = .all) throws -> Int64 {
-        return try ffiConversation.countMessages(opts: FfiListMessagesOptions(
-            sentBeforeNs: beforeNs,
-            sentAfterNs: afterNs,
-            limit: nil,
-            deliveryStatus: deliveryStatus.toFfi(),
-            direction: .descending,
-            contentTypes: nil
-        ))
-    }
+
+	// Count the number of messages in the conversation according to the provided filters
+	public func countMessages(
+		beforeNs: Int64? = nil, afterNs: Int64? = nil, deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
+	) throws -> Int64 {
+		return try ffiConversation.countMessages(
+			opts: FfiListMessagesOptions(
+				sentBeforeNs: beforeNs,
+				sentAfterNs: afterNs,
+				limit: nil,
+				deliveryStatus: deliveryStatus.toFfi(),
+				direction: .descending,
+				contentTypes: nil,
+				excludeContentTypes: excludeContentTypes
+			))
+	}
 
 	public func enrichedMessages(
 		beforeNs: Int64? = nil,
 		afterNs: Int64? = nil,
 		limit: Int? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) async throws -> [DecodedMessageV2] {
 		var options = FfiListMessagesOptions(
 			sentBeforeNs: nil,
@@ -404,7 +415,8 @@ public struct Dm: Identifiable, Equatable, Hashable {
 			limit: nil,
 			deliveryStatus: nil,
 			direction: nil,
-			contentTypes: nil
+			contentTypes: nil,
+			excludeContentTypes: nil
 		)
 
 		if let beforeNs {
@@ -444,10 +456,11 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		}()
 
 		options.direction = direction
+		options.excludeContentTypes = excludeContentTypes
 
 		return try await ffiConversation.findMessagesV2(opts: options).compactMap {
 			ffiDecodedMessage in
-			return DecodedMessageV2(ffiMessage: ffiDecodedMessage)
+			DecodedMessageV2(ffiMessage: ffiDecodedMessage)
 		}
 	}
 

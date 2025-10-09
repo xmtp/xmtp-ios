@@ -264,31 +264,34 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		beforeNs: Int64? = nil,
 		afterNs: Int64? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) async throws -> [DecodedMessage] {
 		switch self {
 		case let .group(group):
 			return try await group.messages(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes
 			)
 		case let .dm(dm):
 			return try await dm.messages(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes
 			)
 		}
 	}
 
-    // Returns null if conversation is not paused, otherwise the min version required to unpause this conversation
-    public func pausedForVersion() async throws -> String? {
-        switch self {
-        case let .group(group):
-            return try group.pausedForVersion()
-        case let .dm(dm):
-            return try dm.pausedForVersion()
-        }
-    }
+	// Returns null if conversation is not paused, otherwise the min version required to unpause this conversation
+	public func pausedForVersion() async throws -> String? {
+		switch self {
+		case let .group(group):
+			return try group.pausedForVersion()
+		case let .dm(dm):
+			return try dm.pausedForVersion()
+		}
+	}
 
 	public var client: Client {
 		switch self {
@@ -304,18 +307,21 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		beforeNs: Int64? = nil,
 		afterNs: Int64? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) async throws -> [DecodedMessage] {
 		switch self {
 		case let .group(group):
 			return try await group.messagesWithReactions(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes
 			)
 		case let .dm(dm):
 			return try await dm.messagesWithReactions(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes
 			)
 		}
 	}
@@ -325,34 +331,44 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		beforeNs: Int64? = nil,
 		afterNs: Int64? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) async throws -> [DecodedMessageV2] {
 		switch self {
 		case let .group(group):
 			return try await group.enrichedMessages(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes
 			)
 		case let .dm(dm):
 			return try await dm.enrichedMessages(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes
 			)
 		}
 	}
-    
-    public func countMessages(
-        beforeNs: Int64? = nil,
-        afterNs: Int64? = nil,
-        deliveryStatus: MessageDeliveryStatus = .all
-    ) throws -> Int64 {
-        switch self {
-        case let .group(group):
-            return try group.countMessages(beforeNs: beforeNs, afterNs: afterNs, deliveryStatus: deliveryStatus)
-        case let .dm(dm):
-            return try dm.countMessages(beforeNs: beforeNs, afterNs: afterNs, deliveryStatus: deliveryStatus)
-        }
-    }
+
+	public func countMessages(
+		beforeNs: Int64? = nil,
+		afterNs: Int64? = nil,
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
+	) throws -> Int64 {
+		switch self {
+		case let .group(group):
+			return try group.countMessages(
+				beforeNs: beforeNs, afterNs: afterNs, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes
+			)
+		case let .dm(dm):
+			return try dm.countMessages(
+				beforeNs: beforeNs, afterNs: afterNs, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes
+			)
+		}
+	}
 
 	public func getHmacKeys() throws -> Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse {
 		switch self {
