@@ -10,7 +10,7 @@ class ConversationTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caroClient.inboxID
+			fixtures.caroClient.inboxID,
 		])
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
 			with: fixtures.caroClient.inboxID
@@ -35,7 +35,7 @@ class ConversationTests: XCTestCase {
 			with: fixtures.caroClient.inboxID
 		)
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caroClient.inboxID
+			fixtures.caroClient.inboxID,
 		])
 
 		let convoCount = try await fixtures.boClient.conversations
@@ -64,7 +64,7 @@ class ConversationTests: XCTestCase {
 			with: fixtures.caroClient.inboxID
 		)
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caroClient.inboxID
+			fixtures.caroClient.inboxID,
 		])
 
 		let convoCount = try await fixtures.boClient.conversations
@@ -97,7 +97,7 @@ class ConversationTests: XCTestCase {
 			with: fixtures.caroClient.inboxID
 		)
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caroClient.inboxID
+			fixtures.caroClient.inboxID,
 		])
 
 		let convoCount = try await fixtures.boClient.conversations
@@ -163,7 +163,7 @@ class ConversationTests: XCTestCase {
 		}
 
 		_ = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.alixClient.inboxID
+			fixtures.alixClient.inboxID,
 		])
 		_ = try await fixtures.boClient.conversations.newConversation(
 			with: fixtures.alixClient.inboxID
@@ -185,7 +185,7 @@ class ConversationTests: XCTestCase {
 			with: fixtures.alixClient.inboxID
 		)
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.alixClient.inboxID
+			fixtures.alixClient.inboxID,
 		])
 		let dm = try await fixtures.caroClient.conversations.findOrCreateDm(
 			with: fixtures.alixClient.inboxID
@@ -216,7 +216,7 @@ class ConversationTests: XCTestCase {
 		)
 		let fixtures = try await fixtures()
 		var conversations: [Conversation] = []
-		for _ in 0..<5 {
+		for _ in 0 ..< 5 {
 			let account = try PrivateKey.generate()
 			let client = try await Client.create(
 				account: account, options: opts
@@ -245,8 +245,9 @@ class ConversationTests: XCTestCase {
 
 		let alixGroup = try await fixtures.alixClient.conversations.newGroup(
 			with: [
-				fixtures.boClient.inboxID
-			])
+				fixtures.boClient.inboxID,
+			]
+		)
 
 		_ = try await fixtures.alixClient.conversations.syncAllConversations()
 
@@ -255,7 +256,7 @@ class ConversationTests: XCTestCase {
 		let alixMessages = try await alixGroup.messages()
 		XCTAssertEqual(alixMessages.count, 2)
 
-		try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 seconds
+		try await Task.sleep(nanoseconds: 1_000_000_000) // 1 seconds
 
 		try await alixGroup.sync()
 
@@ -320,13 +321,13 @@ class ConversationTests: XCTestCase {
 			}
 		}
 
-		try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 second delay
+		try await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
 
 		// Simulate message sending in parallel
 		await withThrowingTaskGroup(of: Void.self) { taskGroup in
 			taskGroup.addTask {
 				print("Alix is sending messages...")
-				for i in 0..<20 {
+				for i in 0 ..< 20 {
 					let message = "Alix Message \(i)"
 					_ = try await alixGroup.send(content: message)
 					_ = try await alixGroup2.send(content: message)
@@ -336,7 +337,7 @@ class ConversationTests: XCTestCase {
 
 			taskGroup.addTask {
 				print("Bo is sending messages...")
-				for i in 0..<10 {
+				for i in 0 ..< 10 {
 					let message = "Bo Message \(i)"
 					_ = try await boGroup.send(content: message)
 					_ = try await boGroup2.send(content: message)
@@ -346,7 +347,7 @@ class ConversationTests: XCTestCase {
 
 			taskGroup.addTask {
 				print("Davon is sending spam groups...")
-				for i in 0..<10 {
+				for i in 0 ..< 10 {
 					let spamMessage = "Davon Spam Message \(i)"
 					let group = try await fixtures.davonClient.conversations
 						.newGroup(
@@ -359,7 +360,7 @@ class ConversationTests: XCTestCase {
 
 			taskGroup.addTask {
 				print("Caro is sending messages...")
-				for i in 0..<10 {
+				for i in 0 ..< 10 {
 					let message = "Caro Message \(i)"
 					_ = try await caroGroup.send(content: message)
 					_ = try await caroGroup2.send(content: message)
@@ -369,7 +370,7 @@ class ConversationTests: XCTestCase {
 		}
 
 		// Wait a bit to ensure all messages are processed
-		try await Task.sleep(nanoseconds: 5_000_000_000)  // 2 seconds delay
+		try await Task.sleep(nanoseconds: 5_000_000_000) // 2 seconds delay
 
 		caroTask.cancel()
 
@@ -423,13 +424,13 @@ class ConversationTests: XCTestCase {
 
 		// Create groups and conversations
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caroClient.inboxID
+			fixtures.caroClient.inboxID,
 		])
 		let conversation = try await fixtures.boClient.conversations.findOrCreateDm(
 			with: fixtures.caroClient.inboxID
 		)
 		let blockedGroup = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.alixClient.inboxID
+			fixtures.alixClient.inboxID,
 		])
 		let blockedConversation = try await fixtures.boClient.conversations.findOrCreateDm(
 			with: fixtures.alixClient.inboxID
@@ -460,7 +461,7 @@ class ConversationTests: XCTestCase {
 		}
 
 		// Wait a bit before sending messages
-		try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 second
+		try await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
 
 		// Send messages to all conversations
 		_ = try await group.send(content: "hi")
@@ -562,7 +563,7 @@ class ConversationTests: XCTestCase {
 			with: fixtures.caroClient.inboxID
 		)
 		_ = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caroClient.inboxID
+			fixtures.caroClient.inboxID,
 		])
 
 		try await fixtures.caroClient.conversations.sync()
@@ -598,7 +599,8 @@ class ConversationTests: XCTestCase {
 		let fixtures = try await fixtures()
 
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.caroClient.inboxID)
+			with: fixtures.caroClient.inboxID
+		)
 
 		let msgID = try await dm.send(content: "This will be deleted")
 
@@ -614,10 +616,11 @@ class ConversationTests: XCTestCase {
 
 		// Create a group and a DM
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
-			fixtures.caroClient.inboxID
+			fixtures.caroClient.inboxID,
 		])
 		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
-			with: fixtures.caroClient.inboxID)
+			with: fixtures.caroClient.inboxID
+		)
 
 		// Initially both should have 0 messages (or 1 for group with membership change)
 		let initialGroupCount = try group.countMessages()
@@ -660,6 +663,113 @@ class ConversationTests: XCTestCase {
 		// No messages should be after current time
 		XCTAssertEqual(futureGroupCount, 0)
 		XCTAssertEqual(futureDmCount, 0)
+
+		try fixtures.cleanUpDatabases()
+	}
+
+	func testMessagesWithExcludedContentTypes() async throws {
+		let fixtures = try await fixtures()
+		Client.register(codec: ReactionCodec())
+
+		// Create a group
+		let group = try await fixtures.boClient.conversations.newGroup(with: [
+			fixtures.caroClient.inboxID,
+		])
+
+		// Send different types of messages
+		_ = try await group.send(content: "Text message 1")
+		_ = try await group.send(content: "Text message 2")
+
+		// Send a reaction
+		let textMessageId = try await group.send(content: "Message to react to")
+		_ = try await group.send(
+			content: Reaction(
+				reference: textMessageId,
+				action: .added,
+				content: "👍",
+				schema: .unicode
+			),
+			options: SendOptions(contentType: ContentTypeReaction)
+		)
+
+		// Wait a bit for messages to sync
+		try await Task.sleep(nanoseconds: 100_000_000)
+		try await group.sync()
+
+		// Get all messages
+		let allMessages = try await group.messages()
+
+		// Get messages excluding reactions
+		let messagesWithoutReactions = try await group.messages(
+			excludeContentTypes: [.reaction]
+		)
+
+		// Should have fewer messages when excluding reactions
+		XCTAssertGreaterThan(allMessages.count, messagesWithoutReactions.count)
+
+		// Verify no reactions in the filtered list
+		for message in messagesWithoutReactions {
+			XCTAssertNotEqual(try message.encodedContent.type.typeID, "reaction")
+		}
+
+		try fixtures.cleanUpDatabases()
+	}
+
+	func testCountMessagesWithExcludedContentTypes() async throws {
+		let fixtures = try await fixtures()
+		Client.register(codec: ReactionCodec())
+
+		// Create a DM
+		let dm = try await fixtures.boClient.conversations.findOrCreateDm(
+			with: fixtures.caroClient.inboxID
+		)
+
+		// Send different types of messages
+		_ = try await dm.send(content: "Text message 1")
+		_ = try await dm.send(content: "Text message 2")
+		_ = try await dm.send(content: "Text message 3")
+
+		// Send reactions
+		let textMessageId = try await dm.send(content: "Message to react to")
+		_ = try await dm.send(
+			content: Reaction(
+				reference: textMessageId,
+				action: .added,
+				content: "👍",
+				schema: .unicode
+			),
+			options: SendOptions(contentType: ContentTypeReaction)
+		)
+		_ = try await dm.send(
+			content: Reaction(
+				reference: textMessageId,
+				action: .added,
+				content: "❤️",
+				schema: .unicode
+			),
+			options: SendOptions(contentType: ContentTypeReaction)
+		)
+
+		// Wait a bit for messages to sync
+		try await Task.sleep(nanoseconds: 100_000_000)
+		try await dm.sync()
+
+		// Count all messages
+		let totalCount = try dm.countMessages()
+
+		// Count messages excluding reactions
+		let countWithoutReactions = try dm.countMessages(
+			excludeContentTypes: [.reaction]
+		)
+
+		// Should have 6 total (4 text + 2 reactions)
+		XCTAssertEqual(totalCount, 6)
+
+		// Should have 4 without reactions
+		XCTAssertEqual(countWithoutReactions, 4)
+
+		// Verify the difference equals the number of reactions
+		XCTAssertEqual(totalCount - countWithoutReactions, 2)
 
 		try fixtures.cleanUpDatabases()
 	}
