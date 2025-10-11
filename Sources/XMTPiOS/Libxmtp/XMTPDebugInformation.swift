@@ -8,11 +8,11 @@
 import Foundation
 
 public class XMTPDebugInformation {
-    private let client: Client
+    private let historySyncUrl: String
     private let ffiClient: FfiXmtpClient
     
-    public init(client: Client, ffiClient: FfiXmtpClient) {
-        self.client = client
+    public init(historySyncUrl: String, ffiClient: FfiXmtpClient) {
+        self.historySyncUrl = historySyncUrl
         self.ffiClient = ffiClient
     }
     
@@ -33,7 +33,7 @@ public class XMTPDebugInformation {
 	}
     
     public func uploadDebugInformation(serverUrl: String? = nil) async throws -> String {
-        let url = serverUrl ?? client.environment.getHistorySyncUrl()
+        let url = serverUrl ?? historySyncUrl
         return try await ffiClient.uploadDebugArchive(serverUrl: url)
     }
 }
