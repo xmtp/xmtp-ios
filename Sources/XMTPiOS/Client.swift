@@ -1,5 +1,4 @@
 import Foundation
-import LibXMTP
 import os
 
 public typealias PreEventCallback = () async throws -> Void
@@ -35,11 +34,12 @@ public struct ClientOptions {
 
 		/// Specify whether the API client should use TLS security. In general this should only be false when using the `.local` environment.
 		public var isSecure: Bool = true
-		
+
 		public var appVersion: String? = nil
 
 		public init(
-			env: XMTPEnvironment = .dev, isSecure: Bool = true, appVersion: String? = nil
+			env: XMTPEnvironment = .dev, isSecure: Bool = true,
+			appVersion: String? = nil
 		) {
 			self.env = env
 			self.isSecure = isSecure
@@ -116,7 +116,7 @@ public final class Client {
 	public let installationID: String
 	public let publicIdentity: PublicIdentity
 	public let environment: XMTPEnvironment
-	private let ffiClient: LibXMTP.FfiXmtpClient
+	private let ffiClient: FfiXmtpClient
 	private static let apiCache = ApiClientCache()
 
 	public lazy var conversations: Conversations = .init(
@@ -242,8 +242,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Creating an FfiClient without signing or registering will create a broken experience. 
+			This function is delicate and should be used with caution.
+			Creating an FfiClient without signing or registering will create a broken experience.
 			Use `create()` instead.
 			"""
 	)
@@ -316,7 +316,7 @@ public final class Client {
 		let deviceSyncMode: FfiSyncWorkerMode =
 			!options.deviceSyncEnabled ? .disabled : .enabled
 
-		let ffiClient = try await LibXMTP.createClient(
+		let ffiClient = try await createClient(
 			api: connectToApiBackend(api: options.api),
 			syncApi: connectToSyncApiBackend(api: options.api),
 			db: dbURL,
@@ -366,7 +366,7 @@ public final class Client {
 
 		// Check for an existing connected client
 		if let cached = await apiCache.getClient(forKey: cacheKey),
-			try await LibXMTP.isConnected(api: cached)
+			try await isConnected(api: cached)
 		{
 			return cached
 		}
@@ -389,7 +389,7 @@ public final class Client {
 
 		// Check for an existing connected client
 		if let cached = await apiCache.getSyncClient(forKey: cacheKey),
-			try await LibXMTP.isConnected(api: cached)
+			try await isConnected(api: cached)
 		{
 			return cached
 		}
@@ -431,14 +431,21 @@ public final class Client {
 		let apiClient = try await connectToApiBackend(api: api)
 		let rootIdentity = signingKey.identity.ffiPrivate
 		let ids = installationIds.map { $0.hexToData }
-		let signatureRequest = try await LibXMTP.revokeInstallations(
+		let signatureRequest: FfiSignatureRequest
+#if canImport(XMTPiOS)
+		signatureRequest = try await XMTPiOS.revokeInstallations(
 			api: apiClient, recoveryIdentifier: rootIdentity, inboxId: inboxId,
 			installationIds: ids)
+#else
+		signatureRequest = try await XMTP.revokeInstallations(
+			api: apiClient, recoveryIdentifier: rootIdentity, inboxId: inboxId,
+			installationIds: ids)
+#endif
 		do {
 			try await Client.handleSignature(
 				for: signatureRequest,
 				signingKey: signingKey)
-			try await LibXMTP.applySignatureRequest(
+			try await applySignatureRequest(
 				api: apiClient, signatureRequest: signatureRequest)
 		} catch {
 			throw ClientError.creationError(
@@ -450,8 +457,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `revokeInstallations()` instead.
 			"""
 	)
@@ -462,7 +469,7 @@ public final class Client {
 		async throws
 	{
 		let apiClient = try await connectToApiBackend(api: api)
-		try await LibXMTP.applySignatureRequest(
+		try await applySignatureRequest(
 			api: apiClient,
 			signatureRequest: signatureRequest.ffiSignatureRequest)
 	}
@@ -471,8 +478,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `revokeInstallations()` instead.
 			"""
 	)
@@ -487,9 +494,16 @@ public final class Client {
 		let apiClient = try await connectToApiBackend(api: api)
 		let rootIdentity = publicIdentity.ffiPrivate
 		let ids = installationIds.map { $0.hexToData }
-		let signatureRequest = try await LibXMTP.revokeInstallations(
+		let signatureRequest: FfiSignatureRequest
+#if canImport(XMTPiOS)
+		signatureRequest = try await XMTPiOS.revokeInstallations(
 			api: apiClient, recoveryIdentifier: rootIdentity, inboxId: inboxId,
 			installationIds: ids)
+#else
+		signatureRequest = try await XMTP.revokeInstallations(
+			api: apiClient, recoveryIdentifier: rootIdentity, inboxId: inboxId,
+			installationIds: ids)
+#endif
 		return SignatureRequest(ffiSignatureRequest: signatureRequest)
 	}
 
@@ -501,7 +515,7 @@ public final class Client {
 	) async throws -> FfiXmtpClient {
 		let inboxId = try await getOrCreateInboxId(
 			api: api, publicIdentity: identity)
-		return try await LibXMTP.createClient(
+		return try await createClient(
 			api: connectToApiBackend(api: api),
 			syncApi: connectToApiBackend(api: api),
 			db: nil,
@@ -534,7 +548,7 @@ public final class Client {
 		api: ClientOptions.Api
 	) async throws -> [InboxState] {
 		let apiClient = try await connectToApiBackend(api: api)
-		let result = try await LibXMTP.inboxStateFromInboxIds(
+		let result = try await inboxStateFromInboxIds(
 			api: apiClient, inboxIds: inboxIds)
 		return result.map { InboxState(ffiInboxState: $0) }
 	}
@@ -558,7 +572,7 @@ public final class Client {
 	}
 
 	init(
-		ffiClient: LibXMTP.FfiXmtpClient, dbPath: String,
+		ffiClient: FfiXmtpClient, dbPath: String,
 		installationID: String, inboxID: InboxId, environment: XMTPEnvironment,
 		publicIdentity: PublicIdentity
 	) throws {
@@ -742,12 +756,33 @@ public final class Client {
 		).map { InboxState(ffiInboxState: $0) }
 	}
 
+	public func createArchive(
+		path: String,
+		encryptionKey: Data,
+		opts: ArchiveOptions = ArchiveOptions()
+	) async throws {
+		try await ffiClient.createArchive(
+			path: path, opts: opts.toFfi(), key: encryptionKey)
+	}
+
+	public func importArchive(path: String, encryptionKey: Data) async throws {
+		try await ffiClient.importArchive(path: path, key: encryptionKey)
+	}
+
+	public func archiveMetadata(path: String, encryptionKey: Data) async throws
+		-> ArchiveMetadata
+	{
+		let ffiMetadata = try await ffiClient.archiveMetadata(
+			path: path, key: encryptionKey)
+		return ArchiveMetadata(ffiMetadata)
+	}
+
 	@available(
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `addAccount()`, `removeAccount()`, or `revoke()` instead.
 			"""
 	)
@@ -762,8 +797,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `revokeInstallations()` instead.
 			"""
 	)
@@ -779,8 +814,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `revokeAllOtherInstallations()` instead.
 			"""
 	)
@@ -795,8 +830,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `removeIdentity()` instead.
 			"""
 	)
@@ -812,8 +847,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the create and register flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the create and register flow independently;
 			otherwise use `addIdentity()` instead.
 			"""
 	)
@@ -846,8 +881,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the signature flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the signature flow independently;
 			otherwise use `create()` instead.
 			"""
 	)
@@ -862,8 +897,8 @@ public final class Client {
 		*,
 		deprecated,
 		message: """
-			This function is delicate and should be used with caution. 
-			Should only be used if trying to manage the create and register flow independently; 
+			This function is delicate and should be used with caution.
+			Should only be used if trying to manage the create and register flow independently;
 			otherwise use `create()` instead.
 			"""
 	)

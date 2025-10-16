@@ -1,5 +1,4 @@
 import Foundation
-import LibXMTP
 
 public enum ConversationError: Error, CustomStringConvertible, LocalizedError {
 	case memberCannotBeSelf
@@ -34,6 +33,17 @@ public enum ConversationFilterType {
 	case all, groups, dms
 }
 
+public enum ConversationsOrderBy {
+    case createdAt, lastActivity
+    
+    fileprivate var ffiOrderBy: FfiGroupQueryOrderBy {
+        switch self {
+        case .createdAt: return .createdAt
+        case .lastActivity: return .lastActivity
+        }
+    }
+}
+
 final class ConversationStreamCallback: FfiConversationCallback {
 	let onCloseCallback: () -> Void
 	let callback: (FfiConversation) -> Void
@@ -50,7 +60,7 @@ final class ConversationStreamCallback: FfiConversationCallback {
 		self.onCloseCallback()
 	}
 
-	func onError(error: LibXMTP.FfiSubscribeError) {
+	func onError(error: FfiSubscribeError) {
 		print("Error ConversationStreamCallback \(error)")
 	}
 
@@ -84,6 +94,16 @@ public class Conversations {
 		self.client = client
 		self.ffiConversations = ffiConversations
 		self.ffiClient = ffiClient
+	}
+
+	/// Helper function to convert DisappearingMessageSettings to FfiMessageDisappearingSettings
+	/// Returns nil if the input is nil, making it explicit that nil will be passed to FFI
+	private func toFfiDisappearingMessageSettings(_ settings: DisappearingMessageSettings?) -> FfiMessageDisappearingSettings? {
+		guard let settings = settings else { return nil }
+		return FfiMessageDisappearingSettings(
+			fromNs: settings.disappearStartingAtNs,
+			inNs: settings.retentionDurationInNs
+		)
 	}
 
 	public func findGroup(groupId: String) throws -> Group? {
@@ -165,6 +185,14 @@ public class Conversations {
 		}
 	}
 
+	public func findEnrichedMessage(messageId: String) throws -> DecodedMessageV2? {
+		do {
+			return DecodedMessageV2.create(ffiMessage: try ffiClient.messageV2(messageId: messageId.hexToData))
+		} catch {
+			return nil
+		}
+	}
+
 	public func sync() async throws {
 		try await ffiConversations.sync()
 	}
@@ -175,87 +203,107 @@ public class Conversations {
 			consentStates: consentStates?.toFFI)
 	}
 
-	public func listGroups(
-		createdAfter: Date? = nil, createdBefore: Date? = nil,
-		limit: Int? = nil,
-		consentStates: [ConsentState]? = nil
-	) throws -> [Group] {
-		var options = FfiListConversationsOptions(
-			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
-			consentStates: consentStates?.toFFI, includeDuplicateDms: false)
-		if let createdAfter {
-			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
-		}
-		if let createdBefore {
-			options.createdBeforeNs = Int64(
-				createdBefore.millisecondsSinceEpoch)
-		}
-		if let limit {
-			options.limit = Int64(limit)
-		}
-		let conversations = try ffiConversations.listGroups(
-			opts: options)
+    public func listGroups(
+            createdAfterNs: Int64? = nil,
+            createdBeforeNs: Int64? = nil,
+            lastActivityAfterNs: Int64? = nil,
+            lastActivityBeforeNs: Int64? = nil,
+            limit: Int? = nil,
+            consentStates: [ConsentState]? = nil,
+            orderBy: ConversationsOrderBy = ConversationsOrderBy.lastActivity
+        ) throws -> [Group] {
+            var options = FfiListConversationsOptions(
+                createdAfterNs: createdAfterNs,
+                createdBeforeNs: createdBeforeNs,
+                lastActivityBeforeNs: lastActivityBeforeNs,
+                lastActivityAfterNs: lastActivityAfterNs,
+                orderBy: orderBy.ffiOrderBy,
+                limit: nil,
+                consentStates: consentStates?.toFFI,
+                includeDuplicateDms: false
+            )
 
-		return conversations.map {
-			$0.groupFromFFI(client: client)
-		}
-	}
+            if let limit {
+                options.limit = Int64(limit)
+            }
+            let conversations = try ffiConversations.listGroups(
+                opts: options
+            )
 
-	public func listDms(
-		createdAfter: Date? = nil, createdBefore: Date? = nil,
-		limit: Int? = nil,
-		consentStates: [ConsentState]? = nil
-	) throws -> [Dm] {
-		var options = FfiListConversationsOptions(
-			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
-			consentStates: consentStates?.toFFI, includeDuplicateDms: false)
-		if let createdAfter {
-			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
-		}
-		if let createdBefore {
-			options.createdBeforeNs = Int64(
-				createdBefore.millisecondsSinceEpoch)
-		}
-		if let limit {
-			options.limit = Int64(limit)
-		}
-		let conversations = try ffiConversations.listDms(
-			opts: options)
+            return conversations.map {
+                $0.groupFromFFI(client: client)
+            }
+        }
 
-		return conversations.map {
-			$0.dmFromFFI(client: client)
-		}
-	}
+        public func listDms(
+            createdAfterNs: Int64? = nil,
+            createdBeforeNs: Int64? = nil,
+            lastActivityBeforeNs: Int64? = nil,
+            lastActivityAfterNs: Int64? = nil,
+            limit: Int? = nil,
+            consentStates: [ConsentState]? = nil,
+            orderBy: ConversationsOrderBy = ConversationsOrderBy.lastActivity
+        ) throws -> [Dm] {
+            var options = FfiListConversationsOptions(
+                createdAfterNs: createdAfterNs,
+                createdBeforeNs: createdBeforeNs,
+                lastActivityBeforeNs: lastActivityBeforeNs,
+                lastActivityAfterNs: lastActivityAfterNs,
+                orderBy: orderBy.ffiOrderBy,
+                limit: nil,
+                consentStates: consentStates?.toFFI,
+                includeDuplicateDms: false  
+            )
 
-	public func list(
-		createdAfter: Date? = nil, createdBefore: Date? = nil,
-		limit: Int? = nil,
-		consentStates: [ConsentState]? = nil
-	) async throws -> [Conversation] {
-		var options = FfiListConversationsOptions(
-			createdAfterNs: nil, createdBeforeNs: nil, limit: nil,
-			consentStates: consentStates?.toFFI, includeDuplicateDms: false)
-		if let createdAfter {
-			options.createdAfterNs = Int64(createdAfter.millisecondsSinceEpoch)
-		}
-		if let createdBefore {
-			options.createdBeforeNs = Int64(
-				createdBefore.millisecondsSinceEpoch)
-		}
-		if let limit {
-			options.limit = Int64(limit)
-		}
-		let ffiConversations = try ffiConversations.list(
-			opts: options)
+            if let limit {
+                options.limit = Int64(limit)
+            }
 
-		var conversations: [Conversation] = []
-		for conversation in ffiConversations {
-			let conversation = try await conversation.toConversation(
-				client: client)
-			conversations.append(conversation)
-		}
-		return conversations
-	}
+            let conversations = try ffiConversations.listDms(
+                opts: options
+            )
+
+            return conversations.map {
+                $0.dmFromFFI(client: client)
+            }
+        }
+
+        public func list(
+            createdAfterNs: Int64? = nil,
+            createdBeforeNs: Int64? = nil,
+            lastActivityBeforeNs: Int64? = nil,
+            lastActivityAfterNs: Int64? = nil,
+            limit: Int? = nil,
+            consentStates: [ConsentState]? = nil,
+            orderBy: ConversationsOrderBy = ConversationsOrderBy.lastActivity
+        ) async throws -> [Conversation] {
+            var options = FfiListConversationsOptions(
+                createdAfterNs: createdAfterNs,
+                createdBeforeNs: createdBeforeNs,
+                lastActivityBeforeNs: lastActivityBeforeNs,
+                lastActivityAfterNs: lastActivityAfterNs,
+                orderBy: orderBy.ffiOrderBy,
+                limit: nil,
+                consentStates: consentStates?.toFFI,
+                includeDuplicateDms: false
+            )
+
+            if let limit {
+                options.limit = Int64(limit)
+            }
+            let ffiConversations = try ffiConversations.list(
+                opts: options
+            )
+
+            var conversations: [Conversation] = []
+            for conversation in ffiConversations {
+                let conversation = try await conversation.toConversation(
+                    client: client
+                )
+                conversations.append(conversation)
+            }
+            return conversations
+        }
 
 	public func stream(
 		type: ConversationFilterType = .all, onClose: (() -> Void)? = nil
@@ -350,11 +398,8 @@ public class Conversations {
 			.findOrCreateDm(
 				targetIdentity: peerIdentity.ffiPrivate,
 				opts: FfiCreateDmOptions(
-					messageDisappearingSettings: FfiMessageDisappearingSettings(
-						fromNs: disappearingMessageSettings?
-							.disappearStartingAtNs ?? 0,
-						inNs: disappearingMessageSettings?.retentionDurationInNs
-							?? 0)))
+					messageDisappearingSettings: toFfiDisappearingMessageSettings(disappearingMessageSettings)
+					))
 
 		return dm.dmFromFFI(client: client)
 	}
@@ -384,11 +429,8 @@ public class Conversations {
 			.findOrCreateDmByInboxId(
 				inboxId: peerInboxId,
 				opts: FfiCreateDmOptions(
-					messageDisappearingSettings: FfiMessageDisappearingSettings(
-						fromNs: disappearingMessageSettings?
-							.disappearStartingAtNs ?? 0,
-						inNs: disappearingMessageSettings?.retentionDurationInNs
-							?? 0)))
+					messageDisappearingSettings: toFfiDisappearingMessageSettings(disappearingMessageSettings)
+					))
 		return dm.dmFromFFI(client: client)
 
 	}
@@ -451,12 +493,7 @@ public class Conversations {
 				groupImageUrlSquare: imageUrl,
 				groupDescription: description,
 				customPermissionPolicySet: permissionPolicySet,
-				messageDisappearingSettings: FfiMessageDisappearingSettings(
-					fromNs: disappearingMessageSettings?
-						.disappearStartingAtNs ?? 0,
-					inNs: disappearingMessageSettings?
-						.retentionDurationInNs ?? 0
-				)
+				messageDisappearingSettings: toFfiDisappearingMessageSettings(disappearingMessageSettings)
 			)
 		).groupFromFFI(client: client)
 		return group
@@ -521,12 +558,7 @@ public class Conversations {
 				groupImageUrlSquare: imageUrl,
 				groupDescription: description,
 				customPermissionPolicySet: permissionPolicySet,
-				messageDisappearingSettings: FfiMessageDisappearingSettings(
-					fromNs: disappearingMessageSettings?
-						.disappearStartingAtNs ?? 0,
-					inNs: disappearingMessageSettings?
-						.retentionDurationInNs ?? 0
-				)
+				messageDisappearingSettings: toFfiDisappearingMessageSettings(disappearingMessageSettings)
 			)
 		).groupFromFFI(client: client)
 		return group
@@ -547,13 +579,7 @@ public class Conversations {
 			groupImageUrlSquare: groupImageUrlSquare,
 			groupDescription: groupDescription,
 			customPermissionPolicySet: nil,
-			messageDisappearingSettings: disappearingMessageSettings.map {
-				settings in
-				FfiMessageDisappearingSettings(
-					fromNs: settings.disappearStartingAtNs,
-					inNs: settings.retentionDurationInNs
-				)
-			}
+			messageDisappearingSettings: toFfiDisappearingMessageSettings(disappearingMessageSettings)
 		)
 
 		let ffiGroup = try ffiConversations.createGroupOptimistic(opts: ffiOpts)
@@ -657,6 +683,9 @@ public class Conversations {
 		let options = FfiListConversationsOptions(
 			createdAfterNs: nil,
 			createdBeforeNs: nil,
+            lastActivityBeforeNs: nil,
+            lastActivityAfterNs: nil,
+            orderBy: nil,
 			limit: nil,
 			consentStates: nil,
 			includeDuplicateDms: true

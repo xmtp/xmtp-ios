@@ -1,4 +1,3 @@
-import LibXMTP
 import XCTest
 import XMTPTestHelpers
 
@@ -466,8 +465,8 @@ class DmTests: XCTestCase {
 		XCTAssertEqual(convoBoMessageCount, 2)  // memberAdd and Bo hey
 		XCTAssertEqual(convoAlixMessageCount, 2)  // memberAdd and Alix hey
 
-		try await fixtures.boClient.conversations.syncAllConversations()
-		try await fixtures.alixClient.conversations.syncAllConversations()
+		let _ = try await fixtures.boClient.conversations.syncAllConversations()
+		let _ = try await fixtures.alixClient.conversations.syncAllConversations()
 
 		let convoBoMessageCountAfterSync = try await convoBo.messages().count
 		let convoAlixMessageCountAfterSync = try await convoAlix.messages()
@@ -489,9 +488,9 @@ class DmTests: XCTestCase {
 		let alixConvoID = convoAlix.id
 		let topicBoSameID = topicBoSame?.id
 		let topicAlixSameID = topicAlixSame?.id
-		let firstAlixDmID = try await fixtures.alixClient.conversations
+		let firstAlixDmID = try fixtures.alixClient.conversations
 			.listDms().first?.id
-		let firstBoDmID = try await fixtures.boClient.conversations.listDms()
+		let firstBoDmID = try fixtures.boClient.conversations.listDms()
 			.first?.id
 
 		XCTAssertEqual(alixConvoID, sameConvoBo.id)
@@ -513,4 +512,23 @@ class DmTests: XCTestCase {
 		XCTAssertEqual(sameConvoAlixMessageCount, 5)  // memberAdd, Bo hey, Alix hey, Bo hey2, Alix hey2
 		try fixtures.cleanUpDatabases()
 	}
+    
+    func testLastReadTimes() async throws {
+        let fixtures = try await fixtures()
+        
+        let convoBo = try await fixtures.boClient.conversations.findOrCreateDm(
+            with: fixtures.alixClient.inboxID)
+        
+        Client.register(codec: ReadReceiptCodec())
+        let messageID = try await convoBo.send(
+            content: ReadReceipt(),
+            options: .init(contentType: ReadReceiptCodec().contentType))
+        
+        let message = try fixtures.boClient.conversations.findMessage(messageId: messageID)
+        
+        let lastReadTimes = try convoBo.getLastReadTimes()
+        
+        XCTAssertEqual(lastReadTimes.count, 1)
+        XCTAssertEqual(lastReadTimes[fixtures.boClient.inboxID], message?.sentAtNs)
+    }
 }

@@ -1,5 +1,4 @@
 import CryptoKit
-import LibXMTP
 import XCTest
 import XMTPTestHelpers
 
@@ -225,6 +224,32 @@ class ConversationTests: XCTestCase {
 		}
 		try fixtures.cleanUpDatabases()
 	}
+    
+    func testMessagesDontDisappear() async throws {
+            let fixtures = try await fixtures()
+            
+            let alixGroup = try await fixtures.alixClient.conversations.newGroup(
+                with: [
+                    fixtures.boClient.inboxID,
+                ])
+            
+            _ = try await fixtures.alixClient.conversations.syncAllConversations()
+            
+            _ = try await alixGroup.send(content: "hello world")
+
+            let alixMessages = try await alixGroup.messages()
+            XCTAssertEqual(alixMessages.count, 2)
+            
+            try await Task.sleep(nanoseconds: 1_000_000_000)  // 1 seconds
+            
+            try await alixGroup.sync()
+            
+            let messages_2 = try await alixGroup.messages()
+			
+            XCTAssertEqual(messages_2.count, 2)
+            
+            try fixtures.cleanUpDatabases()
+        }
 
 	func testStreamsAndMessages() async throws {
 		var messages: [String] = []
@@ -491,6 +516,44 @@ class ConversationTests: XCTestCase {
 		for topic in dmTopics {
 			XCTAssertTrue(dmHmacTopics.contains(topic))
 		}
+		try fixtures.cleanUpDatabases()
+	}
+
+	func testCanListConversationsAndCheckCommitLogForkStatus() async throws {
+		let fixtures = try await fixtures()
+		
+		_ = try await fixtures.boClient.conversations.findOrCreateDm(
+			with: fixtures.caroClient.inboxID)
+		_ = try await fixtures.boClient.conversations.newGroup(with: [
+			fixtures.caroClient.inboxID
+		])
+		
+		try await fixtures.caroClient.conversations.sync()
+		let caroConversations = try await fixtures.caroClient.conversations.list()
+		
+		XCTAssertEqual(caroConversations.count, 2)
+		
+		var numForkStatusUnknown = 0
+		var numForkStatusForked = 0
+		var numForkStatusNotForked = 0
+		
+		for conversation in caroConversations {
+			let forkStatus =  conversation.commitLogForkStatus()
+			switch forkStatus {
+			case .forked:
+				numForkStatusForked += 1
+			case .notForked:
+				numForkStatusNotForked += 1
+			case .unknown:
+				numForkStatusUnknown += 1
+			}
+		}
+		
+		// Right now worker runs every 5 minutes so we'd need to wait that long to verify not forked
+		XCTAssertEqual(numForkStatusForked, 0)
+		XCTAssertEqual(numForkStatusNotForked, 0)
+		XCTAssertEqual(numForkStatusUnknown, 2)
+		
 		try fixtures.cleanUpDatabases()
 	}
 }

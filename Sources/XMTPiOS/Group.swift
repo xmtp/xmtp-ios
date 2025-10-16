@@ -1,17 +1,16 @@
 import Foundation
-import LibXMTP
 
 final class MessageCallback: FfiMessageCallback {
 	func onClose() {
 		self.onCloseCallback()
 	}
 
-	func onError(error: LibXMTP.FfiSubscribeError) {
+	func onError(error: FfiSubscribeError) {
 		print("Error MessageCallback \(error)")
 	}
 
 	let onCloseCallback: () -> Void
-	let callback: (LibXMTP.FfiMessage) -> Void
+	let callback: (FfiMessage) -> Void
 
 	init(
 		callback: @escaping (FfiMessage) -> Void,
@@ -21,7 +20,7 @@ final class MessageCallback: FfiMessageCallback {
 		self.onCloseCallback = onClose
 	}
 
-	func onMessage(message: LibXMTP.FfiMessage) {
+	func onMessage(message: FfiMessage) {
 		callback(message)
 	}
 }
@@ -33,6 +32,7 @@ final class StreamHolder {
 public struct Group: Identifiable, Equatable, Hashable {
 	var ffiGroup: FfiConversation
 	var ffiLastMessage: FfiMessage? = nil
+    var ffiCommitLogForkStatus: Bool? = nil
 	var client: Client
 	let streamHolder = StreamHolder()
 
@@ -150,6 +150,14 @@ public struct Group: Identifiable, Equatable, Hashable {
 	public var createdAt: Date {
 		Date(millisecondsSinceEpoch: ffiGroup.createdAtNs())
 	}
+    
+    public var createdAtNs: Int64 {
+        ffiGroup.createdAtNs()
+    }
+    
+    public var lastActivityAtNs: Int64 {
+        ffiLastMessage?.sentAtNs ?? createdAtNs
+    }
 
 	public func addMembers(inboxIds: [InboxId]) async throws
 		-> GroupMembershipResult
@@ -416,12 +424,12 @@ public struct Group: Identifiable, Equatable, Hashable {
 					}
 				)
 
-				continuation.onTermination = { @Sendable reason in
+				continuation.onTermination = { @Sendable _ in
 					self.streamHolder.stream?.end()
 				}
 			}
 
-			continuation.onTermination = { @Sendable reason in
+			continuation.onTermination = { @Sendable _ in
 				task.cancel()
 				self.streamHolder.stream?.end()
 			}
@@ -435,6 +443,14 @@ public struct Group: Identifiable, Equatable, Hashable {
 			return try await messages(limit: 1).first
 		}
 	}
+
+    public func commitLogForkStatus() -> CommitLogForkStatus {
+        switch ffiCommitLogForkStatus {
+            case true: return .forked
+            case false: return .notForked
+            default: return .unknown
+        }
+    }
 
 	public func messages(
 		beforeNs: Int64? = nil,
@@ -558,6 +574,66 @@ public struct Group: Identifiable, Equatable, Hashable {
 			}
 	}
 
+	public func enrichedMessages(
+		beforeNs: Int64? = nil,
+		afterNs: Int64? = nil,
+		limit: Int? = nil,
+		direction: SortDirection? = .descending,
+		deliveryStatus: MessageDeliveryStatus = .all
+	) async throws -> [DecodedMessageV2] {
+		var options = FfiListMessagesOptions(
+			sentBeforeNs: nil,
+			sentAfterNs: nil,
+			limit: nil,
+			deliveryStatus: nil,
+			direction: nil,
+			contentTypes: nil
+		)
+
+		if let beforeNs {
+			options.sentBeforeNs = beforeNs
+		}
+
+		if let afterNs {
+			options.sentAfterNs = afterNs
+		}
+
+		if let limit {
+			options.limit = Int64(limit)
+		}
+
+		let status: FfiDeliveryStatus? = {
+			switch deliveryStatus {
+			case .published:
+				return FfiDeliveryStatus.published
+			case .unpublished:
+				return FfiDeliveryStatus.unpublished
+			case .failed:
+				return FfiDeliveryStatus.failed
+			default:
+				return nil
+			}
+		}()
+
+		options.deliveryStatus = status
+
+		let direction: FfiDirection? = {
+			switch direction {
+			case .ascending:
+				return FfiDirection.ascending
+			default:
+				return FfiDirection.descending
+			}
+		}()
+
+		options.direction = direction
+
+		return try await ffiGroup.findMessagesV2(opts: options).compactMap {
+			ffiDecodedMessage in
+			return DecodedMessageV2(ffiMessage: ffiDecodedMessage)
+		}
+	}
+
 	public func getHmacKeys() throws
 		-> Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse
 	{
@@ -592,4 +668,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 			ffiConversationDebugInfo: try await ffiGroup.conversationDebugInfo()
 		)
 	}
+    
+    public func getLastReadTimes() throws -> Dictionary<String, Int64> {
+        return try ffiGroup.getLastReadTimes()
+    }
 }
