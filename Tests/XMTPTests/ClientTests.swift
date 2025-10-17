@@ -12,6 +12,7 @@ class ClientTests: XCTestCase {
 			api: ClientOptions.Api(
 				env: XMTPEnvironment.local, isSecure: false,
 				appVersion: "Testing/0.0.0"),
+            
 			dbEncryptionKey: key
 		)
 		let fakeWallet = try PrivateKey.generate()

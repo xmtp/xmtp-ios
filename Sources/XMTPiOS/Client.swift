@@ -36,14 +36,18 @@ public struct ClientOptions {
 		public var isSecure: Bool = true
 
 		public var appVersion: String? = nil
+        
+        public var gatewayUrl: String? = nil
 
 		public init(
 			env: XMTPEnvironment = .dev, isSecure: Bool = true,
-			appVersion: String? = nil
+			appVersion: String? = nil,
+            gatewayUrl: String? = nil
 		) {
 			self.env = env
 			self.isSecure = isSecure
 			self.appVersion = appVersion
+            self.gatewayUrl = gatewayUrl
 		}
 	}
 
@@ -373,7 +377,8 @@ public final class Client {
 
 		// Either not cached or not connected; create new client
 		let newClient = try await connectToBackend(
-			host: api.env.url,
+			v3Host: api.env.url,
+            gatewayHost: api.gatewayUrl,
 			isSecure: api.isSecure,
 			appVersion: api.appVersion
 		)
@@ -396,7 +401,8 @@ public final class Client {
 
 		// Either not cached or not connected; create new client
 		let newClient = try await connectToBackend(
-			host: api.env.url,
+			v3Host: api.env.url,
+            gatewayHost: api.gatewayUrl,
 			isSecure: api.isSecure,
 			appVersion: api.appVersion
 		)
