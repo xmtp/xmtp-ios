@@ -50,6 +50,7 @@ jobs:
       - name: Extract LibXMTPSwiftFFI URL from Package.swift
         id: extract_url
         run: |
+          set -eu
           ZIP_URL=$(grep -A 3 'name: "LibXMTPSwiftFFI"' Package.swift | grep -o 'https://[^"]*')
           echo "ZIP_URL=$ZIP_URL" >> $GITHUB_ENV
           echo "Extracted URL: $ZIP_URL"
