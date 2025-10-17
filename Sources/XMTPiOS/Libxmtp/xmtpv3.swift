@@ -5697,11 +5697,11 @@ public struct FfiConversationDebugInfo {
     public var isCommitLogForked: Bool?
     public var localCommitLog: String
     public var remoteCommitLog: String
-    public var cursor: Int64
+    public var cursor: [FfiCursor]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(epoch: UInt64, maybeForked: Bool, forkDetails: String, isCommitLogForked: Bool?, localCommitLog: String, remoteCommitLog: String, cursor: Int64) {
+    public init(epoch: UInt64, maybeForked: Bool, forkDetails: String, isCommitLogForked: Bool?, localCommitLog: String, remoteCommitLog: String, cursor: [FfiCursor]) {
         self.epoch = epoch
         self.maybeForked = maybeForked
         self.forkDetails = forkDetails
@@ -5769,7 +5769,7 @@ public struct FfiConverterTypeFfiConversationDebugInfo: FfiConverterRustBuffer {
                 isCommitLogForked: FfiConverterOptionBool.read(from: &buf), 
                 localCommitLog: FfiConverterString.read(from: &buf), 
                 remoteCommitLog: FfiConverterString.read(from: &buf), 
-                cursor: FfiConverterInt64.read(from: &buf)
+                cursor: FfiConverterSequenceTypeFfiCursor.read(from: &buf)
         )
     }
 
@@ -5780,7 +5780,7 @@ public struct FfiConverterTypeFfiConversationDebugInfo: FfiConverterRustBuffer {
         FfiConverterOptionBool.write(value.isCommitLogForked, into: &buf)
         FfiConverterString.write(value.localCommitLog, into: &buf)
         FfiConverterString.write(value.remoteCommitLog, into: &buf)
-        FfiConverterInt64.write(value.cursor, into: &buf)
+        FfiConverterSequenceTypeFfiCursor.write(value.cursor, into: &buf)
     }
 }
 
@@ -6055,6 +6055,76 @@ public func FfiConverterTypeFfiCreateGroupOptions_lift(_ buf: RustBuffer) throws
 #endif
 public func FfiConverterTypeFfiCreateGroupOptions_lower(_ value: FfiCreateGroupOptions) -> RustBuffer {
     return FfiConverterTypeFfiCreateGroupOptions.lower(value)
+}
+
+
+public struct FfiCursor {
+    public var originatorId: UInt32
+    public var sequenceId: UInt64
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(originatorId: UInt32, sequenceId: UInt64) {
+        self.originatorId = originatorId
+        self.sequenceId = sequenceId
+    }
+}
+
+#if compiler(>=6)
+extension FfiCursor: Sendable {}
+#endif
+
+
+extension FfiCursor: Equatable, Hashable {
+    public static func ==(lhs: FfiCursor, rhs: FfiCursor) -> Bool {
+        if lhs.originatorId != rhs.originatorId {
+            return false
+        }
+        if lhs.sequenceId != rhs.sequenceId {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(originatorId)
+        hasher.combine(sequenceId)
+    }
+}
+
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeFfiCursor: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> FfiCursor {
+        return
+            try FfiCursor(
+                originatorId: FfiConverterUInt32.read(from: &buf), 
+                sequenceId: FfiConverterUInt64.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: FfiCursor, into buf: inout [UInt8]) {
+        FfiConverterUInt32.write(value.originatorId, into: &buf)
+        FfiConverterUInt64.write(value.sequenceId, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeFfiCursor_lift(_ buf: RustBuffer) throws -> FfiCursor {
+    return try FfiConverterTypeFfiCursor.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeFfiCursor_lower(_ value: FfiCursor) -> RustBuffer {
+    return FfiConverterTypeFfiCursor.lower(value)
 }
 
 
@@ -7240,11 +7310,11 @@ public struct FfiMessage {
     public var content: Data
     public var kind: FfiConversationMessageKind
     public var deliveryStatus: FfiDeliveryStatus
-    public var sequenceId: UInt64?
+    public var sequenceId: UInt64
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(id: Data, sentAtNs: Int64, conversationId: Data, senderInboxId: String, content: Data, kind: FfiConversationMessageKind, deliveryStatus: FfiDeliveryStatus, sequenceId: UInt64?) {
+    public init(id: Data, sentAtNs: Int64, conversationId: Data, senderInboxId: String, content: Data, kind: FfiConversationMessageKind, deliveryStatus: FfiDeliveryStatus, sequenceId: UInt64) {
         self.id = id
         self.sentAtNs = sentAtNs
         self.conversationId = conversationId
@@ -7318,7 +7388,7 @@ public struct FfiConverterTypeFfiMessage: FfiConverterRustBuffer {
                 content: FfiConverterData.read(from: &buf), 
                 kind: FfiConverterTypeFfiConversationMessageKind.read(from: &buf), 
                 deliveryStatus: FfiConverterTypeFfiDeliveryStatus.read(from: &buf), 
-                sequenceId: FfiConverterOptionUInt64.read(from: &buf)
+                sequenceId: FfiConverterUInt64.read(from: &buf)
         )
     }
 
@@ -7330,7 +7400,7 @@ public struct FfiConverterTypeFfiMessage: FfiConverterRustBuffer {
         FfiConverterData.write(value.content, into: &buf)
         FfiConverterTypeFfiConversationMessageKind.write(value.kind, into: &buf)
         FfiConverterTypeFfiDeliveryStatus.write(value.deliveryStatus, into: &buf)
-        FfiConverterOptionUInt64.write(value.sequenceId, into: &buf)
+        FfiConverterUInt64.write(value.sequenceId, into: &buf)
     }
 }
 
@@ -12775,6 +12845,31 @@ fileprivate struct FfiConverterSequenceTypeFfiConversationMember: FfiConverterRu
         seq.reserveCapacity(Int(len))
         for _ in 0 ..< len {
             seq.append(try FfiConverterTypeFfiConversationMember.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceTypeFfiCursor: FfiConverterRustBuffer {
+    typealias SwiftType = [FfiCursor]
+
+    public static func write(_ value: [FfiCursor], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeFfiCursor.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [FfiCursor] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [FfiCursor]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeFfiCursor.read(from: &buf))
         }
         return seq
     }
