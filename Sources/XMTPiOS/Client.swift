@@ -36,14 +36,18 @@ public struct ClientOptions {
 		public var isSecure: Bool = true
 
 		public var appVersion: String? = nil
+        
+        public var gatewayUrl: String? = nil
 
 		public init(
 			env: XMTPEnvironment = .dev, isSecure: Bool = true,
-			appVersion: String? = nil
+			appVersion: String? = nil,
+            gatewayUrl: String? = nil
 		) {
 			self.env = env
 			self.isSecure = isSecure
 			self.appVersion = appVersion
+            self.gatewayUrl = gatewayUrl
 		}
 	}
 
@@ -86,9 +90,30 @@ public struct ClientOptions {
 	}
 }
 
+/// Cache for API clients to avoid creating duplicate connections.
+/// Cache keys are constructed from v3Host, gatewayHost, isSecure, and appVersion
+/// to ensure proper isolation between different API configurations.
 actor ApiClientCache {
 	private var apiClientCache: [String: XmtpApiClient] = [:]
 	private var syncApiClientCache: [String: XmtpApiClient] = [:]
+	
+	/// Creates a cache key from API configuration parameters
+	/// - Parameters:
+	///   - v3Host: The v3 host URL
+	///   - gatewayHost: The gateway host URL (optional)
+	///   - isSecure: Whether the connection uses TLS
+	///   - appVersion: The app version string (optional)
+	/// - Returns: A unique cache key string
+	static func makeCacheKey(
+		v3Host: String,
+		gatewayHost: String?,
+		isSecure: Bool,
+		appVersion: String?
+	) -> String {
+		let gateway = gatewayHost ?? "none"
+		let version = appVersion ?? "none"
+		return "\(v3Host)|\(gateway)|\(isSecure)|\(version)"
+	}
 
 	func getClient(forKey key: String) -> XmtpApiClient? {
 		return apiClientCache[key]
@@ -362,7 +387,12 @@ public final class Client {
 	public static func connectToApiBackend(api: ClientOptions.Api) async throws
 		-> XmtpApiClient
 	{
-		let cacheKey = api.env.url
+		let cacheKey = ApiClientCache.makeCacheKey(
+			v3Host: api.env.url,
+			gatewayHost: api.gatewayUrl,
+			isSecure: api.isSecure,
+			appVersion: api.appVersion
+		)
 
 		// Check for an existing connected client
 		if let cached = await apiCache.getClient(forKey: cacheKey),
@@ -373,7 +403,8 @@ public final class Client {
 
 		// Either not cached or not connected; create new client
 		let newClient = try await connectToBackend(
-			host: api.env.url,
+			v3Host: api.env.url,
+            gatewayHost: api.gatewayUrl,
 			isSecure: api.isSecure,
 			appVersion: api.appVersion
 		)
@@ -385,7 +416,12 @@ public final class Client {
 		async throws
 		-> XmtpApiClient
 	{
-		let cacheKey = api.env.url
+		let cacheKey = ApiClientCache.makeCacheKey(
+			v3Host: api.env.url,
+			gatewayHost: api.gatewayUrl,
+			isSecure: api.isSecure,
+			appVersion: api.appVersion
+		)
 
 		// Check for an existing connected client
 		if let cached = await apiCache.getSyncClient(forKey: cacheKey),
@@ -396,7 +432,8 @@ public final class Client {
 
 		// Either not cached or not connected; create new client
 		let newClient = try await connectToBackend(
-			host: api.env.url,
+			v3Host: api.env.url,
+            gatewayHost: api.gatewayUrl,
 			isSecure: api.isSecure,
 			appVersion: api.appVersion
 		)

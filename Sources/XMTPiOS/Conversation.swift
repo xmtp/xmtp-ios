@@ -137,17 +137,21 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func prepareMessage(encodedContent: EncodedContent) async throws
-		-> String
-	{
-		switch self {
-		case let .group(group):
-			return try await group.prepareMessage(
-				encodedContent: encodedContent)
-		case let .dm(dm):
-			return try await dm.prepareMessage(encodedContent: encodedContent)
-		}
-	}
+    public func prepareMessage(
+            encodedContent: EncodedContent, visibilityOptions: MessageVisibilityOptions? = nil
+    ) async throws -> String
+    {
+        switch self {
+        case let .group(group):
+            return try await group.prepareMessage(
+                encodedContent: encodedContent, visibilityOptions: visibilityOptions
+            )
+        case let .dm(dm):
+            return try await dm.prepareMessage(
+                encodedContent: encodedContent, visibilityOptions: visibilityOptions
+            )
+        }
+    }
 
 	public func prepareMessage<T>(content: T, options: SendOptions? = nil)
 		async throws -> String
@@ -218,17 +222,20 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	@discardableResult public func send(
-		encodedContent: EncodedContent
-	) async throws -> String {
-		switch self {
-		case let .group(group):
-			return try await group.send(
-				encodedContent: encodedContent)
-		case let .dm(dm):
-			return try await dm.send(encodedContent: encodedContent)
-		}
-	}
+    @discardableResult public func send(
+        encodedContent: EncodedContent, visibilityOptions: MessageVisibilityOptions? = nil
+    ) async throws -> String {
+        switch self {
+        case let .group(group):
+            return try await group.send(
+                encodedContent: encodedContent, visibilityOptions: visibilityOptions
+            )
+        case let .dm(dm):
+            return try await dm.send(
+                encodedContent: encodedContent, visibilityOptions: visibilityOptions
+            )
+        }
+    }
 
 	public func send(text: String, options: SendOptions? = nil) async throws
 		-> String
