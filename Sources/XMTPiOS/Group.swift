@@ -481,7 +481,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 		afterNs: Int64? = nil,
 		limit: Int? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(
 			sentBeforeNs: nil,
@@ -489,7 +490,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 			limit: nil,
 			deliveryStatus: nil,
 			direction: nil,
-			contentTypes: nil
+			contentTypes: nil,
+			excludeContentTypes: nil
 		)
 
 		if let beforeNs {
@@ -529,6 +531,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}()
 
 		options.direction = direction
+		options.excludeContentTypes = excludeContentTypes
 
 		return try await ffiGroup.findMessages(opts: options).compactMap {
 			ffiMessage in
@@ -541,7 +544,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 		afterNs: Int64? = nil,
 		limit: Int? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) async throws -> [DecodedMessage] {
 		var options = FfiListMessagesOptions(
 			sentBeforeNs: nil,
@@ -549,7 +553,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 			limit: nil,
 			deliveryStatus: nil,
 			direction: nil,
-			contentTypes: nil
+			contentTypes: nil,
+			excludeContentTypes: nil
 		)
 
 		if let beforeNs {
@@ -589,6 +594,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}()
 
 		options.direction = direction
+		options.excludeContentTypes = excludeContentTypes
 
 		return try ffiGroup.findMessagesWithReactions(opts: options)
 			.compactMap {
@@ -604,7 +610,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 		afterNs: Int64? = nil,
 		limit: Int? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) async throws -> [DecodedMessageV2] {
 		var options = FfiListMessagesOptions(
 			sentBeforeNs: nil,
@@ -612,7 +619,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 			limit: nil,
 			deliveryStatus: nil,
 			direction: nil,
-			contentTypes: nil
+			contentTypes: nil,
+			excludeContentTypes: nil
 		)
 
 		if let beforeNs {
@@ -652,6 +660,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 		}()
 
 		options.direction = direction
+		options.excludeContentTypes = excludeContentTypes
 
 		return try await ffiGroup.findMessagesV2(opts: options).compactMap { ffiDecodedMessage in
 			DecodedMessageV2(ffiMessage: ffiDecodedMessage)
@@ -659,7 +668,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 	}
 
 	public func countMessages(
-		beforeNs: Int64? = nil, afterNs: Int64? = nil, deliveryStatus: MessageDeliveryStatus = .all
+		beforeNs: Int64? = nil, afterNs: Int64? = nil, deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil
 	) throws -> Int64 {
 		try ffiGroup.countMessages(
 			opts: FfiListMessagesOptions(
@@ -668,7 +678,8 @@ public struct Group: Identifiable, Equatable, Hashable {
 				limit: nil,
 				deliveryStatus: deliveryStatus.toFfi(),
 				direction: .descending,
-				contentTypes: nil
+				contentTypes: nil,
+				excludeContentTypes: excludeContentTypes
 			)
 		)
 	}
