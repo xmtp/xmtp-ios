@@ -341,6 +341,35 @@ class ClientTests: XCTestCase {
 		XCTAssertEqual(alixClient2.inboxID, alixClient.inboxID)
 		try alixClient.deleteLocalDatabase()
 	}
+    
+    func testCreatesAD14NStagingClient() async throws {
+        let key = try Crypto.secureRandomBytes(count: 32)
+        let alix = try PrivateKey.generate()
+        let options = ClientOptions.init(
+            api: .init(env: .dev, isSecure: true, gatewayUrl: "https://payer.testnet-staging.xmtp.network:443"),
+            dbEncryptionKey: key
+        )
+
+        let inboxId = try await Client.getOrCreateInboxId(
+            api: options.api, publicIdentity: alix.identity)
+        let alixClient = try await Client.create(
+            account: alix,
+            options: options
+        )
+
+        XCTAssertEqual(inboxId, alixClient.inboxID)
+
+        let alixClient2 = try await Client.build(
+            publicIdentity: alix.identity,
+            options: options
+        )
+
+        XCTAssertEqual(
+            alixClient2.publicIdentity.identifier,
+            alixClient.publicIdentity.identifier)
+        XCTAssertEqual(alixClient2.inboxID, alixClient.inboxID)
+        try alixClient.deleteLocalDatabase()
+    }
 
 	func testRevokeInstallations() async throws {
 		let key = try Crypto.secureRandomBytes(count: 32)
