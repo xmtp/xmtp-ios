@@ -322,15 +322,21 @@ public struct Group: Identifiable, Equatable, Hashable {
 	public func send<T>(content: T, options: SendOptions? = nil) async throws
 		-> String
 	{
-		let encodeContent = try await encodeContent(
-			content: content, options: options)
-		return try await send(encodedContent: encodeContent)
+		let (encodeContent, visibilityOptions) = try await encodeContent(
+			content: content, options: options
+		)
+		return try await send(encodedContent: encodeContent, visibilityOptions: visibilityOptions)
 	}
 
-	public func send(encodedContent: EncodedContent) async throws -> String {
+	public func send(
+		encodedContent: EncodedContent, visibilityOptions: MessageVisibilityOptions? = nil
+	) async throws -> String {
 		do {
+			let opts = visibilityOptions?.toFfi() ?? FfiSendMessageOpts(shouldPush: true)
 			let messageId = try await ffiGroup.send(
-				contentBytes: encodedContent.serializedData())
+				contentBytes: encodedContent.serializedData(),
+				opts: opts
+			)
 			return messageId.toHex
 		} catch {
 			throw error
@@ -338,7 +344,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 	}
 
 	public func encodeContent<T>(content: T, options: SendOptions?) async throws
-		-> EncodedContent
+		-> (EncodedContent, MessageVisibilityOptions)
 	{
 		let codec = Client.codecRegistry.find(for: options?.contentType)
 
@@ -372,24 +378,45 @@ public struct Group: Identifiable, Equatable, Hashable {
 			encoded = try encoded.compress(compression)
 		}
 
-		return encoded
+		func shouldPush<Codec: ContentCodec>(codec: Codec, content: Any) throws
+			-> Bool
+		{
+			if let content = content as? Codec.T {
+				return try codec.shouldPush(content: content)
+			} else {
+				throw CodecError.invalidContent
+			}
+		}
+
+		let visibilityOptions = try MessageVisibilityOptions(
+			shouldPush: shouldPush(codec: codec, content: content)
+		)
+
+		return (encoded, visibilityOptions)
 	}
 
-	public func prepareMessage(encodedContent: EncodedContent) async throws
+	public func prepareMessage(
+		encodedContent: EncodedContent, visibilityOptions: MessageVisibilityOptions? = nil
+	) async throws
 		-> String
 	{
+		let opts = visibilityOptions?.toFfi() ?? FfiSendMessageOpts(shouldPush: true)
 		let messageId = try ffiGroup.sendOptimistic(
-			contentBytes: encodedContent.serializedData())
+			contentBytes: encodedContent.serializedData(),
+			opts: opts
+		)
 		return messageId.toHex
 	}
 
 	public func prepareMessage<T>(content: T, options: SendOptions? = nil)
 		async throws -> String
 	{
-		let encodeContent = try await encodeContent(
-			content: content, options: options)
+		let (encodeContent, visibilityOptions) = try await encodeContent(
+			content: content, options: options
+		)
 		return try ffiGroup.sendOptimistic(
-			contentBytes: try encodeContent.serializedData()
+			contentBytes: encodeContent.serializedData(),
+			opts: visibilityOptions.toFfi()
 		).toHex
 	}
 
