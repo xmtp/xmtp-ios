@@ -211,7 +211,7 @@ class ConversationTests: XCTestCase {
 	func testReturnsAllHMACKeys() async throws {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let opts = ClientOptions(
-			api: ClientOptions.Api(env: .local, isSecure: false),
+			api: ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			dbEncryptionKey: key
 		)
 		let fixtures = try await fixtures()
@@ -286,14 +286,22 @@ class ConversationTests: XCTestCase {
 		_ = try await fixtures.caroClient.conversations.syncAllConversations()
 		_ = try await fixtures.boClient.conversations.syncAllConversations()
 
-		let boGroup = try await fixtures.boClient.conversations.findGroup(groupId: alixGroup.id)!
-		let caroGroup = try await fixtures.caroClient.conversations.findGroup(
+		let boGroupResult = try await fixtures.boClient.conversations.findGroup(
 			groupId: alixGroup.id
-		)!
-		let boGroup2 = try await fixtures.boClient.conversations.findGroup(groupId: caroGroup2.id)!
-		let alixGroup2 = try await fixtures.alixClient.conversations.findGroup(
+		)
+		let boGroup = try XCTUnwrap(boGroupResult)
+		let caroGroupResult = try await fixtures.caroClient.conversations.findGroup(
+			groupId: alixGroup.id
+		)
+		let caroGroup = try XCTUnwrap(caroGroupResult)
+		let boGroup2Result = try await fixtures.boClient.conversations.findGroup(
 			groupId: caroGroup2.id
-		)!
+		)
+		let boGroup2 = try XCTUnwrap(boGroup2Result)
+		let alixGroup2Result = try await fixtures.alixClient.conversations.findGroup(
+			groupId: caroGroup2.id
+		)
+		let alixGroup2 = try XCTUnwrap(alixGroup2Result)
 
 		// Start listening for messages
 		let caroTask = Task {
@@ -474,7 +482,7 @@ class ConversationTests: XCTestCase {
 	func testReturnsAllTopics() async throws {
 		let key = try Crypto.secureRandomBytes(count: 32)
 		let opts = ClientOptions(
-			api: ClientOptions.Api(env: .local, isSecure: false),
+			api: ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			dbEncryptionKey: key
 		)
 
