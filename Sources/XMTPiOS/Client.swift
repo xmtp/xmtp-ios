@@ -37,13 +37,18 @@ public struct ClientOptions {
 
 		public var appVersion: String? = nil
 
+		// Future proofing - gateway URL support.
+		public var gatewayHost: String? = nil
+
 		public init(
 			env: XMTPEnvironment = .dev, isSecure: Bool = true,
-			appVersion: String? = nil
+			appVersion: String? = nil,
+			gatewayHost: String? = nil
 		) {
 			self.env = env
 			self.isSecure = isSecure
 			self.appVersion = appVersion
+			self.gatewayHost = gatewayHost
 		}
 	}
 
@@ -83,6 +88,18 @@ public struct ClientOptions {
 		}
 		self.deviceSyncEnabled = deviceSyncEnabled
 		self.debugEventsEnabled = debugEventsEnabled
+	}
+}
+
+struct ApiCacheKey {
+	let api: ClientOptions.Api
+
+	init(api: ClientOptions.Api) {
+		self.api = api
+	}
+
+	var stringValue: String {
+		"\(api.env.url)|\(api.isSecure)|\(api.appVersion ?? "nil")|\(api.gatewayHost ?? "nil")"
 	}
 }
 
@@ -362,7 +379,7 @@ public final class Client {
 	public static func connectToApiBackend(api: ClientOptions.Api) async throws
 		-> XmtpApiClient
 	{
-		let cacheKey = api.env.url
+		let cacheKey = ApiCacheKey(api: api).stringValue
 
 		// Check for an existing connected client
 		if let cached = await apiCache.getClient(forKey: cacheKey),
@@ -385,7 +402,7 @@ public final class Client {
 		async throws
 		-> XmtpApiClient
 	{
-		let cacheKey = api.env.url
+		let cacheKey = ApiCacheKey(api: api).stringValue
 
 		// Check for an existing connected client
 		if let cached = await apiCache.getSyncClient(forKey: cacheKey),
