@@ -9,12 +9,18 @@ let package = Package(
 	products: [
 		.library(
 			name: "XMTPiOS",
+			type: .static,
 			targets: ["XMTPiOS"]
 		),
 		.library(
 			name: "XMTPTestHelpers",
 			targets: ["XMTPTestHelpers"]
 		),
+		.library(
+            name: "XMTPiOS",
+            type: .dynamic,
+            targets: ["XMTPiOSDynamic"]
+        )
 	],
 	dependencies: [
 		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.0.0"),
@@ -37,6 +43,20 @@ let package = Package(
 				.product(name: "CryptoSwift", package: "CryptoSwift"),
 			]
 		),
+		.target(
+            name: "XMTPiOSDynamic",
+            dependencies: [
+				.product(name: "Connect", package: "connect-swift"),
+				"LibXMTPSwiftFFIDynamic",
+				.product(name: "CryptoSwift", package: "CryptoSwift"),
+			],
+        ),
+        .binaryTarget(
+            name: "LibXMTPSwiftFFIDynamic",
+			url:
+			"https://github.com/xmtp/libxmtp/releases/download/swift-bindings-dynamic-1.6.0-dev.ca1e5bf/LibXMTPSwiftFFIDynamic.zip",
+            checksum: "236a652f24b17a249328abb2029f4168e6dc298b6c6647bc9cba10cd5df15f7a"
+        ),
 		.target(
 			name: "XMTPTestHelpers",
 			dependencies: ["XMTPiOS"]
