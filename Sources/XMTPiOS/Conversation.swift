@@ -52,14 +52,14 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-    public func commitLogForkStatus() -> CommitLogForkStatus {
-        switch self {
-        case let .group(group):
-            return group.commitLogForkStatus()
-        case let .dm(dm):
-            return dm.commitLogForkStatus()
-        }
-    }
+	public func commitLogForkStatus() -> CommitLogForkStatus {
+		switch self {
+		case let .group(group):
+			return group.commitLogForkStatus()
+		case let .dm(dm):
+			return dm.commitLogForkStatus()
+		}
+	}
 
 	public func isCreator() async throws -> Bool {
 		switch self {
@@ -103,10 +103,12 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		switch self {
 		case let .group(group):
 			try await group.updateDisappearingMessageSettings(
-				disappearingMessageSettings)
+				disappearingMessageSettings
+			)
 		case let .dm(dm):
 			try await dm.updateDisappearingMessageSettings(
-				disappearingMessageSettings)
+				disappearingMessageSettings
+			)
 		}
 	}
 
@@ -137,15 +139,20 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func prepareMessage(encodedContent: EncodedContent) async throws
+	public func prepareMessage(
+		encodedContent: EncodedContent, visibilityOptions: MessageVisibilityOptions? = nil
+	) async throws
 		-> String
 	{
 		switch self {
 		case let .group(group):
 			return try await group.prepareMessage(
-				encodedContent: encodedContent)
+				encodedContent: encodedContent, visibilityOptions: visibilityOptions
+			)
 		case let .dm(dm):
-			return try await dm.prepareMessage(encodedContent: encodedContent)
+			return try await dm.prepareMessage(
+				encodedContent: encodedContent, visibilityOptions: visibilityOptions
+			)
 		}
 	}
 
@@ -155,10 +162,12 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		switch self {
 		case let .group(group):
 			return try await group.prepareMessage(
-				content: content, options: options)
+				content: content, options: options
+			)
 		case let .dm(dm):
 			return try await dm.prepareMessage(
-				content: content, options: options)
+				content: content, options: options
+			)
 		}
 	}
 
@@ -188,24 +197,24 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 			return dm.createdAt
 		}
 	}
-    
-    public var createdAtNs: Int64 {
-        switch self {
-        case let .group(group):
-            return group.createdAtNs
-        case let .dm(dm):
-            return dm.createdAtNs
-        }
-    }
-    
-    public var lastActivityAtNs: Int64 {
-        switch self {
-        case let .group(group):
-            return group.lastActivityAtNs
-        case let .dm(dm):
-            return dm.lastActivityAtNs
-        }
-    }
+
+	public var createdAtNs: Int64 {
+		switch self {
+		case let .group(group):
+			return group.createdAtNs
+		case let .dm(dm):
+			return dm.createdAtNs
+		}
+	}
+
+	public var lastActivityAtNs: Int64 {
+		switch self {
+		case let .group(group):
+			return group.lastActivityAtNs
+		case let .dm(dm):
+			return dm.lastActivityAtNs
+		}
+	}
 
 	@discardableResult public func send<T>(
 		content: T, options: SendOptions? = nil, fallback _: String? = nil
@@ -219,14 +228,17 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 	}
 
 	@discardableResult public func send(
-		encodedContent: EncodedContent
+		encodedContent: EncodedContent, visibilityOptions: MessageVisibilityOptions? = nil
 	) async throws -> String {
 		switch self {
 		case let .group(group):
 			return try await group.send(
-				encodedContent: encodedContent)
+				encodedContent: encodedContent, visibilityOptions: visibilityOptions
+			)
 		case let .dm(dm):
-			return try await dm.send(encodedContent: encodedContent)
+			return try await dm.send(
+				encodedContent: encodedContent, visibilityOptions: visibilityOptions
+			)
 		}
 	}
 
@@ -250,7 +262,9 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-	public func streamMessages(onClose: (() -> Void)? = nil) -> AsyncThrowingStream<DecodedMessage, Error> {
+	public func streamMessages(onClose: (() -> Void)? = nil) -> AsyncThrowingStream<
+		DecodedMessage, Error
+	> {
 		switch self {
 		case let .group(group):
 			return group.streamMessages(onClose: onClose)
@@ -264,31 +278,37 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		beforeNs: Int64? = nil,
 		afterNs: Int64? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil,
+		excludeSenderInboxIds: [String]? = nil
 	) async throws -> [DecodedMessage] {
 		switch self {
 		case let .group(group):
 			return try await group.messages(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes,
+				excludeSenderInboxIds: excludeSenderInboxIds
 			)
 		case let .dm(dm):
 			return try await dm.messages(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes,
+				excludeSenderInboxIds: excludeSenderInboxIds
 			)
 		}
 	}
 
-    // Returns null if conversation is not paused, otherwise the min version required to unpause this conversation
-    public func pausedForVersion() async throws -> String? {
-        switch self {
-        case let .group(group):
-            return try group.pausedForVersion()
-        case let .dm(dm):
-            return try dm.pausedForVersion()
-        }
-    }
+	// Returns null if conversation is not paused, otherwise the min version required to unpause this conversation
+	public func pausedForVersion() async throws -> String? {
+		switch self {
+		case let .group(group):
+			return try group.pausedForVersion()
+		case let .dm(dm):
+			return try dm.pausedForVersion()
+		}
+	}
 
 	public var client: Client {
 		switch self {
@@ -304,18 +324,24 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		beforeNs: Int64? = nil,
 		afterNs: Int64? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil,
+		excludeSenderInboxIds: [String]? = nil
 	) async throws -> [DecodedMessage] {
 		switch self {
 		case let .group(group):
 			return try await group.messagesWithReactions(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes,
+				excludeSenderInboxIds: excludeSenderInboxIds
 			)
 		case let .dm(dm):
 			return try await dm.messagesWithReactions(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes,
+				excludeSenderInboxIds: excludeSenderInboxIds
 			)
 		}
 	}
@@ -325,18 +351,47 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		beforeNs: Int64? = nil,
 		afterNs: Int64? = nil,
 		direction: SortDirection? = .descending,
-		deliveryStatus: MessageDeliveryStatus = .all
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil,
+		excludeSenderInboxIds: [String]? = nil
 	) async throws -> [DecodedMessageV2] {
 		switch self {
 		case let .group(group):
 			return try await group.enrichedMessages(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes,
+				excludeSenderInboxIds: excludeSenderInboxIds
 			)
 		case let .dm(dm):
 			return try await dm.enrichedMessages(
 				beforeNs: beforeNs, afterNs: afterNs, limit: limit,
-				direction: direction, deliveryStatus: deliveryStatus
+				direction: direction, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes,
+				excludeSenderInboxIds: excludeSenderInboxIds
+			)
+		}
+	}
+
+	public func countMessages(
+		beforeNs: Int64? = nil,
+		afterNs: Int64? = nil,
+		deliveryStatus: MessageDeliveryStatus = .all,
+		excludeContentTypes: [StandardContentType]? = nil,
+		excludeSenderInboxIds: [String]? = nil
+	) throws -> Int64 {
+		switch self {
+		case let .group(group):
+			return try group.countMessages(
+				beforeNs: beforeNs, afterNs: afterNs, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes,
+				excludeSenderInboxIds: excludeSenderInboxIds
+			)
+		case let .dm(dm):
+			return try dm.countMessages(
+				beforeNs: beforeNs, afterNs: afterNs, deliveryStatus: deliveryStatus,
+				excludeContentTypes: excludeContentTypes,
+				excludeSenderInboxIds: excludeSenderInboxIds
 			)
 		}
 	}
@@ -350,16 +405,16 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-    public func getPushTopics() async throws -> [String] {
-        switch self {
-        case let .group(group):
-            return try group.getPushTopics()
-        case let .dm(dm):
-            return try await dm.getPushTopics()
-        }
-    }
+	public func getPushTopics() async throws -> [String] {
+		switch self {
+		case let .group(group):
+			return try group.getPushTopics()
+		case let .dm(dm):
+			return try await dm.getPushTopics()
+		}
+	}
 
-	public func getDebugInformation() async throws -> ConversationDebugInfo  {
+	public func getDebugInformation() async throws -> ConversationDebugInfo {
 		switch self {
 		case let .group(group):
 			return try await group.getDebugInformation()
@@ -377,14 +432,14 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
-    // Returns a dictionary where the keys are inbox IDs and the values
-    // are the timestamp in nanoseconds of their last read receipt
-    public func getLastReadTimes() throws -> [String: Int64] {
-        switch self {
-            case let .group(group):
-            return try group.getLastReadTimes()
-        case let .dm(dm):
-            return try dm.getLastReadTimes()
-        }
-    }
+	// Returns a dictionary where the keys are inbox IDs and the values
+	// are the timestamp in nanoseconds of their last read receipt
+	public func getLastReadTimes() throws -> [String: Int64] {
+		switch self {
+		case let .group(group):
+			return try group.getLastReadTimes()
+		case let .dm(dm):
+			return try dm.getLastReadTimes()
+		}
+	}
 }

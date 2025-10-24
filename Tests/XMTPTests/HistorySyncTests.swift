@@ -12,6 +12,11 @@ import XCTest
 
 @available(iOS 15, *)
 class HistorySyncTests: XCTestCase {
+	override func setUp() {
+		super.setUp()
+		setupLocalEnv()
+	}
+
 	func testSyncConsent() async throws {
 		let fixtures = try await fixtures()
 
@@ -20,25 +25,26 @@ class HistorySyncTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db"
-					// useDefaultHistorySyncUrl: false
+				// useDefaultHistorySyncUrl: false
 			)
 		)
 
 		let group = try await alixClient.conversations.newGroup(
-			with: [fixtures.boClient.inboxID])
+			with: [fixtures.boClient.inboxID]
+		)
 		try await group.updateConsentState(state: .denied)
 		XCTAssertEqual(try group.consentState(), .denied)
 
 		let alixClient2 = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db2"
-					//                useDefaultHistorySyncUrl: false
+				//                useDefaultHistorySyncUrl: false
 			)
 		)
 
@@ -52,8 +58,8 @@ class HistorySyncTests: XCTestCase {
 		sleep(2)
 
 		if let dm2 = try await alixClient2.conversations.findConversation(
-			conversationId: group.id)
-		{
+			conversationId: group.id
+		) {
 			XCTAssertEqual(try dm2.consentState(), .denied)
 
 			try await alixClient2.preferences.setConsentState(
@@ -62,12 +68,13 @@ class HistorySyncTests: XCTestCase {
 						value: dm2.id,
 						entryType: .conversation_id,
 						consentType: .allowed
-					)
+					),
 				]
 			)
 			let convoState = try await alixClient2.preferences
 				.conversationState(
-					conversationId: dm2.id)
+					conversationId: dm2.id
+				)
 			XCTAssertEqual(convoState, .allowed)
 			XCTAssertEqual(try dm2.consentState(), .allowed)
 		}
@@ -81,25 +88,24 @@ class HistorySyncTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db"
-					//                useDefaultHistorySyncUrl: false
 			)
 		)
 
 		let group = try await alixClient.conversations.newGroup(
-			with: [fixtures.boClient.inboxID])
+			with: [fixtures.boClient.inboxID]
+		)
 		let messageCount = try await group.messages().count
 		XCTAssertEqual(messageCount, 1)
 
 		let alixClient2 = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db2"
-					//                useDefaultHistorySyncUrl: false
 			)
 		)
 
@@ -117,12 +123,12 @@ class HistorySyncTests: XCTestCase {
 		sleep(2)
 
 		if let group2 = try await alixClient2.conversations.findGroup(
-			groupId: group.id)
-		{
+			groupId: group.id
+		) {
 			let messageCount2 = try await group2.messages().count
 			XCTAssertEqual(messageCount2, 2)
 		} else {
-			XCTFail()
+			XCTFail("Group not found")
 		}
 	}
 
@@ -135,21 +141,21 @@ class HistorySyncTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db"
-					//                useDefaultHistorySyncUrl: false
+				//                useDefaultHistorySyncUrl: false
 			)
 		)
 
 		let alixGroup = try await alixClient.conversations.newGroup(with: [
-			fixtures.boClient.inboxID
+			fixtures.boClient.inboxID,
 		])
 
 		let alixClient2 = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db2"
 			)
@@ -158,16 +164,17 @@ class HistorySyncTests: XCTestCase {
 		try await alixGroup.send(content: "Hello")
 		try await alixClient.conversations.syncAllConversations()
 		try await alixClient2.conversations.syncAllConversations()
-		let alixGroup2 = try alixClient2.conversations.findGroup(
-			groupId: alixGroup.id)!
+		let alixGroup2Result = try await alixClient2.conversations.findGroup(
+			groupId: alixGroup.id
+		)
+		let alixGroup2 = try XCTUnwrap(alixGroup2Result)
 
 		var consentList = [ConsentRecord]()
 		let expectation = XCTestExpectation(description: "Stream Consent")
 		expectation.expectedFulfillmentCount = 2
 
 		Task(priority: .userInitiated) {
-			for try await entry in await alixClient.preferences.streamConsent()
-			{
+			for try await entry in await alixClient.preferences.streamConsent() {
 				consentList.append(entry)
 				expectation.fulfill()
 			}
@@ -175,14 +182,15 @@ class HistorySyncTests: XCTestCase {
 		sleep(1)
 		try await alixGroup2.updateConsentState(state: .denied)
 		let dm = try await alixClient2.conversations.newConversation(
-			with: fixtures.caroClient.inboxID)
+			with: fixtures.caroClient.inboxID
+		)
 		try await dm.updateConsentState(state: .denied)
 
 		sleep(5)
 		try await alixClient.conversations.syncAllConversations()
 		try await alixClient2.conversations.syncAllConversations()
 
-		await fulfillment(of: [expectation], timeout:5)
+		await fulfillment(of: [expectation], timeout: 5)
 		XCTAssertEqual(try alixGroup.consentState(), .denied)
 	}
 
@@ -192,7 +200,7 @@ class HistorySyncTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db"
 			)
@@ -214,7 +222,7 @@ class HistorySyncTests: XCTestCase {
 		let alixClient2 = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db2"
 			)
@@ -234,7 +242,7 @@ class HistorySyncTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db",
 				useDefaultHistorySyncUrl: false
@@ -242,14 +250,15 @@ class HistorySyncTests: XCTestCase {
 		)
 
 		let group = try await alixClient.conversations.newGroup(
-			with: [fixtures.boClient.inboxID])
+			with: [fixtures.boClient.inboxID]
+		)
 		try await group.updateConsentState(state: .denied)
 		XCTAssertEqual(try group.consentState(), .denied)
 
 		let alixClient2 = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db2",
 				useDefaultHistorySyncUrl: false
@@ -266,8 +275,8 @@ class HistorySyncTests: XCTestCase {
 		sleep(2)
 
 		if let dm2 = try await alixClient2.conversations.findConversation(
-			conversationId: group.id)
-		{
+			conversationId: group.id
+		) {
 			XCTAssertEqual(try dm2.consentState(), .denied)
 
 			try await alixClient2.preferences.setConsentState(
@@ -276,12 +285,13 @@ class HistorySyncTests: XCTestCase {
 						value: dm2.id,
 						entryType: .conversation_id,
 						consentType: .allowed
-					)
+					),
 				]
 			)
 			let convoState = try await alixClient2.preferences
 				.conversationState(
-					conversationId: dm2.id)
+					conversationId: dm2.id
+				)
 			XCTAssertEqual(convoState, .allowed)
 			XCTAssertEqual(try dm2.consentState(), .allowed)
 		}
@@ -295,7 +305,7 @@ class HistorySyncTests: XCTestCase {
 		let alixClient = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db",
 				useDefaultHistorySyncUrl: false
@@ -303,14 +313,15 @@ class HistorySyncTests: XCTestCase {
 		)
 
 		let group = try await alixClient.conversations.newGroup(
-			with: [fixtures.boClient.inboxID])
+			with: [fixtures.boClient.inboxID]
+		)
 		let messageCount = try await group.messages().count
 		XCTAssertEqual(messageCount, 1)
 
 		let alixClient2 = try await Client.create(
 			account: alix,
 			options: .init(
-				api: .init(env: .local, isSecure: false),
+				api: .init(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 				dbEncryptionKey: key,
 				dbDirectory: "xmtp_db2"
 			)
@@ -330,13 +341,12 @@ class HistorySyncTests: XCTestCase {
 		sleep(2)
 
 		if let group2 = try await alixClient2.conversations.findGroup(
-			groupId: group.id)
-		{
+			groupId: group.id
+		) {
 			let messageCount2 = try await group2.messages().count
 			XCTAssertEqual(messageCount2, 2)
 		} else {
-			XCTFail()
+			XCTFail("Could not find group")
 		}
 	}
-
 }
