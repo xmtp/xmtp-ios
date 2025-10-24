@@ -33,7 +33,7 @@ let package = Package(
 			name: "LibXMTPSwiftFFI",
 			url:
 			"https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.6.0-dev.3656d63/LibXMTPSwiftFFI.zip",
-			checksum: "d36b68a4520846c9bf4aee99425a681f1d2c18a8b15e3523c325621d6b7ede87"
+			checksum: "94c24c4623f5343454e3cd8533ec626cedd491ea97f6c06e93bb4fdff12772c5"
 		),
 		.target(
 			name: "XMTPiOS",
@@ -55,7 +55,7 @@ let package = Package(
             name: "LibXMTPSwiftFFIDynamic",
 			url:
 			"https://github.com/xmtp/libxmtp/releases/download/swift-bindings-dynamic-1.6.0-dev.ca1e5bf/LibXMTPSwiftFFIDynamic.zip",
-            checksum: "236a652f24b17a249328abb2029f4168e6dc298b6c6647bc9cba10cd5df15f7a"
+            checksum: "d7924e9f1c6e0afb1c8e46d6b5b03ae20c76bc991597b5ffda03f5372fcd4d99"
         ),
 		.target(
 			name: "XMTPTestHelpers",
