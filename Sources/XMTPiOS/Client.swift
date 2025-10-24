@@ -39,7 +39,7 @@ public struct ClientOptions {
 		public var appVersion: String?
 
 		// Future proofing - gateway URL support.
-		public var gatewayHost: String? = nil
+		public var gatewayHost: String?
 
 		public init(
 			env: XMTPEnvironment = .dev, isSecure: Bool = true,
