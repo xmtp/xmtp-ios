@@ -12,6 +12,12 @@ import UserNotifications
 public typealias NotificationSubscription = Notifications_V1_Subscription
 public typealias NotificationSubscriptionHmacKey = Notifications_V1_Subscription.HmacKey
 
+public enum DeliveryMechanism {
+	case apns(deviceToken: String)
+	case firebase(deviceToken: String)
+	case custom(token: String)
+}
+
 enum XMTPPushError: Error {
 	case noPushServer
 }
@@ -55,16 +61,17 @@ enum XMTPPushError: Error {
 		}
 
 		public func register(token: String) async throws {
+			try await register(deliveryMechanism: .apns(deviceToken: token))
+		}
+
+		public func register(deliveryMechanism: DeliveryMechanism) async throws {
 			if pushServer == "" {
 				throw XMTPPushError.noPushServer
 			}
 
 			let request = Notifications_V1_RegisterInstallationRequest.with { request in
 				request.installationID = installationID
-				request.deliveryMechanism = Notifications_V1_DeliveryMechanism.with { delivery in
-					delivery.apnsDeviceToken = token
-					delivery.deliveryMechanismType = .apnsDeviceToken(token)
-				}
+				request.deliveryMechanism = deliveryMechanism.toProtobuf()
 			}
 
 			_ = await client.registerInstallation(request: request)
@@ -141,6 +148,10 @@ enum XMTPPushError: Error {
 			fatalError("XMTPPush not available")
 		}
 
+		public func register(deliveryMechanism _: DeliveryMechanism) async throws {
+			fatalError("XMTPPush not available")
+		}
+
 		public func subscribe(topics _: [String]) async throws {
 			fatalError("XMTPPush not available")
 		}
@@ -158,3 +169,21 @@ enum XMTPPushError: Error {
 		}
 	}
 #endif
+
+extension DeliveryMechanism {
+	func toProtobuf() -> Notifications_V1_DeliveryMechanism {
+		return Notifications_V1_DeliveryMechanism.with { delivery in
+			switch self {
+			case .apns(let deviceToken):
+				delivery.apnsDeviceToken = deviceToken
+				delivery.deliveryMechanismType = .apnsDeviceToken(deviceToken)
+			case .firebase(let deviceToken):
+				delivery.firebaseDeviceToken = deviceToken
+				delivery.deliveryMechanismType = .firebaseDeviceToken(deviceToken)
+			case .custom(let token):
+				delivery.customToken = token
+				delivery.deliveryMechanismType = .customToken(token)
+			}
+		}
+	}
+}
