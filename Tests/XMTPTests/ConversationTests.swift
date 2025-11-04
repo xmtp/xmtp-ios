@@ -106,9 +106,9 @@ class ConversationTests: XCTestCase {
 		])
 
 		let convoCount = try await fixtures.boClient.conversations
-			.syncAllConversations().numSynced
+			.syncAllConversations().numEligible
 		let convoCountConsent = try await fixtures.boClient.conversations
-			.syncAllConversations(consentStates: [.allowed]).numSynced
+			.syncAllConversations(consentStates: [.allowed]).numEligible
 
 		XCTAssertEqual(convoCount, 3)
 		XCTAssertEqual(convoCountConsent, 3)
@@ -116,11 +116,11 @@ class ConversationTests: XCTestCase {
 		try await group.updateConsentState(state: .denied)
 
 		let convoCountAllowed = try await fixtures.boClient.conversations
-			.syncAllConversations(consentStates: [.allowed]).numSynced
+			.syncAllConversations(consentStates: [.allowed]).numEligible
 		let convoCountDenied = try await fixtures.boClient.conversations
-			.syncAllConversations(consentStates: [.denied]).numSynced
+			.syncAllConversations(consentStates: [.denied]).numEligible
 		let convoCountCombined = try await fixtures.boClient.conversations
-			.syncAllConversations(consentStates: [.denied, .allowed]).numSynced
+			.syncAllConversations(consentStates: [.denied, .allowed]).numEligible
 
 		XCTAssertEqual(convoCountAllowed, 2)
 		XCTAssertEqual(convoCountDenied, 2)
