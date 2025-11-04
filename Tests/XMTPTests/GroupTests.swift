@@ -1467,4 +1467,35 @@ class GroupTests: XCTestCase {
 
 		try fixtures.cleanUpDatabases()
 	}
+	
+	func testCanLeaveGroup() async throws {
+		let fixtures = try await fixtures()
+
+		// Create group with alix and bo and verify we have 2 members and group is active for Alix
+		let boGroup = try await fixtures.boClient.conversations.newGroup(
+			with: [fixtures.alixClient.inboxID]
+		)
+		_ = try await fixtures.alixClient.conversations.syncAllConversations()
+		_ = try await fixtures.boClient.conversations.syncAllConversations()
+		let alixGroup = try XCTUnwrap(fixtures.alixClient.conversations.findGroup(groupId: boGroup.id))
+		let groupMembers = try await boGroup.members
+		XCTAssert(groupMembers.count == 2)
+		XCTAssert(try alixGroup.isActive())
+		
+		
+		// Alix leaves group and bo syncs
+		try await alixGroup.leaveGroup()
+		try await alixGroup.sync()
+		try await boGroup.sync()
+		// Alix Group is still active until worker runs
+		XCTAssert(try alixGroup.isActive())
+		
+		// Delay here so that the removal is processed
+		// Verify 1 member and group is no longer active
+		try await Task.sleep(nanoseconds: 3_000_000_000) // 3 second
+		let groupMembersAfterLeave = try await boGroup.members
+		XCTAssert(groupMembersAfterLeave.count == 1)
+		try await alixGroup.sync()
+		XCTAssert(!(try alixGroup.isActive()))
+	}
 }
