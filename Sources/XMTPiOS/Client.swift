@@ -61,7 +61,7 @@ public struct ForkRecoveryOptions {
 	}
 
 	func toFfi() -> FfiForkRecoveryOpts {
-		return FfiForkRecoveryOpts(
+		FfiForkRecoveryOpts(
 			enableRecoveryRequests: enableRecoveryRequests.toFfi(),
 			groupsToRequestRecovery: groupsToRequestRecovery,
 			disableRecoveryResponses: disableRecoveryResponses,

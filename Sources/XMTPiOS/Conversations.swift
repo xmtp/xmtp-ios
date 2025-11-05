@@ -39,8 +39,8 @@ public struct GroupSyncSummary {
 	}
 
 	init(ffiGroupSyncSummary: FfiGroupSyncSummary) {
-		self.numEligible = ffiGroupSyncSummary.numEligible
-		self.numSynced = ffiGroupSyncSummary.numSynced
+		numEligible = ffiGroupSyncSummary.numEligible
+		numSynced = ffiGroupSyncSummary.numSynced
 	}
 }
 

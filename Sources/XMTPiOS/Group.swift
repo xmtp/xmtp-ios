@@ -757,7 +757,7 @@ public struct Group: Identifiable, Equatable, Hashable {
 	public func getLastReadTimes() throws -> [String: Int64] {
 		try ffiGroup.getLastReadTimes()
 	}
-	
+
 	public func leaveGroup() async throws {
 		try await ffiGroup.leaveGroup()
 	}
