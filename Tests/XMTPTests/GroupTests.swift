@@ -1166,7 +1166,7 @@ class GroupTests: XCTestCase {
 		do {
 			let start = Date()
 			let numGroupsSynced = try await fixtures.boClient.conversations
-				.syncAllConversations().numSynced
+				.syncAllConversations().numEligible
 			let end = Date()
 			print(end.timeIntervalSince(start))
 			XCTAssert(end.timeIntervalSince(start) < 1)
@@ -1192,13 +1192,13 @@ class GroupTests: XCTestCase {
 
 		// first syncAllGroups after removal still sync groups in order to process the removal
 		var numGroupsSynced = try await fixtures.boClient.conversations
-			.syncAllConversations().numSynced
+			.syncAllConversations().numEligible
 		XCTAssertEqual(numGroupsSynced, 101)
 
-		// next syncAllGroups only will sync active groups
+		// next syncAllGroups will not sync any groups, since there are no new messages
 		numGroupsSynced = try await fixtures.boClient.conversations
 			.syncAllConversations().numSynced
-		XCTAssertEqual(numGroupsSynced, 1)
+		XCTAssertEqual(numGroupsSynced, 0)
 		try fixtures.cleanUpDatabases()
 	}
 
