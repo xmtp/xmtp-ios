@@ -460,7 +460,9 @@ public final class Client {
 			v3Host: api.env.url,
 			gatewayHost: api.gatewayHost,
 			isSecure: api.isSecure,
-			appVersion: api.appVersion
+			appVersion: api.appVersion,
+			authCallback: nil, // TODO: implement and pass in FfiAuthCallback
+			authHandle: nil // TODO: implement and pass in FfiAuthHandle
 		)
 		await apiCache.setClient(newClient, forKey: cacheKey)
 		return newClient
@@ -484,7 +486,9 @@ public final class Client {
 			v3Host: api.env.url,
 			gatewayHost: api.gatewayHost,
 			isSecure: api.isSecure,
-			appVersion: api.appVersion
+			appVersion: api.appVersion,
+			authCallback: nil, // TODO: implement and pass in FfiAuthCallback
+			authHandle: nil // TODO: implement and pass in FfiAuthHandle
 		)
 		await apiCache.setSyncClient(newClient, forKey: cacheKey)
 		return newClient
