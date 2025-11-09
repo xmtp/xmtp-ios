@@ -202,6 +202,10 @@ public struct Group: Identifiable, Equatable, Hashable {
 		try ffiGroup.groupDescription()
 	}
 
+	public func appData() throws -> String {
+		try ffiGroup.appData()
+	}
+
 	public func updateName(name: String) async throws {
 		try await ffiGroup.updateGroupName(groupName: name)
 	}
@@ -216,6 +220,10 @@ public struct Group: Identifiable, Equatable, Hashable {
 		try await ffiGroup.updateGroupDescription(
 			groupDescription: description
 		)
+	}
+
+	public func updateAppData(appData: String) async throws {
+		try await ffiGroup.updateAppData(appData: appData)
 	}
 
 	public func updateAddMemberPermission(newPermissionOption: PermissionOption)
