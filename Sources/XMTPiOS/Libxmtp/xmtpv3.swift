@@ -6217,16 +6217,18 @@ public struct FfiCreateGroupOptions {
     public var groupDescription: String?
     public var customPermissionPolicySet: FfiPermissionPolicySet?
     public var messageDisappearingSettings: FfiMessageDisappearingSettings?
+    public var appData: String?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(permissions: FfiGroupPermissionsOptions?, groupName: String?, groupImageUrlSquare: String?, groupDescription: String?, customPermissionPolicySet: FfiPermissionPolicySet?, messageDisappearingSettings: FfiMessageDisappearingSettings?) {
+    public init(permissions: FfiGroupPermissionsOptions?, groupName: String?, groupImageUrlSquare: String?, groupDescription: String?, customPermissionPolicySet: FfiPermissionPolicySet?, messageDisappearingSettings: FfiMessageDisappearingSettings?, appData: String?) {
         self.permissions = permissions
         self.groupName = groupName
         self.groupImageUrlSquare = groupImageUrlSquare
         self.groupDescription = groupDescription
         self.customPermissionPolicySet = customPermissionPolicySet
         self.messageDisappearingSettings = messageDisappearingSettings
+        self.appData = appData
     }
 }
 
@@ -6255,6 +6257,9 @@ extension FfiCreateGroupOptions: Equatable, Hashable {
         if lhs.messageDisappearingSettings != rhs.messageDisappearingSettings {
             return false
         }
+        if lhs.appData != rhs.appData {
+            return false
+        }
         return true
     }
 
@@ -6265,6 +6270,7 @@ extension FfiCreateGroupOptions: Equatable, Hashable {
         hasher.combine(groupDescription)
         hasher.combine(customPermissionPolicySet)
         hasher.combine(messageDisappearingSettings)
+        hasher.combine(appData)
     }
 }
 
@@ -6282,7 +6288,8 @@ public struct FfiConverterTypeFfiCreateGroupOptions: FfiConverterRustBuffer {
                 groupImageUrlSquare: FfiConverterOptionString.read(from: &buf), 
                 groupDescription: FfiConverterOptionString.read(from: &buf), 
                 customPermissionPolicySet: FfiConverterOptionTypeFfiPermissionPolicySet.read(from: &buf), 
-                messageDisappearingSettings: FfiConverterOptionTypeFfiMessageDisappearingSettings.read(from: &buf)
+                messageDisappearingSettings: FfiConverterOptionTypeFfiMessageDisappearingSettings.read(from: &buf), 
+                appData: FfiConverterOptionString.read(from: &buf)
         )
     }
 
@@ -6293,6 +6300,7 @@ public struct FfiConverterTypeFfiCreateGroupOptions: FfiConverterRustBuffer {
         FfiConverterOptionString.write(value.groupDescription, into: &buf)
         FfiConverterOptionTypeFfiPermissionPolicySet.write(value.customPermissionPolicySet, into: &buf)
         FfiConverterOptionTypeFfiMessageDisappearingSettings.write(value.messageDisappearingSettings, into: &buf)
+        FfiConverterOptionString.write(value.appData, into: &buf)
     }
 }
 
