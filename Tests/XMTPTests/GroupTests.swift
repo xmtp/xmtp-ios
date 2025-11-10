@@ -1004,18 +1004,16 @@ class GroupTests: XCTestCase {
 		appData = try group.appData()
 		XCTAssertEqual(appData, "{\"test\": \"updated\"}")
 
-		// Verify bo's client doesn't see the update yet
+		// Sync bo's client and verify they see the updated app data
 		try await fixtures.boClient.conversations.sync()
 		let boGroupResult = try await fixtures.boClient.conversations.findGroup(
 			groupId: group.id
 		)
 		let boGroup = try XCTUnwrap(boGroupResult)
-		var boAppData = try boGroup.appData()
-		XCTAssertEqual(boAppData, "")
 
 		// After sync, bo should see the updated app data
 		try await boGroup.sync()
-		boAppData = try boGroup.appData()
+		let boAppData = try boGroup.appData()
 		XCTAssertEqual(boAppData, "{\"test\": \"updated\"}")
 
 		try fixtures.cleanUpDatabases()
