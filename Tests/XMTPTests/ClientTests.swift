@@ -826,7 +826,8 @@ class ClientTests: XCTestCase {
 			logLevel: .debug,
 			rotationSchedule: .hourly,
 			maxFiles: 3,
-			customLogDirectory: logDirectory
+			customLogDirectory: logDirectory,
+			processType: FfiProcessType.main
 		)
 
 		// Create a client
