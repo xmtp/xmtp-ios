@@ -1070,7 +1070,8 @@ public extension Client {
 		logLevel: LogLevel,
 		rotationSchedule: FfiLogRotation,
 		maxFiles: Int,
-		customLogDirectory: URL? = nil
+		customLogDirectory: URL? = nil,
+		processType: FfiProcessType = .main
 	) {
 		let fileManager = FileManager.default
 		let logDirectory =
@@ -1140,7 +1141,8 @@ public extension Client {
 				directory: logDirectory.path,
 				logLevel: logLevel.ffiLogLevel,
 				rotation: rotationSchedule,
-				maxFiles: UInt32(maxFiles)
+				maxFiles: UInt32(maxFiles),
+				processType: processType
 			)
 		} catch {
 			os_log(
