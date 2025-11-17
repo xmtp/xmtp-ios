@@ -3,11 +3,11 @@ import Foundation
 // MARK: - Public Types
 
 public struct Credential {
-	public let name: String
+	public let name: Optional<String>
 	public let value: String
 	public let expiresAtSeconds: Int64
 
-	public init(name: String, value: String, expiresAtSeconds: Int64) {
+	public init(name: String?, value: String, expiresAtSeconds: Int64) {
 		self.name = name
 		self.value = value
 		self.expiresAtSeconds = expiresAtSeconds
@@ -56,7 +56,7 @@ public class AuthHandle {
 
 // MARK: - Internal Wrappers
 
-private class InternalAuthCallback: FfiAuthCallback {
+private final class InternalAuthCallback: FfiAuthCallback, @unchecked Sendable {
 	let callback: AuthCallback
 
 	init(_ callback: @escaping AuthCallback) {
