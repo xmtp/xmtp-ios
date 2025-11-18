@@ -468,4 +468,116 @@ class EnrichedMessagesTests: XCTestCase {
 
 		try fixtures.cleanUpDatabases()
 	}
+
+	func testAttachmentWithReply() async throws {
+		// Register codecs
+		Client.register(codec: AttachmentCodec())
+		Client.register(codec: ReplyCodec())
+
+		let fixtures = try await fixtures()
+		let group = try await fixtures.alixClient.conversations.newGroup(with: [fixtures.boClient.inboxID])
+
+		// Create and send an attachment
+		let attachmentData = Data("Test file contents".utf8)
+		let attachment = Attachment(
+			filename: "document.pdf",
+			mimeType: "application/pdf",
+			data: attachmentData
+		)
+		let attachmentId = try await group.send(
+			content: attachment,
+			options: .init(contentType: ContentTypeAttachment)
+		)
+
+		// Create and send a reply to the attachment
+		let replyText = "Thanks for sharing this document!"
+		let reply = Reply(
+			reference: attachmentId,
+			content: replyText,
+			contentType: ContentTypeText
+		)
+		let replyId = try await group.send(
+			content: reply,
+			options: .init(contentType: ContentTypeReply)
+		)
+
+		// Retrieve messages using enrichedMessages
+		let messages = try await group.enrichedMessages()
+
+		// Should have: group_updated, attachment, reply (3 total)
+		XCTAssertEqual(messages.count, 3, "Should have 3 messages (group_updated, attachment, reply)")
+
+		// Verify content types
+		let contentTypes = Set(messages.map(\.contentTypeId.typeID))
+		XCTAssertTrue(contentTypes.contains("attachment"), "Should have attachment content type")
+		XCTAssertTrue(contentTypes.contains("reply"), "Should have reply content type")
+
+		// Find and verify the attachment message
+		guard let attachmentMessage = messages.first(where: { $0.id == attachmentId }) else {
+			XCTFail("Could not find attachment message")
+			return
+		}
+
+		// Verify attachment message metadata
+		XCTAssertEqual(attachmentMessage.contentTypeId.typeID, "attachment")
+		XCTAssertEqual(attachmentMessage.id, attachmentId)
+		XCTAssertNotNil(attachmentMessage.senderInboxId)
+		XCTAssertEqual(attachmentMessage.senderInboxId, fixtures.alixClient.inboxID)
+		XCTAssertNotNil(attachmentMessage.sentAt)
+		XCTAssertEqual(attachmentMessage.deliveryStatus, .published)
+
+		// Verify attachment content
+		let decodedAttachment: Attachment = try attachmentMessage.content()
+		XCTAssertEqual(decodedAttachment.filename, "document.pdf", "Attachment filename should match")
+		XCTAssertEqual(decodedAttachment.mimeType, "application/pdf", "Attachment MIME type should match")
+		XCTAssertEqual(decodedAttachment.data, attachmentData, "Attachment data should match")
+
+		// Verify attachment fallback
+		let attachmentFallback = try attachmentMessage.fallback
+		XCTAssertNotNil(attachmentFallback, "Attachment should have fallback text")
+		XCTAssertTrue(
+			attachmentFallback.contains("document.pdf"),
+			"Fallback should mention the filename"
+		)
+
+		// Find and verify the reply message
+		guard let replyMessage = messages.first(where: { $0.id == replyId }) else {
+			XCTFail("Could not find reply message")
+			return
+		}
+
+		// Verify reply message metadata
+		XCTAssertEqual(replyMessage.contentTypeId.typeID, "reply")
+		XCTAssertEqual(replyMessage.id, replyId)
+		XCTAssertEqual(replyMessage.senderInboxId, fixtures.alixClient.inboxID)
+		XCTAssertGreaterThan(replyMessage.sentAtNs, attachmentMessage.sentAtNs, "Reply should be sent after attachment")
+
+		// Verify reply content
+		let decodedReply: Reply = try replyMessage.content()
+		XCTAssertEqual(decodedReply.reference, attachmentId, "Reply reference should point to attachment ID")
+		XCTAssertEqual(decodedReply.contentType, ContentTypeText, "Reply should have text content type")
+		XCTAssertEqual(decodedReply.content as? String, replyText, "Reply text content should match")
+
+		// Verify reply fallback
+		let replyFallback = try replyMessage.fallback
+		XCTAssertNotNil(replyFallback, "Reply should have fallback text")
+		XCTAssertTrue(
+			replyFallback.contains(replyText),
+			"Reply fallback should mention the reply text"
+		)
+
+		// Verify that the reply's inReplyTo references the attachment (if populated)
+		if let inReplyTo = decodedReply.inReplyTo {
+			XCTAssertEqual(inReplyTo.id, attachmentId, "inReplyTo should reference the attachment message")
+			XCTAssertEqual(inReplyTo.contentTypeId.typeID, "attachment", "inReplyTo should have attachment content type")
+
+			// Verify we can decode the attachment from inReplyTo
+			let inReplyToAttachment: Attachment = try inReplyTo.content()
+			XCTAssertEqual(inReplyToAttachment.filename, "document.pdf")
+			XCTAssertEqual(inReplyToAttachment.mimeType, "application/pdf")
+			XCTAssertEqual(inReplyToAttachment.data, attachmentData)
+		}
+
+		try fixtures.cleanUpDatabases()
+	}
 }
