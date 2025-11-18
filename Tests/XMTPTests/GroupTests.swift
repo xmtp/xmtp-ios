@@ -988,6 +988,37 @@ class GroupTests: XCTestCase {
 		try fixtures.cleanUpDatabases()
 	}
 
+	func testCanUpdateGroupAppData() async throws {
+		let fixtures = try await fixtures()
+		let group = try await fixtures.alixClient.conversations.newGroup(
+			with: [fixtures.boClient.inboxID]
+		)
+
+		// Set initial app data
+		try await group.updateAppData(appData: "{\"test\": \"initial\"}")
+		var appData = try group.appData()
+		XCTAssertEqual(appData, "{\"test\": \"initial\"}")
+
+		// Update app data
+		try await group.updateAppData(appData: "{\"test\": \"updated\"}")
+		appData = try group.appData()
+		XCTAssertEqual(appData, "{\"test\": \"updated\"}")
+
+		// Sync bo's client and verify they see the updated app data
+		try await fixtures.boClient.conversations.sync()
+		let boGroupResult = try await fixtures.boClient.conversations.findGroup(
+			groupId: group.id
+		)
+		let boGroup = try XCTUnwrap(boGroupResult)
+
+		// After sync, bo should see the updated app data
+		try await boGroup.sync()
+		let boAppData = try boGroup.appData()
+		XCTAssertEqual(boAppData, "{\"test\": \"updated\"}")
+
+		try fixtures.cleanUpDatabases()
+	}
+
 	func testGroupConsent() async throws {
 		let fixtures = try await fixtures()
 		let group = try await fixtures.boClient.conversations.newGroup(with: [
