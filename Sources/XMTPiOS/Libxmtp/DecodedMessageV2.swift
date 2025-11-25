@@ -265,7 +265,8 @@ public struct DecodedMessageV2: Identifiable {
 			reference: reactionPayload.reference,
 			action: reactionPayload.action == .added ? .added : .removed,
 			content: reactionPayload.content,
-			schema: mapReactionSchema(reactionPayload.schema)
+			schema: mapReactionSchema(reactionPayload.schema),
+			referenceInboxId: reactionPayload.referenceInboxId
 		)
 	}
 
