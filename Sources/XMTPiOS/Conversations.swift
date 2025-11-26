@@ -561,7 +561,8 @@ public class Conversations {
 		name: String = "",
 		imageUrl: String = "",
 		description: String = "",
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String? = nil
 	) async throws -> Group {
 		try await newGroupInternal(
 			with: inboxIds,
@@ -573,7 +574,8 @@ public class Conversations {
 			imageUrl: imageUrl,
 			description: description,
 			permissionPolicySet: nil,
-			disappearingMessageSettings: disappearingMessageSettings
+			disappearingMessageSettings: disappearingMessageSettings,
+			appData: appData
 		)
 	}
 
