@@ -535,7 +535,8 @@ public class Conversations {
 		imageUrl: String = "",
 		description: String = "",
 		permissionPolicySet: FfiPermissionPolicySet? = nil,
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String? = nil
 	) async throws -> Group {
 		let group = try await ffiConversations.createGroup(
 			accountIdentities: identities.map(\.ffiPrivate),
@@ -547,7 +548,8 @@ public class Conversations {
 				customPermissionPolicySet: permissionPolicySet,
 				messageDisappearingSettings: toFfiDisappearingMessageSettings(
 					disappearingMessageSettings
-				)
+				),
+				appData: appData
 			)
 		).groupFromFFI(client: client)
 		return group
@@ -603,7 +605,8 @@ public class Conversations {
 		imageUrl: String = "",
 		description: String = "",
 		permissionPolicySet: FfiPermissionPolicySet? = nil,
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String? = nil
 	) async throws -> Group {
 		try validateInboxIds(inboxIds)
 		let group = try await ffiConversations.createGroupWithInboxIds(
@@ -616,7 +619,8 @@ public class Conversations {
 				customPermissionPolicySet: permissionPolicySet,
 				messageDisappearingSettings: toFfiDisappearingMessageSettings(
 					disappearingMessageSettings
-				)
+				),
+				appData: appData
 			)
 		).groupFromFFI(client: client)
 		return group
@@ -627,7 +631,8 @@ public class Conversations {
 		groupName: String = "",
 		groupImageUrlSquare: String = "",
 		groupDescription: String = "",
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String? = nil
 	) throws -> Group {
 		let ffiOpts = FfiCreateGroupOptions(
 			permissions:
@@ -640,7 +645,8 @@ public class Conversations {
 			customPermissionPolicySet: nil,
 			messageDisappearingSettings: toFfiDisappearingMessageSettings(
 				disappearingMessageSettings
-			)
+			),
+			appData: appData
 		)
 
 		let ffiGroup = try ffiConversations.createGroupOptimistic(opts: ffiOpts)
