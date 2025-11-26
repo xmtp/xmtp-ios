@@ -16,7 +16,7 @@ public let ContentTypeReaction = ContentTypeID(
 
 public struct Reaction: Codable {
 	public var reference: String
-	public var referenceInboxId: String
+	public var referenceInboxId: String?
 	public var action: ReactionAction
 	public var content: String
 	public var schema: ReactionSchema

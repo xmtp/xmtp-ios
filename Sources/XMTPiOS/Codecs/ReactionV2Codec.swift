@@ -24,7 +24,7 @@ public struct ReactionV2Codec: ContentCodec {
 		// Convert Reaction to FfiReactionPayload for encoding
 		let ffiReaction = FfiReactionPayload(
 			reference: content.reference,
-			referenceInboxId: content.referenceInboxId,
+			referenceInboxId: content.referenceInboxId ?? "",
 			action: content.action.toFfiReactionAction(),
 			content: content.content,
 			schema: content.schema.toFfiReactionSchema()

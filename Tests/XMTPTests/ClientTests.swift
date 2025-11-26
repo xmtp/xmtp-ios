@@ -924,7 +924,7 @@ class ClientTests: XCTestCase {
 		let apiStats2 = alix.debugInformation.apiStatistics
 		XCTAssertEqual(0, apiStats2.uploadKeyPackage)
 		XCTAssertEqual(0, apiStats2.fetchKeyPackage)
-		XCTAssertEqual(6, apiStats2.sendGroupMessages)
+		XCTAssertEqual(5, apiStats2.sendGroupMessages)
 		XCTAssertEqual(0, apiStats2.sendWelcomeMessages)
 		XCTAssertEqual(1, apiStats2.queryWelcomeMessages)
 		XCTAssertEqual(1, apiStats2.subscribeWelcomes)
