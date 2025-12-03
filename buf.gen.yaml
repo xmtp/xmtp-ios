@@ -6,3 +6,4 @@ plugins:
     out: Sources/XMTPiOS/Proto
     opt:
       - Visibility=Public
+      - FileNaming=PathToUnderscores
