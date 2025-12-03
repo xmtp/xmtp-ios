@@ -65,7 +65,7 @@ public enum Xmtp_MessageApi_V1_SortDirection: SwiftProtobuf.Enum, Swift.CaseIter
 /// This is based off of the go-waku Index type, but with the
 /// receiverTime and pubsubTopic removed for simplicity.
 /// Both removed fields are optional
-public struct Xmtp_MessageApi_V1_IndexCursor: Sendable {
+public struct Xmtp_MessageApi_V1_IndexCursor: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -140,7 +140,7 @@ public struct Xmtp_MessageApi_V1_PagingInfo: Sendable {
 }
 
 /// Envelope encapsulates a message while in transit.
-public struct Xmtp_MessageApi_V1_Envelope: Sendable {
+public struct Xmtp_MessageApi_V1_Envelope: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -293,12 +293,19 @@ public struct Xmtp_MessageApi_V1_BatchQueryResponse: Sendable {
 fileprivate let _protobuf_package = "xmtp.message_api.v1"
 
 extension Xmtp_MessageApi_V1_SortDirection: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0SORT_DIRECTION_UNSPECIFIED\0\u{1}SORT_DIRECTION_ASCENDING\0\u{1}SORT_DIRECTION_DESCENDING\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "SORT_DIRECTION_UNSPECIFIED"),
+    1: .same(proto: "SORT_DIRECTION_ASCENDING"),
+    2: .same(proto: "SORT_DIRECTION_DESCENDING"),
+  ]
 }
 
 extension Xmtp_MessageApi_V1_IndexCursor: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".IndexCursor"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}digest\0\u{3}sender_time_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "digest"),
+    2: .standard(proto: "sender_time_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -333,7 +340,9 @@ extension Xmtp_MessageApi_V1_IndexCursor: SwiftProtobuf.Message, SwiftProtobuf._
 
 extension Xmtp_MessageApi_V1_Cursor: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Cursor"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}index\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "index"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -379,7 +388,11 @@ extension Xmtp_MessageApi_V1_Cursor: SwiftProtobuf.Message, SwiftProtobuf._Messa
 
 extension Xmtp_MessageApi_V1_PagingInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PagingInfo"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}limit\0\u{1}cursor\0\u{1}direction\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "limit"),
+    2: .same(proto: "cursor"),
+    3: .same(proto: "direction"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -423,7 +436,11 @@ extension Xmtp_MessageApi_V1_PagingInfo: SwiftProtobuf.Message, SwiftProtobuf._M
 
 extension Xmtp_MessageApi_V1_Envelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Envelope"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}content_topic\0\u{3}timestamp_ns\0\u{1}message\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "content_topic"),
+    2: .standard(proto: "timestamp_ns"),
+    3: .same(proto: "message"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -463,7 +480,9 @@ extension Xmtp_MessageApi_V1_Envelope: SwiftProtobuf.Message, SwiftProtobuf._Mes
 
 extension Xmtp_MessageApi_V1_PublishRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PublishRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}envelopes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "envelopes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -512,7 +531,9 @@ extension Xmtp_MessageApi_V1_PublishResponse: SwiftProtobuf.Message, SwiftProtob
 
 extension Xmtp_MessageApi_V1_SubscribeRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SubscribeRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}content_topics\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "content_topics"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -561,7 +582,12 @@ extension Xmtp_MessageApi_V1_SubscribeAllRequest: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_MessageApi_V1_QueryRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}content_topics\0\u{3}start_time_ns\0\u{3}end_time_ns\0\u{3}paging_info\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "content_topics"),
+    2: .standard(proto: "start_time_ns"),
+    3: .standard(proto: "end_time_ns"),
+    4: .standard(proto: "paging_info"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -610,7 +636,10 @@ extension Xmtp_MessageApi_V1_QueryRequest: SwiftProtobuf.Message, SwiftProtobuf.
 
 extension Xmtp_MessageApi_V1_QueryResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}envelopes\0\u{3}paging_info\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "envelopes"),
+    2: .standard(proto: "paging_info"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -649,7 +678,9 @@ extension Xmtp_MessageApi_V1_QueryResponse: SwiftProtobuf.Message, SwiftProtobuf
 
 extension Xmtp_MessageApi_V1_BatchQueryRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".BatchQueryRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -679,7 +710,9 @@ extension Xmtp_MessageApi_V1_BatchQueryRequest: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_MessageApi_V1_BatchQueryResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".BatchQueryResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

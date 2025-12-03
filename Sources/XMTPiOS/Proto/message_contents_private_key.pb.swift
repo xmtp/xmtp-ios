@@ -65,7 +65,7 @@ public struct Xmtp_MessageContents_SignedPrivateKey: Sendable {
   }
 
   /// EC: SECP256k1
-  public struct Secp256k1: Sendable {
+  public struct Secp256k1: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -148,7 +148,7 @@ public struct Xmtp_MessageContents_PrivateKey: Sendable {
   }
 
   /// EC: SECP256k1
-  public struct Secp256k1: Sendable {
+  public struct Secp256k1: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -231,7 +231,7 @@ public struct Xmtp_MessageContents_PrivateKeyBundle: Sendable {
 /// i.e. EIP-191 signature of a "storage signature" message with
 /// the pre-key embedded in it.
 /// (see xmtp-js::PrivateKeyBundle.toEncryptedBytes for details)
-public struct Xmtp_MessageContents_EncryptedPrivateKeyBundleV1: Sendable {
+public struct Xmtp_MessageContents_EncryptedPrivateKeyBundleV1: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -288,7 +288,11 @@ fileprivate let _protobuf_package = "xmtp.message_contents"
 
 extension Xmtp_MessageContents_SignedPrivateKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignedPrivateKey"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}created_ns\0\u{1}secp256k1\0\u{3}public_key\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "created_ns"),
+    2: .same(proto: "secp256k1"),
+    3: .standard(proto: "public_key"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -344,7 +348,9 @@ extension Xmtp_MessageContents_SignedPrivateKey: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_MessageContents_SignedPrivateKey.Secp256k1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_SignedPrivateKey.protoMessageName + ".Secp256k1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}bytes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "bytes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -374,7 +380,10 @@ extension Xmtp_MessageContents_SignedPrivateKey.Secp256k1: SwiftProtobuf.Message
 
 extension Xmtp_MessageContents_PrivateKeyBundleV2: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PrivateKeyBundleV2"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}identity_key\0\u{3}pre_keys\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "identity_key"),
+    2: .standard(proto: "pre_keys"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -413,7 +422,11 @@ extension Xmtp_MessageContents_PrivateKeyBundleV2: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_MessageContents_PrivateKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PrivateKey"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}timestamp\0\u{1}secp256k1\0\u{3}public_key\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "timestamp"),
+    2: .same(proto: "secp256k1"),
+    3: .standard(proto: "public_key"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -469,7 +482,9 @@ extension Xmtp_MessageContents_PrivateKey: SwiftProtobuf.Message, SwiftProtobuf.
 
 extension Xmtp_MessageContents_PrivateKey.Secp256k1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_PrivateKey.protoMessageName + ".Secp256k1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}bytes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "bytes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -499,7 +514,10 @@ extension Xmtp_MessageContents_PrivateKey.Secp256k1: SwiftProtobuf.Message, Swif
 
 extension Xmtp_MessageContents_PrivateKeyBundleV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PrivateKeyBundleV1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}identity_key\0\u{3}pre_keys\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "identity_key"),
+    2: .standard(proto: "pre_keys"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -538,7 +556,13 @@ extension Xmtp_MessageContents_PrivateKeyBundleV1: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_MessageContents_PrivateKeyBundle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PrivateKeyBundle"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0\u{1}v2\0\u{c}\u{3}\u{1}")
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(
+      reservedNames: [],
+      reservedRanges: [3..<4],
+      numberNameMappings: [
+        1: .same(proto: "v1"),
+        2: .same(proto: "v2"),
+  ])
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -605,7 +629,10 @@ extension Xmtp_MessageContents_PrivateKeyBundle: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_MessageContents_EncryptedPrivateKeyBundleV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".EncryptedPrivateKeyBundleV1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}wallet_pre_key\0\u{1}ciphertext\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "wallet_pre_key"),
+    2: .same(proto: "ciphertext"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -644,7 +671,9 @@ extension Xmtp_MessageContents_EncryptedPrivateKeyBundleV1: SwiftProtobuf.Messag
 
 extension Xmtp_MessageContents_EncryptedPrivateKeyBundle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".EncryptedPrivateKeyBundle"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

@@ -85,7 +85,7 @@ public struct Xmtp_Mls_MessageContents_ContentTypeId: Sendable {
 
 /// EncodedContent bundles the content with metadata identifying its type
 /// and parameters required for correct decoding and presentation of the content.
-public struct Xmtp_Mls_MessageContents_EncodedContent: Sendable {
+public struct Xmtp_Mls_MessageContents_EncodedContent: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -175,7 +175,7 @@ public struct Xmtp_Mls_MessageContents_PlaintextEnvelope: Sendable {
   }
 
   /// Version 1 of the encrypted envelope
-  public struct V1: Sendable {
+  public struct V1: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -193,7 +193,7 @@ public struct Xmtp_Mls_MessageContents_PlaintextEnvelope: Sendable {
   }
 
   /// Version 2 of the encrypted envelope
-  public struct V2: Sendable {
+  public struct V2: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -242,7 +242,7 @@ public struct Xmtp_Mls_MessageContents_PlaintextEnvelope: Sendable {
 
     public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    public enum OneOf_MessageType: Equatable, Sendable {
+    public enum OneOf_MessageType: Equatable, @unchecked Sendable {
       /// Expected to be EncodedContent
       case content(Data)
       /// Initiator sends a request to receive sync payload
@@ -265,12 +265,20 @@ public struct Xmtp_Mls_MessageContents_PlaintextEnvelope: Sendable {
 fileprivate let _protobuf_package = "xmtp.mls.message_contents"
 
 extension Xmtp_Mls_MessageContents_Compression: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0COMPRESSION_DEFLATE\0\u{1}COMPRESSION_GZIP\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "COMPRESSION_DEFLATE"),
+    1: .same(proto: "COMPRESSION_GZIP"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_ContentTypeId: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ContentTypeId"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}authority_id\0\u{3}type_id\0\u{3}version_major\0\u{3}version_minor\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "authority_id"),
+    2: .standard(proto: "type_id"),
+    3: .standard(proto: "version_major"),
+    4: .standard(proto: "version_minor"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -315,7 +323,13 @@ extension Xmtp_Mls_MessageContents_ContentTypeId: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_Mls_MessageContents_EncodedContent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".EncodedContent"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}parameters\0\u{1}fallback\0\u{1}content\0\u{1}compression\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "type"),
+    2: .same(proto: "parameters"),
+    3: .same(proto: "fallback"),
+    5: .same(proto: "compression"),
+    4: .same(proto: "content"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -369,7 +383,10 @@ extension Xmtp_Mls_MessageContents_EncodedContent: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_Mls_MessageContents_PlaintextEnvelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PlaintextEnvelope"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0\u{1}v2\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+    2: .same(proto: "v2"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -436,7 +453,10 @@ extension Xmtp_Mls_MessageContents_PlaintextEnvelope: SwiftProtobuf.Message, Swi
 
 extension Xmtp_Mls_MessageContents_PlaintextEnvelope.V1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_PlaintextEnvelope.protoMessageName + ".V1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}content\0\u{3}idempotency_key\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "content"),
+    2: .standard(proto: "idempotency_key"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -471,7 +491,16 @@ extension Xmtp_Mls_MessageContents_PlaintextEnvelope.V1: SwiftProtobuf.Message, 
 
 extension Xmtp_Mls_MessageContents_PlaintextEnvelope.V2: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_PlaintextEnvelope.protoMessageName + ".V2"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}idempotency_key\0\u{1}content\0\u{3}device_sync_request\0\u{3}device_sync_reply\0\u{3}user_preference_update\0\u{b}readd_request\0\u{c}\u{6}\u{1}")
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(
+      reservedNames: ["readd_request"],
+      reservedRanges: [6..<7],
+      numberNameMappings: [
+        1: .standard(proto: "idempotency_key"),
+        2: .same(proto: "content"),
+        3: .standard(proto: "device_sync_request"),
+        4: .standard(proto: "device_sync_reply"),
+        5: .standard(proto: "user_preference_update"),
+  ])
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

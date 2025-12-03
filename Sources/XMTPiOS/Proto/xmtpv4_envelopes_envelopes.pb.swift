@@ -37,7 +37,7 @@ public struct Xmtp_Xmtpv4_Envelopes_Cursor: Sendable {
 }
 
 /// Data visible to the server that has been authenticated by the client.
-public struct Xmtp_Xmtpv4_Envelopes_AuthenticatedData: Sendable {
+public struct Xmtp_Xmtpv4_Envelopes_AuthenticatedData: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -144,7 +144,7 @@ public struct Xmtp_Xmtpv4_Envelopes_ClientEnvelope: Sendable {
 }
 
 /// Wraps client envelope with payer signature
-public struct Xmtp_Xmtpv4_Envelopes_PayerEnvelope: Sendable {
+public struct Xmtp_Xmtpv4_Envelopes_PayerEnvelope: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -173,7 +173,7 @@ public struct Xmtp_Xmtpv4_Envelopes_PayerEnvelope: Sendable {
 }
 
 /// For blockchain envelopes, these fields are set by the smart contract
-public struct Xmtp_Xmtpv4_Envelopes_UnsignedOriginatorEnvelope: Sendable {
+public struct Xmtp_Xmtpv4_Envelopes_UnsignedOriginatorEnvelope: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -200,7 +200,7 @@ public struct Xmtp_Xmtpv4_Envelopes_UnsignedOriginatorEnvelope: Sendable {
 }
 
 /// An alternative to a signature for blockchain payloads
-public struct Xmtp_Xmtpv4_Envelopes_BlockchainProof: Sendable {
+public struct Xmtp_Xmtpv4_Envelopes_BlockchainProof: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -213,7 +213,7 @@ public struct Xmtp_Xmtpv4_Envelopes_BlockchainProof: Sendable {
 }
 
 /// Signed originator envelope
-public struct Xmtp_Xmtpv4_Envelopes_OriginatorEnvelope: Sendable {
+public struct Xmtp_Xmtpv4_Envelopes_OriginatorEnvelope: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -256,7 +256,9 @@ fileprivate let _protobuf_package = "xmtp.xmtpv4.envelopes"
 
 extension Xmtp_Xmtpv4_Envelopes_Cursor: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Cursor"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}node_id_to_sequence_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "node_id_to_sequence_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -286,7 +288,10 @@ extension Xmtp_Xmtpv4_Envelopes_Cursor: SwiftProtobuf.Message, SwiftProtobuf._Me
 
 extension Xmtp_Xmtpv4_Envelopes_AuthenticatedData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".AuthenticatedData"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{4}\u{2}target_topic\0\u{3}depends_on\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    2: .standard(proto: "target_topic"),
+    3: .standard(proto: "depends_on"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -325,7 +330,15 @@ extension Xmtp_Xmtpv4_Envelopes_AuthenticatedData: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_Xmtpv4_Envelopes_ClientEnvelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ClientEnvelope"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}aad\0\u{3}group_message\0\u{3}welcome_message\0\u{3}upload_key_package\0\u{3}identity_update\0\u{3}payer_report\0\u{3}payer_report_attestation\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "aad"),
+    2: .standard(proto: "group_message"),
+    3: .standard(proto: "welcome_message"),
+    4: .standard(proto: "upload_key_package"),
+    5: .standard(proto: "identity_update"),
+    6: .standard(proto: "payer_report"),
+    7: .standard(proto: "payer_report_attestation"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -465,7 +478,12 @@ extension Xmtp_Xmtpv4_Envelopes_ClientEnvelope: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_Xmtpv4_Envelopes_PayerEnvelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PayerEnvelope"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}unsigned_client_envelope\0\u{3}payer_signature\0\u{3}target_originator\0\u{3}message_retention_days\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "unsigned_client_envelope"),
+    2: .standard(proto: "payer_signature"),
+    3: .standard(proto: "target_originator"),
+    4: .standard(proto: "message_retention_days"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -514,7 +532,15 @@ extension Xmtp_Xmtpv4_Envelopes_PayerEnvelope: SwiftProtobuf.Message, SwiftProto
 
 extension Xmtp_Xmtpv4_Envelopes_UnsignedOriginatorEnvelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".UnsignedOriginatorEnvelope"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}originator_node_id\0\u{3}originator_sequence_id\0\u{3}originator_ns\0\u{3}payer_envelope_bytes\0\u{3}base_fee_picodollars\0\u{3}congestion_fee_picodollars\0\u{3}expiry_unixtime\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "originator_node_id"),
+    2: .standard(proto: "originator_sequence_id"),
+    3: .standard(proto: "originator_ns"),
+    4: .standard(proto: "payer_envelope_bytes"),
+    5: .standard(proto: "base_fee_picodollars"),
+    6: .standard(proto: "congestion_fee_picodollars"),
+    7: .standard(proto: "expiry_unixtime"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -574,7 +600,9 @@ extension Xmtp_Xmtpv4_Envelopes_UnsignedOriginatorEnvelope: SwiftProtobuf.Messag
 
 extension Xmtp_Xmtpv4_Envelopes_BlockchainProof: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".BlockchainProof"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}transaction_hash\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "transaction_hash"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -604,7 +632,11 @@ extension Xmtp_Xmtpv4_Envelopes_BlockchainProof: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_Xmtpv4_Envelopes_OriginatorEnvelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".OriginatorEnvelope"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}unsigned_originator_envelope\0\u{3}originator_signature\0\u{3}blockchain_proof\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "unsigned_originator_envelope"),
+    2: .standard(proto: "originator_signature"),
+    3: .standard(proto: "blockchain_proof"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

@@ -52,7 +52,7 @@ public struct Xmtp_Mls_MessageContents_OneshotMessage: Sendable {
 /// A request sent by an installation to recover from a fork. Other members
 /// may remove and readd that installation from the group.
 /// XIP: https://community.xmtp.org/t/xip-68-draft-automated-fork-recovery/951
-public struct Xmtp_Mls_MessageContents_ReaddRequest: Sendable {
+public struct Xmtp_Mls_MessageContents_ReaddRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -75,7 +75,9 @@ fileprivate let _protobuf_package = "xmtp.mls.message_contents"
 
 extension Xmtp_Mls_MessageContents_OneshotMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".OneshotMessage"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}readd_request\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "readd_request"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -121,7 +123,10 @@ extension Xmtp_Mls_MessageContents_OneshotMessage: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_Mls_MessageContents_ReaddRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ReaddRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_id\0\u{3}latest_commit_sequence_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_id"),
+    2: .standard(proto: "latest_commit_sequence_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

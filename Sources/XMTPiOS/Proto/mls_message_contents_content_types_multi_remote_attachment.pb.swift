@@ -45,7 +45,7 @@ public struct Xmtp_Mls_MessageContents_ContentTypes_MultiRemoteAttachment: Senda
   public init() {}
 }
 
-public struct Xmtp_Mls_MessageContents_ContentTypes_RemoteAttachmentInfo: Sendable {
+public struct Xmtp_Mls_MessageContents_ContentTypes_RemoteAttachmentInfo: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -102,7 +102,9 @@ fileprivate let _protobuf_package = "xmtp.mls.message_contents.content_types"
 
 extension Xmtp_Mls_MessageContents_ContentTypes_MultiRemoteAttachment: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MultiRemoteAttachment"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}attachments\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "attachments"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -132,7 +134,16 @@ extension Xmtp_Mls_MessageContents_ContentTypes_MultiRemoteAttachment: SwiftProt
 
 extension Xmtp_Mls_MessageContents_ContentTypes_RemoteAttachmentInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RemoteAttachmentInfo"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}content_digest\0\u{1}secret\0\u{1}nonce\0\u{1}salt\0\u{1}scheme\0\u{1}url\0\u{3}content_length\0\u{1}filename\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "content_digest"),
+    2: .same(proto: "secret"),
+    3: .same(proto: "nonce"),
+    4: .same(proto: "salt"),
+    5: .same(proto: "scheme"),
+    6: .same(proto: "url"),
+    7: .standard(proto: "content_length"),
+    8: .same(proto: "filename"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

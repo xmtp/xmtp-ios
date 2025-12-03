@@ -461,7 +461,9 @@ fileprivate let _protobuf_package = "xmtp.mls.message_contents"
 
 extension Xmtp_Mls_MessageContents_GroupMutablePermissionsV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GroupMutablePermissionsV1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}policies\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "policies"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -495,7 +497,14 @@ extension Xmtp_Mls_MessageContents_GroupMutablePermissionsV1: SwiftProtobuf.Mess
 
 extension Xmtp_Mls_MessageContents_PolicySet: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PolicySet"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}add_member_policy\0\u{3}remove_member_policy\0\u{3}update_metadata_policy\0\u{3}add_admin_policy\0\u{3}remove_admin_policy\0\u{3}update_permissions_policy\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "add_member_policy"),
+    2: .standard(proto: "remove_member_policy"),
+    3: .standard(proto: "update_metadata_policy"),
+    4: .standard(proto: "add_admin_policy"),
+    5: .standard(proto: "remove_admin_policy"),
+    6: .standard(proto: "update_permissions_policy"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -554,7 +563,11 @@ extension Xmtp_Mls_MessageContents_PolicySet: SwiftProtobuf.Message, SwiftProtob
 
 extension Xmtp_Mls_MessageContents_MembershipPolicy: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MembershipPolicy"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}base\0\u{3}and_condition\0\u{3}any_condition\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "base"),
+    2: .standard(proto: "and_condition"),
+    3: .standard(proto: "any_condition"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -632,12 +645,20 @@ extension Xmtp_Mls_MessageContents_MembershipPolicy: SwiftProtobuf.Message, Swif
 }
 
 extension Xmtp_Mls_MessageContents_MembershipPolicy.BasePolicy: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0BASE_POLICY_UNSPECIFIED\0\u{1}BASE_POLICY_ALLOW\0\u{1}BASE_POLICY_DENY\0\u{1}BASE_POLICY_ALLOW_IF_ADMIN_OR_SUPER_ADMIN\0\u{1}BASE_POLICY_ALLOW_IF_SUPER_ADMIN\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "BASE_POLICY_UNSPECIFIED"),
+    1: .same(proto: "BASE_POLICY_ALLOW"),
+    2: .same(proto: "BASE_POLICY_DENY"),
+    3: .same(proto: "BASE_POLICY_ALLOW_IF_ADMIN_OR_SUPER_ADMIN"),
+    4: .same(proto: "BASE_POLICY_ALLOW_IF_SUPER_ADMIN"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_MembershipPolicy.AndCondition: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_MembershipPolicy.protoMessageName + ".AndCondition"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}policies\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "policies"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -667,7 +688,9 @@ extension Xmtp_Mls_MessageContents_MembershipPolicy.AndCondition: SwiftProtobuf.
 
 extension Xmtp_Mls_MessageContents_MembershipPolicy.AnyCondition: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_MembershipPolicy.protoMessageName + ".AnyCondition"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}policies\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "policies"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -697,7 +720,11 @@ extension Xmtp_Mls_MessageContents_MembershipPolicy.AnyCondition: SwiftProtobuf.
 
 extension Xmtp_Mls_MessageContents_MetadataPolicy: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MetadataPolicy"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}base\0\u{3}and_condition\0\u{3}any_condition\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "base"),
+    2: .standard(proto: "and_condition"),
+    3: .standard(proto: "any_condition"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -775,12 +802,20 @@ extension Xmtp_Mls_MessageContents_MetadataPolicy: SwiftProtobuf.Message, SwiftP
 }
 
 extension Xmtp_Mls_MessageContents_MetadataPolicy.MetadataBasePolicy: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0METADATA_BASE_POLICY_UNSPECIFIED\0\u{1}METADATA_BASE_POLICY_ALLOW\0\u{1}METADATA_BASE_POLICY_DENY\0\u{1}METADATA_BASE_POLICY_ALLOW_IF_ADMIN\0\u{1}METADATA_BASE_POLICY_ALLOW_IF_SUPER_ADMIN\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "METADATA_BASE_POLICY_UNSPECIFIED"),
+    1: .same(proto: "METADATA_BASE_POLICY_ALLOW"),
+    2: .same(proto: "METADATA_BASE_POLICY_DENY"),
+    3: .same(proto: "METADATA_BASE_POLICY_ALLOW_IF_ADMIN"),
+    4: .same(proto: "METADATA_BASE_POLICY_ALLOW_IF_SUPER_ADMIN"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_MetadataPolicy.AndCondition: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_MetadataPolicy.protoMessageName + ".AndCondition"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}policies\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "policies"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -810,7 +845,9 @@ extension Xmtp_Mls_MessageContents_MetadataPolicy.AndCondition: SwiftProtobuf.Me
 
 extension Xmtp_Mls_MessageContents_MetadataPolicy.AnyCondition: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_MetadataPolicy.protoMessageName + ".AnyCondition"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}policies\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "policies"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -840,7 +877,11 @@ extension Xmtp_Mls_MessageContents_MetadataPolicy.AnyCondition: SwiftProtobuf.Me
 
 extension Xmtp_Mls_MessageContents_PermissionsUpdatePolicy: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PermissionsUpdatePolicy"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}base\0\u{3}and_condition\0\u{3}any_condition\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "base"),
+    2: .standard(proto: "and_condition"),
+    3: .standard(proto: "any_condition"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -918,12 +959,19 @@ extension Xmtp_Mls_MessageContents_PermissionsUpdatePolicy: SwiftProtobuf.Messag
 }
 
 extension Xmtp_Mls_MessageContents_PermissionsUpdatePolicy.PermissionsBasePolicy: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0PERMISSIONS_BASE_POLICY_UNSPECIFIED\0\u{1}PERMISSIONS_BASE_POLICY_DENY\0\u{1}PERMISSIONS_BASE_POLICY_ALLOW_IF_ADMIN\0\u{1}PERMISSIONS_BASE_POLICY_ALLOW_IF_SUPER_ADMIN\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "PERMISSIONS_BASE_POLICY_UNSPECIFIED"),
+    1: .same(proto: "PERMISSIONS_BASE_POLICY_DENY"),
+    2: .same(proto: "PERMISSIONS_BASE_POLICY_ALLOW_IF_ADMIN"),
+    3: .same(proto: "PERMISSIONS_BASE_POLICY_ALLOW_IF_SUPER_ADMIN"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_PermissionsUpdatePolicy.AndCondition: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_PermissionsUpdatePolicy.protoMessageName + ".AndCondition"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}policies\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "policies"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -953,7 +1001,9 @@ extension Xmtp_Mls_MessageContents_PermissionsUpdatePolicy.AndCondition: SwiftPr
 
 extension Xmtp_Mls_MessageContents_PermissionsUpdatePolicy.AnyCondition: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_PermissionsUpdatePolicy.protoMessageName + ".AnyCondition"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}policies\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "policies"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

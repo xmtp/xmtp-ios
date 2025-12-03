@@ -25,7 +25,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 
 /// Query for envelopes, shared by query and subscribe endpoints
 /// Either topics or originator_node_ids may be set, but not both
-public struct Xmtp_Xmtpv4_MessageApi_EnvelopesQuery: Sendable {
+public struct Xmtp_Xmtpv4_MessageApi_EnvelopesQuery: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -216,7 +216,7 @@ public struct Xmtp_Xmtpv4_MessageApi_GetInboxIdsResponse: Sendable {
 }
 
 /// Request to get the newest envelope for a given topic
-public struct Xmtp_Xmtpv4_MessageApi_GetNewestEnvelopeRequest: Sendable {
+public struct Xmtp_Xmtpv4_MessageApi_GetNewestEnvelopeRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -269,7 +269,11 @@ fileprivate let _protobuf_package = "xmtp.xmtpv4.message_api"
 
 extension Xmtp_Xmtpv4_MessageApi_EnvelopesQuery: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".EnvelopesQuery"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}topics\0\u{3}originator_node_ids\0\u{3}last_seen\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "topics"),
+    2: .standard(proto: "originator_node_ids"),
+    3: .standard(proto: "last_seen"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -313,7 +317,9 @@ extension Xmtp_Xmtpv4_MessageApi_EnvelopesQuery: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_Xmtpv4_MessageApi_SubscribeEnvelopesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SubscribeEnvelopesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}query\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "query"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -347,7 +353,9 @@ extension Xmtp_Xmtpv4_MessageApi_SubscribeEnvelopesRequest: SwiftProtobuf.Messag
 
 extension Xmtp_Xmtpv4_MessageApi_SubscribeEnvelopesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SubscribeEnvelopesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}envelopes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "envelopes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -377,7 +385,10 @@ extension Xmtp_Xmtpv4_MessageApi_SubscribeEnvelopesResponse: SwiftProtobuf.Messa
 
 extension Xmtp_Xmtpv4_MessageApi_QueryEnvelopesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryEnvelopesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}query\0\u{1}limit\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "query"),
+    2: .same(proto: "limit"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -416,7 +427,9 @@ extension Xmtp_Xmtpv4_MessageApi_QueryEnvelopesRequest: SwiftProtobuf.Message, S
 
 extension Xmtp_Xmtpv4_MessageApi_QueryEnvelopesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryEnvelopesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}envelopes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "envelopes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -446,7 +459,9 @@ extension Xmtp_Xmtpv4_MessageApi_QueryEnvelopesResponse: SwiftProtobuf.Message, 
 
 extension Xmtp_Xmtpv4_MessageApi_PublishPayerEnvelopesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PublishPayerEnvelopesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}payer_envelopes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "payer_envelopes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -476,7 +491,9 @@ extension Xmtp_Xmtpv4_MessageApi_PublishPayerEnvelopesRequest: SwiftProtobuf.Mes
 
 extension Xmtp_Xmtpv4_MessageApi_PublishPayerEnvelopesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PublishPayerEnvelopesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}originator_envelopes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "originator_envelopes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -506,7 +523,9 @@ extension Xmtp_Xmtpv4_MessageApi_PublishPayerEnvelopesResponse: SwiftProtobuf.Me
 
 extension Xmtp_Xmtpv4_MessageApi_GetInboxIdsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetInboxIdsRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -536,7 +555,10 @@ extension Xmtp_Xmtpv4_MessageApi_GetInboxIdsRequest: SwiftProtobuf.Message, Swif
 
 extension Xmtp_Xmtpv4_MessageApi_GetInboxIdsRequest.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Xmtpv4_MessageApi_GetInboxIdsRequest.protoMessageName + ".Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}identifier\0\u{3}identifier_kind\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "identifier"),
+    2: .standard(proto: "identifier_kind"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -571,7 +593,9 @@ extension Xmtp_Xmtpv4_MessageApi_GetInboxIdsRequest.Request: SwiftProtobuf.Messa
 
 extension Xmtp_Xmtpv4_MessageApi_GetInboxIdsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetInboxIdsResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -601,7 +625,11 @@ extension Xmtp_Xmtpv4_MessageApi_GetInboxIdsResponse: SwiftProtobuf.Message, Swi
 
 extension Xmtp_Xmtpv4_MessageApi_GetInboxIdsResponse.Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Xmtpv4_MessageApi_GetInboxIdsResponse.protoMessageName + ".Response"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}identifier\0\u{3}inbox_id\0\u{3}identifier_kind\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "identifier"),
+    2: .standard(proto: "inbox_id"),
+    3: .standard(proto: "identifier_kind"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -645,7 +673,9 @@ extension Xmtp_Xmtpv4_MessageApi_GetInboxIdsResponse.Response: SwiftProtobuf.Mes
 
 extension Xmtp_Xmtpv4_MessageApi_GetNewestEnvelopeRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetNewestEnvelopeRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}topics\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "topics"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -675,7 +705,9 @@ extension Xmtp_Xmtpv4_MessageApi_GetNewestEnvelopeRequest: SwiftProtobuf.Message
 
 extension Xmtp_Xmtpv4_MessageApi_GetNewestEnvelopeResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetNewestEnvelopeResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}results\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "results"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -705,7 +737,9 @@ extension Xmtp_Xmtpv4_MessageApi_GetNewestEnvelopeResponse: SwiftProtobuf.Messag
 
 extension Xmtp_Xmtpv4_MessageApi_GetNewestEnvelopeResponse.Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Xmtpv4_MessageApi_GetNewestEnvelopeResponse.protoMessageName + ".Response"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}originator_envelope\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "originator_envelope"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

@@ -177,7 +177,7 @@ public enum Xmtp_DeviceSync_MessageBackup_ContentTypeSave: SwiftProtobuf.Enum, S
 }
 
 /// Proto representation of a stored group message
-public struct Xmtp_DeviceSync_MessageBackup_GroupMessageSave: Sendable {
+public struct Xmtp_DeviceSync_MessageBackup_GroupMessageSave: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -247,20 +247,57 @@ public struct Xmtp_DeviceSync_MessageBackup_GroupMessageSave: Sendable {
 fileprivate let _protobuf_package = "xmtp.device_sync.message_backup"
 
 extension Xmtp_DeviceSync_MessageBackup_GroupMessageKindSave: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0GROUP_MESSAGE_KIND_SAVE_UNSPECIFIED\0\u{1}GROUP_MESSAGE_KIND_SAVE_APPLICATION\0\u{1}GROUP_MESSAGE_KIND_SAVE_MEMBERSHIP_CHANGE\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "GROUP_MESSAGE_KIND_SAVE_UNSPECIFIED"),
+    1: .same(proto: "GROUP_MESSAGE_KIND_SAVE_APPLICATION"),
+    2: .same(proto: "GROUP_MESSAGE_KIND_SAVE_MEMBERSHIP_CHANGE"),
+  ]
 }
 
 extension Xmtp_DeviceSync_MessageBackup_DeliveryStatusSave: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0DELIVERY_STATUS_SAVE_UNSPECIFIED\0\u{1}DELIVERY_STATUS_SAVE_UNPUBLISHED\0\u{1}DELIVERY_STATUS_SAVE_PUBLISHED\0\u{1}DELIVERY_STATUS_SAVE_FAILED\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "DELIVERY_STATUS_SAVE_UNSPECIFIED"),
+    1: .same(proto: "DELIVERY_STATUS_SAVE_UNPUBLISHED"),
+    2: .same(proto: "DELIVERY_STATUS_SAVE_PUBLISHED"),
+    3: .same(proto: "DELIVERY_STATUS_SAVE_FAILED"),
+  ]
 }
 
 extension Xmtp_DeviceSync_MessageBackup_ContentTypeSave: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CONTENT_TYPE_SAVE_UNSPECIFIED\0\u{1}CONTENT_TYPE_SAVE_UNKNOWN\0\u{1}CONTENT_TYPE_SAVE_TEXT\0\u{1}CONTENT_TYPE_SAVE_GROUP_MEMBERSHIP_CHANGE\0\u{1}CONTENT_TYPE_SAVE_GROUP_UPDATED\0\u{1}CONTENT_TYPE_SAVE_REACTION\0\u{1}CONTENT_TYPE_SAVE_READ_RECEIPT\0\u{1}CONTENT_TYPE_SAVE_REPLY\0\u{1}CONTENT_TYPE_SAVE_ATTACHMENT\0\u{1}CONTENT_TYPE_SAVE_REMOTE_ATTACHMENT\0\u{1}CONTENT_TYPE_SAVE_TRANSACTION_REFERENCE\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "CONTENT_TYPE_SAVE_UNSPECIFIED"),
+    1: .same(proto: "CONTENT_TYPE_SAVE_UNKNOWN"),
+    2: .same(proto: "CONTENT_TYPE_SAVE_TEXT"),
+    3: .same(proto: "CONTENT_TYPE_SAVE_GROUP_MEMBERSHIP_CHANGE"),
+    4: .same(proto: "CONTENT_TYPE_SAVE_GROUP_UPDATED"),
+    5: .same(proto: "CONTENT_TYPE_SAVE_REACTION"),
+    6: .same(proto: "CONTENT_TYPE_SAVE_READ_RECEIPT"),
+    7: .same(proto: "CONTENT_TYPE_SAVE_REPLY"),
+    8: .same(proto: "CONTENT_TYPE_SAVE_ATTACHMENT"),
+    9: .same(proto: "CONTENT_TYPE_SAVE_REMOTE_ATTACHMENT"),
+    10: .same(proto: "CONTENT_TYPE_SAVE_TRANSACTION_REFERENCE"),
+  ]
 }
 
 extension Xmtp_DeviceSync_MessageBackup_GroupMessageSave: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GroupMessageSave"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}group_id\0\u{3}decrypted_message_bytes\0\u{3}sent_at_ns\0\u{1}kind\0\u{3}sender_installation_id\0\u{3}sender_inbox_id\0\u{3}delivery_status\0\u{3}content_type\0\u{3}version_major\0\u{3}version_minor\0\u{3}authority_id\0\u{3}reference_id\0\u{3}sequence_id\0\u{3}originator_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "id"),
+    2: .standard(proto: "group_id"),
+    3: .standard(proto: "decrypted_message_bytes"),
+    4: .standard(proto: "sent_at_ns"),
+    5: .same(proto: "kind"),
+    6: .standard(proto: "sender_installation_id"),
+    7: .standard(proto: "sender_inbox_id"),
+    8: .standard(proto: "delivery_status"),
+    9: .standard(proto: "content_type"),
+    10: .standard(proto: "version_major"),
+    11: .standard(proto: "version_minor"),
+    12: .standard(proto: "authority_id"),
+    13: .standard(proto: "reference_id"),
+    14: .standard(proto: "sequence_id"),
+    15: .standard(proto: "originator_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

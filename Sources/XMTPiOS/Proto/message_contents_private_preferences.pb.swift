@@ -213,7 +213,14 @@ fileprivate let _protobuf_package = "xmtp.message_contents"
 
 extension Xmtp_MessageContents_PrivatePreferencesAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PrivatePreferencesAction"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}allow_address\0\u{3}deny_address\0\u{3}allow_group\0\u{3}deny_group\0\u{3}allow_inbox_id\0\u{3}deny_inbox_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "allow_address"),
+    2: .standard(proto: "deny_address"),
+    3: .standard(proto: "allow_group"),
+    4: .standard(proto: "deny_group"),
+    5: .standard(proto: "allow_inbox_id"),
+    6: .standard(proto: "deny_inbox_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -348,7 +355,9 @@ extension Xmtp_MessageContents_PrivatePreferencesAction: SwiftProtobuf.Message, 
 
 extension Xmtp_MessageContents_PrivatePreferencesAction.AllowAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_PrivatePreferencesAction.protoMessageName + ".AllowAddress"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}wallet_addresses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "wallet_addresses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -378,7 +387,9 @@ extension Xmtp_MessageContents_PrivatePreferencesAction.AllowAddress: SwiftProto
 
 extension Xmtp_MessageContents_PrivatePreferencesAction.DenyAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_PrivatePreferencesAction.protoMessageName + ".DenyAddress"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}wallet_addresses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "wallet_addresses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -408,7 +419,9 @@ extension Xmtp_MessageContents_PrivatePreferencesAction.DenyAddress: SwiftProtob
 
 extension Xmtp_MessageContents_PrivatePreferencesAction.AllowInboxId: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_PrivatePreferencesAction.protoMessageName + ".AllowInboxId"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}inbox_ids\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "inbox_ids"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -438,7 +451,9 @@ extension Xmtp_MessageContents_PrivatePreferencesAction.AllowInboxId: SwiftProto
 
 extension Xmtp_MessageContents_PrivatePreferencesAction.DenyInboxId: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_PrivatePreferencesAction.protoMessageName + ".DenyInboxId"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}inbox_ids\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "inbox_ids"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -468,7 +483,9 @@ extension Xmtp_MessageContents_PrivatePreferencesAction.DenyInboxId: SwiftProtob
 
 extension Xmtp_MessageContents_PrivatePreferencesAction.AllowGroup: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_PrivatePreferencesAction.protoMessageName + ".AllowGroup"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_ids\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_ids"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -498,7 +515,9 @@ extension Xmtp_MessageContents_PrivatePreferencesAction.AllowGroup: SwiftProtobu
 
 extension Xmtp_MessageContents_PrivatePreferencesAction.DenyGroup: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_PrivatePreferencesAction.protoMessageName + ".DenyGroup"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_ids\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_ids"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -528,7 +547,9 @@ extension Xmtp_MessageContents_PrivatePreferencesAction.DenyGroup: SwiftProtobuf
 
 extension Xmtp_MessageContents_PrivatePreferencesPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PrivatePreferencesPayload"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

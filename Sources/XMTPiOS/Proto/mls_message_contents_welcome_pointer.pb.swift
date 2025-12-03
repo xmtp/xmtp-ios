@@ -118,7 +118,7 @@ public struct Xmtp_Mls_MessageContents_WelcomePointer: Sendable {
   }
 
   /// Points to a V1 WelcomeMessage
-  public struct WelcomeV1Pointer: Sendable {
+  public struct WelcomeV1Pointer: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -164,16 +164,24 @@ public struct Xmtp_Mls_MessageContents_WelcomePointeeEncryptionAeadTypesExtensio
 fileprivate let _protobuf_package = "xmtp.mls.message_contents"
 
 extension Xmtp_Mls_MessageContents_WelcomePointeeEncryptionAeadType: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0WELCOME_POINTEE_ENCRYPTION_AEAD_TYPE_UNSPECIFIED\0\u{2}\u{3}WELCOME_POINTEE_ENCRYPTION_AEAD_TYPE_CHACHA20_POLY1305\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "WELCOME_POINTEE_ENCRYPTION_AEAD_TYPE_UNSPECIFIED"),
+    3: .same(proto: "WELCOME_POINTEE_ENCRYPTION_AEAD_TYPE_CHACHA20_POLY1305"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_WelcomePointerWrapperAlgorithm: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0WELCOME_POINTER_WRAPPER_ALGORITHM_UNSPECIFIED\0\u{2}\u{2}WELCOME_POINTER_WRAPPER_ALGORITHM_XWING_MLKEM_768_DRAFT_6\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "WELCOME_POINTER_WRAPPER_ALGORITHM_UNSPECIFIED"),
+    2: .same(proto: "WELCOME_POINTER_WRAPPER_ALGORITHM_XWING_MLKEM_768_DRAFT_6"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_WelcomePointer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".WelcomePointer"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}welcome_v1_pointer\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "welcome_v1_pointer"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -219,7 +227,13 @@ extension Xmtp_Mls_MessageContents_WelcomePointer: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_Mls_MessageContents_WelcomePointer.WelcomeV1Pointer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_WelcomePointer.protoMessageName + ".WelcomeV1Pointer"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}destination\0\u{3}aead_type\0\u{3}encryption_key\0\u{3}data_nonce\0\u{3}welcome_metadata_nonce\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "destination"),
+    2: .standard(proto: "aead_type"),
+    3: .standard(proto: "encryption_key"),
+    4: .standard(proto: "data_nonce"),
+    5: .standard(proto: "welcome_metadata_nonce"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -269,7 +283,9 @@ extension Xmtp_Mls_MessageContents_WelcomePointer.WelcomeV1Pointer: SwiftProtobu
 
 extension Xmtp_Mls_MessageContents_WelcomePointeeEncryptionAeadTypesExtension: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".WelcomePointeeEncryptionAeadTypesExtension"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}supported_aead_types\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "supported_aead_types"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

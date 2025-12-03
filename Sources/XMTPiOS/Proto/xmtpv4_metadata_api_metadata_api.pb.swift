@@ -176,7 +176,11 @@ public struct Xmtp_Xmtpv4_MetadataApi_GetPayerInfoResponse: Sendable {
 fileprivate let _protobuf_package = "xmtp.xmtpv4.metadata_api"
 
 extension Xmtp_Xmtpv4_MetadataApi_PayerInfoGranularity: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0PAYER_INFO_GRANULARITY_UNSPECIFIED\0\u{1}PAYER_INFO_GRANULARITY_HOUR\0\u{1}PAYER_INFO_GRANULARITY_DAY\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "PAYER_INFO_GRANULARITY_UNSPECIFIED"),
+    1: .same(proto: "PAYER_INFO_GRANULARITY_HOUR"),
+    2: .same(proto: "PAYER_INFO_GRANULARITY_DAY"),
+  ]
 }
 
 extension Xmtp_Xmtpv4_MetadataApi_GetSyncCursorRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -200,7 +204,9 @@ extension Xmtp_Xmtpv4_MetadataApi_GetSyncCursorRequest: SwiftProtobuf.Message, S
 
 extension Xmtp_Xmtpv4_MetadataApi_GetSyncCursorResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetSyncCursorResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}latest_sync\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "latest_sync"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -253,7 +259,9 @@ extension Xmtp_Xmtpv4_MetadataApi_GetVersionRequest: SwiftProtobuf.Message, Swif
 
 extension Xmtp_Xmtpv4_MetadataApi_GetVersionResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetVersionResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}version\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "version"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -283,7 +291,10 @@ extension Xmtp_Xmtpv4_MetadataApi_GetVersionResponse: SwiftProtobuf.Message, Swi
 
 extension Xmtp_Xmtpv4_MetadataApi_GetPayerInfoRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetPayerInfoRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}payer_addresses\0\u{1}granularity\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "payer_addresses"),
+    2: .same(proto: "granularity"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -318,7 +329,9 @@ extension Xmtp_Xmtpv4_MetadataApi_GetPayerInfoRequest: SwiftProtobuf.Message, Sw
 
 extension Xmtp_Xmtpv4_MetadataApi_GetPayerInfoResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetPayerInfoResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}payer_info\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "payer_info"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -348,7 +361,11 @@ extension Xmtp_Xmtpv4_MetadataApi_GetPayerInfoResponse: SwiftProtobuf.Message, S
 
 extension Xmtp_Xmtpv4_MetadataApi_GetPayerInfoResponse.PeriodSummary: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Xmtpv4_MetadataApi_GetPayerInfoResponse.protoMessageName + ".PeriodSummary"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}amount_spent_picodollars\0\u{3}num_messages\0\u{3}period_start_unix_seconds\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "amount_spent_picodollars"),
+    2: .standard(proto: "num_messages"),
+    3: .standard(proto: "period_start_unix_seconds"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -388,7 +405,9 @@ extension Xmtp_Xmtpv4_MetadataApi_GetPayerInfoResponse.PeriodSummary: SwiftProto
 
 extension Xmtp_Xmtpv4_MetadataApi_GetPayerInfoResponse.PayerInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Xmtpv4_MetadataApi_GetPayerInfoResponse.protoMessageName + ".PayerInfo"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}period_summaries\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "period_summaries"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

@@ -114,7 +114,7 @@ public struct Xmtp_MessageContents_InvitationV1: Sendable {
 
   /// Supported encryption schemes
   /// AES256-GCM-HKDF-SHA256
-  public struct Aes256gcmHkdfsha256: Sendable {
+  public struct Aes256gcmHkdfsha256: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -192,7 +192,7 @@ public struct Xmtp_MessageContents_SealedInvitationHeaderV1: Sendable {
 /// Invitation encrypted with key material derived from the sender's and
 /// recipient's public key bundles using simplified X3DH where
 /// the sender's ephemeral key is replaced with sender's pre-key.
-public struct Xmtp_MessageContents_SealedInvitationV1: Sendable {
+public struct Xmtp_MessageContents_SealedInvitationV1: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -269,12 +269,20 @@ public struct Xmtp_MessageContents_ConsentProofPayload: Sendable {
 fileprivate let _protobuf_package = "xmtp.message_contents"
 
 extension Xmtp_MessageContents_ConsentProofPayloadVersion: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CONSENT_PROOF_PAYLOAD_VERSION_UNSPECIFIED\0\u{1}CONSENT_PROOF_PAYLOAD_VERSION_1\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "CONSENT_PROOF_PAYLOAD_VERSION_UNSPECIFIED"),
+    1: .same(proto: "CONSENT_PROOF_PAYLOAD_VERSION_1"),
+  ]
 }
 
 extension Xmtp_MessageContents_InvitationV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".InvitationV1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}topic\0\u{1}context\0\u{3}aes256_gcm_hkdf_sha256\0\u{3}consent_proof\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "topic"),
+    2: .same(proto: "context"),
+    3: .standard(proto: "aes256_gcm_hkdf_sha256"),
+    4: .standard(proto: "consent_proof"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -335,7 +343,9 @@ extension Xmtp_MessageContents_InvitationV1: SwiftProtobuf.Message, SwiftProtobu
 
 extension Xmtp_MessageContents_InvitationV1.Aes256gcmHkdfsha256: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_InvitationV1.protoMessageName + ".Aes256gcmHkdfsha256"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_material\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_material"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -365,7 +375,10 @@ extension Xmtp_MessageContents_InvitationV1.Aes256gcmHkdfsha256: SwiftProtobuf.M
 
 extension Xmtp_MessageContents_InvitationV1.Context: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_InvitationV1.protoMessageName + ".Context"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}conversation_id\0\u{1}metadata\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "conversation_id"),
+    2: .same(proto: "metadata"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -400,7 +413,11 @@ extension Xmtp_MessageContents_InvitationV1.Context: SwiftProtobuf.Message, Swif
 
 extension Xmtp_MessageContents_SealedInvitationHeaderV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SealedInvitationHeaderV1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}sender\0\u{1}recipient\0\u{3}created_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "sender"),
+    2: .same(proto: "recipient"),
+    3: .standard(proto: "created_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -444,7 +461,10 @@ extension Xmtp_MessageContents_SealedInvitationHeaderV1: SwiftProtobuf.Message, 
 
 extension Xmtp_MessageContents_SealedInvitationV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SealedInvitationV1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}header_bytes\0\u{1}ciphertext\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "header_bytes"),
+    2: .same(proto: "ciphertext"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -483,7 +503,12 @@ extension Xmtp_MessageContents_SealedInvitationV1: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_MessageContents_SealedInvitation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SealedInvitation"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0\u{c}\u{2}\u{1}")
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(
+      reservedNames: [],
+      reservedRanges: [2..<3],
+      numberNameMappings: [
+        1: .same(proto: "v1"),
+  ])
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -529,7 +554,11 @@ extension Xmtp_MessageContents_SealedInvitation: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_MessageContents_ConsentProofPayload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ConsentProofPayload"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}signature\0\u{1}timestamp\0\u{3}payload_version\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "signature"),
+    2: .same(proto: "timestamp"),
+    3: .standard(proto: "payload_version"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

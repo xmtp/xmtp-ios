@@ -78,7 +78,14 @@ fileprivate let _protobuf_package = "xmtp.mls.message_contents"
 
 extension Xmtp_Mls_MessageContents_GroupMutableMetadataV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GroupMutableMetadataV1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}attributes\0\u{3}admin_list\0\u{3}super_admin_list\0\u{b}commit_log_signer\0\u{c}\u{4}\u{1}")
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(
+      reservedNames: ["commit_log_signer"],
+      reservedRanges: [4..<5],
+      numberNameMappings: [
+        1: .same(proto: "attributes"),
+        2: .standard(proto: "admin_list"),
+        3: .standard(proto: "super_admin_list"),
+  ])
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -122,7 +129,9 @@ extension Xmtp_Mls_MessageContents_GroupMutableMetadataV1: SwiftProtobuf.Message
 
 extension Xmtp_Mls_MessageContents_Inboxes: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Inboxes"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}inbox_ids\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "inbox_ids"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

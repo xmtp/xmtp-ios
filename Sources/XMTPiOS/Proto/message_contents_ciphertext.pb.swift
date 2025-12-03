@@ -51,7 +51,7 @@ public struct Xmtp_MessageContents_Ciphertext: Sendable {
 
   /// Encryption: AES256-GCM
   /// Key derivation function: HKDF-SHA256
-  public struct Aes256gcmHkdfsha256: Sendable {
+  public struct Aes256gcmHkdfsha256: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -74,7 +74,7 @@ public struct Xmtp_MessageContents_Ciphertext: Sendable {
 }
 
 /// SignedEciesCiphertext represents an ECIES encrypted payload and a signature
-public struct Xmtp_MessageContents_SignedEciesCiphertext: Sendable {
+public struct Xmtp_MessageContents_SignedEciesCiphertext: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -95,7 +95,7 @@ public struct Xmtp_MessageContents_SignedEciesCiphertext: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Ecies is ciphertext encrypted using ECIES with a MAC
-  public struct Ecies: Sendable {
+  public struct Ecies: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -128,7 +128,9 @@ fileprivate let _protobuf_package = "xmtp.message_contents"
 
 extension Xmtp_MessageContents_Ciphertext: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Ciphertext"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}aes256_gcm_hkdf_sha256\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "aes256_gcm_hkdf_sha256"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -174,7 +176,11 @@ extension Xmtp_MessageContents_Ciphertext: SwiftProtobuf.Message, SwiftProtobuf.
 
 extension Xmtp_MessageContents_Ciphertext.Aes256gcmHkdfsha256: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_Ciphertext.protoMessageName + ".Aes256gcmHkdfsha256"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}hkdf_salt\0\u{3}gcm_nonce\0\u{1}payload\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "hkdf_salt"),
+    2: .standard(proto: "gcm_nonce"),
+    3: .same(proto: "payload"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -214,7 +220,10 @@ extension Xmtp_MessageContents_Ciphertext.Aes256gcmHkdfsha256: SwiftProtobuf.Mes
 
 extension Xmtp_MessageContents_SignedEciesCiphertext: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignedEciesCiphertext"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}ecies_bytes\0\u{1}signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "ecies_bytes"),
+    2: .same(proto: "signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -253,7 +262,12 @@ extension Xmtp_MessageContents_SignedEciesCiphertext: SwiftProtobuf.Message, Swi
 
 extension Xmtp_MessageContents_SignedEciesCiphertext.Ecies: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_SignedEciesCiphertext.protoMessageName + ".Ecies"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}ephemeral_public_key\0\u{1}iv\0\u{1}mac\0\u{1}ciphertext\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "ephemeral_public_key"),
+    2: .same(proto: "iv"),
+    3: .same(proto: "mac"),
+    4: .same(proto: "ciphertext"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

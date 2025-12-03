@@ -57,7 +57,7 @@ public struct Xmtp_MessageContents_Signature: Sendable {
   }
 
   /// ECDSA signature bytes and the recovery bit
-  public struct ECDSACompact: Sendable {
+  public struct ECDSACompact: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -77,7 +77,7 @@ public struct Xmtp_MessageContents_Signature: Sendable {
   /// produced by xmtp-js::PublicKey.signWithWallet function, i.e.
   /// EIP-191 signature of a "Create Identity" message with the key embedded.
   /// Used to sign identity keys.
-  public struct WalletECDSACompact: Sendable {
+  public struct WalletECDSACompact: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -102,7 +102,10 @@ fileprivate let _protobuf_package = "xmtp.message_contents"
 
 extension Xmtp_MessageContents_Signature: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Signature"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}ecdsa_compact\0\u{3}wallet_ecdsa_compact\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "ecdsa_compact"),
+    2: .standard(proto: "wallet_ecdsa_compact"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -169,7 +172,10 @@ extension Xmtp_MessageContents_Signature: SwiftProtobuf.Message, SwiftProtobuf._
 
 extension Xmtp_MessageContents_Signature.ECDSACompact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_Signature.protoMessageName + ".ECDSACompact"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}bytes\0\u{1}recovery\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "bytes"),
+    2: .same(proto: "recovery"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -204,7 +210,10 @@ extension Xmtp_MessageContents_Signature.ECDSACompact: SwiftProtobuf.Message, Sw
 
 extension Xmtp_MessageContents_Signature.WalletECDSACompact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MessageContents_Signature.protoMessageName + ".WalletECDSACompact"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}bytes\0\u{1}recovery\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "bytes"),
+    2: .same(proto: "recovery"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

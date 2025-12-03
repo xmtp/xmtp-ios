@@ -185,7 +185,7 @@ public struct Xmtp_Xmtpv4_MessageApi_UnsignedMisbehaviorReport: Sendable {
   public init() {}
 }
 
-public struct Xmtp_Xmtpv4_MessageApi_MisbehaviorReport: Sendable {
+public struct Xmtp_Xmtpv4_MessageApi_MisbehaviorReport: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -273,12 +273,27 @@ public struct Xmtp_Xmtpv4_MessageApi_QueryMisbehaviorReportsResponse: Sendable {
 fileprivate let _protobuf_package = "xmtp.xmtpv4.message_api"
 
 extension Xmtp_Xmtpv4_MessageApi_Misbehavior: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0MISBEHAVIOR_UNSPECIFIED\0\u{1}MISBEHAVIOR_UNRESPONSIVE_NODE\0\u{1}MISBEHAVIOR_SLOW_NODE\0\u{1}MISBEHAVIOR_FAILED_REQUEST\0\u{1}MISBEHAVIOR_OUT_OF_ORDER\0\u{1}MISBEHAVIOR_DUPLICATE_SEQUENCE_ID\0\u{1}MISBEHAVIOR_CAUSAL_ORDERING\0\u{1}MISBEHAVIOR_INVALID_PAYLOAD\0\u{1}MISBEHAVIOR_BLOCKCHAIN_INCONSISTENCY\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "MISBEHAVIOR_UNSPECIFIED"),
+    1: .same(proto: "MISBEHAVIOR_UNRESPONSIVE_NODE"),
+    2: .same(proto: "MISBEHAVIOR_SLOW_NODE"),
+    3: .same(proto: "MISBEHAVIOR_FAILED_REQUEST"),
+    4: .same(proto: "MISBEHAVIOR_OUT_OF_ORDER"),
+    5: .same(proto: "MISBEHAVIOR_DUPLICATE_SEQUENCE_ID"),
+    6: .same(proto: "MISBEHAVIOR_CAUSAL_ORDERING"),
+    7: .same(proto: "MISBEHAVIOR_INVALID_PAYLOAD"),
+    8: .same(proto: "MISBEHAVIOR_BLOCKCHAIN_INCONSISTENCY"),
+  ]
 }
 
 extension Xmtp_Xmtpv4_MessageApi_LivenessFailure: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".LivenessFailure"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}response_time_ns\0\u{1}subscribe\0\u{1}query\0\u{1}publish\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "response_time_ns"),
+    2: .same(proto: "subscribe"),
+    3: .same(proto: "query"),
+    4: .same(proto: "publish"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -367,7 +382,9 @@ extension Xmtp_Xmtpv4_MessageApi_LivenessFailure: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_Xmtpv4_MessageApi_SafetyFailure: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SafetyFailure"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}envelopes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "envelopes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -397,7 +414,14 @@ extension Xmtp_Xmtpv4_MessageApi_SafetyFailure: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_Xmtpv4_MessageApi_UnsignedMisbehaviorReport: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".UnsignedMisbehaviorReport"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}reporter_time_ns\0\u{3}misbehaving_node_id\0\u{1}type\0\u{1}liveness\0\u{1}safety\0\u{3}submitted_by_node\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "reporter_time_ns"),
+    2: .standard(proto: "misbehaving_node_id"),
+    3: .same(proto: "type"),
+    4: .same(proto: "liveness"),
+    5: .same(proto: "safety"),
+    6: .standard(proto: "submitted_by_node"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -484,7 +508,11 @@ extension Xmtp_Xmtpv4_MessageApi_UnsignedMisbehaviorReport: SwiftProtobuf.Messag
 
 extension Xmtp_Xmtpv4_MessageApi_MisbehaviorReport: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MisbehaviorReport"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}server_time_ns\0\u{3}unsigned_misbehavior_report\0\u{1}signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "server_time_ns"),
+    2: .standard(proto: "unsigned_misbehavior_report"),
+    3: .same(proto: "signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -528,7 +556,9 @@ extension Xmtp_Xmtpv4_MessageApi_MisbehaviorReport: SwiftProtobuf.Message, Swift
 
 extension Xmtp_Xmtpv4_MessageApi_SubmitMisbehaviorReportRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SubmitMisbehaviorReportRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}report\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "report"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -581,7 +611,9 @@ extension Xmtp_Xmtpv4_MessageApi_SubmitMisbehaviorReportResponse: SwiftProtobuf.
 
 extension Xmtp_Xmtpv4_MessageApi_QueryMisbehaviorReportsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryMisbehaviorReportsRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}after_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "after_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -611,7 +643,9 @@ extension Xmtp_Xmtpv4_MessageApi_QueryMisbehaviorReportsRequest: SwiftProtobuf.M
 
 extension Xmtp_Xmtpv4_MessageApi_QueryMisbehaviorReportsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryMisbehaviorReportsResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}reports\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "reports"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

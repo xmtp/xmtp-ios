@@ -24,7 +24,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 }
 
 /// RecoverableEcdsaSignature for EIP-191 and V2 signatures
-public struct Xmtp_Identity_Associations_RecoverableEcdsaSignature: Sendable {
+public struct Xmtp_Identity_Associations_RecoverableEcdsaSignature: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -38,7 +38,7 @@ public struct Xmtp_Identity_Associations_RecoverableEcdsaSignature: Sendable {
 }
 
 /// EdDSA signature for 25519
-public struct Xmtp_Identity_Associations_RecoverableEd25519Signature: Sendable {
+public struct Xmtp_Identity_Associations_RecoverableEd25519Signature: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -55,7 +55,7 @@ public struct Xmtp_Identity_Associations_RecoverableEd25519Signature: Sendable {
 }
 
 /// Smart Contract Wallet signature
-public struct Xmtp_Identity_Associations_SmartContractWalletSignature: Sendable {
+public struct Xmtp_Identity_Associations_SmartContractWalletSignature: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -76,7 +76,7 @@ public struct Xmtp_Identity_Associations_SmartContractWalletSignature: Sendable 
 }
 
 /// Passkey signature
-public struct Xmtp_Identity_Associations_RecoverablePasskeySignature: Sendable {
+public struct Xmtp_Identity_Associations_RecoverablePasskeySignature: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -209,7 +209,9 @@ fileprivate let _protobuf_package = "xmtp.identity.associations"
 
 extension Xmtp_Identity_Associations_RecoverableEcdsaSignature: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RecoverableEcdsaSignature"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}bytes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "bytes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -239,7 +241,10 @@ extension Xmtp_Identity_Associations_RecoverableEcdsaSignature: SwiftProtobuf.Me
 
 extension Xmtp_Identity_Associations_RecoverableEd25519Signature: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RecoverableEd25519Signature"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}bytes\0\u{3}public_key\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "bytes"),
+    2: .standard(proto: "public_key"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -274,7 +279,11 @@ extension Xmtp_Identity_Associations_RecoverableEd25519Signature: SwiftProtobuf.
 
 extension Xmtp_Identity_Associations_SmartContractWalletSignature: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SmartContractWalletSignature"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}account_id\0\u{3}block_number\0\u{1}signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "account_id"),
+    2: .standard(proto: "block_number"),
+    3: .same(proto: "signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -314,7 +323,12 @@ extension Xmtp_Identity_Associations_SmartContractWalletSignature: SwiftProtobuf
 
 extension Xmtp_Identity_Associations_RecoverablePasskeySignature: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RecoverablePasskeySignature"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}public_key\0\u{1}signature\0\u{3}authenticator_data\0\u{3}client_data_json\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "public_key"),
+    2: .same(proto: "signature"),
+    3: .standard(proto: "authenticator_data"),
+    4: .standard(proto: "client_data_json"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -359,7 +373,10 @@ extension Xmtp_Identity_Associations_RecoverablePasskeySignature: SwiftProtobuf.
 
 extension Xmtp_Identity_Associations_LegacyDelegatedSignature: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".LegacyDelegatedSignature"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}delegated_key\0\u{1}signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "delegated_key"),
+    2: .same(proto: "signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -398,7 +415,13 @@ extension Xmtp_Identity_Associations_LegacyDelegatedSignature: SwiftProtobuf.Mes
 
 extension Xmtp_Identity_Associations_Signature: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Signature"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}erc_191\0\u{3}erc_6492\0\u{3}installation_key\0\u{3}delegated_erc_191\0\u{1}passkey\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "erc_191"),
+    2: .standard(proto: "erc_6492"),
+    3: .standard(proto: "installation_key"),
+    4: .standard(proto: "delegated_erc_191"),
+    5: .same(proto: "passkey"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

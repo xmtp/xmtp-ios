@@ -137,7 +137,7 @@ public struct Xmtp_DeviceSync_Content_PreferenceUpdate: Sendable {
   public init() {}
 }
 
-public struct Xmtp_DeviceSync_Content_V1UserPreferenceUpdate: Sendable {
+public struct Xmtp_DeviceSync_Content_V1UserPreferenceUpdate: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -150,7 +150,7 @@ public struct Xmtp_DeviceSync_Content_V1UserPreferenceUpdate: Sendable {
 }
 
 /// Hmac key update
-public struct Xmtp_DeviceSync_Content_HmacKeyUpdate: Sendable {
+public struct Xmtp_DeviceSync_Content_HmacKeyUpdate: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -246,7 +246,7 @@ public struct Xmtp_DeviceSync_Content_DeviceSyncReply: Sendable {
 }
 
 /// Key used to encrypt the message-bundle
-public struct Xmtp_DeviceSync_Content_DeviceSyncKeyType: Sendable {
+public struct Xmtp_DeviceSync_Content_DeviceSyncKeyType: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -263,7 +263,7 @@ public struct Xmtp_DeviceSync_Content_DeviceSyncKeyType: Sendable {
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  public enum OneOf_Key: Equatable, Sendable {
+  public enum OneOf_Key: Equatable, @unchecked Sendable {
     case aes256Gcm(Data)
 
   }
@@ -277,7 +277,12 @@ fileprivate let _protobuf_package = "xmtp.device_sync.content"
 
 extension Xmtp_DeviceSync_Content_DeviceSyncContent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DeviceSyncContent"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}request\0\u{1}acknowledge\0\u{1}reply\0\u{3}preference_updates\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "request"),
+    2: .same(proto: "acknowledge"),
+    3: .same(proto: "reply"),
+    4: .standard(proto: "preference_updates"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -378,7 +383,9 @@ extension Xmtp_DeviceSync_Content_DeviceSyncContent: SwiftProtobuf.Message, Swif
 
 extension Xmtp_DeviceSync_Content_DeviceSyncAcknowledge: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DeviceSyncAcknowledge"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}request_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "request_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -408,7 +415,9 @@ extension Xmtp_DeviceSync_Content_DeviceSyncAcknowledge: SwiftProtobuf.Message, 
 
 extension Xmtp_DeviceSync_Content_PreferenceUpdates: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PreferenceUpdates"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}updates\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "updates"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -438,7 +447,10 @@ extension Xmtp_DeviceSync_Content_PreferenceUpdates: SwiftProtobuf.Message, Swif
 
 extension Xmtp_DeviceSync_Content_PreferenceUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PreferenceUpdate"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}consent\0\u{1}hmac\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "consent"),
+    2: .same(proto: "hmac"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -505,7 +517,9 @@ extension Xmtp_DeviceSync_Content_PreferenceUpdate: SwiftProtobuf.Message, Swift
 
 extension Xmtp_DeviceSync_Content_V1UserPreferenceUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".V1UserPreferenceUpdate"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}contents\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "contents"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -535,7 +549,10 @@ extension Xmtp_DeviceSync_Content_V1UserPreferenceUpdate: SwiftProtobuf.Message,
 
 extension Xmtp_DeviceSync_Content_HmacKeyUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".HmacKeyUpdate"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}key\0\u{3}cycled_at_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "key"),
+    2: .standard(proto: "cycled_at_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -570,7 +587,12 @@ extension Xmtp_DeviceSync_Content_HmacKeyUpdate: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_DeviceSync_Content_DeviceSyncRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DeviceSyncRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}request_id\0\u{3}pin_code\0\u{1}kind\0\u{1}options\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "request_id"),
+    2: .standard(proto: "pin_code"),
+    3: .same(proto: "kind"),
+    4: .same(proto: "options"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -619,7 +641,14 @@ extension Xmtp_DeviceSync_Content_DeviceSyncRequest: SwiftProtobuf.Message, Swif
 
 extension Xmtp_DeviceSync_Content_DeviceSyncReply: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DeviceSyncReply"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}request_id\0\u{1}url\0\u{3}encryption_key\0\u{3}timestamp_ns\0\u{1}kind\0\u{1}metadata\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "request_id"),
+    2: .same(proto: "url"),
+    3: .standard(proto: "encryption_key"),
+    4: .standard(proto: "timestamp_ns"),
+    5: .same(proto: "kind"),
+    6: .same(proto: "metadata"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -678,7 +707,9 @@ extension Xmtp_DeviceSync_Content_DeviceSyncReply: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_DeviceSync_Content_DeviceSyncKeyType: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DeviceSyncKeyType"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}aes_256_gcm\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "aes_256_gcm"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

@@ -86,7 +86,13 @@ fileprivate let _protobuf_package = "xmtp.mls.message_contents.content_types"
 
 extension Xmtp_Mls_MessageContents_ContentTypes_WalletSendCalls: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".WalletSendCalls"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}version\0\u{3}chain_id\0\u{1}from\0\u{1}calls\0\u{1}capabilities\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "version"),
+    2: .standard(proto: "chain_id"),
+    3: .same(proto: "from"),
+    4: .same(proto: "calls"),
+    5: .same(proto: "capabilities"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -136,7 +142,13 @@ extension Xmtp_Mls_MessageContents_ContentTypes_WalletSendCalls: SwiftProtobuf.M
 
 extension Xmtp_Mls_MessageContents_ContentTypes_Call: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Call"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}to\0\u{1}data\0\u{1}value\0\u{1}gas\0\u{1}metadata\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "to"),
+    2: .same(proto: "data"),
+    3: .same(proto: "value"),
+    4: .same(proto: "gas"),
+    5: .same(proto: "metadata"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

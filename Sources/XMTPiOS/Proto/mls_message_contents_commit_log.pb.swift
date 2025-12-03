@@ -72,7 +72,7 @@ public enum Xmtp_Mls_MessageContents_CommitResult: SwiftProtobuf.Enum, Swift.Cas
 
 /// PlaintextCommitLogEntry indicates whether a commit was successful or not,
 /// when applied on top of the indicated `last_epoch_authenticator`.
-public struct Xmtp_Mls_MessageContents_PlaintextCommitLogEntry: Sendable {
+public struct Xmtp_Mls_MessageContents_PlaintextCommitLogEntry: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -100,7 +100,7 @@ public struct Xmtp_Mls_MessageContents_PlaintextCommitLogEntry: Sendable {
   public init() {}
 }
 
-public struct Xmtp_Mls_MessageContents_CommitLogEntry: Sendable {
+public struct Xmtp_Mls_MessageContents_CommitLogEntry: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -130,12 +130,25 @@ public struct Xmtp_Mls_MessageContents_CommitLogEntry: Sendable {
 fileprivate let _protobuf_package = "xmtp.mls.message_contents"
 
 extension Xmtp_Mls_MessageContents_CommitResult: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0COMMIT_RESULT_UNSPECIFIED\0\u{1}COMMIT_RESULT_APPLIED\0\u{1}COMMIT_RESULT_WRONG_EPOCH\0\u{1}COMMIT_RESULT_UNDECRYPTABLE\0\u{1}COMMIT_RESULT_INVALID\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "COMMIT_RESULT_UNSPECIFIED"),
+    1: .same(proto: "COMMIT_RESULT_APPLIED"),
+    2: .same(proto: "COMMIT_RESULT_WRONG_EPOCH"),
+    3: .same(proto: "COMMIT_RESULT_UNDECRYPTABLE"),
+    4: .same(proto: "COMMIT_RESULT_INVALID"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_PlaintextCommitLogEntry: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PlaintextCommitLogEntry"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_id\0\u{3}commit_sequence_id\0\u{3}last_epoch_authenticator\0\u{3}commit_result\0\u{3}applied_epoch_number\0\u{3}applied_epoch_authenticator\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_id"),
+    2: .standard(proto: "commit_sequence_id"),
+    3: .standard(proto: "last_epoch_authenticator"),
+    4: .standard(proto: "commit_result"),
+    5: .standard(proto: "applied_epoch_number"),
+    6: .standard(proto: "applied_epoch_authenticator"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -190,7 +203,11 @@ extension Xmtp_Mls_MessageContents_PlaintextCommitLogEntry: SwiftProtobuf.Messag
 
 extension Xmtp_Mls_MessageContents_CommitLogEntry: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".CommitLogEntry"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}sequence_id\0\u{3}serialized_commit_log_entry\0\u{1}signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "sequence_id"),
+    2: .standard(proto: "serialized_commit_log_entry"),
+    3: .same(proto: "signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

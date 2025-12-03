@@ -278,16 +278,44 @@ public struct Xmtp_DeviceSync_GroupBackup_ImmutableMetadataSave: Sendable {
 fileprivate let _protobuf_package = "xmtp.device_sync.group_backup"
 
 extension Xmtp_DeviceSync_GroupBackup_GroupMembershipStateSave: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0GROUP_MEMBERSHIP_STATE_SAVE_UNSPECIFIED\0\u{1}GROUP_MEMBERSHIP_STATE_SAVE_ALLOWED\0\u{1}GROUP_MEMBERSHIP_STATE_SAVE_REJECTED\0\u{1}GROUP_MEMBERSHIP_STATE_SAVE_PENDING\0\u{1}GROUP_MEMBERSHIP_STATE_SAVE_RESTORED\0\u{1}GROUP_MEMBERSHIP_STATE_SAVE_PENDING_REMOVE\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "GROUP_MEMBERSHIP_STATE_SAVE_UNSPECIFIED"),
+    1: .same(proto: "GROUP_MEMBERSHIP_STATE_SAVE_ALLOWED"),
+    2: .same(proto: "GROUP_MEMBERSHIP_STATE_SAVE_REJECTED"),
+    3: .same(proto: "GROUP_MEMBERSHIP_STATE_SAVE_PENDING"),
+    4: .same(proto: "GROUP_MEMBERSHIP_STATE_SAVE_RESTORED"),
+    5: .same(proto: "GROUP_MEMBERSHIP_STATE_SAVE_PENDING_REMOVE"),
+  ]
 }
 
 extension Xmtp_DeviceSync_GroupBackup_ConversationTypeSave: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CONVERSATION_TYPE_SAVE_UNSPECIFIED\0\u{1}CONVERSATION_TYPE_SAVE_GROUP\0\u{1}CONVERSATION_TYPE_SAVE_DM\0\u{1}CONVERSATION_TYPE_SAVE_SYNC\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "CONVERSATION_TYPE_SAVE_UNSPECIFIED"),
+    1: .same(proto: "CONVERSATION_TYPE_SAVE_GROUP"),
+    2: .same(proto: "CONVERSATION_TYPE_SAVE_DM"),
+    3: .same(proto: "CONVERSATION_TYPE_SAVE_SYNC"),
+  ]
 }
 
 extension Xmtp_DeviceSync_GroupBackup_GroupSave: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GroupSave"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}created_at_ns\0\u{3}membership_state\0\u{3}installations_last_checked\0\u{3}added_by_inbox_id\0\u{3}welcome_id\0\u{3}rotated_at_ns\0\u{3}conversation_type\0\u{3}dm_id\0\u{3}last_message_ns\0\u{3}message_disappear_from_ns\0\u{3}message_disappear_in_ns\0\u{1}metadata\0\u{3}mutable_metadata\0\u{3}paused_for_version\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "id"),
+    2: .standard(proto: "created_at_ns"),
+    3: .standard(proto: "membership_state"),
+    4: .standard(proto: "installations_last_checked"),
+    5: .standard(proto: "added_by_inbox_id"),
+    6: .standard(proto: "welcome_id"),
+    7: .standard(proto: "rotated_at_ns"),
+    8: .standard(proto: "conversation_type"),
+    9: .standard(proto: "dm_id"),
+    10: .standard(proto: "last_message_ns"),
+    11: .standard(proto: "message_disappear_from_ns"),
+    12: .standard(proto: "message_disappear_in_ns"),
+    13: .same(proto: "metadata"),
+    14: .standard(proto: "mutable_metadata"),
+    15: .standard(proto: "paused_for_version"),
+  ]
 
   fileprivate class _StorageClass {
     var _id: Data = Data()
@@ -455,7 +483,11 @@ extension Xmtp_DeviceSync_GroupBackup_GroupSave: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_DeviceSync_GroupBackup_MutableMetadataSave: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MutableMetadataSave"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}attributes\0\u{3}admin_list\0\u{3}super_admin_list\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "attributes"),
+    2: .standard(proto: "admin_list"),
+    3: .standard(proto: "super_admin_list"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -495,7 +527,9 @@ extension Xmtp_DeviceSync_GroupBackup_MutableMetadataSave: SwiftProtobuf.Message
 
 extension Xmtp_DeviceSync_GroupBackup_ImmutableMetadataSave: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ImmutableMetadataSave"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}creator_inbox_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "creator_inbox_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

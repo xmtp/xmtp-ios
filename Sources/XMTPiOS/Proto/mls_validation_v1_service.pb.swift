@@ -34,7 +34,7 @@ public struct Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesRequest: Sendable 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Wrapper for each key package
-  public struct KeyPackage: Sendable {
+  public struct KeyPackage: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -62,7 +62,7 @@ public struct Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse: Sendable
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// one response corresponding to information about one key package
-  public struct Response: Sendable {
+  public struct Response: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -105,7 +105,7 @@ public struct Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Wrapper for each key package
-  public struct KeyPackage: Sendable {
+  public struct KeyPackage: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -133,7 +133,7 @@ public struct Xmtp_MlsValidation_V1_ValidateKeyPackagesResponse: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// An individual response to one key package
-  public struct ValidationResponse: Sendable {
+  public struct ValidationResponse: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -169,7 +169,7 @@ public struct Xmtp_MlsValidation_V1_ValidateGroupMessagesRequest: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Wrapper for each message
-  public struct GroupMessage: Sendable {
+  public struct GroupMessage: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -271,7 +271,9 @@ fileprivate let _protobuf_package = "xmtp.mls_validation.v1"
 
 extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ValidateInboxIdKeyPackagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_packages\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_packages"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -301,7 +303,10 @@ extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesRequest: SwiftProtobuf
 
 extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesRequest.KeyPackage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesRequest.protoMessageName + ".KeyPackage"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_package_bytes_tls_serialized\0\u{3}is_inbox_id_credential\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_package_bytes_tls_serialized"),
+    2: .standard(proto: "is_inbox_id_credential"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -336,7 +341,9 @@ extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesRequest.KeyPackage: Sw
 
 extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ValidateInboxIdKeyPackagesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -366,7 +373,13 @@ extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse: SwiftProtobu
 
 extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse.Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse.protoMessageName + ".Response"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}is_ok\0\u{3}error_message\0\u{1}credential\0\u{3}installation_public_key\0\u{1}expiration\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "is_ok"),
+    2: .standard(proto: "error_message"),
+    3: .same(proto: "credential"),
+    4: .standard(proto: "installation_public_key"),
+    5: .same(proto: "expiration"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -420,7 +433,9 @@ extension Xmtp_MlsValidation_V1_ValidateInboxIdKeyPackagesResponse.Response: Swi
 
 extension Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ValidateKeyPackagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_packages\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_packages"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -450,7 +465,10 @@ extension Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest: SwiftProtobuf.Messag
 
 extension Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest.KeyPackage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest.protoMessageName + ".KeyPackage"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_package_bytes_tls_serialized\0\u{3}is_inbox_id_credential\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_package_bytes_tls_serialized"),
+    2: .standard(proto: "is_inbox_id_credential"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -485,7 +503,9 @@ extension Xmtp_MlsValidation_V1_ValidateKeyPackagesRequest.KeyPackage: SwiftProt
 
 extension Xmtp_MlsValidation_V1_ValidateKeyPackagesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ValidateKeyPackagesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -515,7 +535,14 @@ extension Xmtp_MlsValidation_V1_ValidateKeyPackagesResponse: SwiftProtobuf.Messa
 
 extension Xmtp_MlsValidation_V1_ValidateKeyPackagesResponse.ValidationResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MlsValidation_V1_ValidateKeyPackagesResponse.protoMessageName + ".ValidationResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}is_ok\0\u{3}error_message\0\u{3}installation_id\0\u{3}account_address\0\u{3}credential_identity_bytes\0\u{1}expiration\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "is_ok"),
+    2: .standard(proto: "error_message"),
+    3: .standard(proto: "installation_id"),
+    4: .standard(proto: "account_address"),
+    5: .standard(proto: "credential_identity_bytes"),
+    6: .same(proto: "expiration"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -570,7 +597,9 @@ extension Xmtp_MlsValidation_V1_ValidateKeyPackagesResponse.ValidationResponse: 
 
 extension Xmtp_MlsValidation_V1_ValidateGroupMessagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ValidateGroupMessagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_messages\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_messages"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -600,7 +629,9 @@ extension Xmtp_MlsValidation_V1_ValidateGroupMessagesRequest: SwiftProtobuf.Mess
 
 extension Xmtp_MlsValidation_V1_ValidateGroupMessagesRequest.GroupMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MlsValidation_V1_ValidateGroupMessagesRequest.protoMessageName + ".GroupMessage"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_message_bytes_tls_serialized\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_message_bytes_tls_serialized"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -630,7 +661,9 @@ extension Xmtp_MlsValidation_V1_ValidateGroupMessagesRequest.GroupMessage: Swift
 
 extension Xmtp_MlsValidation_V1_ValidateGroupMessagesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ValidateGroupMessagesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -660,7 +693,12 @@ extension Xmtp_MlsValidation_V1_ValidateGroupMessagesResponse: SwiftProtobuf.Mes
 
 extension Xmtp_MlsValidation_V1_ValidateGroupMessagesResponse.ValidationResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_MlsValidation_V1_ValidateGroupMessagesResponse.protoMessageName + ".ValidationResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}is_ok\0\u{3}error_message\0\u{3}group_id\0\u{3}is_commit\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "is_ok"),
+    2: .standard(proto: "error_message"),
+    3: .standard(proto: "group_id"),
+    4: .standard(proto: "is_commit"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -705,7 +743,10 @@ extension Xmtp_MlsValidation_V1_ValidateGroupMessagesResponse.ValidationResponse
 
 extension Xmtp_MlsValidation_V1_GetAssociationStateRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetAssociationStateRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}old_updates\0\u{3}new_updates\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "old_updates"),
+    2: .standard(proto: "new_updates"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -740,7 +781,10 @@ extension Xmtp_MlsValidation_V1_GetAssociationStateRequest: SwiftProtobuf.Messag
 
 extension Xmtp_MlsValidation_V1_GetAssociationStateResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetAssociationStateResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}association_state\0\u{3}state_diff\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "association_state"),
+    2: .standard(proto: "state_diff"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

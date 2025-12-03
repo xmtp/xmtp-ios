@@ -66,7 +66,13 @@ fileprivate let _protobuf_package = "xmtp.message_contents"
 
 extension Xmtp_MessageContents_ConversationReference: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ConversationReference"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}topic\0\u{3}peer_address\0\u{3}created_ns\0\u{1}context\0\u{3}consent_proof_payload\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "topic"),
+    2: .standard(proto: "peer_address"),
+    3: .standard(proto: "created_ns"),
+    4: .same(proto: "context"),
+    5: .standard(proto: "consent_proof_payload"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

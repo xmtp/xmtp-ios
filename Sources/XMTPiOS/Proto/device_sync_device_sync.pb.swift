@@ -205,12 +205,23 @@ public struct Xmtp_DeviceSync_BackupOptions: Sendable {
 fileprivate let _protobuf_package = "xmtp.device_sync"
 
 extension Xmtp_DeviceSync_BackupElementSelection: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0BACKUP_ELEMENT_SELECTION_UNSPECIFIED\0\u{1}BACKUP_ELEMENT_SELECTION_MESSAGES\0\u{1}BACKUP_ELEMENT_SELECTION_CONSENT\0\u{1}BACKUP_ELEMENT_SELECTION_EVENT\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "BACKUP_ELEMENT_SELECTION_UNSPECIFIED"),
+    1: .same(proto: "BACKUP_ELEMENT_SELECTION_MESSAGES"),
+    2: .same(proto: "BACKUP_ELEMENT_SELECTION_CONSENT"),
+    3: .same(proto: "BACKUP_ELEMENT_SELECTION_EVENT"),
+  ]
 }
 
 extension Xmtp_DeviceSync_BackupElement: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".BackupElement"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}metadata\0\u{1}group\0\u{3}group_message\0\u{1}consent\0\u{1}event\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "metadata"),
+    2: .same(proto: "group"),
+    3: .standard(proto: "group_message"),
+    4: .same(proto: "consent"),
+    5: .same(proto: "event"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -328,7 +339,12 @@ extension Xmtp_DeviceSync_BackupElement: SwiftProtobuf.Message, SwiftProtobuf._M
 
 extension Xmtp_DeviceSync_BackupMetadataSave: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".BackupMetadataSave"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}elements\0\u{3}exported_at_ns\0\u{3}start_ns\0\u{3}end_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    2: .same(proto: "elements"),
+    3: .standard(proto: "exported_at_ns"),
+    4: .standard(proto: "start_ns"),
+    5: .standard(proto: "end_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -377,7 +393,12 @@ extension Xmtp_DeviceSync_BackupMetadataSave: SwiftProtobuf.Message, SwiftProtob
 
 extension Xmtp_DeviceSync_BackupOptions: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".BackupOptions"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}elements\0\u{3}start_ns\0\u{3}end_ns\0\u{3}exclude_disappearing_messages\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "elements"),
+    2: .standard(proto: "start_ns"),
+    3: .standard(proto: "end_ns"),
+    4: .standard(proto: "exclude_disappearing_messages"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

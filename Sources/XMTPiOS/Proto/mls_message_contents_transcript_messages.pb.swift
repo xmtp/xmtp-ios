@@ -24,7 +24,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 }
 
 /// A group member and affected installation IDs
-public struct Xmtp_Mls_MessageContents_MembershipChange: Sendable {
+public struct Xmtp_Mls_MessageContents_MembershipChange: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -157,7 +157,11 @@ fileprivate let _protobuf_package = "xmtp.mls.message_contents"
 
 extension Xmtp_Mls_MessageContents_MembershipChange: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MembershipChange"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_ids\0\u{3}account_address\0\u{3}initiated_by_account_address\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_ids"),
+    2: .standard(proto: "account_address"),
+    3: .standard(proto: "initiated_by_account_address"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -197,7 +201,12 @@ extension Xmtp_Mls_MessageContents_MembershipChange: SwiftProtobuf.Message, Swif
 
 extension Xmtp_Mls_MessageContents_GroupMembershipChanges: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GroupMembershipChanges"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}members_added\0\u{3}members_removed\0\u{3}installations_added\0\u{3}installations_removed\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "members_added"),
+    2: .standard(proto: "members_removed"),
+    3: .standard(proto: "installations_added"),
+    4: .standard(proto: "installations_removed"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -242,7 +251,17 @@ extension Xmtp_Mls_MessageContents_GroupMembershipChanges: SwiftProtobuf.Message
 
 extension Xmtp_Mls_MessageContents_GroupUpdated: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GroupUpdated"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}initiated_by_inbox_id\0\u{3}added_inboxes\0\u{3}removed_inboxes\0\u{3}metadata_field_changes\0\u{3}left_inboxes\0\u{3}added_admin_inboxes\0\u{3}removed_admin_inboxes\0\u{3}added_super_admin_inboxes\0\u{3}removed_super_admin_inboxes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "initiated_by_inbox_id"),
+    2: .standard(proto: "added_inboxes"),
+    3: .standard(proto: "removed_inboxes"),
+    4: .standard(proto: "metadata_field_changes"),
+    5: .standard(proto: "left_inboxes"),
+    6: .standard(proto: "added_admin_inboxes"),
+    7: .standard(proto: "removed_admin_inboxes"),
+    8: .standard(proto: "added_super_admin_inboxes"),
+    9: .standard(proto: "removed_super_admin_inboxes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -312,7 +331,9 @@ extension Xmtp_Mls_MessageContents_GroupUpdated: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_Mls_MessageContents_GroupUpdated.Inbox: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_GroupUpdated.protoMessageName + ".Inbox"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}inbox_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "inbox_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -342,7 +363,11 @@ extension Xmtp_Mls_MessageContents_GroupUpdated.Inbox: SwiftProtobuf.Message, Sw
 
 extension Xmtp_Mls_MessageContents_GroupUpdated.MetadataFieldChange: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_MessageContents_GroupUpdated.protoMessageName + ".MetadataFieldChange"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}field_name\0\u{3}old_value\0\u{3}new_value\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "field_name"),
+    2: .standard(proto: "old_value"),
+    3: .standard(proto: "new_value"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

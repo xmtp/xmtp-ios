@@ -134,16 +134,31 @@ public struct Xmtp_DeviceSync_ConsentBackup_ConsentSave: Sendable {
 fileprivate let _protobuf_package = "xmtp.device_sync.consent_backup"
 
 extension Xmtp_DeviceSync_ConsentBackup_ConsentTypeSave: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CONSENT_TYPE_SAVE_UNSPECIFIED\0\u{1}CONSENT_TYPE_SAVE_CONVERSATION_ID\0\u{1}CONSENT_TYPE_SAVE_INBOX_ID\0\u{1}CONSENT_TYPE_SAVE_ADDRESS\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "CONSENT_TYPE_SAVE_UNSPECIFIED"),
+    1: .same(proto: "CONSENT_TYPE_SAVE_CONVERSATION_ID"),
+    2: .same(proto: "CONSENT_TYPE_SAVE_INBOX_ID"),
+    3: .same(proto: "CONSENT_TYPE_SAVE_ADDRESS"),
+  ]
 }
 
 extension Xmtp_DeviceSync_ConsentBackup_ConsentStateSave: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CONSENT_STATE_SAVE_UNSPECIFIED\0\u{1}CONSENT_STATE_SAVE_UNKNOWN\0\u{1}CONSENT_STATE_SAVE_ALLOWED\0\u{1}CONSENT_STATE_SAVE_DENIED\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "CONSENT_STATE_SAVE_UNSPECIFIED"),
+    1: .same(proto: "CONSENT_STATE_SAVE_UNKNOWN"),
+    2: .same(proto: "CONSENT_STATE_SAVE_ALLOWED"),
+    3: .same(proto: "CONSENT_STATE_SAVE_DENIED"),
+  ]
 }
 
 extension Xmtp_DeviceSync_ConsentBackup_ConsentSave: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ConsentSave"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}entity_type\0\u{1}state\0\u{1}entity\0\u{3}consented_at_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "entity_type"),
+    2: .same(proto: "state"),
+    3: .same(proto: "entity"),
+    4: .standard(proto: "consented_at_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

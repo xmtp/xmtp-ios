@@ -74,7 +74,7 @@ public enum Xmtp_DeviceSync_EventBackup_EventLevelSave: SwiftProtobuf.Enum, Swif
 }
 
 /// Proto representation of a client record save
-public struct Xmtp_DeviceSync_EventBackup_EventSave: Sendable {
+public struct Xmtp_DeviceSync_EventBackup_EventSave: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -118,12 +118,26 @@ public struct Xmtp_DeviceSync_EventBackup_EventSave: Sendable {
 fileprivate let _protobuf_package = "xmtp.device_sync.event_backup"
 
 extension Xmtp_DeviceSync_EventBackup_EventLevelSave: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0EVENT_LEVEL_SAVE_UNSPECIFIED\0\u{1}EVENT_LEVEL_SAVE_NONE\0\u{1}EVENT_LEVEL_SAVE_SUCCESS\0\u{1}EVENT_LEVEL_SAVE_WARN\0\u{1}EVENT_LEVEL_SAVE_ERROR\0\u{1}EVENT_LEVEL_SAVE_FAULT\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "EVENT_LEVEL_SAVE_UNSPECIFIED"),
+    1: .same(proto: "EVENT_LEVEL_SAVE_NONE"),
+    2: .same(proto: "EVENT_LEVEL_SAVE_SUCCESS"),
+    3: .same(proto: "EVENT_LEVEL_SAVE_WARN"),
+    4: .same(proto: "EVENT_LEVEL_SAVE_ERROR"),
+    5: .same(proto: "EVENT_LEVEL_SAVE_FAULT"),
+  ]
 }
 
 extension Xmtp_DeviceSync_EventBackup_EventSave: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".EventSave"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}created_at_ns\0\u{1}event\0\u{1}details\0\u{3}group_id\0\u{1}level\0\u{1}icon\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "created_at_ns"),
+    2: .same(proto: "event"),
+    3: .same(proto: "details"),
+    4: .standard(proto: "group_id"),
+    5: .same(proto: "level"),
+    6: .same(proto: "icon"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

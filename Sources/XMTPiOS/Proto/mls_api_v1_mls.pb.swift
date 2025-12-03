@@ -95,7 +95,7 @@ public struct Xmtp_Mls_Api_V1_WelcomeMessage: Sendable {
   }
 
   /// Version 1 of the WelcomeMessage format
-  public struct V1: Sendable {
+  public struct V1: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -119,7 +119,7 @@ public struct Xmtp_Mls_Api_V1_WelcomeMessage: Sendable {
     public init() {}
   }
 
-  public struct WelcomePointer: Sendable {
+  public struct WelcomePointer: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -184,7 +184,7 @@ public struct Xmtp_Mls_Api_V1_WelcomeMessageInput: Sendable {
   /// Version 1 of the WelcomeMessageInput format, if used as the pointee of a
   /// WelcomePointer then the hpke_public_key will be unset, and the
   /// wrapper_algorithm will be WELCOME_WRAPPER_ALGORITHM_SYMMETRIC_KEY
-  public struct V1: Sendable {
+  public struct V1: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -211,7 +211,7 @@ public struct Xmtp_Mls_Api_V1_WelcomeMessageInput: Sendable {
 
   /// Version 2 of the WelcomeMessageInput format which uses a WelcomePointer
   /// to point to the welcome message for several installations at once
-  public struct WelcomePointer: Sendable {
+  public struct WelcomePointer: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -273,7 +273,7 @@ public struct Xmtp_Mls_Api_V1_GroupMessage: Sendable {
   }
 
   /// Version 1 of the GroupMessage format
-  public struct V1: Sendable {
+  public struct V1: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -324,7 +324,7 @@ public struct Xmtp_Mls_Api_V1_GroupMessageInput: Sendable {
   }
 
   /// Version 1 of the GroupMessageInput payload format
-  public struct V1: Sendable {
+  public struct V1: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -371,7 +371,7 @@ public struct Xmtp_Mls_Api_V1_SendWelcomeMessagesRequest: Sendable {
 }
 
 /// A wrapper around the Key Package bytes
-public struct Xmtp_Mls_Api_V1_KeyPackageUpload: Sendable {
+public struct Xmtp_Mls_Api_V1_KeyPackageUpload: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -411,7 +411,7 @@ public struct Xmtp_Mls_Api_V1_RegisterInstallationRequest: Sendable {
 }
 
 /// The response to a RegisterInstallationRequest
-public struct Xmtp_Mls_Api_V1_RegisterInstallationResponse: Sendable {
+public struct Xmtp_Mls_Api_V1_RegisterInstallationResponse: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -449,7 +449,7 @@ public struct Xmtp_Mls_Api_V1_UploadKeyPackageRequest: Sendable {
 }
 
 /// Fetch one or more key packages
-public struct Xmtp_Mls_Api_V1_FetchKeyPackagesRequest: Sendable {
+public struct Xmtp_Mls_Api_V1_FetchKeyPackagesRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -478,7 +478,7 @@ public struct Xmtp_Mls_Api_V1_FetchKeyPackagesResponse: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// An individual key package
-  public struct KeyPackage: Sendable {
+  public struct KeyPackage: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -494,7 +494,7 @@ public struct Xmtp_Mls_Api_V1_FetchKeyPackagesResponse: Sendable {
 }
 
 /// Revoke an installation
-public struct Xmtp_Mls_Api_V1_RevokeInstallationRequest: Sendable {
+public struct Xmtp_Mls_Api_V1_RevokeInstallationRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -547,7 +547,7 @@ public struct Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// A new installation key was seen for the first time by the nodes
-  public struct NewInstallationUpdate: Sendable {
+  public struct NewInstallationUpdate: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -562,7 +562,7 @@ public struct Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse: Sendable {
   }
 
   /// An installation was revoked
-  public struct RevokedInstallationUpdate: Sendable {
+  public struct RevokedInstallationUpdate: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -645,7 +645,7 @@ public struct Xmtp_Mls_Api_V1_PagingInfo: Sendable {
 }
 
 /// Request for group message queries
-public struct Xmtp_Mls_Api_V1_QueryGroupMessagesRequest: Sendable {
+public struct Xmtp_Mls_Api_V1_QueryGroupMessagesRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -693,7 +693,7 @@ public struct Xmtp_Mls_Api_V1_QueryGroupMessagesResponse: Sendable {
 }
 
 /// Request for welcome message queries
-public struct Xmtp_Mls_Api_V1_QueryWelcomeMessagesRequest: Sendable {
+public struct Xmtp_Mls_Api_V1_QueryWelcomeMessagesRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -751,7 +751,7 @@ public struct Xmtp_Mls_Api_V1_SubscribeGroupMessagesRequest: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Subscription filter
-  public struct Filter: Sendable {
+  public struct Filter: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -779,7 +779,7 @@ public struct Xmtp_Mls_Api_V1_SubscribeWelcomeMessagesRequest: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Subscription filter
-  public struct Filter: Sendable {
+  public struct Filter: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -808,7 +808,7 @@ public struct Xmtp_Mls_Api_V1_BatchPublishCommitLogRequest: Sendable {
   public init() {}
 }
 
-public struct Xmtp_Mls_Api_V1_PublishCommitLogRequest: Sendable {
+public struct Xmtp_Mls_Api_V1_PublishCommitLogRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -833,7 +833,7 @@ public struct Xmtp_Mls_Api_V1_PublishCommitLogRequest: Sendable {
   fileprivate var _signature: Xmtp_Identity_Associations_RecoverableEd25519Signature? = nil
 }
 
-public struct Xmtp_Mls_Api_V1_QueryCommitLogRequest: Sendable {
+public struct Xmtp_Mls_Api_V1_QueryCommitLogRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -856,7 +856,7 @@ public struct Xmtp_Mls_Api_V1_QueryCommitLogRequest: Sendable {
   fileprivate var _pagingInfo: Xmtp_Mls_Api_V1_PagingInfo? = nil
 }
 
-public struct Xmtp_Mls_Api_V1_QueryCommitLogResponse: Sendable {
+public struct Xmtp_Mls_Api_V1_QueryCommitLogResponse: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -906,7 +906,7 @@ public struct Xmtp_Mls_Api_V1_BatchQueryCommitLogResponse: Sendable {
 }
 
 /// Request to get the newest group message from a range of topics
-public struct Xmtp_Mls_Api_V1_GetNewestGroupMessageRequest: Sendable {
+public struct Xmtp_Mls_Api_V1_GetNewestGroupMessageRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -962,12 +962,19 @@ public struct Xmtp_Mls_Api_V1_GetNewestGroupMessageResponse: Sendable {
 fileprivate let _protobuf_package = "xmtp.mls.api.v1"
 
 extension Xmtp_Mls_Api_V1_SortDirection: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0SORT_DIRECTION_UNSPECIFIED\0\u{1}SORT_DIRECTION_ASCENDING\0\u{1}SORT_DIRECTION_DESCENDING\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "SORT_DIRECTION_UNSPECIFIED"),
+    1: .same(proto: "SORT_DIRECTION_ASCENDING"),
+    2: .same(proto: "SORT_DIRECTION_DESCENDING"),
+  ]
 }
 
 extension Xmtp_Mls_Api_V1_WelcomeMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".WelcomeMessage"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0\u{3}welcome_pointer\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+    2: .standard(proto: "welcome_pointer"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1034,7 +1041,15 @@ extension Xmtp_Mls_Api_V1_WelcomeMessage: SwiftProtobuf.Message, SwiftProtobuf._
 
 extension Xmtp_Mls_Api_V1_WelcomeMessage.V1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_WelcomeMessage.protoMessageName + ".V1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}created_ns\0\u{3}installation_key\0\u{1}data\0\u{3}hpke_public_key\0\u{3}wrapper_algorithm\0\u{3}welcome_metadata\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "id"),
+    2: .standard(proto: "created_ns"),
+    3: .standard(proto: "installation_key"),
+    4: .same(proto: "data"),
+    5: .standard(proto: "hpke_public_key"),
+    6: .standard(proto: "wrapper_algorithm"),
+    7: .standard(proto: "welcome_metadata"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1094,7 +1109,14 @@ extension Xmtp_Mls_Api_V1_WelcomeMessage.V1: SwiftProtobuf.Message, SwiftProtobu
 
 extension Xmtp_Mls_Api_V1_WelcomeMessage.WelcomePointer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_WelcomeMessage.protoMessageName + ".WelcomePointer"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}created_ns\0\u{3}installation_key\0\u{3}welcome_pointer\0\u{3}hpke_public_key\0\u{3}wrapper_algorithm\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "id"),
+    2: .standard(proto: "created_ns"),
+    3: .standard(proto: "installation_key"),
+    4: .standard(proto: "welcome_pointer"),
+    5: .standard(proto: "hpke_public_key"),
+    6: .standard(proto: "wrapper_algorithm"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1149,7 +1171,10 @@ extension Xmtp_Mls_Api_V1_WelcomeMessage.WelcomePointer: SwiftProtobuf.Message, 
 
 extension Xmtp_Mls_Api_V1_WelcomeMessageInput: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".WelcomeMessageInput"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0\u{3}welcome_pointer\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+    2: .standard(proto: "welcome_pointer"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1216,7 +1241,13 @@ extension Xmtp_Mls_Api_V1_WelcomeMessageInput: SwiftProtobuf.Message, SwiftProto
 
 extension Xmtp_Mls_Api_V1_WelcomeMessageInput.V1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_WelcomeMessageInput.protoMessageName + ".V1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_key\0\u{1}data\0\u{3}hpke_public_key\0\u{3}wrapper_algorithm\0\u{4}\u{3}welcome_metadata\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_key"),
+    2: .same(proto: "data"),
+    3: .standard(proto: "hpke_public_key"),
+    4: .standard(proto: "wrapper_algorithm"),
+    7: .standard(proto: "welcome_metadata"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1266,7 +1297,12 @@ extension Xmtp_Mls_Api_V1_WelcomeMessageInput.V1: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_Mls_Api_V1_WelcomeMessageInput.WelcomePointer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_WelcomeMessageInput.protoMessageName + ".WelcomePointer"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_key\0\u{3}welcome_pointer\0\u{3}hpke_public_key\0\u{3}wrapper_algorithm\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_key"),
+    2: .standard(proto: "welcome_pointer"),
+    3: .standard(proto: "hpke_public_key"),
+    4: .standard(proto: "wrapper_algorithm"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1311,7 +1347,9 @@ extension Xmtp_Mls_Api_V1_WelcomeMessageInput.WelcomePointer: SwiftProtobuf.Mess
 
 extension Xmtp_Mls_Api_V1_WelcomeMetadata: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".WelcomeMetadata"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}message_cursor\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "message_cursor"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1341,7 +1379,9 @@ extension Xmtp_Mls_Api_V1_WelcomeMetadata: SwiftProtobuf.Message, SwiftProtobuf.
 
 extension Xmtp_Mls_Api_V1_GroupMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GroupMessage"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1387,7 +1427,15 @@ extension Xmtp_Mls_Api_V1_GroupMessage: SwiftProtobuf.Message, SwiftProtobuf._Me
 
 extension Xmtp_Mls_Api_V1_GroupMessage.V1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_GroupMessage.protoMessageName + ".V1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}created_ns\0\u{3}group_id\0\u{1}data\0\u{3}sender_hmac\0\u{3}should_push\0\u{3}is_commit\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "id"),
+    2: .standard(proto: "created_ns"),
+    3: .standard(proto: "group_id"),
+    4: .same(proto: "data"),
+    5: .standard(proto: "sender_hmac"),
+    6: .standard(proto: "should_push"),
+    7: .standard(proto: "is_commit"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1447,7 +1495,9 @@ extension Xmtp_Mls_Api_V1_GroupMessage.V1: SwiftProtobuf.Message, SwiftProtobuf.
 
 extension Xmtp_Mls_Api_V1_GroupMessageInput: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GroupMessageInput"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1493,7 +1543,11 @@ extension Xmtp_Mls_Api_V1_GroupMessageInput: SwiftProtobuf.Message, SwiftProtobu
 
 extension Xmtp_Mls_Api_V1_GroupMessageInput.V1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_GroupMessageInput.protoMessageName + ".V1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}data\0\u{3}sender_hmac\0\u{3}should_push\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "data"),
+    2: .standard(proto: "sender_hmac"),
+    3: .standard(proto: "should_push"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1533,7 +1587,9 @@ extension Xmtp_Mls_Api_V1_GroupMessageInput.V1: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_Mls_Api_V1_SendGroupMessagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SendGroupMessagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}messages\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "messages"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1563,7 +1619,9 @@ extension Xmtp_Mls_Api_V1_SendGroupMessagesRequest: SwiftProtobuf.Message, Swift
 
 extension Xmtp_Mls_Api_V1_SendWelcomeMessagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SendWelcomeMessagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}messages\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "messages"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1593,7 +1651,9 @@ extension Xmtp_Mls_Api_V1_SendWelcomeMessagesRequest: SwiftProtobuf.Message, Swi
 
 extension Xmtp_Mls_Api_V1_KeyPackageUpload: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".KeyPackageUpload"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_package_tls_serialized\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_package_tls_serialized"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1623,7 +1683,10 @@ extension Xmtp_Mls_Api_V1_KeyPackageUpload: SwiftProtobuf.Message, SwiftProtobuf
 
 extension Xmtp_Mls_Api_V1_RegisterInstallationRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RegisterInstallationRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_package\0\u{3}is_inbox_id_credential\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_package"),
+    2: .standard(proto: "is_inbox_id_credential"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1662,7 +1725,9 @@ extension Xmtp_Mls_Api_V1_RegisterInstallationRequest: SwiftProtobuf.Message, Sw
 
 extension Xmtp_Mls_Api_V1_RegisterInstallationResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RegisterInstallationResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_key\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_key"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1692,7 +1757,10 @@ extension Xmtp_Mls_Api_V1_RegisterInstallationResponse: SwiftProtobuf.Message, S
 
 extension Xmtp_Mls_Api_V1_UploadKeyPackageRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".UploadKeyPackageRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_package\0\u{3}is_inbox_id_credential\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_package"),
+    2: .standard(proto: "is_inbox_id_credential"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1731,7 +1799,9 @@ extension Xmtp_Mls_Api_V1_UploadKeyPackageRequest: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_Mls_Api_V1_FetchKeyPackagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".FetchKeyPackagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_keys\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_keys"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1761,7 +1831,9 @@ extension Xmtp_Mls_Api_V1_FetchKeyPackagesRequest: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_Mls_Api_V1_FetchKeyPackagesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".FetchKeyPackagesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_packages\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_packages"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1791,7 +1863,9 @@ extension Xmtp_Mls_Api_V1_FetchKeyPackagesResponse: SwiftProtobuf.Message, Swift
 
 extension Xmtp_Mls_Api_V1_FetchKeyPackagesResponse.KeyPackage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_FetchKeyPackagesResponse.protoMessageName + ".KeyPackage"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}key_package_tls_serialized\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "key_package_tls_serialized"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1821,7 +1895,10 @@ extension Xmtp_Mls_Api_V1_FetchKeyPackagesResponse.KeyPackage: SwiftProtobuf.Mes
 
 extension Xmtp_Mls_Api_V1_RevokeInstallationRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RevokeInstallationRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_key\0\u{3}wallet_signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_key"),
+    2: .standard(proto: "wallet_signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1860,7 +1937,10 @@ extension Xmtp_Mls_Api_V1_RevokeInstallationRequest: SwiftProtobuf.Message, Swif
 
 extension Xmtp_Mls_Api_V1_GetIdentityUpdatesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetIdentityUpdatesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}account_addresses\0\u{3}start_time_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "account_addresses"),
+    2: .standard(proto: "start_time_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1895,7 +1975,9 @@ extension Xmtp_Mls_Api_V1_GetIdentityUpdatesRequest: SwiftProtobuf.Message, Swif
 
 extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetIdentityUpdatesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}updates\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "updates"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1925,7 +2007,10 @@ extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse: SwiftProtobuf.Message, Swi
 
 extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.NewInstallationUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.protoMessageName + ".NewInstallationUpdate"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_key\0\u{3}credential_identity\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_key"),
+    2: .standard(proto: "credential_identity"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1960,7 +2045,9 @@ extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.NewInstallationUpdate: Swif
 
 extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.RevokedInstallationUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.protoMessageName + ".RevokedInstallationUpdate"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_key\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_key"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1990,7 +2077,11 @@ extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.RevokedInstallationUpdate: 
 
 extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.Update: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.protoMessageName + ".Update"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}timestamp_ns\0\u{3}new_installation\0\u{3}revoked_installation\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "timestamp_ns"),
+    2: .standard(proto: "new_installation"),
+    3: .standard(proto: "revoked_installation"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2062,7 +2153,9 @@ extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.Update: SwiftProtobuf.Messa
 
 extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.WalletUpdates: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.protoMessageName + ".WalletUpdates"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}updates\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "updates"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2092,7 +2185,11 @@ extension Xmtp_Mls_Api_V1_GetIdentityUpdatesResponse.WalletUpdates: SwiftProtobu
 
 extension Xmtp_Mls_Api_V1_PagingInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PagingInfo"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}direction\0\u{1}limit\0\u{3}id_cursor\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "direction"),
+    2: .same(proto: "limit"),
+    3: .standard(proto: "id_cursor"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2132,7 +2229,10 @@ extension Xmtp_Mls_Api_V1_PagingInfo: SwiftProtobuf.Message, SwiftProtobuf._Mess
 
 extension Xmtp_Mls_Api_V1_QueryGroupMessagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryGroupMessagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_id\0\u{3}paging_info\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_id"),
+    2: .standard(proto: "paging_info"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2171,7 +2271,10 @@ extension Xmtp_Mls_Api_V1_QueryGroupMessagesRequest: SwiftProtobuf.Message, Swif
 
 extension Xmtp_Mls_Api_V1_QueryGroupMessagesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryGroupMessagesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}messages\0\u{3}paging_info\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "messages"),
+    2: .standard(proto: "paging_info"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2210,7 +2313,10 @@ extension Xmtp_Mls_Api_V1_QueryGroupMessagesResponse: SwiftProtobuf.Message, Swi
 
 extension Xmtp_Mls_Api_V1_QueryWelcomeMessagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryWelcomeMessagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_key\0\u{3}paging_info\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_key"),
+    2: .standard(proto: "paging_info"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2249,7 +2355,10 @@ extension Xmtp_Mls_Api_V1_QueryWelcomeMessagesRequest: SwiftProtobuf.Message, Sw
 
 extension Xmtp_Mls_Api_V1_QueryWelcomeMessagesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryWelcomeMessagesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}messages\0\u{3}paging_info\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "messages"),
+    2: .standard(proto: "paging_info"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2288,7 +2397,9 @@ extension Xmtp_Mls_Api_V1_QueryWelcomeMessagesResponse: SwiftProtobuf.Message, S
 
 extension Xmtp_Mls_Api_V1_SubscribeGroupMessagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SubscribeGroupMessagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}filters\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "filters"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2318,7 +2429,10 @@ extension Xmtp_Mls_Api_V1_SubscribeGroupMessagesRequest: SwiftProtobuf.Message, 
 
 extension Xmtp_Mls_Api_V1_SubscribeGroupMessagesRequest.Filter: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_SubscribeGroupMessagesRequest.protoMessageName + ".Filter"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_id\0\u{3}id_cursor\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_id"),
+    2: .standard(proto: "id_cursor"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2353,7 +2467,9 @@ extension Xmtp_Mls_Api_V1_SubscribeGroupMessagesRequest.Filter: SwiftProtobuf.Me
 
 extension Xmtp_Mls_Api_V1_SubscribeWelcomeMessagesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SubscribeWelcomeMessagesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}filters\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "filters"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2383,7 +2499,10 @@ extension Xmtp_Mls_Api_V1_SubscribeWelcomeMessagesRequest: SwiftProtobuf.Message
 
 extension Xmtp_Mls_Api_V1_SubscribeWelcomeMessagesRequest.Filter: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_SubscribeWelcomeMessagesRequest.protoMessageName + ".Filter"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}installation_key\0\u{3}id_cursor\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "installation_key"),
+    2: .standard(proto: "id_cursor"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2418,7 +2537,9 @@ extension Xmtp_Mls_Api_V1_SubscribeWelcomeMessagesRequest.Filter: SwiftProtobuf.
 
 extension Xmtp_Mls_Api_V1_BatchPublishCommitLogRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".BatchPublishCommitLogRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2448,7 +2569,11 @@ extension Xmtp_Mls_Api_V1_BatchPublishCommitLogRequest: SwiftProtobuf.Message, S
 
 extension Xmtp_Mls_Api_V1_PublishCommitLogRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PublishCommitLogRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_id\0\u{3}serialized_commit_log_entry\0\u{1}signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_id"),
+    2: .standard(proto: "serialized_commit_log_entry"),
+    3: .same(proto: "signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2492,7 +2617,10 @@ extension Xmtp_Mls_Api_V1_PublishCommitLogRequest: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_Mls_Api_V1_QueryCommitLogRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryCommitLogRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_id\0\u{3}paging_info\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_id"),
+    2: .standard(proto: "paging_info"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2531,7 +2659,11 @@ extension Xmtp_Mls_Api_V1_QueryCommitLogRequest: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_Mls_Api_V1_QueryCommitLogResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".QueryCommitLogResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_id\0\u{3}commit_log_entries\0\u{3}paging_info\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_id"),
+    2: .standard(proto: "commit_log_entries"),
+    3: .standard(proto: "paging_info"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2575,7 +2707,9 @@ extension Xmtp_Mls_Api_V1_QueryCommitLogResponse: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_Mls_Api_V1_BatchQueryCommitLogRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".BatchQueryCommitLogRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2605,7 +2739,9 @@ extension Xmtp_Mls_Api_V1_BatchQueryCommitLogRequest: SwiftProtobuf.Message, Swi
 
 extension Xmtp_Mls_Api_V1_BatchQueryCommitLogResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".BatchQueryCommitLogResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2635,7 +2771,10 @@ extension Xmtp_Mls_Api_V1_BatchQueryCommitLogResponse: SwiftProtobuf.Message, Sw
 
 extension Xmtp_Mls_Api_V1_GetNewestGroupMessageRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetNewestGroupMessageRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_ids\0\u{3}include_content\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_ids"),
+    2: .standard(proto: "include_content"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2670,7 +2809,9 @@ extension Xmtp_Mls_Api_V1_GetNewestGroupMessageRequest: SwiftProtobuf.Message, S
 
 extension Xmtp_Mls_Api_V1_GetNewestGroupMessageResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetNewestGroupMessageResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2700,7 +2841,9 @@ extension Xmtp_Mls_Api_V1_GetNewestGroupMessageResponse: SwiftProtobuf.Message, 
 
 extension Xmtp_Mls_Api_V1_GetNewestGroupMessageResponse.Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_Mls_Api_V1_GetNewestGroupMessageResponse.protoMessageName + ".Response"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_message\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "group_message"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

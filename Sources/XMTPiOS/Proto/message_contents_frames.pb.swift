@@ -68,7 +68,7 @@ public struct Xmtp_MessageContents_FrameActionBody: Sendable {
 
 /// The outer payload that will be sent as the `messageBytes` in the
 /// `trusted_data` part of the Frames message
-public struct Xmtp_MessageContents_FrameAction: Sendable {
+public struct Xmtp_MessageContents_FrameAction: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -123,7 +123,17 @@ fileprivate let _protobuf_package = "xmtp.message_contents"
 
 extension Xmtp_MessageContents_FrameActionBody: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".FrameActionBody"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}frame_url\0\u{3}button_index\0\u{1}timestamp\0\u{3}opaque_conversation_identifier\0\u{3}unix_timestamp\0\u{3}input_text\0\u{1}state\0\u{1}address\0\u{3}transaction_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "frame_url"),
+    2: .standard(proto: "button_index"),
+    3: .same(proto: "timestamp"),
+    4: .standard(proto: "opaque_conversation_identifier"),
+    5: .standard(proto: "unix_timestamp"),
+    6: .standard(proto: "input_text"),
+    7: .same(proto: "state"),
+    8: .same(proto: "address"),
+    9: .standard(proto: "transaction_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -193,7 +203,14 @@ extension Xmtp_MessageContents_FrameActionBody: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_MessageContents_FrameAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".FrameAction"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}signature\0\u{3}signed_public_key_bundle\0\u{3}action_body\0\u{3}installation_signature\0\u{3}installation_id\0\u{3}inbox_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "signature"),
+    2: .standard(proto: "signed_public_key_bundle"),
+    3: .standard(proto: "action_body"),
+    4: .standard(proto: "installation_signature"),
+    5: .standard(proto: "installation_id"),
+    6: .standard(proto: "inbox_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

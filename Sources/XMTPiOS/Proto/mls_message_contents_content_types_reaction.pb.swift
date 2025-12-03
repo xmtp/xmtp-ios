@@ -144,16 +144,31 @@ public struct Xmtp_Mls_MessageContents_ContentTypes_ReactionV2: Sendable {
 fileprivate let _protobuf_package = "xmtp.mls.message_contents.content_types"
 
 extension Xmtp_Mls_MessageContents_ContentTypes_ReactionAction: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0REACTION_ACTION_UNSPECIFIED\0\u{1}REACTION_ACTION_ADDED\0\u{1}REACTION_ACTION_REMOVED\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "REACTION_ACTION_UNSPECIFIED"),
+    1: .same(proto: "REACTION_ACTION_ADDED"),
+    2: .same(proto: "REACTION_ACTION_REMOVED"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_ContentTypes_ReactionSchema: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0REACTION_SCHEMA_UNSPECIFIED\0\u{1}REACTION_SCHEMA_UNICODE\0\u{1}REACTION_SCHEMA_SHORTCODE\0\u{1}REACTION_SCHEMA_CUSTOM\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "REACTION_SCHEMA_UNSPECIFIED"),
+    1: .same(proto: "REACTION_SCHEMA_UNICODE"),
+    2: .same(proto: "REACTION_SCHEMA_SHORTCODE"),
+    3: .same(proto: "REACTION_SCHEMA_CUSTOM"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_ContentTypes_ReactionV2: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ReactionV2"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}reference\0\u{3}reference_inbox_id\0\u{1}action\0\u{1}content\0\u{1}schema\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "reference"),
+    2: .standard(proto: "reference_inbox_id"),
+    3: .same(proto: "action"),
+    4: .same(proto: "content"),
+    5: .same(proto: "schema"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

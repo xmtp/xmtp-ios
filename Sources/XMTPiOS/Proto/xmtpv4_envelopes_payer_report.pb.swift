@@ -24,7 +24,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 }
 
 /// A report of the payers and nodes that sent messages in a given range of messages
-public struct Xmtp_Xmtpv4_Envelopes_PayerReport: Sendable {
+public struct Xmtp_Xmtpv4_Envelopes_PayerReport: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -76,7 +76,7 @@ public struct Xmtp_Xmtpv4_Envelopes_NodeSignature: Sendable {
 }
 
 /// An attestation of a payer report
-public struct Xmtp_Xmtpv4_Envelopes_PayerReportAttestation: Sendable {
+public struct Xmtp_Xmtpv4_Envelopes_PayerReportAttestation: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -107,7 +107,14 @@ fileprivate let _protobuf_package = "xmtp.xmtpv4.envelopes"
 
 extension Xmtp_Xmtpv4_Envelopes_PayerReport: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PayerReport"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}originator_node_id\0\u{3}start_sequence_id\0\u{3}end_sequence_id\0\u{3}end_minute_since_epoch\0\u{3}payers_merkle_root\0\u{3}active_node_ids\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "originator_node_id"),
+    2: .standard(proto: "start_sequence_id"),
+    3: .standard(proto: "end_sequence_id"),
+    4: .standard(proto: "end_minute_since_epoch"),
+    5: .standard(proto: "payers_merkle_root"),
+    6: .standard(proto: "active_node_ids"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -162,7 +169,10 @@ extension Xmtp_Xmtpv4_Envelopes_PayerReport: SwiftProtobuf.Message, SwiftProtobu
 
 extension Xmtp_Xmtpv4_Envelopes_NodeSignature: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".NodeSignature"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}node_id\0\u{1}signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "node_id"),
+    2: .same(proto: "signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -201,7 +211,10 @@ extension Xmtp_Xmtpv4_Envelopes_NodeSignature: SwiftProtobuf.Message, SwiftProto
 
 extension Xmtp_Xmtpv4_Envelopes_PayerReportAttestation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PayerReportAttestation"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}report_id\0\u{1}signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "report_id"),
+    2: .same(proto: "signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

@@ -61,7 +61,7 @@ public struct Xmtp_MessageContents_MessageHeaderV1: @unchecked Sendable {
 }
 
 /// Message is the top level protocol element
-public struct Xmtp_MessageContents_MessageV1: Sendable {
+public struct Xmtp_MessageContents_MessageV1: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -107,7 +107,7 @@ public struct Xmtp_MessageContents_MessageHeaderV2: Sendable {
 }
 
 /// Message combines the encoded header with the encrypted payload.
-public struct Xmtp_MessageContents_MessageV2: Sendable {
+public struct Xmtp_MessageContents_MessageV2: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -194,7 +194,7 @@ public struct Xmtp_MessageContents_Message: Sendable {
 /// DecodedMessage represents the decrypted message contents.
 /// DecodedMessage instances are not stored on the network, but
 /// may be serialized and stored by clients
-public struct Xmtp_MessageContents_DecodedMessage: Sendable {
+public struct Xmtp_MessageContents_DecodedMessage: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -244,7 +244,11 @@ fileprivate let _protobuf_package = "xmtp.message_contents"
 
 extension Xmtp_MessageContents_MessageHeaderV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MessageHeaderV1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}sender\0\u{1}recipient\0\u{1}timestamp\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "sender"),
+    2: .same(proto: "recipient"),
+    3: .same(proto: "timestamp"),
+  ]
 
   fileprivate class _StorageClass {
     var _sender: Xmtp_MessageContents_PublicKeyBundle? = nil
@@ -328,7 +332,10 @@ extension Xmtp_MessageContents_MessageHeaderV1: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_MessageContents_MessageV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MessageV1"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}header_bytes\0\u{1}ciphertext\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "header_bytes"),
+    2: .same(proto: "ciphertext"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -367,7 +374,10 @@ extension Xmtp_MessageContents_MessageV1: SwiftProtobuf.Message, SwiftProtobuf._
 
 extension Xmtp_MessageContents_MessageHeaderV2: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MessageHeaderV2"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}created_ns\0\u{1}topic\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "created_ns"),
+    2: .same(proto: "topic"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -402,7 +412,12 @@ extension Xmtp_MessageContents_MessageHeaderV2: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_MessageContents_MessageV2: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MessageV2"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}header_bytes\0\u{1}ciphertext\0\u{3}sender_hmac\0\u{3}should_push\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "header_bytes"),
+    2: .same(proto: "ciphertext"),
+    3: .standard(proto: "sender_hmac"),
+    4: .standard(proto: "should_push"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -451,7 +466,10 @@ extension Xmtp_MessageContents_MessageV2: SwiftProtobuf.Message, SwiftProtobuf._
 
 extension Xmtp_MessageContents_Message: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Message"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0\u{1}v2\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+    2: .same(proto: "v2"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -518,7 +536,16 @@ extension Xmtp_MessageContents_Message: SwiftProtobuf.Message, SwiftProtobuf._Me
 
 extension Xmtp_MessageContents_DecodedMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DecodedMessage"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}message_version\0\u{3}sender_address\0\u{3}recipient_address\0\u{3}sent_ns\0\u{3}content_topic\0\u{1}conversation\0\u{3}content_bytes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "id"),
+    2: .standard(proto: "message_version"),
+    3: .standard(proto: "sender_address"),
+    4: .standard(proto: "recipient_address"),
+    5: .standard(proto: "sent_ns"),
+    6: .standard(proto: "content_topic"),
+    7: .same(proto: "conversation"),
+    8: .standard(proto: "content_bytes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

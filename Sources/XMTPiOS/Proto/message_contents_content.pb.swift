@@ -84,7 +84,7 @@ public struct Xmtp_MessageContents_ContentTypeId: Sendable {
 
 /// EncodedContent bundles the content with metadata identifying its type
 /// and parameters required for correct decoding and presentation of the content.
-public struct Xmtp_MessageContents_EncodedContent: Sendable {
+public struct Xmtp_MessageContents_EncodedContent: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -138,7 +138,7 @@ public struct Xmtp_MessageContents_EncodedContent: Sendable {
 }
 
 /// SignedContent attaches a signature to EncodedContent.
-public struct Xmtp_MessageContents_SignedContent: Sendable {
+public struct Xmtp_MessageContents_SignedContent: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -180,12 +180,20 @@ public struct Xmtp_MessageContents_SignedContent: Sendable {
 fileprivate let _protobuf_package = "xmtp.message_contents"
 
 extension Xmtp_MessageContents_Compression: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0COMPRESSION_DEFLATE\0\u{1}COMPRESSION_GZIP\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "COMPRESSION_DEFLATE"),
+    1: .same(proto: "COMPRESSION_GZIP"),
+  ]
 }
 
 extension Xmtp_MessageContents_ContentTypeId: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ContentTypeId"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}authority_id\0\u{3}type_id\0\u{3}version_major\0\u{3}version_minor\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "authority_id"),
+    2: .standard(proto: "type_id"),
+    3: .standard(proto: "version_major"),
+    4: .standard(proto: "version_minor"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -230,7 +238,13 @@ extension Xmtp_MessageContents_ContentTypeId: SwiftProtobuf.Message, SwiftProtob
 
 extension Xmtp_MessageContents_EncodedContent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".EncodedContent"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}parameters\0\u{1}fallback\0\u{1}content\0\u{1}compression\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "type"),
+    2: .same(proto: "parameters"),
+    3: .same(proto: "fallback"),
+    5: .same(proto: "compression"),
+    4: .same(proto: "content"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -284,7 +298,11 @@ extension Xmtp_MessageContents_EncodedContent: SwiftProtobuf.Message, SwiftProto
 
 extension Xmtp_MessageContents_SignedContent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignedContent"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}payload\0\u{1}sender\0\u{1}signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "payload"),
+    2: .same(proto: "sender"),
+    3: .same(proto: "signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

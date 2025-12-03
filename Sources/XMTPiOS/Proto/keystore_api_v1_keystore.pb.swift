@@ -131,7 +131,7 @@ public struct Xmtp_KeystoreApi_V1_DecryptV1Request: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// A single decryption request
-  public struct Request: Sendable {
+  public struct Request: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -212,7 +212,7 @@ public struct Xmtp_KeystoreApi_V1_DecryptResponse: Sendable {
     }
 
     /// Wrapper object for success response
-    public struct Success: Sendable {
+    public struct Success: @unchecked Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -241,7 +241,7 @@ public struct Xmtp_KeystoreApi_V1_DecryptV2Request: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// A single decryption request
-  public struct Request: Sendable {
+  public struct Request: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -280,7 +280,7 @@ public struct Xmtp_KeystoreApi_V1_EncryptV1Request: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// A single encryption request
-  public struct Request: Sendable {
+  public struct Request: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -351,7 +351,7 @@ public struct Xmtp_KeystoreApi_V1_EncryptResponse: Sendable {
     }
 
     /// Wrapper object for success response
-    public struct Success: Sendable {
+    public struct Success: @unchecked Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -391,7 +391,7 @@ public struct Xmtp_KeystoreApi_V1_EncryptV2Request: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// A single encryption request
-  public struct Request: Sendable {
+  public struct Request: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -421,7 +421,7 @@ public struct Xmtp_KeystoreApi_V1_SelfEncryptRequest: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Request type
-  public struct Request: Sendable {
+  public struct Request: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -479,7 +479,7 @@ public struct Xmtp_KeystoreApi_V1_SelfEncryptResponse: Sendable {
     }
 
     /// Success response
-    public struct Success: Sendable {
+    public struct Success: @unchecked Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -508,7 +508,7 @@ public struct Xmtp_KeystoreApi_V1_SelfDecryptRequest: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Request type
-  public struct Request: Sendable {
+  public struct Request: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -581,7 +581,7 @@ public struct Xmtp_KeystoreApi_V1_CreateInviteRequest: Sendable {
 }
 
 /// Response to a CreateInviteRequest
-public struct Xmtp_KeystoreApi_V1_CreateInviteResponse: Sendable {
+public struct Xmtp_KeystoreApi_V1_CreateInviteResponse: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -615,7 +615,7 @@ public struct Xmtp_KeystoreApi_V1_SaveInvitesRequest: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// Mirrors xmtp.envelope schema
-  public struct Request: Sendable {
+  public struct Request: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -881,7 +881,7 @@ public struct Xmtp_KeystoreApi_V1_InitKeystoreResponse: Sendable {
 
 /// SignDigestRequest is used to sign a digest with either the identity key
 /// or a prekey
-public struct Xmtp_KeystoreApi_V1_SignDigestRequest: Sendable {
+public struct Xmtp_KeystoreApi_V1_SignDigestRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1032,7 +1032,7 @@ public struct Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   /// HmacKeyData wraps the HMAC key and the number of 30 day periods since epoch
-  public struct HmacKeyData: Sendable {
+  public struct HmacKeyData: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -1080,16 +1080,28 @@ public struct Xmtp_KeystoreApi_V1_PrivatePreferencesActionMap: Sendable {
 fileprivate let _protobuf_package = "xmtp.keystore_api.v1"
 
 extension Xmtp_KeystoreApi_V1_ErrorCode: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0ERROR_CODE_UNSPECIFIED\0\u{1}ERROR_CODE_INVALID_INPUT\0\u{1}ERROR_CODE_NO_MATCHING_PREKEY\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "ERROR_CODE_UNSPECIFIED"),
+    1: .same(proto: "ERROR_CODE_INVALID_INPUT"),
+    2: .same(proto: "ERROR_CODE_NO_MATCHING_PREKEY"),
+  ]
 }
 
 extension Xmtp_KeystoreApi_V1_JobType: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0JOB_TYPE_UNSPECIFIED\0\u{1}JOB_TYPE_REFRESH_V1\0\u{1}JOB_TYPE_REFRESH_V2\0\u{1}JOB_TYPE_REFRESH_PPPP\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "JOB_TYPE_UNSPECIFIED"),
+    1: .same(proto: "JOB_TYPE_REFRESH_V1"),
+    2: .same(proto: "JOB_TYPE_REFRESH_V2"),
+    3: .same(proto: "JOB_TYPE_REFRESH_PPPP"),
+  ]
 }
 
 extension Xmtp_KeystoreApi_V1_KeystoreError: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".KeystoreError"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}message\0\u{1}code\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "message"),
+    2: .same(proto: "code"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1124,7 +1136,9 @@ extension Xmtp_KeystoreApi_V1_KeystoreError: SwiftProtobuf.Message, SwiftProtobu
 
 extension Xmtp_KeystoreApi_V1_DecryptV1Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DecryptV1Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1154,7 +1168,12 @@ extension Xmtp_KeystoreApi_V1_DecryptV1Request: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_KeystoreApi_V1_DecryptV1Request.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_DecryptV1Request.protoMessageName + ".Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}payload\0\u{3}peer_keys\0\u{3}header_bytes\0\u{3}is_sender\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "payload"),
+    2: .standard(proto: "peer_keys"),
+    3: .standard(proto: "header_bytes"),
+    4: .standard(proto: "is_sender"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1203,7 +1222,9 @@ extension Xmtp_KeystoreApi_V1_DecryptV1Request.Request: SwiftProtobuf.Message, S
 
 extension Xmtp_KeystoreApi_V1_DecryptResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DecryptResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1233,7 +1254,10 @@ extension Xmtp_KeystoreApi_V1_DecryptResponse: SwiftProtobuf.Message, SwiftProto
 
 extension Xmtp_KeystoreApi_V1_DecryptResponse.Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_DecryptResponse.protoMessageName + ".Response"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}result\0\u{1}error\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "result"),
+    2: .same(proto: "error"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1300,7 +1324,9 @@ extension Xmtp_KeystoreApi_V1_DecryptResponse.Response: SwiftProtobuf.Message, S
 
 extension Xmtp_KeystoreApi_V1_DecryptResponse.Response.Success: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_DecryptResponse.Response.protoMessageName + ".Success"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}decrypted\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "decrypted"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1330,7 +1356,9 @@ extension Xmtp_KeystoreApi_V1_DecryptResponse.Response.Success: SwiftProtobuf.Me
 
 extension Xmtp_KeystoreApi_V1_DecryptV2Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DecryptV2Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1360,7 +1388,11 @@ extension Xmtp_KeystoreApi_V1_DecryptV2Request: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_KeystoreApi_V1_DecryptV2Request.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_DecryptV2Request.protoMessageName + ".Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}payload\0\u{3}header_bytes\0\u{3}content_topic\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "payload"),
+    2: .standard(proto: "header_bytes"),
+    3: .standard(proto: "content_topic"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1404,7 +1436,9 @@ extension Xmtp_KeystoreApi_V1_DecryptV2Request.Request: SwiftProtobuf.Message, S
 
 extension Xmtp_KeystoreApi_V1_EncryptV1Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".EncryptV1Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1434,7 +1468,11 @@ extension Xmtp_KeystoreApi_V1_EncryptV1Request: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_KeystoreApi_V1_EncryptV1Request.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_EncryptV1Request.protoMessageName + ".Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}recipient\0\u{1}payload\0\u{3}header_bytes\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "recipient"),
+    2: .same(proto: "payload"),
+    3: .standard(proto: "header_bytes"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1478,7 +1516,9 @@ extension Xmtp_KeystoreApi_V1_EncryptV1Request.Request: SwiftProtobuf.Message, S
 
 extension Xmtp_KeystoreApi_V1_EncryptResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".EncryptResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1508,7 +1548,10 @@ extension Xmtp_KeystoreApi_V1_EncryptResponse: SwiftProtobuf.Message, SwiftProto
 
 extension Xmtp_KeystoreApi_V1_EncryptResponse.Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_EncryptResponse.protoMessageName + ".Response"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}result\0\u{1}error\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "result"),
+    2: .same(proto: "error"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1575,7 +1618,10 @@ extension Xmtp_KeystoreApi_V1_EncryptResponse.Response: SwiftProtobuf.Message, S
 
 extension Xmtp_KeystoreApi_V1_EncryptResponse.Response.Success: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_EncryptResponse.Response.protoMessageName + ".Success"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}encrypted\0\u{3}sender_hmac\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "encrypted"),
+    2: .standard(proto: "sender_hmac"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1614,7 +1660,9 @@ extension Xmtp_KeystoreApi_V1_EncryptResponse.Response.Success: SwiftProtobuf.Me
 
 extension Xmtp_KeystoreApi_V1_EncryptV2Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".EncryptV2Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1644,7 +1692,11 @@ extension Xmtp_KeystoreApi_V1_EncryptV2Request: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_KeystoreApi_V1_EncryptV2Request.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_EncryptV2Request.protoMessageName + ".Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}payload\0\u{3}header_bytes\0\u{3}content_topic\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "payload"),
+    2: .standard(proto: "header_bytes"),
+    3: .standard(proto: "content_topic"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1684,7 +1736,9 @@ extension Xmtp_KeystoreApi_V1_EncryptV2Request.Request: SwiftProtobuf.Message, S
 
 extension Xmtp_KeystoreApi_V1_SelfEncryptRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SelfEncryptRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1714,7 +1768,9 @@ extension Xmtp_KeystoreApi_V1_SelfEncryptRequest: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_KeystoreApi_V1_SelfEncryptRequest.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_SelfEncryptRequest.protoMessageName + ".Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}payload\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "payload"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1744,7 +1800,9 @@ extension Xmtp_KeystoreApi_V1_SelfEncryptRequest.Request: SwiftProtobuf.Message,
 
 extension Xmtp_KeystoreApi_V1_SelfEncryptResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SelfEncryptResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1774,7 +1832,10 @@ extension Xmtp_KeystoreApi_V1_SelfEncryptResponse: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_KeystoreApi_V1_SelfEncryptResponse.Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_SelfEncryptResponse.protoMessageName + ".Response"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}result\0\u{1}error\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "result"),
+    2: .same(proto: "error"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1841,7 +1902,9 @@ extension Xmtp_KeystoreApi_V1_SelfEncryptResponse.Response: SwiftProtobuf.Messag
 
 extension Xmtp_KeystoreApi_V1_SelfEncryptResponse.Response.Success: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_SelfEncryptResponse.Response.protoMessageName + ".Success"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}encrypted\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "encrypted"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1871,7 +1934,9 @@ extension Xmtp_KeystoreApi_V1_SelfEncryptResponse.Response.Success: SwiftProtobu
 
 extension Xmtp_KeystoreApi_V1_SelfDecryptRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SelfDecryptRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1901,7 +1966,9 @@ extension Xmtp_KeystoreApi_V1_SelfDecryptRequest: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_KeystoreApi_V1_SelfDecryptRequest.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_SelfDecryptRequest.protoMessageName + ".Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}payload\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "payload"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1931,7 +1998,9 @@ extension Xmtp_KeystoreApi_V1_SelfDecryptRequest.Request: SwiftProtobuf.Message,
 
 extension Xmtp_KeystoreApi_V1_GetPrivatePreferencesTopicIdentifierResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetPrivatePreferencesTopicIdentifierResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}identifier\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "identifier"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1961,7 +2030,12 @@ extension Xmtp_KeystoreApi_V1_GetPrivatePreferencesTopicIdentifierResponse: Swif
 
 extension Xmtp_KeystoreApi_V1_CreateInviteRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".CreateInviteRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}context\0\u{1}recipient\0\u{3}created_ns\0\u{3}consent_proof\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "context"),
+    2: .same(proto: "recipient"),
+    3: .standard(proto: "created_ns"),
+    4: .standard(proto: "consent_proof"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2010,7 +2084,10 @@ extension Xmtp_KeystoreApi_V1_CreateInviteRequest: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_KeystoreApi_V1_CreateInviteResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".CreateInviteResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}conversation\0\u{1}payload\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "conversation"),
+    2: .same(proto: "payload"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2049,7 +2126,9 @@ extension Xmtp_KeystoreApi_V1_CreateInviteResponse: SwiftProtobuf.Message, Swift
 
 extension Xmtp_KeystoreApi_V1_SaveInvitesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SaveInvitesRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}requests\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "requests"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2079,7 +2158,11 @@ extension Xmtp_KeystoreApi_V1_SaveInvitesRequest: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_KeystoreApi_V1_SaveInvitesRequest.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_SaveInvitesRequest.protoMessageName + ".Request"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}content_topic\0\u{3}timestamp_ns\0\u{1}payload\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "content_topic"),
+    2: .standard(proto: "timestamp_ns"),
+    3: .same(proto: "payload"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2119,7 +2202,9 @@ extension Xmtp_KeystoreApi_V1_SaveInvitesRequest.Request: SwiftProtobuf.Message,
 
 extension Xmtp_KeystoreApi_V1_SaveInvitesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SaveInvitesResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}responses\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "responses"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2149,7 +2234,10 @@ extension Xmtp_KeystoreApi_V1_SaveInvitesResponse: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_KeystoreApi_V1_SaveInvitesResponse.Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_SaveInvitesResponse.protoMessageName + ".Response"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}result\0\u{1}error\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "result"),
+    2: .same(proto: "error"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2216,7 +2304,9 @@ extension Xmtp_KeystoreApi_V1_SaveInvitesResponse.Response: SwiftProtobuf.Messag
 
 extension Xmtp_KeystoreApi_V1_SaveInvitesResponse.Response.Success: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_SaveInvitesResponse.Response.protoMessageName + ".Success"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}conversation\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "conversation"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2250,7 +2340,9 @@ extension Xmtp_KeystoreApi_V1_SaveInvitesResponse.Response.Success: SwiftProtobu
 
 extension Xmtp_KeystoreApi_V1_CreateAuthTokenRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".CreateAuthTokenRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}timestamp_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "timestamp_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2284,7 +2376,9 @@ extension Xmtp_KeystoreApi_V1_CreateAuthTokenRequest: SwiftProtobuf.Message, Swi
 
 extension Xmtp_KeystoreApi_V1_SaveV1ConversationsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SaveV1ConversationsRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}conversations\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "conversations"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2333,7 +2427,9 @@ extension Xmtp_KeystoreApi_V1_SaveV1ConversationsResponse: SwiftProtobuf.Message
 
 extension Xmtp_KeystoreApi_V1_GetConversationsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetConversationsResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}conversations\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "conversations"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2363,7 +2459,9 @@ extension Xmtp_KeystoreApi_V1_GetConversationsResponse: SwiftProtobuf.Message, S
 
 extension Xmtp_KeystoreApi_V1_GetKeystoreStatusRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetKeystoreStatusRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}wallet_address\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "wallet_address"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2393,7 +2491,9 @@ extension Xmtp_KeystoreApi_V1_GetKeystoreStatusRequest: SwiftProtobuf.Message, S
 
 extension Xmtp_KeystoreApi_V1_GetKeystoreStatusResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetKeystoreStatusResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}status\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "status"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2422,12 +2522,18 @@ extension Xmtp_KeystoreApi_V1_GetKeystoreStatusResponse: SwiftProtobuf.Message, 
 }
 
 extension Xmtp_KeystoreApi_V1_GetKeystoreStatusResponse.KeystoreStatus: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0KEYSTORE_STATUS_UNSPECIFIED\0\u{1}KEYSTORE_STATUS_UNINITIALIZED\0\u{1}KEYSTORE_STATUS_INITIALIZED\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "KEYSTORE_STATUS_UNSPECIFIED"),
+    1: .same(proto: "KEYSTORE_STATUS_UNINITIALIZED"),
+    2: .same(proto: "KEYSTORE_STATUS_INITIALIZED"),
+  ]
 }
 
 extension Xmtp_KeystoreApi_V1_InitKeystoreRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".InitKeystoreRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}v1\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "v1"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2473,7 +2579,9 @@ extension Xmtp_KeystoreApi_V1_InitKeystoreRequest: SwiftProtobuf.Message, SwiftP
 
 extension Xmtp_KeystoreApi_V1_InitKeystoreResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".InitKeystoreResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}error\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "error"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2507,7 +2615,11 @@ extension Xmtp_KeystoreApi_V1_InitKeystoreResponse: SwiftProtobuf.Message, Swift
 
 extension Xmtp_KeystoreApi_V1_SignDigestRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignDigestRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}digest\0\u{3}identity_key\0\u{3}prekey_index\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "digest"),
+    2: .standard(proto: "identity_key"),
+    3: .standard(proto: "prekey_index"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2569,7 +2681,9 @@ extension Xmtp_KeystoreApi_V1_SignDigestRequest: SwiftProtobuf.Message, SwiftPro
 
 extension Xmtp_KeystoreApi_V1_GetRefreshJobRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetRefreshJobRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}job_type\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "job_type"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2599,7 +2713,9 @@ extension Xmtp_KeystoreApi_V1_GetRefreshJobRequest: SwiftProtobuf.Message, Swift
 
 extension Xmtp_KeystoreApi_V1_GetRefreshJobResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetRefreshJobResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}last_run_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "last_run_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2629,7 +2745,10 @@ extension Xmtp_KeystoreApi_V1_GetRefreshJobResponse: SwiftProtobuf.Message, Swif
 
 extension Xmtp_KeystoreApi_V1_SetRefeshJobRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SetRefeshJobRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}job_type\0\u{3}last_run_ns\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "job_type"),
+    2: .standard(proto: "last_run_ns"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2683,7 +2802,9 @@ extension Xmtp_KeystoreApi_V1_SetRefreshJobResponse: SwiftProtobuf.Message, Swif
 
 extension Xmtp_KeystoreApi_V1_TopicMap: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".TopicMap"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}topics\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "topics"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2713,7 +2834,11 @@ extension Xmtp_KeystoreApi_V1_TopicMap: SwiftProtobuf.Message, SwiftProtobuf._Me
 
 extension Xmtp_KeystoreApi_V1_TopicMap.TopicData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_TopicMap.protoMessageName + ".TopicData"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}created_ns\0\u{3}peer_address\0\u{1}invitation\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "created_ns"),
+    2: .standard(proto: "peer_address"),
+    3: .same(proto: "invitation"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2757,7 +2882,9 @@ extension Xmtp_KeystoreApi_V1_TopicMap.TopicData: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetConversationHmacKeysRequest"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}topics\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "topics"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2787,7 +2914,9 @@ extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysRequest: SwiftProtobuf.Mess
 
 extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetConversationHmacKeysResponse"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}hmac_keys\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "hmac_keys"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2817,7 +2946,10 @@ extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse: SwiftProtobuf.Mes
 
 extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeyData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.protoMessageName + ".HmacKeyData"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}thirty_day_periods_since_epoch\0\u{3}hmac_key\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "thirty_day_periods_since_epoch"),
+    2: .standard(proto: "hmac_key"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2852,7 +2984,9 @@ extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeyData: Swift
 
 extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeys: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.protoMessageName + ".HmacKeys"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}values\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "values"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2882,7 +3016,9 @@ extension Xmtp_KeystoreApi_V1_GetConversationHmacKeysResponse.HmacKeys: SwiftPro
 
 extension Xmtp_KeystoreApi_V1_PrivatePreferencesActionMap: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PrivatePreferencesActionMap"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}actions\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "actions"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

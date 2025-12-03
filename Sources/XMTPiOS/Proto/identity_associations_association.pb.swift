@@ -65,7 +65,7 @@ public enum Xmtp_Identity_Associations_IdentifierKind: SwiftProtobuf.Enum, Swift
 }
 
 /// The identifier for a member of an XID
-public struct Xmtp_Identity_Associations_MemberIdentifier: Sendable {
+public struct Xmtp_Identity_Associations_MemberIdentifier: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -98,7 +98,7 @@ public struct Xmtp_Identity_Associations_MemberIdentifier: Sendable {
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  public enum OneOf_Kind: Equatable, Sendable {
+  public enum OneOf_Kind: Equatable, @unchecked Sendable {
     case ethereumAddress(String)
     case installationPublicKey(Data)
     case passkey(Xmtp_Identity_Associations_Passkey)
@@ -109,7 +109,7 @@ public struct Xmtp_Identity_Associations_MemberIdentifier: Sendable {
 }
 
 /// Passkey identifier
-public struct Xmtp_Identity_Associations_Passkey: Sendable {
+public struct Xmtp_Identity_Associations_Passkey: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -463,7 +463,7 @@ public struct Xmtp_Identity_Associations_MemberMap: Sendable {
 }
 
 /// A final association state resulting from multiple `IdentityUpdates`
-public struct Xmtp_Identity_Associations_AssociationState: Sendable {
+public struct Xmtp_Identity_Associations_AssociationState: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -515,12 +515,20 @@ public struct Xmtp_Identity_Associations_AssociationStateDiff: Sendable {
 fileprivate let _protobuf_package = "xmtp.identity.associations"
 
 extension Xmtp_Identity_Associations_IdentifierKind: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0IDENTIFIER_KIND_UNSPECIFIED\0\u{1}IDENTIFIER_KIND_ETHEREUM\0\u{1}IDENTIFIER_KIND_PASSKEY\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "IDENTIFIER_KIND_UNSPECIFIED"),
+    1: .same(proto: "IDENTIFIER_KIND_ETHEREUM"),
+    2: .same(proto: "IDENTIFIER_KIND_PASSKEY"),
+  ]
 }
 
 extension Xmtp_Identity_Associations_MemberIdentifier: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MemberIdentifier"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}ethereum_address\0\u{3}installation_public_key\0\u{1}passkey\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "ethereum_address"),
+    2: .standard(proto: "installation_public_key"),
+    3: .same(proto: "passkey"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -594,7 +602,10 @@ extension Xmtp_Identity_Associations_MemberIdentifier: SwiftProtobuf.Message, Sw
 
 extension Xmtp_Identity_Associations_Passkey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Passkey"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}key\0\u{3}relying_party\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "key"),
+    2: .standard(proto: "relying_party"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -633,7 +644,12 @@ extension Xmtp_Identity_Associations_Passkey: SwiftProtobuf.Message, SwiftProtob
 
 extension Xmtp_Identity_Associations_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Member"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}identifier\0\u{3}added_by_entity\0\u{3}client_timestamp_ns\0\u{3}added_on_chain_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "identifier"),
+    2: .standard(proto: "added_by_entity"),
+    3: .standard(proto: "client_timestamp_ns"),
+    4: .standard(proto: "added_on_chain_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -682,7 +698,13 @@ extension Xmtp_Identity_Associations_Member: SwiftProtobuf.Message, SwiftProtobu
 
 extension Xmtp_Identity_Associations_CreateInbox: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".CreateInbox"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}initial_identifier\0\u{1}nonce\0\u{3}initial_identifier_signature\0\u{3}initial_identifier_kind\0\u{3}relying_party\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "initial_identifier"),
+    2: .same(proto: "nonce"),
+    3: .standard(proto: "initial_identifier_signature"),
+    4: .standard(proto: "initial_identifier_kind"),
+    5: .standard(proto: "relying_party"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -736,7 +758,12 @@ extension Xmtp_Identity_Associations_CreateInbox: SwiftProtobuf.Message, SwiftPr
 
 extension Xmtp_Identity_Associations_AddAssociation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".AddAssociation"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}new_member_identifier\0\u{3}existing_member_signature\0\u{3}new_member_signature\0\u{3}relying_party\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "new_member_identifier"),
+    2: .standard(proto: "existing_member_signature"),
+    3: .standard(proto: "new_member_signature"),
+    4: .standard(proto: "relying_party"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -785,7 +812,10 @@ extension Xmtp_Identity_Associations_AddAssociation: SwiftProtobuf.Message, Swif
 
 extension Xmtp_Identity_Associations_RevokeAssociation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RevokeAssociation"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}member_to_revoke\0\u{3}recovery_identifier_signature\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "member_to_revoke"),
+    2: .standard(proto: "recovery_identifier_signature"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -824,7 +854,12 @@ extension Xmtp_Identity_Associations_RevokeAssociation: SwiftProtobuf.Message, S
 
 extension Xmtp_Identity_Associations_ChangeRecoveryAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ChangeRecoveryAddress"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}new_recovery_identifier\0\u{3}existing_recovery_identifier_signature\0\u{3}new_recovery_identifier_kind\0\u{3}relying_party\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "new_recovery_identifier"),
+    2: .standard(proto: "existing_recovery_identifier_signature"),
+    3: .standard(proto: "new_recovery_identifier_kind"),
+    4: .standard(proto: "relying_party"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -873,7 +908,12 @@ extension Xmtp_Identity_Associations_ChangeRecoveryAddress: SwiftProtobuf.Messag
 
 extension Xmtp_Identity_Associations_IdentityAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".IdentityAction"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}create_inbox\0\u{1}add\0\u{1}revoke\0\u{3}change_recovery_address\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "create_inbox"),
+    2: .same(proto: "add"),
+    3: .same(proto: "revoke"),
+    4: .standard(proto: "change_recovery_address"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -974,7 +1014,11 @@ extension Xmtp_Identity_Associations_IdentityAction: SwiftProtobuf.Message, Swif
 
 extension Xmtp_Identity_Associations_IdentityUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".IdentityUpdate"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}actions\0\u{3}client_timestamp_ns\0\u{3}inbox_id\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "actions"),
+    2: .standard(proto: "client_timestamp_ns"),
+    3: .standard(proto: "inbox_id"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1014,7 +1058,10 @@ extension Xmtp_Identity_Associations_IdentityUpdate: SwiftProtobuf.Message, Swif
 
 extension Xmtp_Identity_Associations_MemberMap: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".MemberMap"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}key\0\u{1}value\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "key"),
+    2: .same(proto: "value"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1053,7 +1100,14 @@ extension Xmtp_Identity_Associations_MemberMap: SwiftProtobuf.Message, SwiftProt
 
 extension Xmtp_Identity_Associations_AssociationState: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".AssociationState"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}inbox_id\0\u{1}members\0\u{3}recovery_identifier\0\u{3}seen_signatures\0\u{3}recovery_identifier_kind\0\u{3}relying_party\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "inbox_id"),
+    2: .same(proto: "members"),
+    3: .standard(proto: "recovery_identifier"),
+    4: .standard(proto: "seen_signatures"),
+    5: .standard(proto: "recovery_identifier_kind"),
+    6: .standard(proto: "relying_party"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1112,7 +1166,10 @@ extension Xmtp_Identity_Associations_AssociationState: SwiftProtobuf.Message, Sw
 
 extension Xmtp_Identity_Associations_AssociationStateDiff: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".AssociationStateDiff"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}new_members\0\u{3}removed_members\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "new_members"),
+    2: .standard(proto: "removed_members"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

@@ -69,7 +69,7 @@ public enum Xmtp_Mls_MessageContents_WelcomeWrapperAlgorithm: SwiftProtobuf.Enum
 }
 
 /// The KeyPackageExtension that stores the PubKey and the WelcomeWrapperEncryption
-public struct Xmtp_Mls_MessageContents_WelcomeWrapperEncryption: Sendable {
+public struct Xmtp_Mls_MessageContents_WelcomeWrapperEncryption: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -88,12 +88,20 @@ public struct Xmtp_Mls_MessageContents_WelcomeWrapperEncryption: Sendable {
 fileprivate let _protobuf_package = "xmtp.mls.message_contents"
 
 extension Xmtp_Mls_MessageContents_WelcomeWrapperAlgorithm: SwiftProtobuf._ProtoNameProviding {
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0WELCOME_WRAPPER_ALGORITHM_UNSPECIFIED\0\u{1}WELCOME_WRAPPER_ALGORITHM_CURVE25519\0\u{1}WELCOME_WRAPPER_ALGORITHM_XWING_MLKEM_768_DRAFT_6\0\u{1}WELCOME_WRAPPER_ALGORITHM_SYMMETRIC_KEY\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "WELCOME_WRAPPER_ALGORITHM_UNSPECIFIED"),
+    1: .same(proto: "WELCOME_WRAPPER_ALGORITHM_CURVE25519"),
+    2: .same(proto: "WELCOME_WRAPPER_ALGORITHM_XWING_MLKEM_768_DRAFT_6"),
+    3: .same(proto: "WELCOME_WRAPPER_ALGORITHM_SYMMETRIC_KEY"),
+  ]
 }
 
 extension Xmtp_Mls_MessageContents_WelcomeWrapperEncryption: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".WelcomeWrapperEncryption"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}pub_key\0\u{1}algorithm\0")
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "pub_key"),
+    2: .same(proto: "algorithm"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
