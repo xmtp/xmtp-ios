@@ -50,20 +50,20 @@ jobs:
       - name: Extract LibXMTPSwiftFFI URL from Package.swift
         id: extract_url
         run: |
-          ZIP_URL=$(grep -A 3 'name: "LibXMTPSwiftFFI"' Package.swift | grep -o 'https://[^"]*')
+          ZIP_URL=$(grep -A 3 'name: "LibXMTPSwiftFFIDynamic"' Package.swift | grep -o 'https://[^"]*')
           echo "ZIP_URL=$ZIP_URL" >> $GITHUB_ENV
           echo "Extracted URL: $ZIP_URL"
 
       - name: Build release archive (Sources + LibXMTPSwiftFFI.xcframework)
         run: |
           set -euo pipefail
-          curl -L "$ZIP_URL" -o LibXMTPSwiftFFI.zip
-          rm -rf LibXMTPSwiftFFI.xcframework
-          unzip -qo LibXMTPSwiftFFI.zip 'LibXMTPSwiftFFI.xcframework/*' -d .
-          rm -f LibXMTPSwiftFFI.zip
+          curl -L "$ZIP_URL" -o LibXMTPSwiftFFIDynamic.zip
+          rm -rf LibXMTPSwiftFFIDynamic.xcframework
+          unzip -qo LibXMTPSwiftFFIDynamic.zip 'LibXMTPSwiftFFIDynamic.xcframework/*' -d .
+          rm -f LibXMTPSwiftFFIDynamic.zip
           rm -rf bundle && mkdir -p bundle
-          rsync -a --exclude 'LibXMTPSwiftFFI.xcframework' Sources/ bundle/Sources/
-          mv LibXMTPSwiftFFI.xcframework bundle/
+          rsync -a --exclude 'LibXMTPSwiftFFIDynamic.xcframework' Sources/ bundle/Sources/
+          mv LibXMTPSwiftFFIDynamic.xcframework bundle/
           (cd bundle && zip -qry ../XMTP-${UPDATED_VERSION}.zip .)
 
       - name: Create GitHub Release and upload asset
