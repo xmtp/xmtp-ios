@@ -1570,7 +1570,7 @@ class GroupTests: XCTestCase {
 
 		let content: GroupUpdated = try leaveMessage!.content()
 		XCTAssertEqual(
-			content.leftInboxes.map { $0.inboxID },
+			content.leftInboxes.map(\.inboxID),
 			[fixtures.boClient.inboxID],
 			"Bo's inbox should be in leftInboxes"
 		)
