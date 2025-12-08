@@ -1534,6 +1534,9 @@ class GroupTests: XCTestCase {
 	func testLeftInboxesPopulatedWhenMemberLeaves() async throws {
 		let fixtures = try await fixtures()
 
+		// Register the GroupUpdatedCodec
+		Client.register(codec: GroupUpdatedCodec())
+
 		// Alix creates a group with Bo
 		let alixGroup = try await fixtures.alixClient.conversations.newGroup(
 			with: [fixtures.boClient.inboxID]
