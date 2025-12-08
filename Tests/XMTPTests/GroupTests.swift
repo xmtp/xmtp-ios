@@ -1530,4 +1530,52 @@ class GroupTests: XCTestCase {
 		try await alixGroup.sync()
 		XCTAssert(try !(alixGroup.isActive()))
 	}
+
+	func testLeftInboxesPopulatedWhenMemberLeaves() async throws {
+		let fixtures = try await fixtures()
+
+		// Alix creates a group with Bo
+		let alixGroup = try await fixtures.alixClient.conversations.newGroup(
+			with: [fixtures.boClient.inboxID]
+		)
+
+		// Bo syncs and gets the group
+		_ = try await fixtures.boClient.conversations.syncAllConversations()
+		let boGroup = try XCTUnwrap(fixtures.boClient.conversations.findGroup(groupId: alixGroup.id))
+
+		// Bo leaves the group
+		try await boGroup.leaveGroup()
+
+		// Alix syncs to process the leave request
+		try await alixGroup.sync()
+
+		// Wait for the admin worker to process the removal
+		try await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
+
+		// Alix syncs again to get the removal message
+		try await alixGroup.sync()
+
+		// Get all messages and find the one with leftInboxes
+		let messages = try await alixGroup.messages()
+
+		// Find the GroupUpdated message that contains the left inbox
+		let leaveMessage = messages.first { message in
+			if let content: GroupUpdated = try? message.content() {
+				return !content.leftInboxes.isEmpty
+			}
+			return false
+		}
+
+		XCTAssertNotNil(leaveMessage, "Should find a GroupUpdated message with leftInboxes")
+
+		let content: GroupUpdated = try leaveMessage!.content()
+		XCTAssertEqual(
+			content.leftInboxes.map { $0.inboxID },
+			[fixtures.boClient.inboxID],
+			"Bo's inbox should be in leftInboxes"
+		)
+
+		// Verify removedInboxes is empty for self-removal
+		XCTAssert(content.removedInboxes.isEmpty, "removedInboxes should be empty for self-removal")
+	}
 }
