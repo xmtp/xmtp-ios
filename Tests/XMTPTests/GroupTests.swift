@@ -1585,7 +1585,7 @@ class GroupTests: XCTestCase {
 
 	func testLeftInboxesPersistedAfterClientReinitialization() async throws {
 		// Create clients with explicit options so we can reinitialize
-		let key = Data((0..<32).map { _ in UInt8.random(in: 0...255) })
+		let key = Data((0 ..< 32).map { _ in UInt8.random(in: 0 ... 255) })
 		let clientOptions = ClientOptions(
 			api: ClientOptions.Api(env: XMTPEnvironment.local, isSecure: false),
 			dbEncryptionKey: key
@@ -1617,7 +1617,7 @@ class GroupTests: XCTestCase {
 		try await alixGroup.sync()
 
 		// Wait for the admin worker to process the removal
-		try await Task.sleep(nanoseconds: 3_000_000_000)  // 3 seconds
+		try await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
 
 		// Alix syncs again to get the removal message
 		try await alixGroup.sync()
