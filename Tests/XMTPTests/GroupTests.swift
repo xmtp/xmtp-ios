@@ -1558,12 +1558,13 @@ class GroupTests: XCTestCase {
 		// Alix syncs again to get the removal message
 		try await alixGroup.sync()
 
-		// Get all messages and find the one with leftInboxes
-		let messages = try await alixGroup.messages()
+		// Get all messages using enrichedMessages() which goes through DecodedMessageV2
+		// This tests the FFI-to-proto mapping in mapGroupUpdated()
+		let messages = try await alixGroup.enrichedMessages()
 
 		// Find the GroupUpdated message that contains the left inbox
 		let leaveMessage = messages.first { message in
-			if let content: GroupUpdated = try? message.content() {
+			if let content: GroupUpdated = message.content() {
 				return !content.leftInboxes.isEmpty
 			}
 			return false
@@ -1571,14 +1572,15 @@ class GroupTests: XCTestCase {
 
 		XCTAssertNotNil(leaveMessage, "Should find a GroupUpdated message with leftInboxes")
 
-		let content: GroupUpdated = try leaveMessage!.content()
+		let content: GroupUpdated? = leaveMessage!.content()
+		XCTAssertNotNil(content, "Content should not be nil")
 		XCTAssertEqual(
-			content.leftInboxes.map(\.inboxID),
+			content!.leftInboxes.map(\.inboxID),
 			[fixtures.boClient.inboxID],
 			"Bo's inbox should be in leftInboxes"
 		)
 
 		// Verify removedInboxes is empty for self-removal
-		XCTAssert(content.removedInboxes.isEmpty, "removedInboxes should be empty for self-removal")
+		XCTAssert(content!.removedInboxes.isEmpty, "removedInboxes should be empty for self-removal")
 	}
 }
