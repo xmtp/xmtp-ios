@@ -138,6 +138,9 @@ public struct DecodedMessageV2: Identifiable {
 		case .readReceipt:
 			return ReadReceipt()
 
+		case let .leaveRequest(ffiLeaveRequest):
+			return mapLeaveRequest(ffiLeaveRequest)
+
 		case let .walletSendCalls(walletSend):
 			return walletSend
 
@@ -152,6 +155,10 @@ public struct DecodedMessageV2: Identifiable {
 		case let .actions(actions):
 			return actions
 		}
+	}
+
+	private func mapLeaveRequest(_ ffiLeaveRequest: FfiLeaveRequest) -> LeaveRequest {
+		LeaveRequest(authenticatedNote: ffiLeaveRequest.authenticatedNote)
 	}
 
 	private func mapReply(_ enrichedReply: FfiEnrichedReply) throws -> Reply {
@@ -195,6 +202,8 @@ public struct DecodedMessageV2: Identifiable {
 			return walletSend
 		case .readReceipt:
 			return ReadReceipt()
+		case let .leaveRequest(ffiLeaveRequest):
+			return mapLeaveRequest(ffiLeaveRequest)
 		case let .custom(ffiEncodedContent):
 			let encoded = try mapFfiEncodedContent(ffiEncodedContent)
 			let codec = Client.codecRegistry.find(for: encoded.type)
@@ -224,6 +233,8 @@ public struct DecodedMessageV2: Identifiable {
 			return ContentTypeGroupUpdated
 		case .readReceipt:
 			return ContentTypeReadReceipt
+		case .leaveRequest:
+			return ContentTypeLeaveRequest
 		case .walletSendCalls:
 			return ContentTypeID(
 				authorityID: "xmtp.org",
