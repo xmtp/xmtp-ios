@@ -8,8 +8,10 @@ public let ContentTypeLeaveRequest = ContentTypeID(
 )
 
 /// Represents a leave request message sent when a user wants to leave a group.
-public struct LeaveRequest {
-	/// Optional authenticated note for the leave request
+/// This content type is used to notify group members when a participant requests to leave.
+public struct LeaveRequest: Codable, Equatable {
+	/// Optional authenticated note for the leave request.
+	/// Can contain additional context or reason for leaving.
 	public var authenticatedNote: Data?
 
 	public init(authenticatedNote: Data? = nil) {
@@ -17,6 +19,8 @@ public struct LeaveRequest {
 	}
 }
 
+/// Codec for encoding and decoding `LeaveRequest` content types.
+/// Used when a group member wants to leave a conversation.
 public struct LeaveRequestCodec: ContentCodec {
 	public typealias T = LeaveRequest
 
@@ -28,9 +32,8 @@ public struct LeaveRequestCodec: ContentCodec {
 		var encodedContent = EncodedContent()
 
 		encodedContent.type = ContentTypeLeaveRequest
-		if let note = content.authenticatedNote {
-			encodedContent.content = note
-		}
+		// Always set content to maintain encode/decode symmetry
+		encodedContent.content = content.authenticatedNote ?? Data()
 
 		return encodedContent
 	}

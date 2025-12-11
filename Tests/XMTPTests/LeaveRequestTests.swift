@@ -6,10 +6,105 @@ import XMTPTestHelpers
 
 @available(iOS 16, *)
 class LeaveRequestTests: XCTestCase {
+	/// Delay for admin worker to process removals (in nanoseconds)
+	private static let adminWorkerDelayNs: UInt64 = 3_000_000_000 // 3 seconds
+
 	override func setUp() {
 		super.setUp()
 		setupLocalEnv()
 	}
+
+	// MARK: - Unit Tests for LeaveRequestCodec
+
+	func testLeaveRequestCodecEncodeDecodeWithNote() throws {
+		let codec = LeaveRequestCodec()
+		let noteData = Data("Test leave note".utf8)
+		let original = LeaveRequest(authenticatedNote: noteData)
+
+		let encoded = try codec.encode(content: original)
+		let decoded = try codec.decode(content: encoded)
+
+		XCTAssertEqual(decoded.authenticatedNote, noteData)
+		XCTAssertEqual(original, decoded)
+	}
+
+	func testLeaveRequestCodecEncodeDecodeWithNilNote() throws {
+		let codec = LeaveRequestCodec()
+		let original = LeaveRequest(authenticatedNote: nil)
+
+		let encoded = try codec.encode(content: original)
+		let decoded = try codec.decode(content: encoded)
+
+		XCTAssertNil(decoded.authenticatedNote)
+		XCTAssertEqual(original, decoded)
+	}
+
+	func testLeaveRequestCodecEncodeDecodeWithEmptyNote() throws {
+		let codec = LeaveRequestCodec()
+		let original = LeaveRequest(authenticatedNote: Data())
+
+		let encoded = try codec.encode(content: original)
+		let decoded = try codec.decode(content: encoded)
+
+		// Empty data should decode as nil for consistency
+		XCTAssertNil(decoded.authenticatedNote)
+	}
+
+	func testLeaveRequestCodecContentType() {
+		let codec = LeaveRequestCodec()
+
+		XCTAssertEqual(codec.contentType.authorityID, "xmtp.org")
+		XCTAssertEqual(codec.contentType.typeID, "leave_request")
+		XCTAssertEqual(codec.contentType.versionMajor, 1)
+		XCTAssertEqual(codec.contentType.versionMinor, 0)
+	}
+
+	func testLeaveRequestCodecFallback() throws {
+		let codec = LeaveRequestCodec()
+		let leaveRequest = LeaveRequest()
+
+		let fallback = try codec.fallback(content: leaveRequest)
+
+		XCTAssertEqual(fallback, "A member has requested to leave the group")
+	}
+
+	func testLeaveRequestCodecShouldNotPush() throws {
+		let codec = LeaveRequestCodec()
+		let leaveRequest = LeaveRequest()
+
+		let shouldPush = try codec.shouldPush(content: leaveRequest)
+
+		XCTAssertFalse(shouldPush)
+	}
+
+	func testLeaveRequestEquatable() {
+		let note1 = Data("note".utf8)
+		let note2 = Data("note".utf8)
+		let note3 = Data("different".utf8)
+
+		let request1 = LeaveRequest(authenticatedNote: note1)
+		let request2 = LeaveRequest(authenticatedNote: note2)
+		let request3 = LeaveRequest(authenticatedNote: note3)
+		let request4 = LeaveRequest(authenticatedNote: nil)
+
+		XCTAssertEqual(request1, request2)
+		XCTAssertNotEqual(request1, request3)
+		XCTAssertNotEqual(request1, request4)
+	}
+
+	func testLeaveRequestCodable() throws {
+		let original = LeaveRequest(authenticatedNote: Data("test".utf8))
+
+		let encoder = JSONEncoder()
+		let data = try encoder.encode(original)
+
+		let decoder = JSONDecoder()
+		let decoded = try decoder.decode(LeaveRequest.self, from: data)
+
+		XCTAssertEqual(original, decoded)
+	}
+
+	// MARK: - Integration Tests
 
 	func testLeaveRequestMessageIsDecodedProperly() async throws {
 		let fixtures = try await fixtures()
@@ -32,7 +127,7 @@ class LeaveRequestTests: XCTestCase {
 		try await alixGroup.sync()
 
 		// Wait for the admin worker to process the removal
-		try await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
+		try await Task.sleep(nanoseconds: Self.adminWorkerDelayNs)
 
 		// Alix syncs again to get the messages
 		try await alixGroup.sync()
@@ -82,7 +177,7 @@ class LeaveRequestTests: XCTestCase {
 
 		// Alix syncs
 		try await alixGroup.sync()
-		try await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
+		try await Task.sleep(nanoseconds: Self.adminWorkerDelayNs)
 		try await alixGroup.sync()
 
 		// Get enriched messages
@@ -121,7 +216,7 @@ class LeaveRequestTests: XCTestCase {
 
 		// Alix syncs
 		try await alixGroup.sync()
-		try await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
+		try await Task.sleep(nanoseconds: Self.adminWorkerDelayNs)
 		try await alixGroup.sync()
 
 		// Get enriched messages
