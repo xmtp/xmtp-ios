@@ -61,10 +61,10 @@ class LeaveRequestTests: XCTestCase {
 		Client.register(codec: LeaveRequestCodec())
 
 		let fixtures = try await fixtures()
-		let alixClient = fixtures.alixClient
-		let boInboxId = fixtures.boClient.inboxID
+		let alixClient = try XCTUnwrap(fixtures.alixClient)
+		let boClient = try XCTUnwrap(fixtures.boClient)
 
-		let conversation = try await alixClient.conversations.newConversation(with: boInboxId)
+		let conversation = try await alixClient.conversations.newConversation(with: boClient.inboxID)
 		let alixConversation = try XCTUnwrap(conversation)
 
 		let leaveRequest = LeaveRequest(authenticatedNote: Data("random_auth_note".utf8))
@@ -90,10 +90,10 @@ class LeaveRequestTests: XCTestCase {
 		Client.register(codec: LeaveRequestCodec())
 
 		let fixtures = try await fixtures()
-		let alixClient = fixtures.alixClient
-		let boInboxId = fixtures.boClient.inboxID
+		let alixClient = try XCTUnwrap(fixtures.alixClient)
+		let boClient = try XCTUnwrap(fixtures.boClient)
 
-		let conversation = try await alixClient.conversations.newConversation(with: boInboxId)
+		let conversation = try await alixClient.conversations.newConversation(with: boClient.inboxID)
 		let alixConversation = try XCTUnwrap(conversation)
 
 		let leaveRequest = LeaveRequest(authenticatedNote: nil)
