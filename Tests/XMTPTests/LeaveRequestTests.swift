@@ -14,7 +14,119 @@ class LeaveRequestTests: XCTestCase {
 		setupLocalEnv()
 	}
 
+	// MARK: - Codec Tests
+
+	func testCanUseLeaveRequestCodec() async throws {
+		let codec = LeaveRequestCodec()
+
+		let original = LeaveRequest(authenticatedNote: Data("test note".utf8))
+		let encoded = try codec.encode(content: original)
+		let decoded = try codec.decode(content: encoded)
+
+		XCTAssertEqual(original, decoded)
+		XCTAssertEqual(original.authenticatedNote, decoded.authenticatedNote)
+	}
+
+	func testLeaveRequestCodecWithNilNote() async throws {
+		let codec = LeaveRequestCodec()
+
+		let original = LeaveRequest(authenticatedNote: nil)
+		let encoded = try codec.encode(content: original)
+		let decoded = try codec.decode(content: encoded)
+
+		XCTAssertEqual(original, decoded)
+		XCTAssertNil(decoded.authenticatedNote)
+	}
+
+	func testLeaveRequestCodecFallback() throws {
+		let codec = LeaveRequestCodec()
+		let content = LeaveRequest()
+		let fallback = try codec.fallback(content: content)
+		XCTAssertEqual(fallback, "A member has requested leaving the group")
+	}
+
+	func testLeaveRequestCodecShouldPush() throws {
+		let codec = LeaveRequestCodec()
+		let content = LeaveRequest()
+		let shouldPush = try codec.shouldPush(content: content)
+		XCTAssertFalse(shouldPush)
+	}
+
+	func testLeaveRequestCodecContentType() {
+		let codec = LeaveRequestCodec()
+		XCTAssertEqual(codec.contentType, ContentTypeLeaveRequest)
+	}
+
+	func testCanSendAndReceiveLeaveRequestWithCodec() async throws {
+		Client.register(codec: LeaveRequestCodec())
+
+		let fixtures = try await fixtures()
+		let alixClient = fixtures.alixClient
+		let boInboxId = fixtures.boClient.inboxID
+
+		let conversation = try await alixClient.conversations.newConversation(with: boInboxId)
+		let alixConversation = try XCTUnwrap(conversation)
+
+		let leaveRequest = LeaveRequest(authenticatedNote: Data("random_auth_note".utf8))
+
+		try await alixConversation.send(
+			content: leaveRequest,
+			options: .init(contentType: ContentTypeLeaveRequest)
+		)
+
+		let messages = try await alixConversation.messages()
+		XCTAssertEqual(messages.count, 2)
+
+		if messages.count == 2 {
+			let content: LeaveRequest? = try messages.first?.content()
+			XCTAssertNotNil(content)
+			XCTAssertEqual(content?.authenticatedNote, Data("random_auth_note".utf8))
+		}
+
+		try fixtures.cleanUpDatabases()
+	}
+
+	func testCanSendAndReceiveLeaveRequestWithNilNote() async throws {
+		Client.register(codec: LeaveRequestCodec())
+
+		let fixtures = try await fixtures()
+		let alixClient = fixtures.alixClient
+		let boInboxId = fixtures.boClient.inboxID
+
+		let conversation = try await alixClient.conversations.newConversation(with: boInboxId)
+		let alixConversation = try XCTUnwrap(conversation)
+
+		let leaveRequest = LeaveRequest(authenticatedNote: nil)
+
+		try await alixConversation.send(
+			content: leaveRequest,
+			options: .init(contentType: ContentTypeLeaveRequest)
+		)
+
+		let messages = try await alixConversation.messages()
+		XCTAssertEqual(messages.count, 2)
+
+		if messages.count == 2 {
+			let content: LeaveRequest? = try messages.first?.content()
+			XCTAssertNotNil(content)
+			XCTAssertNil(content?.authenticatedNote)
+		}
+
+		try fixtures.cleanUpDatabases()
+	}
+
 	// MARK: - Unit Tests for LeaveRequest
+
+	func testLeaveRequestEmptyDataNormalizedToNil() {
+		let requestWithEmptyData = LeaveRequest(authenticatedNote: Data())
+		XCTAssertNil(requestWithEmptyData.authenticatedNote)
+
+		let requestWithData = LeaveRequest(authenticatedNote: Data("note".utf8))
+		XCTAssertNotNil(requestWithData.authenticatedNote)
+
+		let requestWithNil = LeaveRequest(authenticatedNote: nil)
+		XCTAssertNil(requestWithNil.authenticatedNote)
+	}
 
 	func testLeaveRequestEquatable() {
 		let note1 = Data("note".utf8)

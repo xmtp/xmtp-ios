@@ -21,6 +21,42 @@ public struct LeaveRequest: Codable, Equatable {
 	public var authenticatedNote: Data?
 
 	public init(authenticatedNote: Data? = nil) {
-		self.authenticatedNote = authenticatedNote
+		self.authenticatedNote = (authenticatedNote?.isEmpty == true) ? nil : authenticatedNote
+	}
+}
+
+public struct LeaveRequestCodec: ContentCodec {
+	public typealias T = LeaveRequest
+
+	public init() {}
+
+	public var contentType: ContentTypeID = ContentTypeLeaveRequest
+
+	public func encode(content: LeaveRequest) throws -> EncodedContent {
+		let ffi = FfiLeaveRequest(
+			authenticatedNote: content.authenticatedNote
+		)
+		return try EncodedContent(
+			serializedBytes: encodeLeaveRequest(
+				leaveRequest: ffi
+			)
+		)
+	}
+
+	public func decode(content: EncodedContent) throws -> LeaveRequest {
+		let decoded = try decodeLeaveRequest(
+			bytes: content.serializedData()
+		)
+		return LeaveRequest(
+			authenticatedNote: decoded.authenticatedNote
+		)
+	}
+
+	public func fallback(content: LeaveRequest) throws -> String? {
+		"A member has requested leaving the group"
+	}
+
+	public func shouldPush(content _: LeaveRequest) throws -> Bool {
+		false
 	}
 }
