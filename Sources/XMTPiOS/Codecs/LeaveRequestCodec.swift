@@ -36,17 +36,11 @@ public struct LeaveRequestCodec: ContentCodec {
 		let ffi = FfiLeaveRequest(
 			authenticatedNote: content.authenticatedNote
 		)
-		return try EncodedContent(
-			serializedBytes: encodeLeaveRequest(
-				request: ffi
-			)
-		)
+		return try EncodedContent(serializedBytes: encodeLeaveRequest(request: ffi))
 	}
 
 	public func decode(content: EncodedContent) throws -> LeaveRequest {
-		let decoded = try decodeLeaveRequest(
-			bytes: content.serializedData()
-		)
+		let decoded = try decodeLeaveRequest(bytes: content.serializedBytes())
 		return LeaveRequest(
 			authenticatedNote: decoded.authenticatedNote
 		)
