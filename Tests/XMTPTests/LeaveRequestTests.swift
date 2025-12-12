@@ -14,68 +14,7 @@ class LeaveRequestTests: XCTestCase {
 		setupLocalEnv()
 	}
 
-	// MARK: - Unit Tests for LeaveRequestCodec
-
-	func testLeaveRequestCodecEncodeDecodeWithNote() throws {
-		let codec = LeaveRequestCodec()
-		let noteData = Data("Test leave note".utf8)
-		let original = LeaveRequest(authenticatedNote: noteData)
-
-		let encoded = try codec.encode(content: original)
-		let decoded = try codec.decode(content: encoded)
-
-		XCTAssertEqual(decoded.authenticatedNote, noteData)
-		XCTAssertEqual(original, decoded)
-	}
-
-	func testLeaveRequestCodecEncodeDecodeWithNilNote() throws {
-		let codec = LeaveRequestCodec()
-		let original = LeaveRequest(authenticatedNote: nil)
-
-		let encoded = try codec.encode(content: original)
-		let decoded = try codec.decode(content: encoded)
-
-		XCTAssertNil(decoded.authenticatedNote)
-		XCTAssertEqual(original, decoded)
-	}
-
-	func testLeaveRequestCodecEncodeDecodeWithEmptyNote() throws {
-		let codec = LeaveRequestCodec()
-		let original = LeaveRequest(authenticatedNote: Data())
-
-		let encoded = try codec.encode(content: original)
-		let decoded = try codec.decode(content: encoded)
-
-		// Empty data should decode as nil for consistency
-		XCTAssertNil(decoded.authenticatedNote)
-	}
-
-	func testLeaveRequestCodecContentType() {
-		let codec = LeaveRequestCodec()
-
-		XCTAssertEqual(codec.contentType.authorityID, "xmtp.org")
-		XCTAssertEqual(codec.contentType.typeID, "leave_request")
-		XCTAssertEqual(codec.contentType.versionMajor, 1)
-		XCTAssertEqual(codec.contentType.versionMinor, 0)
-	}
-
-	func testLeaveRequestCodecFallback() throws {
-		let codec = LeaveRequestCodec()
-		let leaveRequest = LeaveRequest()
-
-		let fallback = try codec.fallback(content: leaveRequest)
-
-		XCTAssertEqual(fallback, "A member has requested to leave the group")
-	}
-
-	func testLeaveRequestCodecShouldNotPush() throws {
-		let codec = LeaveRequestCodec()
-		let leaveRequest = LeaveRequest()
-
-		let shouldPush = try codec.shouldPush(content: leaveRequest)
-
-		XCTAssertFalse(shouldPush)
-	}
+	// MARK: - Unit Tests for LeaveRequest
 
 	func testLeaveRequestEquatable() {
 		let note1 = Data("note".utf8)
@@ -102,6 +41,13 @@ class LeaveRequestTests: XCTestCase {
 		let decoded = try decoder.decode(LeaveRequest.self, from: data)
 
 		XCTAssertEqual(original, decoded)
+	}
+
+	func testContentTypeLeaveRequestValues() {
+		XCTAssertEqual(ContentTypeLeaveRequest.authorityID, "xmtp.org")
+		XCTAssertEqual(ContentTypeLeaveRequest.typeID, "leave_request")
+		XCTAssertEqual(ContentTypeLeaveRequest.versionMajor, 1)
+		XCTAssertEqual(ContentTypeLeaveRequest.versionMinor, 0)
 	}
 
 	// MARK: - Integration Tests
