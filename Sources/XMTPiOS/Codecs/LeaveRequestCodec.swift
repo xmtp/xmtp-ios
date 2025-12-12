@@ -38,7 +38,7 @@ public struct LeaveRequestCodec: ContentCodec {
 		)
 		return try EncodedContent(
 			serializedBytes: encodeLeaveRequest(
-				leaveRequest: ffi
+				request: ffi
 			)
 		)
 	}
@@ -52,7 +52,7 @@ public struct LeaveRequestCodec: ContentCodec {
 		)
 	}
 
-	public func fallback(content: LeaveRequest) throws -> String? {
+	public func fallback(content _: LeaveRequest) throws -> String? {
 		"A member has requested leaving the group"
 	}
 
