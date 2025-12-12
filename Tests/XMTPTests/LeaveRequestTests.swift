@@ -166,16 +166,18 @@ class LeaveRequestTests: XCTestCase {
 
 	func testLeaveRequestMessageIsDecodedProperly() async throws {
 		let fixtures = try await fixtures()
+		let alixClient = try XCTUnwrap(fixtures.alixClient)
+		let boClient = try XCTUnwrap(fixtures.boClient)
 
 		// Alix creates a group with Bo
-		let alixGroup = try await fixtures.alixClient.conversations.newGroup(
-			with: [fixtures.boClient.inboxID]
+		let alixGroup = try await alixClient.conversations.newGroup(
+			with: [boClient.inboxID]
 		)
 
 		// Bo syncs and gets the group
-		_ = try await fixtures.boClient.conversations.syncAllConversations()
+		_ = try await boClient.conversations.syncAllConversations()
 		let boGroup = try XCTUnwrap(
-			fixtures.boClient.conversations.findGroup(groupId: alixGroup.id)
+			boClient.conversations.findGroup(groupId: alixGroup.id)
 		)
 
 		// Bo leaves the group - this creates a LeaveRequest message
@@ -194,7 +196,7 @@ class LeaveRequestTests: XCTestCase {
 		let messages = try await alixGroup.enrichedMessages()
 
 		// Find the messages from Bo (the leave request)
-		let boMessages = messages.filter { $0.senderInboxId == fixtures.boClient.inboxID }
+		let boMessages = messages.filter { $0.senderInboxId == boClient.inboxID }
 		XCTAssertTrue(!boMessages.isEmpty, "Bo should have sent at least one message")
 
 		// Find the leave request message by checking for LeaveRequest content type
@@ -218,16 +220,18 @@ class LeaveRequestTests: XCTestCase {
 
 	func testLeaveRequestContentTypeIsCorrect() async throws {
 		let fixtures = try await fixtures()
+		let alixClient = try XCTUnwrap(fixtures.alixClient)
+		let boClient = try XCTUnwrap(fixtures.boClient)
 
 		// Alix creates a group with Bo
-		let alixGroup = try await fixtures.alixClient.conversations.newGroup(
-			with: [fixtures.boClient.inboxID]
+		let alixGroup = try await alixClient.conversations.newGroup(
+			with: [boClient.inboxID]
 		)
 
 		// Bo syncs and gets the group
-		_ = try await fixtures.boClient.conversations.syncAllConversations()
+		_ = try await boClient.conversations.syncAllConversations()
 		let boGroup = try XCTUnwrap(
-			fixtures.boClient.conversations.findGroup(groupId: alixGroup.id)
+			boClient.conversations.findGroup(groupId: alixGroup.id)
 		)
 
 		// Bo leaves the group
@@ -257,16 +261,18 @@ class LeaveRequestTests: XCTestCase {
 
 	func testLeaveRequestFallbackText() async throws {
 		let fixtures = try await fixtures()
+		let alixClient = try XCTUnwrap(fixtures.alixClient)
+		let boClient = try XCTUnwrap(fixtures.boClient)
 
 		// Alix creates a group with Bo
-		let alixGroup = try await fixtures.alixClient.conversations.newGroup(
-			with: [fixtures.boClient.inboxID]
+		let alixGroup = try await alixClient.conversations.newGroup(
+			with: [boClient.inboxID]
 		)
 
 		// Bo syncs and gets the group
-		_ = try await fixtures.boClient.conversations.syncAllConversations()
+		_ = try await boClient.conversations.syncAllConversations()
 		let boGroup = try XCTUnwrap(
-			fixtures.boClient.conversations.findGroup(groupId: alixGroup.id)
+			boClient.conversations.findGroup(groupId: alixGroup.id)
 		)
 
 		// Bo leaves the group
