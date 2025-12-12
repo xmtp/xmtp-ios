@@ -75,6 +75,8 @@ public struct DecodedMessageV2: Identifiable {
 				return text.content
 			case let .custom(encodedContent):
 				return encodedContent.fallback ?? ""
+			case .leaveRequest:
+				return "A member has requested leaving the group"
 			default:
 				return ""
 			}
