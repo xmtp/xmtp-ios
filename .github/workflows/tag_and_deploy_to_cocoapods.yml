@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: warp-macos-15-arm64-12x
 
     steps:
       - uses: actions/checkout@v3
@@ -72,6 +72,8 @@ jobs:
           tag_name: ${{ env.UPDATED_VERSION }}
           name: ${{ env.UPDATED_VERSION }}
           files: XMTP-${{ env.UPDATED_VERSION }}.zip
+          make_latest: false
+          prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

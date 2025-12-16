@@ -17,7 +17,7 @@ let package = Package(
 		),
 	],
 	dependencies: [
-		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.0.0"),
+		.package(url: "https://github.com/bufbuild/connect-swift", exact: "1.2.0"),
 		.package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.4.3"),
 		.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", "1.8.4" ..< "2.0.0"),
 		.package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.62.1"),
@@ -25,8 +25,8 @@ let package = Package(
 	targets: [
 		.binaryTarget(
 			name: "LibXMTPSwiftFFI",
-			url: "https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.6.1-rc2.671e788/LibXMTPSwiftFFI.zip",
-			checksum: "bb1dd2bc65832023428bca68b1187912c24192bc984b3530698cd9ba9d9cd364"
+			url: "https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.6.9.13f093e/LibXMTPSwiftFFI.zip",
+			checksum: "3c2d4e2b9203323e5767a6054a52d471d1abf8aa04c0c68ab704b41600be2829"
 		),
 		.target(
 			name: "XMTPiOS",

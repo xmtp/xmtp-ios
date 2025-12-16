@@ -469,6 +469,7 @@ public final class Client {
 			v3Host: api.env.url,
 			gatewayHost: api.gatewayHost,
 			isSecure: api.isSecure,
+			clientMode: FfiClientMode.default,
 			appVersion: api.appVersion,
 			authCallback: makeInternalAuthCallback(api.authCallback),
 			authHandle: api.authHandle?.ffi
@@ -495,6 +496,7 @@ public final class Client {
 			v3Host: api.env.url,
 			gatewayHost: api.gatewayHost,
 			isSecure: api.isSecure,
+			clientMode: FfiClientMode.default,
 			appVersion: api.appVersion,
 			authCallback: makeInternalAuthCallback(api.authCallback),
 			authHandle: api.authHandle?.ffi
@@ -762,7 +764,10 @@ public final class Client {
 	}
 
 	public func revokeAllOtherInstallations(signingKey: SigningKey) async throws {
-		let signatureRequest = try await ffiRevokeAllOtherInstallations()
+		guard let signatureRequest = try await ffiRevokeAllOtherInstallations() else {
+			// No other installations to revoke – nothing to do.
+			return
+		}
 		do {
 			try await Client.handleSignature(
 				for: signatureRequest.ffiSignatureRequest,
@@ -958,10 +963,11 @@ public final class Client {
 		"""
 	)
 	public func ffiRevokeAllOtherInstallations() async throws
-		-> SignatureRequest
+		-> SignatureRequest?
 	{
-		let ffiSigReq = try await ffiClient.revokeAllOtherInstallations()
-		return SignatureRequest(ffiSignatureRequest: ffiSigReq)
+		try await ffiClient
+			.revokeAllOtherInstallationsSignatureRequest()
+			.map(SignatureRequest.init(ffiSignatureRequest:))
 	}
 
 	@available(
@@ -1079,11 +1085,13 @@ public extension Client {
 	///   - rotationSchedule: When log files should rotate
 	///   - maxFiles: Maximum number of log files to keep
 	///   - customLogDirectory: Optional custom directory path for logs
+	///   - processType: The type of process (main app or notification extension)
 	static func activatePersistentLibXMTPLogWriter(
 		logLevel: LogLevel,
 		rotationSchedule: FfiLogRotation,
 		maxFiles: Int,
-		customLogDirectory: URL? = nil
+		customLogDirectory: URL? = nil,
+		processType: FfiProcessType = .main
 	) {
 		let fileManager = FileManager.default
 		let logDirectory =
@@ -1153,7 +1161,8 @@ public extension Client {
 				directory: logDirectory.path,
 				logLevel: logLevel.ffiLogLevel,
 				rotation: rotationSchedule,
-				maxFiles: UInt32(maxFiles)
+				maxFiles: UInt32(maxFiles),
+				processType: processType
 			)
 		} catch {
 			os_log(

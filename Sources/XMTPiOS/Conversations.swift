@@ -84,6 +84,31 @@ final class ConversationStreamCallback: FfiConversationCallback {
 	}
 }
 
+final class MessageDeletionCallback: FfiMessageDeletionCallback {
+	let onCloseCallback: () -> Void
+	let callback: (Data) -> Void
+
+	init(
+		callback: @escaping (Data) -> Void,
+		onClose: @escaping () -> Void
+	) {
+		self.callback = callback
+		onCloseCallback = onClose
+	}
+
+	func onClose() {
+		onCloseCallback()
+	}
+
+	func onError(error: FfiSubscribeError) {
+		print("Error MessageDeletionCallback \(error)")
+	}
+
+	func onMessageDeleted(messageId: Data) {
+		callback(messageId)
+	}
+}
+
 actor FfiStreamActor {
 	private var ffiStream: FfiStreamCloser?
 
@@ -491,7 +516,8 @@ public class Conversations {
 		name: String = "",
 		imageUrl: String = "",
 		description: String = "",
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String? = nil
 	) async throws -> Group {
 		try await newGroupInternalWithIdentities(
 			with: identities,
@@ -503,7 +529,8 @@ public class Conversations {
 			imageUrl: imageUrl,
 			description: description,
 			permissionPolicySet: nil,
-			disappearingMessageSettings: disappearingMessageSettings
+			disappearingMessageSettings: disappearingMessageSettings,
+			appData: appData
 		)
 	}
 
@@ -513,7 +540,8 @@ public class Conversations {
 		name: String = "",
 		imageUrl: String = "",
 		description: String = "",
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String? = nil
 	) async throws -> Group {
 		try await newGroupInternalWithIdentities(
 			with: identities,
@@ -524,7 +552,8 @@ public class Conversations {
 			permissionPolicySet: PermissionPolicySet.toFfiPermissionPolicySet(
 				permissionPolicySet
 			),
-			disappearingMessageSettings: disappearingMessageSettings
+			disappearingMessageSettings: disappearingMessageSettings,
+			appData: appData
 		)
 	}
 
@@ -535,7 +564,8 @@ public class Conversations {
 		imageUrl: String = "",
 		description: String = "",
 		permissionPolicySet: FfiPermissionPolicySet? = nil,
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String?
 	) async throws -> Group {
 		let group = try await ffiConversations.createGroup(
 			accountIdentities: identities.map(\.ffiPrivate),
@@ -547,7 +577,8 @@ public class Conversations {
 				customPermissionPolicySet: permissionPolicySet,
 				messageDisappearingSettings: toFfiDisappearingMessageSettings(
 					disappearingMessageSettings
-				)
+				),
+				appData: appData
 			)
 		).groupFromFFI(client: client)
 		return group
@@ -559,7 +590,8 @@ public class Conversations {
 		name: String = "",
 		imageUrl: String = "",
 		description: String = "",
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String? = nil
 	) async throws -> Group {
 		try await newGroupInternal(
 			with: inboxIds,
@@ -571,7 +603,8 @@ public class Conversations {
 			imageUrl: imageUrl,
 			description: description,
 			permissionPolicySet: nil,
-			disappearingMessageSettings: disappearingMessageSettings
+			disappearingMessageSettings: disappearingMessageSettings,
+			appData: appData
 		)
 	}
 
@@ -581,7 +614,8 @@ public class Conversations {
 		name: String = "",
 		imageUrl: String = "",
 		description: String = "",
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String? = nil
 	) async throws -> Group {
 		try await newGroupInternal(
 			with: inboxIds,
@@ -592,7 +626,8 @@ public class Conversations {
 			permissionPolicySet: PermissionPolicySet.toFfiPermissionPolicySet(
 				permissionPolicySet
 			),
-			disappearingMessageSettings: disappearingMessageSettings
+			disappearingMessageSettings: disappearingMessageSettings,
+			appData: appData
 		)
 	}
 
@@ -603,7 +638,8 @@ public class Conversations {
 		imageUrl: String = "",
 		description: String = "",
 		permissionPolicySet: FfiPermissionPolicySet? = nil,
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String?
 	) async throws -> Group {
 		try validateInboxIds(inboxIds)
 		let group = try await ffiConversations.createGroupWithInboxIds(
@@ -616,7 +652,8 @@ public class Conversations {
 				customPermissionPolicySet: permissionPolicySet,
 				messageDisappearingSettings: toFfiDisappearingMessageSettings(
 					disappearingMessageSettings
-				)
+				),
+				appData: appData
 			)
 		).groupFromFFI(client: client)
 		return group
@@ -627,7 +664,8 @@ public class Conversations {
 		groupName: String = "",
 		groupImageUrlSquare: String = "",
 		groupDescription: String = "",
-		disappearingMessageSettings: DisappearingMessageSettings? = nil
+		disappearingMessageSettings: DisappearingMessageSettings? = nil,
+		appData: String? = nil
 	) throws -> Group {
 		let ffiOpts = FfiCreateGroupOptions(
 			permissions:
@@ -640,7 +678,8 @@ public class Conversations {
 			customPermissionPolicySet: nil,
 			messageDisappearingSettings: toFfiDisappearingMessageSettings(
 				disappearingMessageSettings
-			)
+			),
+			appData: appData
 		)
 
 		let ffiGroup = try ffiConversations.createGroupOptimistic(opts: ffiOpts)
@@ -693,6 +732,45 @@ public class Conversations {
 						consentStates: consentStates?.toFFI
 					)
 				}
+				await ffiStreamActor.setFfiStream(stream)
+			}
+
+			continuation.onTermination = { _ in
+				task.cancel()
+				Task {
+					await ffiStreamActor.endStream()
+				}
+			}
+		}
+	}
+
+	// A stream of all deleted or disappeared messages
+	// that will be emitted as the messages are removed from the database
+	public func streamMessageDeletions(
+		onClose: (() -> Void)? = nil
+	) -> AsyncThrowingStream<String, Error> {
+		AsyncThrowingStream { continuation in
+			let ffiStreamActor = FfiStreamActor()
+
+			let deletionCallback = MessageDeletionCallback {
+				messageId in
+				guard !Task.isCancelled else {
+					continuation.finish()
+					Task {
+						await ffiStreamActor.endStream()
+					}
+					return
+				}
+				continuation.yield(messageId.toHex)
+			} onClose: {
+				onClose?()
+				continuation.finish()
+			}
+
+			let task = Task {
+				let stream = await ffiConversations.streamMessageDeletions(
+					callback: deletionCallback
+				)
 				await ffiStreamActor.setFfiStream(stream)
 			}
 
