@@ -4984,11 +4984,6 @@ public protocol FfiXmtpClientProtocol: AnyObject, Sendable {
     func syncPreferences() async throws  -> FfiGroupSyncSummary
     
     /**
-     * Export an encrypted debug archive to a device sync server to inspect telemetry for debugging purposes.
-     */
-    func uploadDebugArchive(serverUrl: String) async throws  -> String
-    
-    /**
      * A utility function to easily verify that a piece of text was signed by this installation.
      */
     func verifySignedWithInstallationKey(signatureText: String, signatureBytes: Data) throws 
@@ -5559,26 +5554,6 @@ open func syncPreferences()async throws  -> FfiGroupSyncSummary  {
             completeFunc: ffi_xmtpv3_rust_future_complete_rust_buffer,
             freeFunc: ffi_xmtpv3_rust_future_free_rust_buffer,
             liftFunc: FfiConverterTypeFfiGroupSyncSummary_lift,
-            errorHandler: FfiConverterTypeGenericError_lift
-        )
-}
-    
-    /**
-     * Export an encrypted debug archive to a device sync server to inspect telemetry for debugging purposes.
-     */
-open func uploadDebugArchive(serverUrl: String)async throws  -> String  {
-    return
-        try  await uniffiRustCallAsync(
-            rustFutureFunc: {
-                uniffi_xmtpv3_fn_method_ffixmtpclient_upload_debug_archive(
-                    self.uniffiClonePointer(),
-                    FfiConverterString.lower(serverUrl)
-                )
-            },
-            pollFunc: ffi_xmtpv3_rust_future_poll_rust_buffer,
-            completeFunc: ffi_xmtpv3_rust_future_complete_rust_buffer,
-            freeFunc: ffi_xmtpv3_rust_future_free_rust_buffer,
-            liftFunc: FfiConverterString.lift,
             errorHandler: FfiConverterTypeGenericError_lift
         )
 }
@@ -15614,11 +15589,11 @@ public func connectToBackend(v3Host: String, gatewayHost: String?, isSecure: Boo
  * xmtp.create_client(account_identifier, nonce, inbox_id, Option<legacy_signed_private_key_proto>)
  * ```
  */
-public func createClient(api: XmtpApiClient, syncApi: XmtpApiClient, db: String?, encryptionKey: Data?, inboxId: String, accountIdentifier: FfiIdentifier, nonce: UInt64, legacySignedPrivateKeyProto: Data?, deviceSyncServerUrl: String?, deviceSyncMode: FfiSyncWorkerMode?, allowOffline: Bool?, disableEvents: Bool?, forkRecoveryOpts: FfiForkRecoveryOpts?)async throws  -> FfiXmtpClient  {
+public func createClient(api: XmtpApiClient, syncApi: XmtpApiClient, db: String?, encryptionKey: Data?, inboxId: String, accountIdentifier: FfiIdentifier, nonce: UInt64, legacySignedPrivateKeyProto: Data?, deviceSyncServerUrl: String?, deviceSyncMode: FfiSyncWorkerMode?, allowOffline: Bool?, forkRecoveryOpts: FfiForkRecoveryOpts?)async throws  -> FfiXmtpClient  {
     return
         try  await uniffiRustCallAsync(
             rustFutureFunc: {
-                uniffi_xmtpv3_fn_func_create_client(FfiConverterTypeXmtpApiClient_lower(api),FfiConverterTypeXmtpApiClient_lower(syncApi),FfiConverterOptionString.lower(db),FfiConverterOptionData.lower(encryptionKey),FfiConverterString.lower(inboxId),FfiConverterTypeFfiIdentifier_lower(accountIdentifier),FfiConverterUInt64.lower(nonce),FfiConverterOptionData.lower(legacySignedPrivateKeyProto),FfiConverterOptionString.lower(deviceSyncServerUrl),FfiConverterOptionTypeFfiSyncWorkerMode.lower(deviceSyncMode),FfiConverterOptionBool.lower(allowOffline),FfiConverterOptionBool.lower(disableEvents),FfiConverterOptionTypeFfiForkRecoveryOpts.lower(forkRecoveryOpts)
+                uniffi_xmtpv3_fn_func_create_client(FfiConverterTypeXmtpApiClient_lower(api),FfiConverterTypeXmtpApiClient_lower(syncApi),FfiConverterOptionString.lower(db),FfiConverterOptionData.lower(encryptionKey),FfiConverterString.lower(inboxId),FfiConverterTypeFfiIdentifier_lower(accountIdentifier),FfiConverterUInt64.lower(nonce),FfiConverterOptionData.lower(legacySignedPrivateKeyProto),FfiConverterOptionString.lower(deviceSyncServerUrl),FfiConverterOptionTypeFfiSyncWorkerMode.lower(deviceSyncMode),FfiConverterOptionBool.lower(allowOffline),FfiConverterOptionTypeFfiForkRecoveryOpts.lower(forkRecoveryOpts)
                 )
             },
             pollFunc: ffi_xmtpv3_rust_future_poll_pointer,
@@ -15990,7 +15965,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_xmtpv3_checksum_func_connect_to_backend() != 18636) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_xmtpv3_checksum_func_create_client() != 54009) {
+    if (uniffi_xmtpv3_checksum_func_create_client() != 16448) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_func_decode_actions() != 13209) {
@@ -16594,9 +16569,6 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_ffixmtpclient_sync_preferences() != 36404) {
-        return InitializationResult.apiChecksumMismatch
-    }
-    if (uniffi_xmtpv3_checksum_method_ffixmtpclient_upload_debug_archive() != 21347) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_ffixmtpclient_verify_signed_with_installation_key() != 3285) {
