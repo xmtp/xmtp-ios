@@ -123,7 +123,7 @@ actor FfiStreamActor {
 
 /// Handles listing and creating Conversations.
 public class Conversations {
-	private unowned var client: Client
+	private weak var client: Client?
 	var ffiConversations: FfiConversations
 	var ffiClient: FfiXmtpClient
 
@@ -134,6 +134,13 @@ public class Conversations {
 		self.client = client
 		self.ffiConversations = ffiConversations
 		self.ffiClient = ffiClient
+	}
+
+	private func requireClient() throws -> Client {
+		guard let client = client else {
+			throw ClientError.clientDeallocated
+		}
+		return client
 	}
 
 	/// Helper function to convert DisappearingMessageSettings to FfiMessageDisappearingSettings
@@ -149,6 +156,7 @@ public class Conversations {
 	}
 
 	public func findGroup(groupId: String) throws -> Group? {
+		let client = try requireClient()
 		do {
 			return try Group(
 				ffiGroup: ffiClient.conversation(
@@ -164,6 +172,7 @@ public class Conversations {
 	public func findConversation(conversationId: String) async throws
 		-> Conversation?
 	{
+		let client = try requireClient()
 		do {
 			let conversation = try ffiClient.conversation(
 				conversationId: conversationId.hexToData
@@ -177,6 +186,7 @@ public class Conversations {
 	public func findConversationByTopic(topic: String) async throws
 		-> Conversation?
 	{
+		let client = try requireClient()
 		do {
 			let regexPattern = #"/xmtp/mls/1/g-(.*?)/proto"#
 			if let regex = try? NSRegularExpression(pattern: regexPattern) {
@@ -200,6 +210,7 @@ public class Conversations {
 	}
 
 	public func findDmByInboxId(inboxId: InboxId) throws -> Dm? {
+		let client = try requireClient()
 		do {
 			let conversation = try ffiClient.dmConversation(
 				targetInboxId: inboxId
@@ -215,6 +226,7 @@ public class Conversations {
 	public func findDmByIdentity(publicIdentity: PublicIdentity) async throws
 		-> Dm?
 	{
+		let client = try requireClient()
 		guard
 			let inboxId = try await client.inboxIdFromIdentity(
 				identity: publicIdentity
@@ -288,6 +300,7 @@ public class Conversations {
 		if let limit {
 			options.limit = Int64(limit)
 		}
+		let client = try requireClient()
 		let conversations = try ffiConversations.listGroups(
 			opts: options
 		)
@@ -321,6 +334,7 @@ public class Conversations {
 			options.limit = Int64(limit)
 		}
 
+		let client = try requireClient()
 		let conversations = try ffiConversations.listDms(
 			opts: options
 		)
@@ -353,6 +367,7 @@ public class Conversations {
 		if let limit {
 			options.limit = Int64(limit)
 		}
+		let client = try requireClient()
 		let ffiConversations = try ffiConversations.list(
 			opts: options
 		)
@@ -373,6 +388,10 @@ public class Conversations {
 		Conversation, Error
 	> {
 		AsyncThrowingStream { continuation in
+			guard let client = self.client else {
+				continuation.finish(throwing: ClientError.clientDeallocated)
+				return
+			}
 			let ffiStreamActor = FfiStreamActor()
 			let conversationCallback = ConversationStreamCallback {
 				conversation in
@@ -387,14 +406,14 @@ public class Conversations {
 						if conversationType == .dm {
 							continuation.yield(
 								Conversation.dm(
-									conversation.dmFromFFI(client: self.client)
+									conversation.dmFromFFI(client: client)
 								)
 							)
 						} else if conversationType == .group {
 							continuation.yield(
 								Conversation.group(
 									conversation.groupFromFFI(
-										client: self.client
+										client: client
 									)
 								)
 							)
@@ -456,6 +475,7 @@ public class Conversations {
 		with peerIdentity: PublicIdentity,
 		disappearingMessageSettings: DisappearingMessageSettings? = nil
 	) async throws -> Dm {
+		let client = try requireClient()
 		if try await client.inboxState(refreshFromNetwork: false).identities
 			.map(\.identifier).contains(peerIdentity.identifier)
 		{
@@ -493,6 +513,7 @@ public class Conversations {
 	)
 		async throws -> Dm
 	{
+		let client = try requireClient()
 		if peerInboxId == client.inboxID {
 			throw ConversationError.memberCannotBeSelf
 		}
@@ -567,6 +588,7 @@ public class Conversations {
 		disappearingMessageSettings: DisappearingMessageSettings? = nil,
 		appData: String?
 	) async throws -> Group {
+		let client = try requireClient()
 		let group = try await ffiConversations.createGroup(
 			accountIdentities: identities.map(\.ffiPrivate),
 			opts: FfiCreateGroupOptions(
@@ -641,6 +663,7 @@ public class Conversations {
 		disappearingMessageSettings: DisappearingMessageSettings? = nil,
 		appData: String?
 	) async throws -> Group {
+		let client = try requireClient()
 		try validateInboxIds(inboxIds)
 		let group = try await ffiConversations.createGroupWithInboxIds(
 			inboxIds: inboxIds,
@@ -667,6 +690,7 @@ public class Conversations {
 		disappearingMessageSettings: DisappearingMessageSettings? = nil,
 		appData: String? = nil
 	) throws -> Group {
+		let client = try requireClient()
 		let ffiOpts = FfiCreateGroupOptions(
 			permissions:
 			GroupPermissionPreconfiguration.toFfiGroupPermissionOptions(
@@ -786,6 +810,7 @@ public class Conversations {
 	public func fromWelcome(envelopeBytes: Data) async throws
 		-> Conversation?
 	{
+		let client = try requireClient()
 		let conversations =
 			try await ffiConversations
 				.processStreamedWelcomeMessage(envelopeBytes: envelopeBytes)
