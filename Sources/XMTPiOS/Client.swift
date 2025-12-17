@@ -683,7 +683,7 @@ public final class Client {
 	public static func getNewestMessageMetadata(
 		groupIds: [String],
 		api: ClientOptions.Api
-	) async throws -> [String: FfiMessageMetadata] {
+	) async throws -> [String: MessageMetadata] {
 		let apiClient = try await connectToApiBackend(api: api)
 		let groupIdData = groupIds.map(\.hexToData)
 		let result: [Data: FfiMessageMetadata]
