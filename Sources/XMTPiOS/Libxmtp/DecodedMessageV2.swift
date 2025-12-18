@@ -164,6 +164,9 @@ public struct DecodedMessageV2: Identifiable {
 
 		case let .actions(actions):
 			return actions
+
+		case let .markdown(markdownContent):
+			return markdownContent.content
 		}
 	}
 
@@ -220,6 +223,8 @@ public struct DecodedMessageV2: Identifiable {
 			return try codec.decode(content: encoded)
 		case let .intent(intent):
 			return intent as Intent
+		case let .markdown(markdownContent):
+			return markdownContent.content
 		case let .actions(actions):
 			return actions as Actions
 		}
@@ -275,6 +280,13 @@ public struct DecodedMessageV2: Identifiable {
 			return ContentTypeID(
 				authorityID: "coinbase.com",
 				typeID: "actions",
+				versionMajor: 1,
+				versionMinor: 0
+			)
+		case .markdown:
+			return ContentTypeID(
+				authorityID: "xmtp.org",
+				typeID: "markdown",
 				versionMajor: 1,
 				versionMinor: 0
 			)
