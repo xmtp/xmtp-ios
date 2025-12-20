@@ -9,6 +9,7 @@ let package = Package(
 	products: [
 		.library(
 			name: "XMTPiOS",
+			type: .dynamic,
 			targets: ["XMTPiOS"]
 		),
 		.library(
@@ -24,15 +25,15 @@ let package = Package(
 	],
 	targets: [
 		.binaryTarget(
-			name: "LibXMTPSwiftFFI",
-			url: "https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.7.0-rc3.f5b908e/LibXMTPSwiftFFI.zip",
-			checksum: "e4492e8b903ff4a3d874ce450c023364346ca5f675b33f086d1614a3354679eb"
+			name: "LibXMTPSwiftFFIDynamic",
+			url: "https://github.com/xmtp/libxmtp/releases/download/swift-bindings-1.7.0-rc3.f5b908e/LibXMTPSwiftFFIDynamic.zip",
+			checksum: "0f0fc1f7711fdd1bceb01599e6ff5573deafab049cc2c4ba37013b62ba98b114"
 		),
 		.target(
 			name: "XMTPiOS",
 			dependencies: [
 				.product(name: "Connect", package: "connect-swift"),
-				"LibXMTPSwiftFFI",
+				"LibXMTPSwiftFFIDynamic",
 				.product(name: "CryptoSwift", package: "CryptoSwift"),
 			]
 		),
