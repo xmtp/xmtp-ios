@@ -4,15 +4,15 @@ If you're seeing this document, you are an early contributor to the development 
 
 ## ❔ Questions
 
-Have a question? You are welcome to ask it in [Q&A discussions](https://github.com/orgs/xmtp/discussions/categories/q-a).
+Have a question about how to build with XMTP? Ask your question and learn with the community in [XMTP Community Forums](https://community.xmtp.org/).
 
 ## 🐞 Bugs
 
-Report bugs as GitHub Issues. Please confirm that there isn't an existing open issue about the bug and include detailed steps to reproduce the bug.
+Report a bug using [GitHub Issues](https://github.com/xmtp/xmtp-ios/issues).
 
 ## ✨ Feature requests
 
-Submit feature requests as GitHub Issues. Please confirm that there isn't an existing open issue requesting the feature. Describe the use cases this feature unlocks so the issue can be investigated and prioritized.
+Request a feature using [GitHub Issues](https://github.com/xmtp/xmtp-ios/issues).
 
 ## 🔀 Pull requests
 
