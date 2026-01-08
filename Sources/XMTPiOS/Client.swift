@@ -8,6 +8,7 @@ public enum ClientError: Error, CustomStringConvertible, LocalizedError {
 	case creationError(String)
 	case missingInboxId
 	case invalidInboxId(String)
+	case clientDeallocated
 
 	public var description: String {
 		switch self {
@@ -18,6 +19,8 @@ public enum ClientError: Error, CustomStringConvertible, LocalizedError {
 		case let .invalidInboxId(inboxId):
 			return
 				"Invalid inboxId: \(inboxId). Inbox IDs cannot start with '0x'."
+		case .clientDeallocated:
+			return "ClientError.clientDeallocated: The Client has been deallocated."
 		}
 	}
 
@@ -154,7 +157,7 @@ struct ApiCacheKey {
 }
 
 actor ApiClientCache {
-	private var apiClientCache: [String: XmtpApiClient] = [:]
+    private var apiClientCache: [String: XmtpApiClient] = [:]
 	private var syncApiClientCache: [String: XmtpApiClient] = [:]
 
 	func getClient(forKey key: String) -> XmtpApiClient? {
@@ -162,7 +165,7 @@ actor ApiClientCache {
 	}
 
 	func setClient(_ client: XmtpApiClient, forKey key: String) {
-		apiClientCache[key] = client
+        apiClientCache[key] = client
 	}
 
 	func getSyncClient(forKey key: String) -> XmtpApiClient? {
@@ -170,7 +173,7 @@ actor ApiClientCache {
 	}
 
 	func setSyncClient(_ client: XmtpApiClient, forKey key: String) {
-		syncApiClientCache[key] = client
+        syncApiClientCache[key] = client
 	}
 }
 
@@ -192,11 +195,11 @@ public final class Client {
 	)
 
 	public lazy var preferences: PrivatePreferences = .init(
-		client: self, ffiClient: ffiClient
+		ffiClient: ffiClient
 	)
 
 	public lazy var debugInformation: XMTPDebugInformation = .init(
-		client: self, ffiClient: ffiClient
+		historySyncUrl: environment.getHistorySyncUrl(), ffiClient: ffiClient
 	)
 
 	static var codecRegistry = CodecRegistry()
