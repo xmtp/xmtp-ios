@@ -1244,12 +1244,23 @@ public protocol FfiConversationProtocol: AnyObject, Sendable {
     
     func pausedForVersion() throws  -> String?
     
+    /**
+     * Prepare a message for later publishing.
+     * Stores the message locally without publishing. Returns the message ID.
+     */
+    func prepareMessage(contentBytes: Data, shouldPush: Bool) throws  -> Data
+    
     func processStreamedConversationMessage(envelopeBytes: Data) async throws  -> [FfiMessage]
     
     /**
      * Publish all unpublished messages
      */
     func publishMessages() async throws 
+    
+    /**
+     * Publish a previously prepared message by ID.
+     */
+    func publishStoredMessage(messageId: Data) async throws 
     
     func removeAdmin(inboxId: String) async throws 
     
@@ -1697,6 +1708,19 @@ open func pausedForVersion()throws  -> String?  {
 })
 }
     
+    /**
+     * Prepare a message for later publishing.
+     * Stores the message locally without publishing. Returns the message ID.
+     */
+open func prepareMessage(contentBytes: Data, shouldPush: Bool)throws  -> Data  {
+    return try  FfiConverterData.lift(try rustCallWithError(FfiConverterTypeGenericError_lift) {
+    uniffi_xmtpv3_fn_method_fficonversation_prepare_message(self.uniffiClonePointer(),
+        FfiConverterData.lower(contentBytes),
+        FfiConverterBool.lower(shouldPush),$0
+    )
+})
+}
+    
 open func processStreamedConversationMessage(envelopeBytes: Data)async throws  -> [FfiMessage]  {
     return
         try  await uniffiRustCallAsync(
@@ -1724,6 +1748,26 @@ open func publishMessages()async throws   {
                 uniffi_xmtpv3_fn_method_fficonversation_publish_messages(
                     self.uniffiClonePointer()
                     
+                )
+            },
+            pollFunc: ffi_xmtpv3_rust_future_poll_void,
+            completeFunc: ffi_xmtpv3_rust_future_complete_void,
+            freeFunc: ffi_xmtpv3_rust_future_free_void,
+            liftFunc: { $0 },
+            errorHandler: FfiConverterTypeGenericError_lift
+        )
+}
+    
+    /**
+     * Publish a previously prepared message by ID.
+     */
+open func publishStoredMessage(messageId: Data)async throws   {
+    return
+        try  await uniffiRustCallAsync(
+            rustFutureFunc: {
+                uniffi_xmtpv3_fn_method_fficonversation_publish_stored_message(
+                    self.uniffiClonePointer(),
+                    FfiConverterData.lower(messageId)
                 )
             },
             pollFunc: ffi_xmtpv3_rust_future_poll_void,
@@ -16654,10 +16698,16 @@ private let initializationResult: InitializationResult = {
     if (uniffi_xmtpv3_checksum_method_fficonversation_paused_for_version() != 61438) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_xmtpv3_checksum_method_fficonversation_prepare_message() != 2996) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_xmtpv3_checksum_method_fficonversation_process_streamed_conversation_message() != 33913) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_fficonversation_publish_messages() != 15643) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_xmtpv3_checksum_method_fficonversation_publish_stored_message() != 23535) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_fficonversation_remove_admin() != 7973) {
