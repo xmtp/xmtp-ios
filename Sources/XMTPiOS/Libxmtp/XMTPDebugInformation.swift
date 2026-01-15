@@ -33,7 +33,7 @@ public class XMTPDebugInformation {
 	}
 
 	@available(*, deprecated, message: "uploadDebugInformation has been removed from libxmtp")
-	public func uploadDebugInformation(serverUrl: String? = nil) async throws -> String {
+	public func uploadDebugInformation(serverUrl _: String? = nil) async throws -> String {
 		// uploadDebugArchive has been removed from FFI
 		throw ClientError.creationError("uploadDebugInformation is no longer available")
 	}
