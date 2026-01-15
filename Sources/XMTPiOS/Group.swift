@@ -436,28 +436,40 @@ public struct Group: Identifiable, Equatable, Hashable {
 	}
 
 	public func prepareMessage(
-		encodedContent: EncodedContent, visibilityOptions: MessageVisibilityOptions? = nil
+		encodedContent: EncodedContent,
+		visibilityOptions: MessageVisibilityOptions? = nil,
+		noSend: Bool = false
 	) async throws
 		-> String
 	{
-		let opts = visibilityOptions?.toFfi() ?? FfiSendMessageOpts(shouldPush: true)
-		let messageId = try ffiGroup.sendOptimistic(
-			contentBytes: encodedContent.serializedData(),
-			opts: opts
-		)
+		let shouldPush = visibilityOptions?.shouldPush ?? true
+		let messageId: Data
+		if noSend {
+			messageId = try ffiGroup.prepareMessage(
+				contentBytes: encodedContent.serializedData(),
+				shouldPush: shouldPush
+			)
+		} else {
+			let opts = visibilityOptions?.toFfi() ?? FfiSendMessageOpts(shouldPush: true)
+			messageId = try ffiGroup.sendOptimistic(
+				contentBytes: encodedContent.serializedData(),
+				opts: opts
+			)
+		}
 		return messageId.toHex
 	}
 
-	public func prepareMessage<T>(content: T, options: SendOptions? = nil)
+	public func prepareMessage<T>(content: T, options: SendOptions? = nil, noSend: Bool = false)
 		async throws -> String
 	{
 		let (encodeContent, visibilityOptions) = try await encodeContent(
 			content: content, options: options
 		)
-		return try ffiGroup.sendOptimistic(
-			contentBytes: encodeContent.serializedData(),
-			opts: visibilityOptions.toFfi()
-		).toHex
+		return try await prepareMessage(
+			encodedContent: encodeContent,
+			visibilityOptions: visibilityOptions,
+			noSend: noSend
+		)
 	}
 
 	public func publishMessages() async throws {

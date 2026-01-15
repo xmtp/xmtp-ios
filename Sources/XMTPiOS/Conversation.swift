@@ -140,33 +140,39 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 	}
 
 	public func prepareMessage(
-		encodedContent: EncodedContent, visibilityOptions: MessageVisibilityOptions? = nil
+		encodedContent: EncodedContent,
+		visibilityOptions: MessageVisibilityOptions? = nil,
+		noSend: Bool = false
 	) async throws
 		-> String
 	{
 		switch self {
 		case let .group(group):
 			return try await group.prepareMessage(
-				encodedContent: encodedContent, visibilityOptions: visibilityOptions
+				encodedContent: encodedContent,
+				visibilityOptions: visibilityOptions,
+				noSend: noSend
 			)
 		case let .dm(dm):
 			return try await dm.prepareMessage(
-				encodedContent: encodedContent, visibilityOptions: visibilityOptions
+				encodedContent: encodedContent,
+				visibilityOptions: visibilityOptions,
+				noSend: noSend
 			)
 		}
 	}
 
-	public func prepareMessage<T>(content: T, options: SendOptions? = nil)
+	public func prepareMessage<T>(content: T, options: SendOptions? = nil, noSend: Bool = false)
 		async throws -> String
 	{
 		switch self {
 		case let .group(group):
 			return try await group.prepareMessage(
-				content: content, options: options
+				content: content, options: options, noSend: noSend
 			)
 		case let .dm(dm):
 			return try await dm.prepareMessage(
-				content: content, options: options
+				content: content, options: options, noSend: noSend
 			)
 		}
 	}

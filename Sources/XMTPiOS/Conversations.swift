@@ -86,10 +86,10 @@ final class ConversationStreamCallback: FfiConversationCallback {
 
 final class MessageDeletionCallback: FfiMessageDeletionCallback {
 	let onCloseCallback: () -> Void
-	let callback: (Data) -> Void
+	let callback: (FfiDecodedMessage) -> Void
 
 	init(
-		callback: @escaping (Data) -> Void,
+		callback: @escaping (FfiDecodedMessage) -> Void,
 		onClose: @escaping () -> Void
 	) {
 		self.callback = callback
@@ -104,8 +104,8 @@ final class MessageDeletionCallback: FfiMessageDeletionCallback {
 		print("Error MessageDeletionCallback \(error)")
 	}
 
-	func onMessageDeleted(messageId: Data) {
-		callback(messageId)
+	func onMessageDeleted(message: FfiDecodedMessage) {
+		callback(message)
 	}
 }
 
@@ -748,12 +748,12 @@ public class Conversations {
 	// that will be emitted as the messages are removed from the database
 	public func streamMessageDeletions(
 		onClose: (() -> Void)? = nil
-	) -> AsyncThrowingStream<String, Error> {
+	) -> AsyncThrowingStream<DecodedMessageV2, Error> {
 		AsyncThrowingStream { continuation in
 			let ffiStreamActor = FfiStreamActor()
 
 			let deletionCallback = MessageDeletionCallback {
-				messageId in
+				ffiMessage in
 				guard !Task.isCancelled else {
 					continuation.finish()
 					Task {
@@ -761,7 +761,9 @@ public class Conversations {
 					}
 					return
 				}
-				continuation.yield(messageId.toHex)
+				if let message = DecodedMessageV2(ffiMessage: ffiMessage) {
+					continuation.yield(message)
+				}
 			} onClose: {
 				onClose?()
 				continuation.finish()
