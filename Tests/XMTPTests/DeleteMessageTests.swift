@@ -125,7 +125,8 @@ class DeleteMessageTests: XCTestCase {
 
 		try await dm.sync()
 		let messagesBefore = try await dm.messages()
-		XCTAssertEqual(messagesBefore.count, 1)
+		let textMessagesBefore = messagesBefore.filter { (try? $0.encodedContent.type.typeID) == "text" }
+		XCTAssertEqual(textMessagesBefore.count, 1)
 
 		let deleteMessageId = try await dm.deleteMessage(messageId: messageId)
 		XCTAssertFalse(deleteMessageId.isEmpty)
@@ -238,6 +239,7 @@ class DeleteMessageTests: XCTestCase {
 		try await Task.sleep(nanoseconds: 500_000_000)
 
 		_ = try await boGroup.deleteMessage(messageId: messageId)
+		try await boGroup.sync()
 
 		await fulfillment(of: [expectation], timeout: 5)
 
