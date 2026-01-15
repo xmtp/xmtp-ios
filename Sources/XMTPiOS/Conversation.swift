@@ -186,6 +186,15 @@ public enum Conversation: Identifiable, Equatable, Hashable {
 		}
 	}
 
+	public func publishMessage(messageId: String) async throws {
+		switch self {
+		case let .group(group):
+			return try await group.publishMessage(messageId: messageId)
+		case let .dm(dm):
+			return try await dm.publishMessage(messageId: messageId)
+		}
+	}
+
 	public var type: XMTPConversationType {
 		switch self {
 		case .group:

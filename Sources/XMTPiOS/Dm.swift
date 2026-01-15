@@ -261,6 +261,10 @@ public struct Dm: Identifiable, Equatable, Hashable {
 		try await ffiConversation.publishMessages()
 	}
 
+	public func publishMessage(messageId: String) async throws {
+		try await ffiConversation.publishStoredMessage(messageId: messageId.hexToData)
+	}
+
 	public func endStream() {
 		streamHolder.stream?.end()
 	}

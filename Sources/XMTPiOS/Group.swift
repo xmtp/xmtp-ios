@@ -476,6 +476,10 @@ public struct Group: Identifiable, Equatable, Hashable {
 		try await ffiGroup.publishMessages()
 	}
 
+	public func publishMessage(messageId: String) async throws {
+		try await ffiGroup.publishStoredMessage(messageId: messageId.hexToData)
+	}
+
 	public func endStream() {
 		streamHolder.stream?.end()
 	}
