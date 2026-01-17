@@ -1197,6 +1197,11 @@ public protocol FfiConversationProtocol: AnyObject, Sendable {
     
     func createdAtNs()  -> Int64
     
+    /**
+     * Delete a message by its ID. Returns the ID of the deletion message.
+     */
+    func deleteMessage(messageId: Data) throws  -> Data
+    
     func dmPeerInboxId()  -> String?
     
     func findDuplicateDms() async throws  -> [FfiConversation]
@@ -1487,6 +1492,17 @@ open func countMessages(opts: FfiListMessagesOptions)throws  -> Int64  {
 open func createdAtNs() -> Int64  {
     return try!  FfiConverterInt64.lift(try! rustCall() {
     uniffi_xmtpv3_fn_method_fficonversation_created_at_ns(self.uniffiClonePointer(),$0
+    )
+})
+}
+    
+    /**
+     * Delete a message by its ID. Returns the ID of the deletion message.
+     */
+open func deleteMessage(messageId: Data)throws  -> Data  {
+    return try  FfiConverterData.lift(try rustCallWithError(FfiConverterTypeGenericError_lift) {
+    uniffi_xmtpv3_fn_method_fficonversation_delete_message(self.uniffiClonePointer(),
+        FfiConverterData.lower(messageId),$0
     )
 })
 }
@@ -7180,6 +7196,68 @@ public func FfiConverterTypeFfiDecodedMessageMetadata_lower(_ value: FfiDecodedM
 }
 
 
+public struct FfiDeletedMessage {
+    public var deletedBy: FfiDeletedBy
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(deletedBy: FfiDeletedBy) {
+        self.deletedBy = deletedBy
+    }
+}
+
+#if compiler(>=6)
+extension FfiDeletedMessage: Sendable {}
+#endif
+
+
+extension FfiDeletedMessage: Equatable, Hashable {
+    public static func ==(lhs: FfiDeletedMessage, rhs: FfiDeletedMessage) -> Bool {
+        if lhs.deletedBy != rhs.deletedBy {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(deletedBy)
+    }
+}
+
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeFfiDeletedMessage: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> FfiDeletedMessage {
+        return
+            try FfiDeletedMessage(
+                deletedBy: FfiConverterTypeFfiDeletedBy.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: FfiDeletedMessage, into buf: inout [UInt8]) {
+        FfiConverterTypeFfiDeletedBy.write(value.deletedBy, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeFfiDeletedMessage_lift(_ buf: RustBuffer) throws -> FfiDeletedMessage {
+    return try FfiConverterTypeFfiDeletedMessage.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeFfiDeletedMessage_lower(_ value: FfiDeletedMessage) -> RustBuffer {
+    return FfiConverterTypeFfiDeletedMessage.lower(value)
+}
+
+
 public struct FfiEncodedContent {
     public var typeId: FfiContentTypeId?
     public var parameters: [String: String]
@@ -11310,6 +11388,8 @@ public enum FfiDecodedMessageBody {
     )
     case leaveRequest(FfiLeaveRequest
     )
+    case deletedMessage(FfiDeletedMessage
+    )
     case custom(FfiEncodedContent
     )
 }
@@ -11368,7 +11448,10 @@ public struct FfiConverterTypeFfiDecodedMessageBody: FfiConverterRustBuffer {
         case 13: return .leaveRequest(try FfiConverterTypeFfiLeaveRequest.read(from: &buf)
         )
         
-        case 14: return .custom(try FfiConverterTypeFfiEncodedContent.read(from: &buf)
+        case 14: return .deletedMessage(try FfiConverterTypeFfiDeletedMessage.read(from: &buf)
+        )
+        
+        case 15: return .custom(try FfiConverterTypeFfiEncodedContent.read(from: &buf)
         )
         
         default: throw UniffiInternalError.unexpectedEnumCase
@@ -11444,8 +11527,13 @@ public struct FfiConverterTypeFfiDecodedMessageBody: FfiConverterRustBuffer {
             FfiConverterTypeFfiLeaveRequest.write(v1, into: &buf)
             
         
-        case let .custom(v1):
+        case let .deletedMessage(v1):
             writeInt(&buf, Int32(14))
+            FfiConverterTypeFfiDeletedMessage.write(v1, into: &buf)
+            
+        
+        case let .custom(v1):
+            writeInt(&buf, Int32(15))
             FfiConverterTypeFfiEncodedContent.write(v1, into: &buf)
             
         }
@@ -11508,6 +11596,8 @@ public enum FfiDecodedMessageContent {
     )
     case leaveRequest(FfiLeaveRequest
     )
+    case deletedMessage(FfiDeletedMessage
+    )
     case custom(FfiEncodedContent
     )
 }
@@ -11569,7 +11659,10 @@ public struct FfiConverterTypeFfiDecodedMessageContent: FfiConverterRustBuffer {
         case 14: return .leaveRequest(try FfiConverterTypeFfiLeaveRequest.read(from: &buf)
         )
         
-        case 15: return .custom(try FfiConverterTypeFfiEncodedContent.read(from: &buf)
+        case 15: return .deletedMessage(try FfiConverterTypeFfiDeletedMessage.read(from: &buf)
+        )
+        
+        case 16: return .custom(try FfiConverterTypeFfiEncodedContent.read(from: &buf)
         )
         
         default: throw UniffiInternalError.unexpectedEnumCase
@@ -11650,8 +11743,13 @@ public struct FfiConverterTypeFfiDecodedMessageContent: FfiConverterRustBuffer {
             FfiConverterTypeFfiLeaveRequest.write(v1, into: &buf)
             
         
-        case let .custom(v1):
+        case let .deletedMessage(v1):
             writeInt(&buf, Int32(15))
+            FfiConverterTypeFfiDeletedMessage.write(v1, into: &buf)
+            
+        
+        case let .custom(v1):
+            writeInt(&buf, Int32(16))
             FfiConverterTypeFfiEncodedContent.write(v1, into: &buf)
             
         }
@@ -11672,6 +11770,79 @@ public func FfiConverterTypeFfiDecodedMessageContent_lift(_ buf: RustBuffer) thr
 public func FfiConverterTypeFfiDecodedMessageContent_lower(_ value: FfiDecodedMessageContent) -> RustBuffer {
     return FfiConverterTypeFfiDecodedMessageContent.lower(value)
 }
+
+
+
+
+
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+
+public enum FfiDeletedBy {
+    
+    case sender
+    case admin(inboxId: String
+    )
+}
+
+
+#if compiler(>=6)
+extension FfiDeletedBy: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeFfiDeletedBy: FfiConverterRustBuffer {
+    typealias SwiftType = FfiDeletedBy
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> FfiDeletedBy {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        
+        case 1: return .sender
+        
+        case 2: return .admin(inboxId: try FfiConverterString.read(from: &buf)
+        )
+        
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: FfiDeletedBy, into buf: inout [UInt8]) {
+        switch value {
+        
+        
+        case .sender:
+            writeInt(&buf, Int32(1))
+        
+        
+        case let .admin(inboxId):
+            writeInt(&buf, Int32(2))
+            FfiConverterString.write(inboxId, into: &buf)
+            
+        }
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeFfiDeletedBy_lift(_ buf: RustBuffer) throws -> FfiDeletedBy {
+    return try FfiConverterTypeFfiDeletedBy.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeFfiDeletedBy_lower(_ value: FfiDeletedBy) -> RustBuffer {
+    return FfiConverterTypeFfiDeletedBy.lower(value)
+}
+
+
+extension FfiDeletedBy: Equatable, Hashable {}
 
 
 
@@ -16459,6 +16630,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_fficonversation_created_at_ns() != 17973) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_xmtpv3_checksum_method_fficonversation_delete_message() != 54360) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_xmtpv3_checksum_method_fficonversation_dm_peer_inbox_id() != 2178) {

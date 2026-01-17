@@ -791,9 +791,10 @@ public class Conversations {
 		let conversations =
 			try await ffiConversations
 				.processStreamedWelcomeMessage(envelopeBytes: envelopeBytes)
-		// TODO: Handle multiple conversations, which is now possible with d14n iceboxes
-		let conversation = conversations[0]
-		return try await conversation.toConversation(client: client)
+		guard let firstConversation = conversations.first else {
+			return nil
+		}
+		return try await firstConversation.toConversation(client: client)
 	}
 
 	public func getHmacKeys() throws
