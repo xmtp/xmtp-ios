@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import LibXMTP
 
 public let ContentTypeTransactionReference = ContentTypeID(
 	authorityID: "xmtp.org",
@@ -83,13 +82,16 @@ public struct TransactionReferenceCodec: ContentCodec {
 			}
 		)
 		return try EncodedContent(
-			serializedBytes: LibXMTP.encodeTransactionReference(
-				reference: ffi))
+			serializedBytes: encodeTransactionReference(
+				reference: ffi
+			)
+		)
 	}
 
 	public func decode(content: EncodedContent) throws -> TransactionReference {
-		let decoded = try LibXMTP.decodeTransactionReference(
-			bytes: content.serializedData())
+		let decoded = try decodeTransactionReference(
+			bytes: content.serializedData()
+		)
 
 		let metadata = decoded.metadata.map {
 			TransactionReference.Metadata(
@@ -111,11 +113,10 @@ public struct TransactionReferenceCodec: ContentCodec {
 	}
 
 	public func fallback(content: TransactionReference) throws -> String? {
-		return
-			"[Crypto transaction] Use a blockchain explorer to learn more using the transaction hash: \(content.reference)"
+		"[Crypto transaction] Use a blockchain explorer to learn more using the transaction hash: \(content.reference)"
 	}
 
-	public func shouldPush(content: TransactionReference) throws -> Bool {
-		return true
+	public func shouldPush(content _: TransactionReference) throws -> Bool {
+		true
 	}
 }

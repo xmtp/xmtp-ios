@@ -5,28 +5,30 @@
 //  Created by Naomi Plasterer on 8/5/25.
 //
 
-import LibXMTP
-
 public struct ArchiveOptions {
 	public var startNs: Int64?
 	public var endNs: Int64?
 	public var archiveElements: [ArchiveElement]
+	public var excludeDisappearingMessages = false
 
 	public init(
 		startNs: Int64? = nil,
 		endNs: Int64? = nil,
-		archiveElements: [ArchiveElement] = [.messages, .consent]
+		archiveElements: [ArchiveElement] = [.messages, .consent],
+		excludeDisappearingMessages: Bool = false
 	) {
 		self.startNs = startNs
 		self.endNs = endNs
 		self.archiveElements = archiveElements
+		self.excludeDisappearingMessages = excludeDisappearingMessages
 	}
 
 	public func toFfi() -> FfiArchiveOptions {
-		return FfiArchiveOptions(
+		FfiArchiveOptions(
 			startNs: startNs,
 			endNs: endNs,
-			elements: archiveElements.map { $0.toFfi() }
+			elements: archiveElements.map { $0.toFfi() },
+			excludeDisappearingMessages: excludeDisappearingMessages
 		)
 	}
 }
@@ -64,22 +66,22 @@ public struct ArchiveMetadata {
 	}
 
 	public var archiveVersion: UInt16 {
-		return ffi.backupVersion
+		ffi.backupVersion
 	}
 
 	public var elements: [ArchiveElement] {
-		return ffi.elements.map { ArchiveElement.fromFfi($0) }
+		ffi.elements.map { ArchiveElement.fromFfi($0) }
 	}
 
 	public var exportedAtNs: Int64 {
-		return ffi.exportedAtNs
+		ffi.exportedAtNs
 	}
 
 	public var startNs: Int64? {
-		return ffi.startNs
+		ffi.startNs
 	}
 
 	public var endNs: Int64? {
-		return ffi.endNs
+		ffi.endNs
 	}
 }

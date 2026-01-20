@@ -1,19 +1,19 @@
 import Foundation
-import LibXMTP
 
 public enum ConsentState: String, Codable {
 	case allowed, denied, unknown
 }
+
 public enum EntryType: String, Codable {
 	case conversation_id, inbox_id
 }
+
 public enum PreferenceType: String, Codable {
 	case hmac_keys
 }
 
 public struct ConsentRecord: Codable, Hashable {
-	public init(value: String, entryType: EntryType, consentType: ConsentState)
-	{
+	public init(value: String, entryType: EntryType, consentType: ConsentState) {
 		self.value = value
 		self.entryType = entryType
 		self.consentType = consentType
@@ -24,14 +24,16 @@ public struct ConsentRecord: Codable, Hashable {
 	) -> ConsentRecord {
 		ConsentRecord(
 			value: conversationId, entryType: .conversation_id,
-			consentType: type)
+			consentType: type
+		)
 	}
 
 	static func inboxId(_ inboxId: InboxId, type: ConsentState = .unknown)
 		-> ConsentRecord
 	{
 		ConsentRecord(
-			value: inboxId, entryType: .inbox_id, consentType: type)
+			value: inboxId, entryType: .inbox_id, consentType: type
+		)
 	}
 
 	public var value: String
@@ -60,14 +62,14 @@ public actor PrivatePreferences {
 	public func conversationState(conversationId: String) async throws
 		-> ConsentState
 	{
-		return try await ffiClient.getConsentState(
+		try await ffiClient.getConsentState(
 			entityType: .conversationId,
 			entity: conversationId
 		).fromFFI
 	}
 
 	public func inboxIdState(inboxId: InboxId) async throws -> ConsentState {
-		return try await ffiClient.getConsentState(
+		try await ffiClient.getConsentState(
 			entityType: .inboxId,
 			entity: inboxId
 		).fromFFI
@@ -110,7 +112,8 @@ public actor PrivatePreferences {
 
 			let task = Task {
 				let stream = await ffiClient.conversations().streamConsent(
-					callback: consentCallback)
+					callback: consentCallback
+				)
 				await ffiStreamActor.setFfiStream(stream)
 			}
 
@@ -139,7 +142,7 @@ public actor PrivatePreferences {
 					return
 				}
 				for preference in records {
-					if case .hmac(let key) = preference {
+					if case let .hmac(key) = preference {
 						continuation.yield(.hmac_keys)
 					}
 				}
@@ -150,7 +153,8 @@ public actor PrivatePreferences {
 
 			let task = Task {
 				let stream = await ffiClient.conversations().streamPreferences(
-					callback: preferenceCallback)
+					callback: preferenceCallback
+				)
 				await ffiStreamActor.setFfiStream(stream)
 			}
 
@@ -175,7 +179,7 @@ final class ConsentCallback: FfiConsentCallback {
 	) {
 		self.client = client
 		self.callback = callback
-		self.onCloseCallback = onClose
+		onCloseCallback = onClose
 	}
 
 	func onConsentUpdate(consent: [FfiConsent]) {
@@ -187,7 +191,7 @@ final class ConsentCallback: FfiConsentCallback {
 	}
 
 	func onClose() {
-		self.onCloseCallback()
+		onCloseCallback()
 	}
 }
 
@@ -202,7 +206,7 @@ final class PreferenceCallback: FfiPreferenceCallback {
 	) {
 		self.client = client
 		self.callback = callback
-		self.onCloseCallback = onClose
+		onCloseCallback = onClose
 	}
 
 	func onPreferenceUpdate(preference: [FfiPreferenceUpdate]) {
@@ -214,6 +218,6 @@ final class PreferenceCallback: FfiPreferenceCallback {
 	}
 
 	func onClose() {
-		self.onCloseCallback()
+		onCloseCallback()
 	}
 }

@@ -1,5 +1,4 @@
 import Foundation
-import LibXMTP
 
 /// Represents a secp256k1 private key.  ``PrivateKey`` conforms to ``SigningKey`` so you can use it
 /// to create a ``Client``.
@@ -23,7 +22,7 @@ enum PrivateKeyError: Error, CustomStringConvertible {
 
 extension PrivateKey: SigningKey {
 	public var identity: PublicIdentity {
-		return PublicIdentity(kind: .ethereum, identifier: walletAddress)
+		PublicIdentity(kind: .ethereum, identifier: walletAddress)
 	}
 
 	public func sign(_ message: String) async throws -> SignedData {
@@ -43,15 +42,15 @@ extension PrivateKey: SigningKey {
 	}
 }
 
-extension PrivateKey {
+public extension PrivateKey {
 	/// **Generate a new private key like in Kotlin**
-	public static func generate() throws -> PrivateKey {
-		let privateKeyData = Data(try Crypto.secureRandomBytes(count: 32))
+	static func generate() throws -> PrivateKey {
+		let privateKeyData = try Data(Crypto.secureRandomBytes(count: 32))
 		return try PrivateKey(privateKeyData)
 	}
 
 	/// **Initialize from raw private key data**
-	public init(_ privateKeyData: Data) throws {
+	init(_ privateKeyData: Data) throws {
 		self.init()
 		timestamp = UInt64(Date().timeIntervalSince1970 * 1000) // Match Kotlin's timestamp
 		secp256K1.bytes = privateKeyData
@@ -59,17 +58,22 @@ extension PrivateKey {
 		let publicData = try KeyUtilx.generatePublicKey(from: privateKeyData)
 		publicKey.secp256K1Uncompressed.bytes = publicData
 		publicKey.timestamp = timestamp
+
+		// Validate that we can generate a wallet address - throw if invalid
+		_ = try KeyUtilx.generateAddress(from: publicData)
 	}
 
 	/// **Compute Ethereum wallet address from public key (matching Kotlin)**
 	internal var walletAddress: String {
-		return publicKey.walletAddress
+		publicKey.walletAddress
 	}
 }
 
 /// **Compute wallet address from PublicKey like in Kotlin**
 extension PublicKey {
 	var walletAddress: String {
-		KeyUtilx.generateAddress(from: secp256K1Uncompressed.bytes).lowercased()
+		// Safe to force unwrap since we validate address generation during PrivateKey initialization
+		// swiftlint:disable:next force_try
+		try! KeyUtilx.generateAddress(from: secp256K1Uncompressed.bytes).lowercased()
 	}
 }

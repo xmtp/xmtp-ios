@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import LibXMTP
 
 public enum IdentityKind {
 	case ethereum
@@ -17,7 +16,7 @@ public struct PublicIdentity {
 	let ffiPrivate: FfiIdentifier
 
 	public init(kind: IdentityKind, identifier: String) {
-		self.ffiPrivate = FfiIdentifier(
+		ffiPrivate = FfiIdentifier(
 			identifier: identifier,
 			identifierKind: kind.toFfiPublicIdentifierKind()
 		)
@@ -28,16 +27,16 @@ public struct PublicIdentity {
 	}
 
 	public var kind: IdentityKind {
-		return ffiPrivate.identifierKind.toIdentityKind()
+		ffiPrivate.identifierKind.toIdentityKind()
 	}
 
 	public var identifier: String {
-		return ffiPrivate.identifier.lowercased()
+		ffiPrivate.identifier.lowercased()
 	}
 }
 
-extension IdentityKind {
-	public func toFfiPublicIdentifierKind() -> FfiIdentifierKind {
+public extension IdentityKind {
+	func toFfiPublicIdentifierKind() -> FfiIdentifierKind {
 		switch self {
 		case .ethereum:
 			return .ethereum
@@ -47,8 +46,8 @@ extension IdentityKind {
 	}
 }
 
-extension FfiIdentifierKind {
-	public func toIdentityKind() -> IdentityKind {
+public extension FfiIdentifierKind {
+	func toIdentityKind() -> IdentityKind {
 		switch self {
 		case .ethereum:
 			return .ethereum
