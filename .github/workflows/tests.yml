@@ -2,8 +2,7 @@ name: iOS Integration Tests
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
 
 concurrency:
@@ -15,106 +14,99 @@ env:
   GPR_USER: ${{ secrets.GITHUB_ACTOR }}
 
 jobs:
-  backend:
+  deploy-backend:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      node_url: ${{ steps.deploy.outputs.node_url }}
+      history_url: ${{ steps.deploy.outputs.history_url }}
+      app_name: ${{ steps.deploy.outputs.app_name }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install docker-compose
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy multi-container machine
+        id: deploy
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq docker-compose
-
-      - name: Start Docker services
-        run: ./dev/local/up
+          APP_NAME="xmtp-ios-test-${{ github.run_id }}-${{ github.run_attempt }}"
+          ./dev/fly/deploy "$APP_NAME"
+          echo "app_name=$APP_NAME" >> "$GITHUB_OUTPUT"
+          echo "node_url=https://${APP_NAME}.fly.dev" >> "$GITHUB_OUTPUT"
+          echo "history_url=https://${APP_NAME}.fly.dev:5558" >> "$GITHUB_OUTPUT"
 
       - name: Wait for services to be ready
-        run: |
-          timeout 60 bash -c 'until nc -z localhost 5556; do sleep 1; done'
-
-      - name: Install ngrok
-        run: |
-          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
-          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
-          sudo apt-get update
-          sudo apt-get install -y ngrok
-
-      - name: Setup NGrok Tunnels
-        id: tunnel
         env:
-          NGROK_AUTHTOKEN: ${{ secrets.NGROK_TOKEN }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          # Start both tunnels using config file (writes URLs to tunnel-info/)
-          ./dev/start-ngrok-tunnels.sh
+          APP_NAME="${{ steps.deploy.outputs.app_name }}"
+          NODE_URL="${{ steps.deploy.outputs.node_url }}"
+          NODE_HOST="${NODE_URL#https://}"
 
-      - name: Verify tunnels
-        run: |
-          echo "=== Ngrok 5556 Log ==="
-          cat ngrok-5556.log
-          echo ""
-          echo "=== Ngrok 5558 Log ==="
-          cat ngrok-5558.log
-          echo ""
-          echo "=== Tunnel URLs ==="
-          echo "Node: $(cat tunnel-info/node-url.txt)"
-          echo "History: $(cat tunnel-info/history-url.txt)"
+          MAX_RETRIES=60
+          RETRY_INTERVAL=5
 
-      - name: Upload tunnel info
-        uses: actions/upload-artifact@v4
-        with:
-          name: tunnel-info-${{ github.run_id }}-${{ github.run_attempt }}
-          path: tunnel-info/
-          retention-days: 1
-
-      - name: Keep backend running
-        run: |
-          echo "Monitoring tunnel activity for up to 1 hour, with a 10 minute inactivity timeout..."
-          timeout 3600 bash -c 'tail -f ngrok-5556.log ngrok-5558.log | while read -t 600; do :; done' || true
-
-      - name: Cleanup
-        if: always()
-        run: |
-          if [ -f ngrok-5556.pid ]; then
-            kill $(cat ngrok-5556.pid) || true
+          # Verify machine is running before waiting for services
+          echo "Checking machine status..."
+          if ! flyctl machine list --app "$APP_NAME" --json | jq -e '.[0].state == "started"' >/dev/null 2>&1; then
+            echo "Warning: Machine may not be in started state"
+            flyctl machine list --app "$APP_NAME" || true
           fi
-          if [ -f ngrok-5558.pid ]; then
-            kill $(cat ngrok-5558.pid) || true
-          fi
-          docker-compose -p xmtp-ios -f dev/local/docker-compose.yml down
+
+          echo "Waiting for gRPC service at ${NODE_HOST}:443..."
+          for i in $(seq 1 $MAX_RETRIES); do
+            if echo | openssl s_client -connect "${NODE_HOST}:443" -servername "${NODE_HOST}" 2>/dev/null | grep -q "CONNECTED"; then
+              echo "Services are ready! (TLS connection successful)"
+              exit 0
+            fi
+
+            echo "Waiting... (attempt $i of $MAX_RETRIES)"
+            sleep $RETRY_INTERVAL
+          done
+
+          echo "Services failed to become ready after $((MAX_RETRIES * RETRY_INTERVAL / 60)) minutes"
+          echo "Final diagnostic:"
+          echo | openssl s_client -connect "${NODE_HOST}:443" -servername "${NODE_HOST}" 2>&1 || true
+          exit 1
 
   tests:
     runs-on: warp-macos-15-arm64-6x
+    needs: deploy-backend
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: "16.0"
+
       - name: Build everything
         run: swift build --build-tests -q
-      # Get the tunnel info from the github artifact as soon as it is available
-      - name: Wait for tunnel info
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 10
-          max_attempts: 30
-          retry_wait_seconds: 10
-          command: |
-            gh run download ${{ github.run_id }} -n tunnel-info-${{ github.run_id }}-${{ github.run_attempt }} -D tunnel-info
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure test environment
-        run: |
-          NODE_URL=$(cat tunnel-info/node-url.txt)
-          HISTORY_URL=$(cat tunnel-info/history-url.txt)
-          if [ -z "$NODE_URL" ] || [ -z "$HISTORY_URL" ]; then
-            echo "Failed to read tunnel URLs"
-            exit 1
-          fi
-          echo "XMTP_NODE_ADDRESS=${NODE_URL}" >> $GITHUB_ENV
-          echo "XMTP_HISTORY_SERVER_ADDRESS=${HISTORY_URL}" >> $GITHUB_ENV
-          echo "Using node tunnel: $NODE_URL"
-          echo "Using history tunnel: $HISTORY_URL"
       - name: Run iOS tests
-        run: ./script/run_tests.sh
+        env:
+          XMTP_NODE_ADDRESS: ${{ needs.deploy-backend.outputs.node_url }}
+          XMTP_HISTORY_SERVER_ADDRESS: ${{ needs.deploy-backend.outputs.history_url }}
+        run: |
+          echo "Node URL: $XMTP_NODE_ADDRESS"
+          echo "History URL: $XMTP_HISTORY_SERVER_ADDRESS"
+          ./script/run_tests.sh
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, tests]
+    if: always()
+    steps:
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Destroy app
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          APP_NAME="${{ needs.deploy-backend.outputs.app_name }}"
+          if [ -n "$APP_NAME" ]; then
+            echo "Destroying app: $APP_NAME"
+            flyctl apps destroy "$APP_NAME" --yes || true
+          fi
+          echo "Cleanup complete"
