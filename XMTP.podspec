@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "XMTP"
-  spec.version      = "4.9.0-dev"
+  spec.version      = "4.9.0-dev-local-test"
 
   spec.summary      = "XMTP SDK Cocoapod"
 
@@ -18,7 +18,7 @@ Pod::Spec.new do |spec|
   spec.swift_version  = '5.6'
 
   # Release archive contains libxmtp uniffi bindings Sources/** and LibXMTPSwiftFFI.xcframework
-  spec.source       	= { :http => "https://github.com/xmtp/xmtp-ios/releases/download/#{spec.version}/XMTP-#{spec.version}.zip", :type => :zip }
+  spec.source       	= { :http => "https://github.com/xmtp/xmtp-ios/releases/download/4.9.0-dev.c190039/XMTP-4.9.0-dev.c190039.zip", :type => :zip }
   spec.source_files  	= "Sources/**/*.swift"
   spec.frameworks 		= "CryptoKit", "UIKit"
 
