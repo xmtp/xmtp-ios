@@ -77,6 +77,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Verify Cocoapods token owner
+        run: pod trunk me
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
       - name: Deploy to Cocoapods
         run: |
           set -eo pipefail
