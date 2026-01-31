@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "XMTP"
-  spec.version      = "4.9.0"
+  spec.version      = "4.10.0-dev.85f2090"
 
   spec.summary      = "XMTP SDK Cocoapod"
 
