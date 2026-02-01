@@ -87,15 +87,24 @@ public struct ClientOptions {
 		/// Future proofing - gateway URL support.
 		public var gatewayHost: String?
 
+		public var authCallback: AuthCallback?
+
+		public var authHandle: AuthHandle?
+
 		public init(
-			env: XMTPEnvironment = .dev, isSecure: Bool = true,
+			env: XMTPEnvironment = .dev,
+			isSecure: Bool = true,
 			appVersion: String? = nil,
-			gatewayHost: String? = nil
+			gatewayHost: String? = nil,
+			authCallback: AuthCallback? = nil,
+			authHandle: AuthHandle? = nil
 		) {
 			self.env = env
 			self.isSecure = isSecure
 			self.appVersion = appVersion
 			self.gatewayHost = gatewayHost
+			self.authCallback = authCallback
+			self.authHandle = authHandle
 		}
 	}
 
@@ -458,8 +467,8 @@ public final class Client {
 			isSecure: api.isSecure,
 			clientMode: FfiClientMode.default,
 			appVersion: api.appVersion,
-			authCallback: nil,
-			authHandle: nil
+			authCallback: makeInternalAuthCallback(api.authCallback),
+			authHandle: api.authHandle?.ffi
 		)
 		await apiCache.setClient(newClient, forKey: cacheKey)
 		return newClient
@@ -485,8 +494,8 @@ public final class Client {
 			isSecure: api.isSecure,
 			clientMode: FfiClientMode.default,
 			appVersion: api.appVersion,
-			authCallback: nil,
-			authHandle: nil
+			authCallback: makeInternalAuthCallback(api.authCallback),
+			authHandle: api.authHandle?.ffi
 		)
 		await apiCache.setSyncClient(newClient, forKey: cacheKey)
 		return newClient
