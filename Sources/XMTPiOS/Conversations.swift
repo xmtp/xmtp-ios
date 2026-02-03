@@ -589,7 +589,7 @@ public class Conversations {
 		appData: String?
 	) async throws -> Group {
 		let client = try requireClient()
-		try await ffiConversations.createGroup(
+		return try await ffiConversations.createGroup(
 			accountIdentities: identities.map(\.ffiPrivate),
 			opts: FfiCreateGroupOptions(
 				permissions: permissions,
