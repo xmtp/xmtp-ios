@@ -354,7 +354,7 @@ public struct DecodedMessageV2: Identifiable {
 			salt: ffiAttachment.salt,
 			nonce: ffiAttachment.nonce,
 			scheme: mapRemoteAttachmentScheme(ffiAttachment.scheme),
-			contentLength: Int(ffiAttachment.contentLength),
+			contentLength: Int(ffiAttachment.contentLength ?? 0),
 			filename: ffiAttachment.filename
 		)
 	}

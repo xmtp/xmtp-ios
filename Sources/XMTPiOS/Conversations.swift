@@ -484,7 +484,7 @@ public class Conversations {
 
 		let dm =
 			try await ffiConversations
-				.findOrCreateDm(
+				.findOrCreateDmByIdentity(
 					targetIdentity: peerIdentity.ffiPrivate,
 					opts: FfiCreateDmOptions(
 						messageDisappearingSettings: toFfiDisappearingMessageSettings(
@@ -520,7 +520,7 @@ public class Conversations {
 		try validateInboxId(peerInboxId)
 		let dm =
 			try await ffiConversations
-				.findOrCreateDmByInboxId(
+				.findOrCreateDm(
 					inboxId: peerInboxId,
 					opts: FfiCreateDmOptions(
 						messageDisappearingSettings: toFfiDisappearingMessageSettings(
@@ -589,7 +589,7 @@ public class Conversations {
 		appData: String?
 	) async throws -> Group {
 		let client = try requireClient()
-		return try await ffiConversations.createGroup(
+		return try await ffiConversations.createGroupByIdentity(
 			accountIdentities: identities.map(\.ffiPrivate),
 			opts: FfiCreateGroupOptions(
 				permissions: permissions,
@@ -664,7 +664,7 @@ public class Conversations {
 	) async throws -> Group {
 		let client = try requireClient()
 		try validateInboxIds(inboxIds)
-		return try await ffiConversations.createGroupWithInboxIds(
+		return try await ffiConversations.createGroup(
 			inboxIds: inboxIds,
 			opts: FfiCreateGroupOptions(
 				permissions: permissions,

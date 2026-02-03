@@ -77,14 +77,6 @@ public actor PrivatePreferences {
 		try await ffiClient.syncPreferences()
 	}
 
-	@available(
-		*, deprecated,
-		message: "syncConsent is deprecated. Use `sync()` instead."
-	)
-	public func syncConsent() async throws {
-		try await ffiClient.sendSyncRequest()
-	}
-
 	public func streamConsent(onClose: (() -> Void)? = nil)
 		-> AsyncThrowingStream<ConsentRecord, Error>
 	{

@@ -111,6 +111,8 @@ public struct ClientOptions {
 
 	public var dbEncryptionKey: Data
 	public var dbDirectory: String?
+	public var minDbPoolSize: UInt32?
+	public var maxDbPoolSize: UInt32?
 	public var historySyncUrl: String?
 	public var deviceSyncEnabled: Bool
 	public var debugEventsEnabled: Bool
@@ -122,6 +124,8 @@ public struct ClientOptions {
 		preAuthenticateToInboxCallback: PreEventCallback? = nil,
 		dbEncryptionKey: Data,
 		dbDirectory: String? = nil,
+		minDbPoolSize: UInt32? = nil,
+		maxDbPoolSize: UInt32? = nil,
 		historySyncUrl: String? = nil,
 		useDefaultHistorySyncUrl: Bool = true,
 		deviceSyncEnabled: Bool = true,
@@ -133,6 +137,8 @@ public struct ClientOptions {
 		self.preAuthenticateToInboxCallback = preAuthenticateToInboxCallback
 		self.dbEncryptionKey = dbEncryptionKey
 		self.dbDirectory = dbDirectory
+		self.minDbPoolSize = minDbPoolSize
+		self.maxDbPoolSize = maxDbPoolSize
 		if useDefaultHistorySyncUrl, historySyncUrl == nil {
 			self.historySyncUrl = api.env.getHistorySyncUrl()
 		} else {
@@ -396,11 +402,18 @@ public final class Client {
 		let deviceSyncMode: FfiSyncWorkerMode =
 			!options.deviceSyncEnabled ? .disabled : .enabled
 
+		let dbOptions = DbOptions(
+				db: dbURL,
+				encryptionKey: options.dbEncryptionKey,
+				maxDbPoolSize: options.maxDbPoolSize,
+				minDbPoolSize: options.minDbPoolSize
+			)
+
+
 		let ffiClient = try await createClient(
 			api: connectToApiBackend(api: options.api),
 			syncApi: connectToSyncApiBackend(api: options.api),
-			db: dbURL,
-			encryptionKey: options.dbEncryptionKey,
+			db: dbOptions,
 			inboxId: inboxId,
 			accountIdentifier: accountIdentifier.ffiPrivate,
 			nonce: 0,
@@ -622,8 +635,7 @@ public final class Client {
 		return try await createClient(
 			api: connectToApiBackend(api: api),
 			syncApi: connectToApiBackend(api: api),
-			db: nil,
-			encryptionKey: nil,
+			db: DbOptions(db: nil, encryptionKey: nil, maxDbPoolSize: nil, minDbPoolSize: nil),
 			inboxId: inboxId,
 			accountIdentifier: identity.ffiPrivate,
 			nonce: 0,
@@ -862,10 +874,10 @@ public final class Client {
 		try await ffiClient.findInboxId(identifier: identity.ffiPrivate)
 	}
 
-	/// Manually trigger a device sync request to sync records from another active device on this account.
-	public func sendSyncRequest() async throws {
-		try await ffiClient.sendSyncRequest()
-	}
+//	/// Manually trigger a device sync request to sync records from another active device on this account.
+//	public func sendSyncRequest() async throws {
+//		try await ffiClient.sendSyncRequest()
+//	}
 
 	public func signWithInstallationKey(message: String) throws -> Data {
 		try ffiClient.signWithInstallationKey(text: message)
@@ -912,28 +924,28 @@ public final class Client {
 		).map { InboxState(ffiInboxState: $0) }
 	}
 
-	public func createArchive(
-		path: String,
-		encryptionKey: Data,
-		opts: ArchiveOptions = ArchiveOptions()
-	) async throws {
-		try await ffiClient.createArchive(
-			path: path, opts: opts.toFfi(), key: encryptionKey
-		)
-	}
+//	public func createArchive(
+//		path: String,
+//		encryptionKey: Data,
+//		opts: ArchiveOptions = ArchiveOptions()
+//	) async throws {
+//		try await ffiClient.createArchive(
+//			path: path, opts: opts.toFfi(), key: encryptionKey
+//		)
+//	}
 
-	public func importArchive(path: String, encryptionKey: Data) async throws {
-		try await ffiClient.importArchive(path: path, key: encryptionKey)
-	}
-
-	public func archiveMetadata(path: String, encryptionKey: Data) async throws
-		-> ArchiveMetadata
-	{
-		let ffiMetadata = try await ffiClient.archiveMetadata(
-			path: path, key: encryptionKey
-		)
-		return ArchiveMetadata(ffiMetadata)
-	}
+//	public func importArchive(path: String, encryptionKey: Data) async throws {
+//		try await ffiClient.importArchive(path: path, key: encryptionKey)
+//	}
+//
+//	public func archiveMetadata(path: String, encryptionKey: Data) async throws
+//		-> ArchiveMetadata
+//	{
+//		let ffiMetadata = try await ffiClient.archiveMetadata(
+//			path: path, key: encryptionKey
+//		)
+//		return ArchiveMetadata(ffiMetadata)
+//	}
 
 	@available(
 		*,
