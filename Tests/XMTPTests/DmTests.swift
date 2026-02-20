@@ -1,5 +1,5 @@
 import XCTest
-@testable import XMTPiOS
+import XMTPiOS
 import XMTPTestHelpers
 
 @available(iOS 16, *)
@@ -104,14 +104,14 @@ class DmTests: XCTestCase {
 
 		do {
 			_ = try await fixtures.boClient.conversations.newConversation(
-				with: fixtures.alix.walletAddress
+				with: fixtures.alix.identity.identifier
 			)
 			XCTFail("Did not throw error")
 		} catch {
 			if case let ClientError.invalidInboxId(message) = error {
 				XCTAssertEqual(
 					message.lowercased(),
-					fixtures.alix.walletAddress.lowercased()
+					fixtures.alix.identity.identifier.lowercased()
 				)
 			} else {
 				XCTFail("Did not throw correct error")
