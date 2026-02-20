@@ -7,7 +7,8 @@
 
 import Foundation
 import XCTest
-@testable import XMTPiOS
+import XMTPiOS
+import XMTPTestHelpers
 
 @available(iOS 15, *)
 class HistorySyncTests: XCTestCase {
@@ -19,7 +20,7 @@ class HistorySyncTests: XCTestCase {
 	func testSyncConsent() async throws {
 		let fixtures = try await fixtures()
 
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 		let alixClient = try await Client.create(
 			account: alix,
@@ -82,7 +83,7 @@ class HistorySyncTests: XCTestCase {
 	func testSyncMessages() async throws {
 		let fixtures = try await fixtures()
 
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 		let alixClient = try await Client.create(
 			account: alix,
@@ -134,7 +135,7 @@ class HistorySyncTests: XCTestCase {
 	func testStreamConsent() async throws {
 		let fixtures = try await fixtures()
 
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 
 		let alixClient = try await Client.create(
@@ -196,7 +197,7 @@ class HistorySyncTests: XCTestCase {
 	}
 
 	func testStreamPrivatePreferences() async throws {
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 		let alixClient = try await Client.create(
 			account: alix,
@@ -238,7 +239,7 @@ class HistorySyncTests: XCTestCase {
 	func testDisablingHistoryTransferStillSyncsLocalState() async throws {
 		let fixtures = try await fixtures()
 
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 		let alixClient = try await Client.create(
 			account: alix,
@@ -301,7 +302,7 @@ class HistorySyncTests: XCTestCase {
 	func testDisablingHistoryTransferDoesNotTransfer() async throws {
 		let fixtures = try await fixtures()
 
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 		let alixClient = try await Client.create(
 			account: alix,
