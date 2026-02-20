@@ -11,7 +11,7 @@ class ClientTests: XCTestCase {
 	}
 
 	func testTakesAWallet() async throws {
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let clientOptions = ClientOptions(
 			api: ClientOptions.Api(
 				env: XMTPEnvironment.local, isSecure: XMTPEnvironment.local.isSecure,
@@ -28,7 +28,7 @@ class ClientTests: XCTestCase {
 
 	func testPassingEncryptionKey() async throws {
 		let bo = try PrivateKey.generate()
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 
 		let client = try await Client.create(
 			account: bo,
@@ -92,7 +92,7 @@ class ClientTests: XCTestCase {
 	}
 
 	func testCanDeleteDatabase() async throws {
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let bo = try PrivateKey.generate()
 		let alix = try PrivateKey.generate()
 		var boClient = try await Client.create(

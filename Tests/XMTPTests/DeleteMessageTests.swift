@@ -1,5 +1,5 @@
 import XCTest
-@testable import XMTPiOS
+import XMTPiOS
 import XMTPTestHelpers
 
 @available(iOS 16, *)

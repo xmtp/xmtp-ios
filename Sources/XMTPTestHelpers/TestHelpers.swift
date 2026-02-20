@@ -12,6 +12,10 @@
 		_env("XMTP_NODE_ADDRESS")
 	}
 
+	public func generateRandomBytes(count: Int) -> Data {
+		Data((0..<count).map { _ in UInt8.random(in: 0...255) })
+	}
+
 	public func getHistorySyncUrlFromEnvironment() -> String? {
 		_env("XMTP_HISTORY_SERVER_ADDRESS")
 	}
@@ -58,7 +62,7 @@
 			caro = try PrivateKey.generate()
 			davon = try PrivateKey.generate()
 
-			let key = Data((0 ..< 32).map { _ in UInt8.random(in: 0 ... 255) })
+			let key = generateRandomBytes(count: 32)
 			let clientOptions = ClientOptions(
 				api: clientOptions,
 				dbEncryptionKey: key
@@ -104,4 +108,15 @@
 			try await Fixtures(clientOptions: clientOptions)
 		}
 	}
+
+// INFO: - copied from Date.swift
+public extension Date {
+	var millisecondsSinceEpoch: Double {
+		timeIntervalSince1970 * 1000
+	}
+	
+	init(millisecondsSinceEpoch: Int64) {
+		self.init(timeIntervalSince1970: TimeInterval(millisecondsSinceEpoch / 1_000_000_000))
+	}
+}
 #endif

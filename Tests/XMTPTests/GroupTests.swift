@@ -1,5 +1,5 @@
 import XCTest
-@testable import XMTPiOS
+import XMTPiOS
 import XMTPTestHelpers
 
 func assertThrowsAsyncError<T>(
@@ -103,7 +103,7 @@ class GroupTests: XCTestCase {
 			.newGroupWithIdentities(
 				with: [
 					PublicIdentity(
-						kind: .ethereum, identifier: fixtures.alix.walletAddress
+						kind: .ethereum, identifier: fixtures.alix.identity.identifier
 					),
 				]
 			)
@@ -390,12 +390,12 @@ class GroupTests: XCTestCase {
 
 		do {
 			_ = try await fixtures.boClient.conversations.newGroup(with: [
-				fixtures.alix.walletAddress,
+				fixtures.alix.identity.identifier,
 			])
 			XCTFail("Did not throw error")
 		} catch {
 			if case let ClientError.invalidInboxId(message) = error {
-				XCTAssertEqual(message.lowercased(), fixtures.alix.walletAddress.lowercased())
+				XCTAssertEqual(message.lowercased(), fixtures.alix.identity.identifier.lowercased())
 			} else {
 				XCTFail("Did not throw correct error")
 			}
@@ -406,22 +406,22 @@ class GroupTests: XCTestCase {
 		])
 
 		do {
-			_ = try await group.addMembers(inboxIds: [fixtures.caro.walletAddress])
+			_ = try await group.addMembers(inboxIds: [fixtures.caro.identity.identifier])
 			XCTFail("Did not throw error")
 		} catch {
 			if case let ClientError.invalidInboxId(message) = error {
-				XCTAssertEqual(message.lowercased(), fixtures.caro.walletAddress.lowercased())
+				XCTAssertEqual(message.lowercased(), fixtures.caro.identity.identifier.lowercased())
 			} else {
 				XCTFail("Did not throw correct error")
 			}
 		}
 
 		do {
-			_ = try await group.removeMembers(inboxIds: [fixtures.alix.walletAddress])
+			_ = try await group.removeMembers(inboxIds: [fixtures.alix.identity.identifier])
 			XCTFail("Did not throw error")
 		} catch {
 			if case let ClientError.invalidInboxId(message) = error {
-				XCTAssertEqual(message.lowercased(), fixtures.alix.walletAddress.lowercased())
+				XCTAssertEqual(message.lowercased(), fixtures.alix.identity.identifier.lowercased())
 			} else {
 				XCTFail("Did not throw correct error")
 			}
@@ -438,7 +438,7 @@ class GroupTests: XCTestCase {
 
 		let result = try await group.addMembersByIdentity(identities: [
 			PublicIdentity(
-				kind: .ethereum, identifier: fixtures.caro.walletAddress
+				kind: .ethereum, identifier: fixtures.caro.identity.identifier
 			),
 		])
 
@@ -557,14 +557,14 @@ class GroupTests: XCTestCase {
 		let cannotMessage = try await fixtures.alixClient.canMessage(
 			identities: [
 				PublicIdentity(
-					kind: .ethereum, identifier: notOnNetwork.walletAddress
+					kind: .ethereum, identifier: notOnNetwork.identity.identifier
 				),
 				fixtures.bo.identity,
 			]
 		)
 		XCTAssert(canMessage)
 		XCTAssert(
-			!(cannotMessage[notOnNetwork.walletAddress.lowercased()] ?? true)
+			!(cannotMessage[notOnNetwork.identity.identifier.lowercased()] ?? true)
 		)
 		try fixtures.cleanUpDatabases()
 	}
@@ -661,7 +661,7 @@ class GroupTests: XCTestCase {
 			_ = try await fixtures.alixClient.conversations
 				.newGroupWithIdentities(with: [
 					PublicIdentity(
-						kind: .ethereum, identifier: nonRegistered.walletAddress
+						kind: .ethereum, identifier: nonRegistered.identity.identifier
 					),
 				])
 

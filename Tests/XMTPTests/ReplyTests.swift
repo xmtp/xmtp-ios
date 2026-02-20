@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import XMTPiOS
+import XMTPiOS
 
 @available(iOS 15, *)
 class ReplyTests: XCTestCase {

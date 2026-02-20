@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import XMTPiOS
+import XMTPiOS
 import XMTPTestHelpers
 
 @available(iOS 15, *)
@@ -166,7 +166,7 @@ class PerformanceTests: XCTestCase {
 	}
 
 	func testCreatesADevClientPerformance() async throws {
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let fakeWallet = try PrivateKey.generate()
 
 		// Measure time to create the client

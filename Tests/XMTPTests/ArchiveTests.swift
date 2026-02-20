@@ -7,7 +7,8 @@
 
 import Foundation
 import XCTest
-@testable import XMTPiOS
+import XMTPiOS
+import XMTPTestHelpers
 
 @available(iOS 15, *)
 class ArchiveTests: XCTestCase {
@@ -18,8 +19,8 @@ class ArchiveTests: XCTestCase {
 
 	func testClientArchives() async throws {
 		let fixtures = try await fixtures()
-		let key = try Crypto.secureRandomBytes(count: 32)
-		let encryptionKey = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
+		let encryptionKey = generateRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 
 		let alixClient = try await Client.create(
@@ -107,8 +108,8 @@ class ArchiveTests: XCTestCase {
 
 	func testInActiveDmsStitchIfDuplicated() async throws {
 		let fixtures = try await fixtures()
-		let key = try Crypto.secureRandomBytes(count: 32)
-		let encryptionKey = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
+		let encryptionKey = generateRandomBytes(count: 32)
 		let alix = try PrivateKey.generate()
 
 		let alixClient = try await Client.create(
@@ -183,7 +184,7 @@ class ArchiveTests: XCTestCase {
 
 	func testImportArchiveWorksEvenOnFullDatabase() async throws {
 		let fixtures = try await fixtures()
-		let encryptionKey = try Crypto.secureRandomBytes(count: 32)
+		let encryptionKey = generateRandomBytes(count: 32)
 		let allPath = "xmtp_test1/testAll.zstd"
 
 		let group = try await fixtures.alixClient.conversations.newGroup(with: [

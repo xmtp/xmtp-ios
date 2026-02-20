@@ -1,6 +1,6 @@
 import CryptoKit
 import XCTest
-@testable import XMTPiOS
+import XMTPiOS
 import XMTPTestHelpers
 
 @available(iOS 16, *)
@@ -213,7 +213,7 @@ class ConversationTests: XCTestCase {
 	}
 
 	func testReturnsAllHMACKeys() async throws {
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let opts = ClientOptions(
 			api: ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			dbEncryptionKey: key
@@ -485,7 +485,7 @@ class ConversationTests: XCTestCase {
 	}
 
 	func testReturnsAllTopics() async throws {
-		let key = try Crypto.secureRandomBytes(count: 32)
+		let key = generateRandomBytes(count: 32)
 		let opts = ClientOptions(
 			api: ClientOptions.Api(env: .local, isSecure: XMTPEnvironment.local.isSecure),
 			dbEncryptionKey: key
